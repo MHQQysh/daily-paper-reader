@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-001.webp",
+      "caption": "Figure 4 Actor lossmiscalibration under value-scale amplification. (Left) Actor loss increases sharply as value-scale drift begins, indicating that the policy objective is dominated by value amplitude rather than advantage structure. (Right) The total gradient norm. This reveals ill-conditioned updates and confirms that the coupled actor and mixer-critic system loses numerical stability.",
+      "page": 6,
+      "index": 1,
+      "width": 564,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-002.webp",
+      "caption": "Figure 10 Compatibility of Mix. We integrate Mix into two offline MARL algorithms, MAC-Flow and OMIGA, and compare their performance against the original baselines on SMACv1 tasks.",
+      "page": 11,
+      "index": 2,
+      "width": 548,
+      "height": 310
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-003.webp",
+      "caption": "Figure 1 Revisiting offline RL insights inMARL. (Left) The convex hull denotes the dataset action support, and dots represent actions sampled from the learned policy. BRAC exhibits mode-seeking behavior that extends beyond the dataset support, while AWR remains mode-covering and strictly in-distribution. (Right) Although such modeseeking would be helpful in single-agent RL, even small out-of-distribution actions induced by BRAC lead to severe performance degradation in MARL, highlighting the sensitivity of joint behavior to individual policy deviations. These results are based on TD learning and hold it regardless of the value decomposition methods (centralized, vdn, and decentralized).",
+      "page": 2,
+      "index": 3,
+      "width": 746,
+      "height": 333
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-004.webp",
+      "caption": "Figure 5 Effect of the simple actor-side remedy. These two signals together demonstrate suppression of value-scale amplification without modifying the TD objective.",
+      "page": 7,
+      "index": 4,
+      "width": 560,
+      "height": 249
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-005.webp",
+      "caption": "Figure 8 Learned Q under different value learningmethods. Each point represents a dataset action sample, colored by its Q value: dark blue and apricot indicate lower and higher Q values. The x and y axes are the coordinates of dimension 0 and 1 of action. The top and bottom are about agents 1 and 2.",
+      "page": 10,
+      "index": 5,
+      "width": 568,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-006.webp",
+      "caption": "Figure 6 SVN’s effectiveness. (Left) Un-normalized Q value to fairly compare between each solution. (Right) Average performance curve across 10 evaluations × 8 random seeds. Horizontal shaded area represents the reward distribution of dataset D.",
+      "page": 8,
+      "index": 6,
+      "width": 950,
+      "height": 323
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-007.webp",
+      "caption": "Figure 11 Performance in offline-to-onlineMARL. Online fine-tuning starts at 0.5 gradient steps normalized by [0, 1] scale.",
+      "page": 12,
+      "index": 7,
+      "width": 744,
+      "height": 260
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-008.webp",
+      "caption": "Figure 7 Best performance according to design choices in offline MARL over four continuous control tasks. Each bar plot reports the best normalized return over 8 seeds for different combinations of value decomposition, value learning, and policy extraction methods, aggregated across datasets and α hyperparameter for policy extraction. The bars colored by dark orange and apricot indicate the best and runner-up performance. The top and right panels marginalize over policy extraction and value learning.",
+      "page": 9,
+      "index": 8,
+      "width": 940,
+      "height": 508
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-009.webp",
+      "caption": "Figure 2 Two stepmatrix gamewith offline dataset. (Left) The schematic of the didactic example. In s1, Agent A selects between a safe state s2−1 with a fixed suboptimal reward of 7 and a risky state s2−2 with an optimal reward of 8. (Right) The learned joint Q value matrices for each state. The top and bottom rows display the linear method (VDN) and Mixer. Each cell reports the mean Q value and two standard deviations across five random seeds.",
+      "page": 5,
+      "index": 9,
+      "width": 558,
+      "height": 218
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08399v1/fig-010.webp",
+      "caption": "Figure 3 Divergent dynamics of mixer-based critics. Comparison among the monotonic Mixer, VDN, and individual critics under expert offline data. The mixer induces co-amplification of the Q value (Left) and critical loss (Right), indicating a structural instability of the TD operator.",
+      "page": 5,
+      "index": 10,
+      "width": 562,
+      "height": 221
+    }
+  ]
+}

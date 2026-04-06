@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.14625v1/fig-001.webp",
+      "caption": "Figure 2. Per-episode Gini (16 ports / 50 vessels; mean across runs). Lower is better.",
+      "page": 6,
+      "index": 1,
+      "width": 473,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14625v1/fig-002.webp",
+      "caption": "Figure 1. CH-MARL with high-level routing/budgeting and low-level control under primal–dual (constraint) and fairness layers (CTDE training, decentralised execution).",
+      "page": 5,
+      "index": 2,
+      "width": 500,
+      "height": 290
+    }
+  ]
+}

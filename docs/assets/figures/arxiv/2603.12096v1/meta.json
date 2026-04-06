@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-001.webp",
+      "caption": "Figure 4: Action space: Set Next Phase Duration with small change",
+      "page": 6,
+      "index": 1,
+      "width": 854,
+      "height": 256
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-002.webp",
+      "caption": "Figure 5: CTDE Paradigm",
+      "page": 7,
+      "index": 2,
+      "width": 619,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-003.webp",
+      "caption": "Figure 6: Experimental Network",
+      "page": 7,
+      "index": 3,
+      "width": 950,
+      "height": 256
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-004.webp",
+      "caption": "Table 4: Action Space Adjustment Comparison",
+      "page": 10,
+      "index": 4,
+      "width": 937,
+      "height": 361
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-005.webp",
+      "caption": "Figure 8: Synchronization of Signal Supply and Traffic Demand.",
+      "page": 10,
+      "index": 5,
+      "width": 806,
+      "height": 402
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-006.webp",
+      "caption": "Figure 1: Traffic Terminology",
+      "page": 3,
+      "index": 6,
+      "width": 664,
+      "height": 406
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-007.webp",
+      "caption": "Figure 2: Observation scope",
+      "page": 4,
+      "index": 7,
+      "width": 664,
+      "height": 261
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-008.webp",
+      "caption": "Table 3: non-CTDE Algorithm v.s. CTDE Algorithm",
+      "page": 9,
+      "index": 8,
+      "width": 900,
+      "height": 219
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-009.webp",
+      "caption": "Table 2: Performance Comparison between Peak and Off-Peak Scenarios",
+      "page": 9,
+      "index": 9,
+      "width": 937,
+      "height": 340
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12096v1/fig-010.webp",
+      "caption": "Figure 3: Method Architecture",
+      "page": 5,
+      "index": 10,
+      "width": 950,
+      "height": 412
+    }
+  ]
+}

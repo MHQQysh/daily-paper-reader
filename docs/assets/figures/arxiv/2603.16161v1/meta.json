@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.16161v1/fig-001.webp",
+      "caption": "Table 1: For Bird and Spider, we consistently use Greedy decoding, while for Spider 2.0, we use 8-time sampling followed by majority voting on the answers. *Gretel indicates Gretel-Synth-Filtered.",
+      "page": 6,
+      "index": 1,
+      "width": 950,
+      "height": 567
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16161v1/fig-002.webp",
+      "caption": "Figure 1: The framework of Agentic SQL. CSMR captures rich signals from error cases, whereas traditional binary rewards overlook this information.",
+      "page": 2,
+      "index": 2,
+      "width": 929,
+      "height": 500
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16161v1/fig-003.webp",
+      "caption": "Figure 2: ATR reward analysis, showing the ATR on 0/1 reward (left) and the dense reward distribution by strategy type (right).",
+      "page": 7,
+      "index": 3,
+      "width": 902,
+      "height": 371
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16161v1/fig-004.webp",
+      "caption": "Figure 3: Turn count distribution for models using CSMR on the BIRD-Dev.",
+      "page": 7,
+      "index": 4,
+      "width": 442,
+      "height": 339
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16161v1/fig-005.webp",
+      "caption": "Figure 5: Turn count distribution for models using CSMR on the BIRD-Dev.",
+      "page": 13,
+      "index": 5,
+      "width": 445,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16161v1/fig-006.webp",
+      "caption": "Figure 4: Agentic vs. Single-Turn training speed comparison.",
+      "page": 8,
+      "index": 6,
+      "width": 826,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16161v1/fig-007.webp",
+      "caption": "Table 2: Hyperparameters for RL Training",
+      "page": 12,
+      "index": 7,
+      "width": 325,
+      "height": 381
+    }
+  ]
+}

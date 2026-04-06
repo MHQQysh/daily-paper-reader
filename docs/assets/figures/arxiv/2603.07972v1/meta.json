@@ -1,0 +1,174 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-001.webp",
+      "caption": "Table 7: Effect of the number of agents on performance and token cost on AMC. Increasing the collective size generally improves accuracy, but also leads to a steep rise in input, output, and total token usage, revealing a clear performance–efficiency trade-off.",
+      "page": 25,
+      "index": 1,
+      "width": 827,
+      "height": 320
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-002.webp",
+      "caption": "Table 8: Effect of the number of agents on performance and token cost on MMLU. A larger collective typically yields better accuracy, especially in the low-agent regime, while substantially increasing token consumption as the system scales.",
+      "page": 25,
+      "index": 2,
+      "width": 740,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-003.webp",
+      "caption": "Table 9: Effect of the number of collaborative rounds on performance and token cost on AMC. Accuracy improves substantially as the interaction depth increases from one to four rounds, but declines when an additional round is added, indicating diminishing returns from over-iteration.",
+      "page": 26,
+      "index": 3,
+      "width": 827,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-004.webp",
+      "caption": "Figure 12: Action distribution under HILA when humans provide full proactive reasoning at initialization, while GPT-4o remains available as the reactive expert for later DEFER decisions. Results are shown for GSM8K, AMC, and MMLU.",
+      "page": 30,
+      "index": 4,
+      "width": 664,
+      "height": 212
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-005.webp",
+      "caption": "Figure 11: Action distribution under HILA when humans provide a proactive idea at initialization, while GPT-4o remains available as the reactive expert for later DEFER decisions. Results are shown for GSM8K, AMC, and MMLU.",
+      "page": 30,
+      "index": 5,
+      "width": 664,
+      "height": 208
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-006.webp",
+      "caption": "Table 1: Comparison of baseline and proposed methods using the LLaMA3-8B backbone. All values are percentages (the percent sign is omitted in the table). Values in parentheses denote absolute differences relative to the Vanilla baseline (first row). Underlined numbers indicate the best-performing baseline on each benchmark. “SA” denotes single-agent, and “MA” denotes multi-agent settings.",
+      "page": 7,
+      "index": 6,
+      "width": 827,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-007.webp",
+      "caption": "Table 13: Comparison of different real human participation modes under HILA. In the proactive setting, human information is injected before the initial agent reasoning, while GPT-4o remains available as the reactive expert for later DEFER decisions. All values are percentages.",
+      "page": 29,
+      "index": 7,
+      "width": 827,
+      "height": 218
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-008.webp",
+      "caption": "Figure 10: Action distribution under HILA when real humans act as reactive experts, meaning that feedback is provided only after the system chooses DEFER. Across datasets, CREATE and DEFER dominate on GSM8K and AMC, while MMLU shows a noticeably larger proportion of EVAL.",
+      "page": 29,
+      "index": 8,
+      "width": 664,
+      "height": 219
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-009.webp",
+      "caption": "Figure 4: Accuracy vs. DEFER rate on GSM8K across training stages (Init → GRPO → DLPO). DLPO achieves a joint improvement, increasing accuracy while reducing reliance on external intervention.",
+      "page": 22,
+      "index": 9,
+      "width": 540,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-010.webp",
+      "caption": "Figure 3: Effect of scaling collaborative configurations. (a) shows how increasing the number of agents impacts accuracy on AMC and GSM8K, while (b) analyzes how varying the number of interaction rounds influences performance. Together, the results highlight the trade-offs between broader exploration through more agents and deeper refinement through additional rounds.",
+      "page": 10,
+      "index": 10,
+      "width": 826,
+      "height": 253
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-011.webp",
+      "caption": "Figure 1: Overview of the proposed HILA framework and its Dual-Loop Policy Optimization (DLPO) training paradigm. Left: HILA coordinates multi-agent collaboration with both proactive human guidance and reactive expert feedback via metacognitive states and strategic actions (EVAL, CREATE, DEFER). Right: DLPO optimizes the meta-policy in an inner RL loop with cost-aware rewards, and expands the model’s knowledge boundary in an outer continual-learning loop by storing DEFER-triggered human feedback as offline supervision.",
+      "page": 3,
+      "index": 11,
+      "width": 826,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-012.webp",
+      "caption": "Figure 5: Accuracy vs. DEFER rate on AMC across training stages. GRPO reduces deferral with a small accuracy fluctuation, while DLPO simultaneously improves accuracy and further lowers deferral, suggesting that continual learning mitigates over-conservative intervention.",
+      "page": 23,
+      "index": 12,
+      "width": 540,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-013.webp",
+      "caption": "Figure 6: Accuracy vs. DEFER rate on MMLU across training stages. Accuracy increases monotonically as deferral decreases, indicating that the learned policy becomes both more selective and more capable.",
+      "page": 23,
+      "index": 13,
+      "width": 540,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-014.webp",
+      "caption": "Table 11: Standalone performance of candidate external experts on the human-evaluation benchmarks. Human Experts denote the aggregated real-expert pool collected from 20 PhD participants. All values are reported as percentages.",
+      "page": 28,
+      "index": 14,
+      "width": 827,
+      "height": 239
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-015.webp",
+      "caption": "Table 2: Performance of baselines across four LLM backbones on GSM8K. All values are percentages (percent sign omitted). Parentheses show absolute differences (percentage points) relative to the Vanilla row for each backbone. HILA refers to the proposed method with DLPO.",
+      "page": 8,
+      "index": 15,
+      "width": 660,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-016.webp",
+      "caption": "Figure 8: Real human-in-the-loop collaboration in HILA with bidirectional interaction. Real human experts can act proactively by injecting prior knowledge at initialization (e.g., a high-level human idea or a full human reasoning), shaping the agents’ starting state before autonomous collaboration begins. They can also act reactively by providing corrective feedback when the metapolicy selects DEFER. This unified view highlights that human expertise in HILA is not limited to post-hoc supervision, but can be integrated both as upfront guidance and as on-demand intervention during multi-round collaboration.",
+      "page": 27,
+      "index": 16,
+      "width": 664,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-017.webp",
+      "caption": "Figure 9: Real human feedback pipeline in HILA. Upon a help request (DEFER), the system routes the query to a pool of human experts, who provide either high-level human ideas or full human reasoning. The collected feedback is then stored as structured supervision for subsequent training and continual improvement.",
+      "page": 27,
+      "index": 17,
+      "width": 664,
+      "height": 242
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-018.webp",
+      "caption": "Table 6: Effect of human proxy capability on HILA. Using stronger language models as the external expert consistently improves performance on GSM8K, AMC, and MMLU, showing that the quality of external guidance is an important factor in the effectiveness of strategic deferral.",
+      "page": 24,
+      "index": 18,
+      "width": 827,
+      "height": 198
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-019.webp",
+      "caption": "Figure 7: Deferral cost as a control knob for collaboration. (a) shows how changing the deferral cost C affects task accuracy on AMC and MMLU. (b) shows how increasing cost shifts the learned policy on AMC away from DEFER and toward autonomous actions, especially EVAL. Together, the results illustrate the trade-off between reducing external intervention and preserving final performance.",
+      "page": 24,
+      "index": 19,
+      "width": 829,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-020.webp",
+      "caption": "Table 5: Distribution of strategic actions across training stages. As training progresses, the proportion of DEFER consistently decreases, while EVAL becomes more dominant, indicating improved metacognitive control and reduced reliance on external intervention.",
+      "page": 9,
+      "index": 20,
+      "width": 830,
+      "height": 214
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07972v1/fig-021.webp",
+      "caption": "Figure 2: Effect of human proxy capability on HILA. Using stronger language models as the external expert consistently improves performance on GSM8K, AMC, and MMLU.",
+      "page": 9,
+      "index": 21,
+      "width": 540,
+      "height": 271
+    }
+  ]
+}

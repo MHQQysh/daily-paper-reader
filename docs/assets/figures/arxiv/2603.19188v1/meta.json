@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.19188v1/fig-001.webp",
+      "caption": "TABLE I LOCAL OBSERVATION FOR EACH VEHICLE i.",
+      "page": 7,
+      "index": 1,
+      "width": 516,
+      "height": 237
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19188v1/fig-002.webp",
+      "caption": "Fig. 8. Illustration of the merging behavior in Scenario 2 of the NGSIM dataset. (a) Ego vehicle preparing for merging. (b) Ego vehicle before merging. (b) Ego vehicle after merging.",
+      "page": 10,
+      "index": 2,
+      "width": 1022,
+      "height": 901
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19188v1/fig-003.webp",
+      "caption": "Fig. 5. Illustration of the merging behavior in Scenario 1 of the simulated data. (a) Initial state. (b) Ego vehicle before merging. (c) Ego vehicle after merging.",
+      "page": 8,
+      "index": 3,
+      "width": 1022,
+      "height": 357
+    }
+  ]
+}
