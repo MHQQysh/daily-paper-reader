@@ -1,0 +1,996 @@
+Title: Decompose, Mix, Adapt: A Unified Framework for Parameter-Efficient Neural Network Recombination and Compression
+
+URL Source: https://arxiv.org/pdf/2603.27383v1
+
+Published Time: Tue, 31 Mar 2026 01:11:44 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# Decompose, Mix, Adapt: A Unified Framework for Parameter-Efficient Neural Network Recombination and Compression 
+
+## Nazia Tasnim Boston University 
+
+nimzia@bu.edu 
+
+## Shrimai Prabhumoye NVIDIA, Boston University 
+
+sprabhumoye@nvidia.com 
+
+## Bryan A. Plummer Boston University 
+
+bplum@bu.edu 
+
+## Abstract 
+
+Parameter Recombination (PR) methods aim to efficiently compose the weights of a neural network for applications like Parameter-Efficient FineTuning (PEFT) and Model Compression (MC), among others. Most methods typically focus on one application of PR, which can make compos-ing them challenging. For example, when deploying a large model you may wish to compress the model and also quickly adapt to new settings. However, PEFT methods often can still contain millions of parameters. This may be small compared to the original model size, but can be problem-atic in resource constrained deployments like edge devices, where they take a larger portion of the compressed model’s parameters. To address this, we present Coefficient-gated weight Recombination by Interpolated Shared basis Pro-jections (CRISP), a general approach that seamlessly inte-grates multiple PR tasks within the same framework. CRISP accomplishes this by factorizing pretrained weights into ba-sis matrices and their component mixing projections. Shar-ing basis matrices across layers and adjusting its size en-ables us to perform MC, whereas the mixer weight’s small size (fewer than 200 in some experiments) enables CRISP to support PEFT. Experiments show CRISP outperforms meth-ods from prior work capable of dual-task applications by 4-5% while also outperforming the state-of-the-art in PEFT by 1.5% and PEFT+MC combinations by 1%. Our code is available on the repository: https://github.com/ appledora/CRISP-CVPR26 .
+
+## 1. Introduction 
+
+The sheer scale of large transformer models has triggered a wave of tasks that aim to support their deployment in more computationally constrained environments, such as parameter-efficient finetuning (PEFT) [7, 15, 28, 40, 47, 54, 69, 78, 94, 102], Model Compression (MC) [3, 19, 26, 60, 68, 77, 86, 90, 96], and token pruning [6, 38, 51, 87, 101], among others. As shown in Fig. 1(a), methods for tasks like Pretrained Model  Pretrained Model   
+
+> System 1: Compression Step
+> Pruning/Quantization
+> Compressed Model
+> Fixed Structure
+> Unified Framework
+> W ≈ Base × Mixer
+> Factorized Model
+> Dynamic Structure
+> Compressed Model
+> Dynamic Structure
+> Adapted Model
+> The Problem: Incompatible Operations
+> 1. Compression destroys adapter compatibility
+> 2. Must maintain two separate systems and
+> workflows
+> System 2: PEFT Integration
+> Large number of parameters per task
+> Reduce base
+> Solution: Unified Compatible Framework
+> Both operations use the same factorized
+> parameters
+> One-time Retrofit
+> (a) Prior Work: Two Separate Systems (b) CRISP (ours): One Unified System
+> Freeze Base
+> Tune Mixer
+> Adapted Model
+> Unified approach lets us maximize core model, minimize PEFT cost
+
+Figure 1. PR approach comparison. (a) Prior work in PR typi-cally focuses on PEFT or MC alone [3, 7, 15, 19, 26, 28, 40, 47, 54, 60, 68, 69, 77, 78, 86, 90, 94, 96, 102], which can result in efficient combinations when deployed together. (b) Our unified PR approach CRISP decomposes a pretrained models weights that support both MC and PEFT, enabling us to more effectively use parameter budgets even as tasks scale. 
+
+PEFT and MC often use some type of Parameter Recombi-nation (PR), where the parameters of the model are recon-figured to either enable low-resource adaptation to one or more tasks, or reduce the model size, respectively. How-ever, many applications, especially those on edge devices like robotics or mobile phones, require models with small storage requirements and need to be easily adaptable to new settings. Despite this, these two tasks are typically explored in isolation, which can result in inefficient combinations when put together. For example, if we use a MC method to reduce the parameters of a ViT-S/16 by 50%, then apply-ing PEFT method DoRA [47] on the VTAB-1K dataset [93] would make the compressed model 19% larger, removing a significant portion of MC’s benefit. To address these issues, we propose Coefficient-gated weight Recombination by Interpolated Shared basis Pro-jections (CRISP), a novel factorized basis-mixer reparame-terization scheme that supports both PEFT and MC in the 
+
+> arXiv:2603.27383v1 [cs.CV] 28 Mar 2026
+
+same PR framework. As illustrated in Fig. 1(b), CRISP introduces learnable Factorized Basis matrices that gen-erate weight matrices through parametric transformations with mixer matrices, enabling systematic parameter sharing across transformer layers. Controlling the size of the basis matrices and how many layers share them enables CRISP to reduce the number of parameters required to store the model. Additionally, finetuning with a frozen basis matrix and only updating the mixer matrices allows CRISP to also support task-dependent adaptation capabilities. As our ex-periments will show, our approach is still effective when using few trainable parameters per task ( < 200 ). CRISP creates its basis and mixer matrices during a short adaptation phase performed on pretrained weights, which can be completed in < 1 minute for ViT models [13] mod-els or < 30 minutes for large Llama models [22, 38]. We find that first creating an uncompressed decomposed model provides a more effective teacher for any subsequent com-pression. This multi-stage compression scheme is reminis-cent of weight pruning methods that would reduce a model in stages ( e.g ., [31, 36, 42]), but with a very low computa-tional cost as noted above. Our approach most closely resembles RECAST [71], which can be seen as a special case of the unconstrained ver-sion of our method where the mixing weights are restricted to be a vector (whereas in our approach they are represented as a matrix). This limitation means that RECAST only sees benefits when a very small number of parameters were used for finetuning ( < 200 ). In contrast, our more general for-mulation provides benefits over a wide range of parameter budgets while still reporting gains in settings RECAST does well. As a result, CRISP outperforms RECAST by 4-6% with negligible differences in computational complexity. In addition, CRISP reports a 1.5% gain over the state-of-the-art in PEFT and also improves performance by almost 1% compared to combinations of PEFT and MC methods. Our key contributions include: • We introduce Coefficient-gated weight Recombination by Interpolated Shared basis Projections (CRISP), which supports both PEFT and MC in a unified PR framework. • We propose a carefully designed weight generation strat-egy that provides benefits over a wider range of configu-rations than closely related work [71] while also reducing overfitting without introducing new hyperparameters. • We provide extensive evaluation showing CRISP achieves superior performance compared to existing PEFT methods while using fewer trainable parameters and being faster to compute than most prior work. 
+
+## 2. Related Work 
+
+Two popular uses of Parameter Recombination (PR) meth-ods are Parameter-Efficient FineTuning (PEFT) [28, 37, 41, 45, 47, 48, 53, 54, 61, 71, 73, 100], and Model Compression (MC) [3, 27, 35, 70, 75, 77, 88, 95, 96], which both often optimize the weight space of models to minimize computa-tional resources for either adapting to a dataset or reducing model size, receptively. These methods are often explored in isolation due to varying tasks goals ( e.g ., PEFT methods actually increase total model size), but many applications require both PEFT and MC to create small models that can be efficiently adapted to new tasks, such as in robotics, mo-bile phones, or other edge devices. While we can combine methods from each of these tasks ( e.g ., by compressing first and then applying a PEFT method for adaptation), we show these compositions underperform our more general PR for-mulation that supports both PEFT and MC. Some PR methods are functionally capable of both PEFT and MC, but were often developed and evaluated for only one task and modality. These include template mixing methods [58, 64, 71] or those based on SVD [25, 72, 79]. For example, the MC method Basis Sharing [77] proposes a mixing procedure inspired by SVD decomposition, that acts functionally similar to template mixing methods. This provides an efficient MC method for LLMs, yet we found it fails catastrophically on ViT architectures and underper-forms when coupled with PEFT methods on LLMs. Fur-ther, some methods appear to perform joint compression and model adaptation ( e.g ., [8, 23, 98]), but we find these result in specialized methods that do not generalize well. In contrast, CRISP’s unified framework generalizes across tasks and modalities. A range of alternative methods related to PEFT or MC have been explored in prior work, including prompt tun-ing [56, 66, 76, 80, 82, 89, 92, 97], parameter prun-ing [2, 5, 16, 31, 33, 36, 42, 44, 65, 85, 99], and knowl-edge distillation [1, 12, 26, 32, 46, 60, 81, 86], among oth-ers. However, they have similar shortcomings as past PR approaches as they evaluate on PEFT or MC alone, and of-ten cannot be applied to both tasks. For example, prompt tuning cannot be used to compress a model, and knowledge distillation focuses on making a smaller model, but then re-quires a PEFT method to adapt to new tasks. In contrast, CRISP supports both PEFT and MC, and prior work sug-gests CRISP can likely be combined to boost performance in their settings [58] ( e.g ., using both pruning and CRISP to-gether for compression). We leave the exploration of com-bining PR and these alternative methods to future work. 
+
+## 3. CRISP approach 
+
+PR methods aim to use a small number of trainable pa-rameters to produce the weights of a pretrained network to support applications like efficiently adapting a dataset, such as done for PEFT, or to reduce its storage requirements, as done for MC. More formally, given some trainable parame-ters θi for layer i, PR methods define a transformation T to produce weights Wi ∈ Rdout ×din , i.e ., Wi = T (θi). There Full 
+
+> Model
+> Reduced
+> Model
+> Neural Mimicry
+> Compression
+
+Mixer Matrix-only Tuning Decomposition     
+
+> Shared Basis
+> Matrix, B Mixer, A
+> Section : 3.1 Section : 3.2 Section : 4
+> Standard
+> Weight
+> dout , d in
+> Step 1: Retrofitting with Model Compression
+> Adapted
+> Weight
+> dout , d in
+> Step 2: PEFT Adaptation
+> Shared Basis
+> Matrix, B Mixer, A
+
+Figure 2. CRISP decomposes a pretrained weight matrix into a frozen shared basis and small, learnable mixer matrices, then retrofits these components back into the model (Sec. 3.2). Compression is achieved by reducing the basis size, while adaptation is enabled by fine-tuning only the lightweight, nonlinearly gated mixer matrices (Sec. 3.1) - allowing both Parameter Recombination (PR) applications to coexist within a single factorized structure with no redundant adapters). 
+
+are three major components for PR methods where meth-ods may differ: 1) definition of the transformation T , 2) the role of the pretrained model’s weights, and 3) θ sharing strategy. Sec. 3.1 will define our transformation function 
+
+TCRISP and is where our technical novelty lies. Sec. 3.2 will discuss the sharing strategy and the decomposition-recombination framework we adopt to showcase the ben-efits of TCRISP , but our approach should be comparable with the choices used by other PR methods as well. See Fig. 2 for an overview of our approach 
+
+3.1. Weight Reparameterization via Learnable Ba-sis Modulation 
+
+Many differences in PR methods are largely due to differ-ent definitions of their transformation function. For exam-ple, PEFT method LoRA [28] splits its trainable parameters into a low rank decomposition that is used to adjust the pre-trained model’s weights, i.e ., its transformation for the ith layer would be defined as: 
+
+TLoRA (Bri , A ri ) = Bri Ari + Wpi , (1) where Ari ∈ Rr×din , Wpi and Bri ∈ Rdout ×r are the train-able parameters θ and Wpi is the frozen pretrained model’s weights. We use superscripts on matrices A, B to signify the key hyperparmeters to be set by T . Since Eq. (1) re-quires pretrained weights and trainable parameters, the total size increases. In contrast, MC method Basis Sharing [77] can reduce the number of parameters by removing the re-liance on pretrained weights and adjusting the rank r, i.e ., 
+
+TBasisSharing (Bri , A ri ) = Bri Ari . (2) This represents a small change to T by itself, but Basis Sharing also changed how the pretrained weights were used. Instead of adjusting the pretrained weights like LoRA-based methods, Basis Sharing would use the pretrained weights to create the matrices using a scaled SVD decomposition. The scaling factors were estimated using a few dataset samples following a similar procedure used by Wang et al. [79]. An-other notable difference is that the basis matrix Bri would be shared across multiple layers, providing another mech-anism to increase the compression rate (by sharing across more layers). Layer-specific weights can still be generated via the layer-specific mixing coefficients Ari . While this for-mulation is sufficient for compression, the matrix Ari can still be relatively large, and reducing its size is also tied to additional compression. Thus, TBasisSharing is not suitable for PEFT as any improvements by finetuning Ari (keeping 
+
+Bri frozen) might be lost due to lower model capacity. RECAST [71] addresses this by defining ar as a vector of size r, ensuring a compact size, and making rows of B
+
+the same size as target weights. In addition, RECAST aver-ages over a set of K coefficient vectors to enable additional expressivity in the produced weights, i.e ., 
+
+TRECAST (B∗ri , a ri,j ) = 1
+
+K
+
+> K
+
+X
+
+> j=1
+
+B∗ri ari,j , (3) where B∗ri ∈ Rdin ∗dout ×r . TRECAST supports PEFT due to 
+
+ar ’s small size even for large values of K. Additionally, re-ducing hyperparameter r results in MC. However, limiting 
+
+ar to a vector severely restricts how much the basis matrix 
+
+B∗ri can be adjusted for a task. Thus, RECAST only re-ported improvements for very small sizes of ar (with less than 100 task-specific parameters in a ViT-S/16 [71]). CRISP address this limitation, in part, by introducing a new hyperparameter s to control the size of the mixing ma-trix, i.e ., A′rs i ∈ Rr×s. As the columns of A is not set to a specific size, as in T in prior work, we must also adjust the dimensions of B to ensure the correct number of weights are produced i.e ., B′ri ∈ Ru×r , where u = din ∗dout  
+
+> s
+
+.A common way of adding additional expressivity is to add a non-linearity to a function ( e.g ., ReLU [20]). Plum-mer et al. [58] explored adding non-nonlinearities to a small hypernetwork [24] that predicted the parameters ari,j for a transformation similar to Eq. (3), but found them ineffec-tive as the final transformation is still linear. An alternative is to add a non-linearity to the predicted weight matrix Wi,
+
+i.e ., T = ϕ(Wi). However, this acts as a hard constraint on the layer weights, which may hurt performance. This is exemplified by the fact that most networks might apply weight decay to a layer as a regularizer instead of forcing the weights into a specific form. Thus, we add expressiv-ity without overfitting by applying a constraint only to the mixing matrix, i.e ., the CRISP transformation is: 
+
+TCRISP (B′ri , A ′rs i ) = B′ri
+
+
+
+σ(A′rs i ) ⊙ A′rs i
+
+
+
+(4) where σ(·) is a sigmoid and ⊙ denotes element-wise mul-tiplication. Note that Eq. (4) requires reshaping into the correct dimensions before it can be used, i.e ., Wi =
+
+reshape 
+
+
+
+TCRISP (B′ri , A ′rs i ), (dout , d in )
+
+
+
+. While the re-strictions placed on A′rs i has the same form as the SiLU activation function [14], it acts more as a constraint on the weights rather than a nonlinearity as A′rs i contains only 
+
+layer-specific tuneable parameters. Prior work has also unsuccessfully tried restrict the out-put of A before, but these typically used strong constraints, 
+
+e.g ., forcing ar to sum to one [58]. We find even similar functions like ReLU resulted in a significant drop in per-formance as it would result in a large number of zero-value weights in the output. Additionally, the smoother function provided by adapting SiLU helps reduce overfitting without adding new hyperparameters to tune as would be required by other regularization techniques like weight decay. The final result is a transformation that enables us to use a sin-gle hyperparameter s to adapt the relative size of the frozen basis vectors B′ri and the tuneable mixing matrix A′rs i to the needs of a particular application rather than the hard-coded restrictive formulations of prior work. 
+
+3.2. Retrofitting Pretrained Models with CRISP 
+
+In Sec. 3.1 we discussed how CRISP generates weights by combing shared basis vectors B′ri and the tuneable mix-ing matrix A′rs i . However, most off-the-shelf models do not provide these matrices. Instead, we must retrofit a pretrained model to use our CRISP framework. Follow-ing [71, 77], we initialize our weight matrices using a short preprocessing step. Specifically, we begin by grouping to-gether layers of the same module of consecutive layers that will share parameters ( e.g ., QKV attention or projection). Recall that in Eq. (4) only B′ri is shared across layers, whereas A′rs i is learned per-layer. Then, we decompose the pretrained model by adopting Neural Mimicry [71], which learns to reconstruct the N layer weights Wpi via: 
+
+Lmimicry =
+
+> N
+
+X
+
+> i=1
+
+ℓsmL 1
+
+
+
+TCRISP (B′ri , A ′rs i ) − Wpi
+
+
+
+,
+
+(5) where ℓsmL 1 refers to smooth-L1 loss [18]. Note that Eq. (5) does not use any dataset samples as it simply retrofits a pretrained model into our framework. Thus, this process has negligible computational require-ments. For example, in our experiments it completes in under a minute on a single GPU for ViTs [13] and < 30 
+
+minutes for Llama models [22, 38]. We find Eq. (5) alone is suitable when s and r are relatively large ( e.g ., resulting in similar parameters as the original model), but learning A′rs i
+
+and B′ri under aggressive compression challenging. We make two changes to assist with the learning process in these settings where significant compression is desired. First, we obtain a strong initialization for our target model 
+
+Mstudent by using the top r eigenvectors of a MT eacher 
+
+model’s A′rs i and B′ri matrices. This MT eacher is simply a full parameter model created using Eq. (5) ( i.e ., it has the same parameter count as the pretrained model). Second, we use MT eacher to guide the learning of Mstudent by using both KL divergence and MSE loss on the final predictions of MT eacher and Mstudent along with per-layer MSE fea-ture matching. During this compression stage we use just 2% of ImageNet [11], making it significantly more efficient than recent MC competitors who use the entire ImageNet dataset [3]. See the supplementary for additional details. 
+
+## 4. Experiments 
+
+Datasets. We evaluate our approach on a diverse set of ex-perimental settings to demonstrate its ability to generalize. First, we use VTAB-1K [93], a benchmark of 19 diverse vi-sual tasks spanning Natural (7 tasks), Specialized (4 tasks including medical and satellite imagery), and Structured (8 tasks requiring geometric and relational reasoning). Its lim-ited training budget (1K samples per task) and broad task di-versity make it well-suited for assessing sample efficiency and cross-domain generalization. Second, we use a set of six fine-grained benchmarks to measure the effect of larger training budgets: Flowers102 [55], FGVC-Aircraft [50], MIT-Indoor67 [59], CIFAR-100/10 [34], and CUB-200-2011 [74]. Finally, as the first two sets of datasets fo-cus on vision tasks (using ViTs [13]), we validate CRISP’s ability to generalize to LLMs with seven commonsense reasoning benchmarks: BoolQ [9], PIQA [4], SIQA [63], HellaSwag [91], WinoGrande [62], ARC-easy [10], ARC-challenge [10], and OBQA [52]. We also report quantiza-tion results reported on the ImageNet-1K [11] dataset. 
+
+Implementation Details. All ViT [13] backbones are pre-trained on ImageNet [11] and retrofitted using up to 1000 epochs (lr = 0.01 , Step Scheduler), followed by fine-tuning with AdamW [49] for 100 epochs with early stop-ping. Following [71], we apply layer-wise adapter pa-rameter sharing across consecutive layer groups and struc-tured binary masking for more extreme compression ratios. For LLM experiments, we use models from the LLaMA family [22], adopting the experimental settings of [29] for CRISP coefficient fine-tuning. PEFT baseline results are Table 1. PEFT performance on VTAB-1K [93] across 19 tasks grouped into Natural (7), Specialized (4), and Structured (8). CRISP achieves state-of-the-art overall accuracy while tuning 28% fewer parameters than all baselines ( 5 × 10 −3% vs. 7 × 10 −3% of the base model). It is particularly strong on Structured tasks, achieving the best result on the majority of benchmarks. Bold indicates best performance per task. 
+
+Method Natural Specialized Structured CIFAR-100 Cltch101 DTD Flowers102 Pets SVHN Sun397 Mean Camelyon EuroSAT Resisc45 Retinopathy Mean Clevr-Count Clevr-Dist DMLab KITTI-Dist dSpr-Loc dSpr-Ori sNORB-Azim sNORB-Elev Mean Overall 
+
+ViT-S/16 [13] 42.1 84.4 62.6 97.3 87.2 31.1 43.8 64.0 74.8 87.8 75.2 70.8 77.1 34.9 29.8 34.8 45.9 14.5 15.1 11.1 20.0 25.7 50.7 BoFT [48] 34.4 86.1 60.5 97.3 82.2 61.4 35.8 65.3 73.5 89.6 73.3 68.4 76.1 31.2 45.1 36.0 47.5 22.6 16.3 12.6 25.6 29.6 52.6 DoRA [47] 38.5 86.9 60.6 97.2 85.9 52.7 33.2 65.0 72.9 86.0 75.3 66.9 75.2 46.1 45.7 34.1 41.6 21.4 21.9 11.2 25.1 30.8 52.8 IA3 [45] 11.3 24.5 25.9 41.1 12.8 34.7 7.6 22.5 71.2 75.0 43.9 71.9 65.4 35.6 50.9 24.4 39.5 22.6 10.4 7.8 18.2 26.1 33.1 LoRA [28] 52.8 85.0 64.3 98.1 88.4 55.9 45.4 69.9 75.6 90.4 79.0 69.3 78.5 45.0 47.6 39.5 52.7 19.8 23.1 11.7 18.2 32.1 55.8 ReCAST [71] 50.8 85.1 65.5 98.6 87.7 45.1 46.8 68.5 76.2 91.1 77.1 71.8 79.0 44.2 42.1 38.3 51.3 21.0 24.3 11.6 24.0 32.0 55.3 RoAD [41] 52.8 85.8 66.5 98.8 88.9 60.9 46.8 71.4 77.0 91.2 80.1 69.6 79.4 50.6 49.3 40.1 51.2 21.8 24.9 11.7 26.1 34.4 57.5 RoSA [53] 42.4 83.2 61.8 97.7 87.2 32.3 43.6 64.0 76.2 88.2 72.6 69.8 76.7 35.4 28.1 34.5 43.9 14.3 16.6 11.1 20.0 25.4 50.4 SSF [39] 58.8 87.0 66.8 98.8 89.5 68.0 47.0 73.7 76.0 91.4 81.3 71.8 80.1 46.9 42.5 39.5 50.9 20.4 24.4 12.5 24.9 32.7 57.8 VBLoRA [37] 50.9 85.0 64.6 98.2 87.9 49.7 44.9 68.7 74.2 90.2 77.1 69.4 77.7 46.5 39.8 37.2 46.7 19.2 20.0 11.8 24.9 30.7 54.6 SVFT [43] 50.5 84.2 64.4 97.8 88.5 45.6 39.8 67.3 73.4 90.1 75.6 68.5 76.9 41.2 36.2 37.8 48.1 19.4 20.4 11.2 23.7 29.7 53.5 CRISP (ours) 56.7 87.0 66.5 98.8 87.6 67.3 47.7 73.0 76.8 91.6 79.5 74.0 80.4 61.8 51.6 40.5 48.4 23.6 24.6 12.9 27.8 36.4 59.2 
+
+taken directly from their respective papers, while compres-sion baselines are reproduced using each method’s offi-cial repository. All evaluations are performed using the 
+
+lm-evaluation-harness [17] library under consis-tent hyperparameters across all methods. Additional details are provided in the supplementary. 
+
+Baselines. We compare to methods from relevant prior work in both PEFT [28, 37, 39, 41, 43, 45, 47, 48, 53] and MC [3, 16, 21, 67, 77, 84]. This includes methods like We-CoLoRA [23] whose adaptation based on LoRA makes it appear to support MC and PEFT at first glace. We also com-pare to the closely related RECAST [71] approach that was introduced as a PEFT method, but can naively support MC. Finally, we provide a simple baseline that uses a SVD de-composition to support MC by retaining only the vectors U
+
+and V related to the top-k eigenvalues Σ, and then performs PEFT by updating Σ while freezing U and V .
+
+4.1. Isolated PEFT or MC Results 
+
+PEFT Only. Tab. 1 reports that CRISP boosts PEFT perfor-mance on VTAB-1K [93] by 1.5% over the state-of-the-art while using 28% fewer trainable parameters. The largest gains appear on Structured tasks, where CRISP leads by 2% on average and achieves best accuracy on most individ-ual benchmarks. In contrast methods like LoRA [28] and RECAST [71] plateau or slightly degrade here, suggesting that their linear updates struggle to capture the more com-plex task-specific structure these benchmarks demand. On Natural and Specialized tasks, CRISP remains competitive with SSF [39] and RoAD [41] despite the smaller budget, indicating broad generalization across task types. 0.7 1.4 2.3 3.5 57Number of trainable parameters per task (×10 )  
+
+> 70.0 72.5 75.0 77.5 80.0 82.5 Averaged Best acc@top1
+> LoRA only [28]
+> Recast [7 1]
+> CRISP (ours)
+> BoFT [48]
+> VB-LoRA [3 7]
+> ViT-S/16 [13]
+
+Figure 3. PEFT performance using a ViT-S/16 across a range of trainable parameter budgets averaged over three datasets: FGVC-Aircraft [50], CIFAR-100 [34] and CUB-200-2011 [74]. CRISP consistently outperforms prior work in all settings. 
+
+Fig. 3 shows CRISP outperforms prior work across a range of parameter budgets. Notably, closely related method RECAST’s performance plateau’s, whereas CRISP continues to improve as the budget increases. CRISP also matches LoRA’s peak accuracy with little over half the pa-rameters. These results highlight the benefits from our im-proved weight generation approach defined in Eq. (4). 
+
+MC Only. Tab. 2(Upper) reports performance at 50% pa-rameter reduction (86M → 44M) using a ViT-B/16, where CRISP outperforms the state-of-the-art by 1.5%. No-tably, prior compression methods such as DGMR [67], RDHP [84], and Isomorphic Pruning [16] use the full ImageNet-1K [11] dataset for distillation and recovery, whereas CRISP achieves superior performance using only 2% of the same dataset, underscoring meaningful gains in Table 2. ViT-B/16 [13] compression at 50% parameter reduction across six fine-grained benchmarks. Upper: post-compression accuracy with classifier-only adaptation; CRISP leads all baselines using only 2% of ImageNet-1K [11] for distillation. Lower: compressed backbones used as initialization for PEFT; CRISP achieves state-of-the-art, outperforming the best pruning+PEFT combination by about 1 point and RECAST with coefficient tuning by 5 points, suggesting that compression quality directly bounds downstream task adaptability. 
+
+Compression PEFT Flowers Aircraft Scene CFR100 CFR10 Birds Avg 
+
+ViT-B/16 [13] – 96.7 70.9 84.5 76.3 97.0 84.6 85.0 
+
+Compressed Performance 
+
+SVD – 81.8 43.1 65.6 55.4 83.0 39.3 61.3 Isomorph. Prune. [16] – 94.7 61.5 77.6 76.3 93.2 70.0 78.8 RDHP [84] – 95.3 63.8 74.7 78.1 89.2 61.7 77.1 DGMR [67] – 96.4 71.6 79.8 76.9 92.1 74.3 81.9 BALF [21] – 94.3 68.3 76.3 69.7 89.8 70.3 78.1 WeCoLoRA [23] – 90.8 50.7 63.9 65.5 81.1 45.6 66.2 RECAST [71] – 92.1 71.8 77.4 71.5 91.8 71.0 79.3 CRISP (ours) – 96.8 76.3 81.3 76.2 92.1 77.5 83.3 Compressed + PEFT Performance 
+
+SVD Eigenvalues 85.6 56.9 68.1 71.5 92.9 58.5 72.3 Isomorph. Prune. [16] LoRA [28] 98.4 90.8 78.0 84.7 96.7 73.4 87.0 Isomorph. Prune. [16] SSF [39] 98.2 86.2 81.7 85.6 97.8 77.1 87.7 Isomorph. Prune. [16] SVFT [43] 98.2 89.5 80.6 84.4 97.0 74.2 87.3 RDHP [84] LoRA [28] 97.8 91.5 79.8 84.8 97.0 72.6 87.1 RDHP [84] SSF [39] 98.0 85.0 77.6 83.9 96.5 71.0 85.3 RDHP [84] SVFT [43] 98.2 89.9 77.6 83.1 97.1 72.6 86.4 DGMR [67] LoRA [28] 99.0 91.1 77.2 86.1 93.7 75.5 87.1 DGMR [67] SSF [39] 98.8 87.2 82.4 84.8 97.2 76.8 87.9 DGMR [67] SVFT [43] 98.8 91.2 77.4 82.8 96.5 74.2 86.8 WeCoLoRA [23] WeCoLoRA [23] 3.3 20.9 4.0 19.3 10.1 6.8 10.7 WeCoLoRA [23] SSF [39] 98.2 80.2 73.3 77.6 94.3 69.9 82.2 WeCoLoRA [23] SVFT [43] 97.4 73.7 72.4 75.1 92.6 65.0 79.3 RECAST [71] RECAST [71] 96.8 77.3 79.3 78.5 95.3 74.9 83.7 CRISP (ours) CRISP (ours) 99.0 89.5 81.8 86.2 97.4 79.1 88.8 
+
+> Table 3. LLaMA3.2-1B [22] compression at 30% parameter reduction across seven commonsense reasoning benchmarks. CRISP’s 5% average gain shows it can perform well on LLMs, demonstrating an ability generalize across architectures we found many prior works lack.
+
+BQ PIQ Hell. Wino ARC-e ARC-c OBQ Avg. LLaMA3.2-1B [22] 60.0 90.0 30.0 70.0 70.0 30.0 10.0 51.4 SVD 38.1 53.2 26.0 47.9 26.1 21.5 15.6 32.6 Basis-Sharing [77] 38.2 54.9 26.5 50.5 26.9 20.2 14.6 33.1 PruneNet [65] 51.6 54.7 26.3 48.6 28.6 17.8 16.8 32.4 DFJR [57] 37.8 53.7 26.1 49.6 26.1 19.3 14.2 32.4 CRISP (ours) 60.2 57.5 27.7 50.6 34.6 20.1 15.2 38.0 
+
+data efficiency over prior work. Tab. 3 shows our approach generalizes to LLMs, where we outperform prior work by 5% (additional experiments such as LLMs with PEFT are in the supplementary due to space constraints). These results demonstrate an ability to generalize across architectures we found many other methods lack. Fig. 4 compares performance and memory utilization on ImageNet (the dataset our ViTs were pretrained on) of CRISP alone and in combination with orthogonal compres-sion techniques like post-training quantization (PTQ) [83]. We make two primary observations on these results. First, retrofitting these ViTs into our CRISP framework makes 0 100 200 300 400 500  
+
+> Memory (MB)
+> 60
+> 65
+> 70
+> 75
+> 80
+> 85
+> Top-1 Accuracy (%)
+> CRISP
+> ViT-B 50% (44M)
+> CRISP ViT-B
+> (86M)
+> ViT-B (86M)
+> CRISP ViT-L (304M)
+> ViT-L (304M)
+> CRISP
+> ViT-B 50% (44M)
+> CRISP ViT-B
+> (86M)
+> ViT-B (86M)
+> 1200 1250
+> CRISP ViT-L (304M)
+> ViT-L (304M)
+> ViT-B 50% (44M)
+> ViT-B (86M)
+> ViT-L (304M)
+> Circle = CRISP (Ours)
+> Square = Original ViT
+> Solid = Unquantized
+> Hatched = Quantized
+
+Figure 4. Comparing ImageNet [11] performance with and with-out 8-bit PTQ [83] compression. We find CRISP accurately repro-duces the original model’s performance while also demonstrating effective compositionality with other compression techniques. 
+
+negligible difference in their pretraining dataset’s perfor-mance, demonstrating that we accurately replicated the original model’s performance. Second, CRISP can be ef-fectively combined with methods like PTQ for additional memory savings while outperforming either method alone. 
+
+4.2. Combination PEFT and MC Results 
+
+Tab. 2(Lower) reports performance of combinations of PEFT and MC that result in a total of ∼45M parameters (considering contributions of both PEFT and MC) for a model that originally contained 86M parameters. CRISP outperforms combinations of prior work by 1% while also being simpler to implement due to our single unified frame-work. This gain increases to 5% when restricting com-parison to methods like RECAST [71] that perform both PEFT and MC within the same framework. Although MC method WeCoLoRA [23] is based on LoRA, we find us-ing these matrices for PEFT collapses performance. This suggests that the decomposition learned by WeCoLoRA is very sensitive to use directly. Tab. 2(Lower) shows combin-ing WeCoLoRA with feature-scaling adapters like SSF [39] and SVFT [43] partially sidesteps this issue by operating on activations rather than weights. However, CRISP’s unified framework where compression and adaptation are explicitly designed to coexist still outperforms it by 6.5%. 
+
+4.3. Model Analysis 
+
+Regularization Methods. Tab. 4 compares regularization strategies applied to the mixer matrix A′rs i . Explicit tech-niques such as L2, orthogonal, and spectral normalization all provide modest gains over no regularization, but require an additional hyperparameter to tune. Activation-based constraints offer a parameter-free alternative: GELU and SiLU match or exceed explicit regularization, while ReLU collapses performance by zeroing out negative weights and producing overly sparse mixer matrices. In contrast, SiLU’s smooth gating as defined in Eq. (4) provides built-in regu-larization without introducing additional hyperparameters. 
+
+Table 4. Ablation on the regularization strategy for the mixer ma-trix Ars i using ViT-S/16 [13] averaged over CUB-Birds, CIFAR-100, and FGVC-Aircraft. (a) Explicit regularization pro-vides modest gains but requires additional hyperparameters. (b) Activation-based constraints offer a parameter-free alternative, where CRISP’s use of SiLU’s smooth gating matches explicit reg-ularization without introducing new hyperparameters. 
+
+Type Birds CIF100 ACraft Av. 
+
+No regularization 81.5 86.0 77.9 81.8 L2-Norm 82.6 86.5 77.0 82.0 Orthogonal 84.2 86.9 76.1 82.3 Spectral Norm 83.5 85.7 77.4 82.1 ReLU 58.7 64.0 61.9 61.5 GELU 80.1 85.9 79.0 81.6 SiLU 81.5 86.2 79.1 82.2 
+
+Table 5. Efficiency using a NVIDIA L40S for task adaptation on ViT-B/16 [13] backbone under matched finetuning parameter bud-gets ( ∼150K–240K trainable parameters, excluding head). 
+
+Method Tr.Thr. In.Thr. Lat. Mem.    
+
+> samp/s samp/s ms GB
+
+LoRA [28] 165.2 575 1.74 4.58 DoRA [47] 178.3 726 1.38 3.98 BoFT [48] 74.7 155 6.43 5.24 IA3 [45] 156.8 629 1.59 6.87 RoAD [41] 131.0 479 2.09 8.40 SVFT [43] 134.2 418 2.39 5.15 VBLoRA [37] 161.1 513 1.95 7.72 SSF [39] 167.0 580 1.72 19.66 RECAST [71] 3.3 7 148.27 14.67 CRISP 163.0 657 1.52 13.88 
+
+Mixing Matrix Dimensions. Fig. 5 plots accuracy and total parameter count as r and s are varied independently, revealing a clear asymmetry between the two dimensions of A′rs i . In Fig. 5(b), fixing s=16 (columns) and in-creasing r (rows) from 8 to 64 shrinks the model from 22.1M to 3.5M parameters and causes accuracy to col-lapse across all three benchmarks, despite more rows pro-viding greater per-layer expressivity. The inverse experi-ment in Fig. 5(a), fixing r=16 (rows) and increasing s
+
+(columns) from 8 to 32, restores both parameter count (6.1M to 22.1M) and strong accuracy, while further dou-bling to s=64 (43.4M) yields only marginal change. At matched budgets of ∼6M parameters, the column-starved configuration (r=16 , s =8) substantially underperforms the row-starved one (r=32 , s =16) , confirming that s, not r,8 32 64 Number of s 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Accuracy (%)
+
+(a) Fixed r (= 16): Varying s 
+
+8 32 64 Number of r 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Accuracy (%)
+
+(b) Fixed s (= 16): Varying r         
+
+> CIFAR100 Birds Aircraft Total Params Original Model
+> 0510 15 20 25
+> Parameters (M)
+> 22.1M 6.2M 3.5M
+> 010 20 30 40 50
+> Parameters (M)
+> 6.1M 22.1M 43.4M Figure 5. Impact of mixer matrix dimensions on model capac-ity and performance. (a) Fixed columns ( s= 16 ): Increasing rows reduces parameters but collapses accuracy. (b) Fixed rows (r= 16 ): Increasing columns scales capacity and recovers per-formance. Results across CIFAR-100, CUB-Birds, and FGVC-Aircraft demonstrate that basis capacity (columns) is the dominant factor for maintaining model quality, while coefficient expressiv-ity (rows) plays a secondary role. Red dotted line: original model.
+
+is the primary driver of performance . This is consistent with Eq. (4): s directly controls the dimensionality of the shared basis B′ri , and no amount of per-layer mixing via 
+
+A′rs i can compensate for an undercapacitated basis bank. 
+
+4.4. Computational Efficiency Analysis 
+
+Tab. 5 compares training throughput, inference through-put, latency, and peak memory under matched parameter budgets ( ∼150K–240K) on the same ViT-B/16 backbone. Adapters (and coefficients) are not merged into the back-bone for any method; merging would improve inference uniformly across the board. 
+
+Training. CRISP achieves 163 samples/s training through-put, on par with LoRA (165), DoRA (178), and SSF (167), and substantially ahead of methods with more expensive forward passes such as BoFT (74). Despite both CRISP and RECAST materializing weights from shared bases at each step, their training throughput differs by nearly 50 × (163 vs. 3.3 samples/s). The key distinction lies in how weights are generated: RECAST averages over K coefficient vec-tors per layer, requiring K separate matrix multiplications in every forward and backward pass; CRISP performs a sin-gle matrix multiply with element-wise SiLU gating, keep-ing its cost constant regardless of basis size. This makes RECAST disproportionately expensive at training time de-spite its small per-call generation overhead. 
+
+Inference. CRISP achieves 657 samples/s inference throughput (1.52 ms latency), second only to DoRA (726 samples/s) and ahead of all other methods including IA3, SSF, and LoRA. Notably, CRISP achieves this despite ma-terializing weights from shared bases at each step a cost that RECAST also incurs but handles far less efficiently: RE-CAST’s K-fold template averaging reduces its inference throughput to just 7 samples/s, nearly 100 × slower, with-out caching. In terms of memory, CRISP and RECAST oc-cupy a higher tier ( ∼14 GB) than purely additive methods like LoRA and DoRA (4–5 GB) due to basis storage, yet CRISP delivers competitive throughput that additive meth-ods at this memory cost cannot match. Overall, CRISP is the only weight-materializing method that matches top-tier PEFT methods in inference speed, while delivering superior compression quality and task adaptability. 
+
+## 5. Conclusion and Future Work 
+
+We introduced CRISP, a unified parameter recombination framework that seamlessly integrates model compression and parameter-efficient fine-tuning through a single archi-tectural paradigm. Our coefficient-gated transformation decomposes pretrained weights into shared basis matrices and compact mixing coefficients, enabling flexible con-trol over the expressivity-efficiency trade-off via hyperpa-rameter s while providing built-in regularization through SiLU-inspired gating. Our results demonstrate that unifica-tion need not compromise specialization: CRISP achieves a 1.5% gain on PEFT while simultaneously outperforming similar PR methods like RECAST by 5%. The broader im-plications extend beyond performance metrics, CRISP chal-lenges the prevailing paradigm of developing isolated solu-tions for PR tasks and suggests that principled unification offers a more sustainable path forward. Future work might explore several directions: fully ex-tending CRISP to language models where compression and adaptation demands are even more acute; investigat-ing learned hyperparameter selection to automate capacity-efficiency trade-off; and combining CRISP with orthog-onal techniques like quantization and pruning to com-pound gains. As foundation models continue scaling, uni-fied frameworks that elegantly balance multiple deployment constraints will become essential infrastructure. Decompose, Mix, Adapt: A Unified Framework for Parameter-Efficient Neural Network Recombination and Compression 
+
+# Supplementary Material 
+
+## 6. CRISP Algorithms 
+
+CRISP consists of three core stages: weight reparame-terization via the forward pass (Alg. 1), neural mimicry retrofitting (Alg. 2), and task adaptation via PEFT (Alg. 3). The compression stage differs between ViT and LLaMA ar-chitectures and is described separately below. The complete joint MC+PEFT pipeline is presented in Alg. 6. Algorithm 1 describes the forward pass using the coefficient-gated transformation TCRISP (B′
+
+> i
+
+, A ′rs i ) =
+
+B′
+
+> i
+
+(σ(A′rs i ) ⊙ A′rs i ) introduced in Eq. 4 of the main paper. The retrofitting process in Algorithm 2 imple-ments the initial neural mimicry stage (Sec. 3.2), which decomposes pretrained weights into basis-mixer pairs through smooth-L1 reconstruction loss without requiring any dataset samples. Algorithm 3 demonstrates CRISP’s PEFT capability, where only the lightweight mixer matrices 
+
+{A′rs i } are updated while basis matrices {B′
+
+> i
+
+} remain frozen, enabling task adaptation with fewer than 200 trainable parameters per layer in some experiments (Tab. 1, main paper). 
+
+Algorithm 1 CRISP Forward Pass 
+
+Require: Input x ∈ Rn×din , Basis B′ 
+
+> i
+
+∈ Ru×r , Mixer 
+
+A′rs i ∈ Rr×s, bias b ∈ Rdout 
+
+Ensure: Output y ∈ Rn×dout  
+
+> 1:
+
+˜A′rs i ← σ(A′rs i ) ⊙ A′rs i where σ(·) is sigmoid  
+
+> 2:
+
+Wi ← reshape (B′ 
+
+> i
+
+˜A′rs i , (dout , d in )) where u = din ·dout  
+
+> s
+> 3:
+
+y ← xW Ti + b 
+
+> 4:
+
+return y
+
+6.1. ViT Compression 
+
+For ViT models, compression is performed via distillation using a full-parameter CRISP teacher model trained on only 2% of ImageNet-1K [11]. Algorithm 4 initializes the stu-dent model using the top-r eigenvectors of the teacher’s basis matrices and optimizes a weighted combination of KL divergence on output logits and per-layer MSE feature matching (Tab. 2, main paper; Supp. Tabs. 8 and 9). 
+
+6.2. LLaMA Compression 
+
+For LLaMA models, compression operates differently from the ViT setting. Algorithm 5 first performs data-free basis reduction by computing importance scores from template norms and coefficient sparsity, clustering basis vectors via importance-weighted k-means, and merging clusters with 
+
+Algorithm 2 Neural Mimicry Initialization 
+
+Require: Pretrained weights {W ip}Ni=1 , layer groups G, hy-perparameters r, s 
+
+Ensure: Shared bases {B′
+
+> i
+
+}, per-layer mixers {A′rs i } 
+
+> 1:
+
+for each group g ∈ G do  
+
+> 2:
+
+Initialize shared basis B′ 
+
+> g
+
+∼ N (0 , 0.01) of size u ×
+
+r 
+
+> 3:
+
+for each layer i ∈ g do  
+
+> 4:
+
+Initialize mixer A′rs i ∼ N (0 , 0.01) of size r × s 
+
+> 5:
+
+end for  
+
+> 6:
+
+end for  
+
+> 7:
+
+while not converged do  
+
+> 8:
+
+Lmimicry ← PNi=1 ℓsmL1 (TCRISP (B′
+
+> i
+
+, A ′rs i ) − W ip) 
+
+> 9:
+
+Update {B′
+
+> i
+
+}, {A′rs i } via gradient descent on 
+
+Lmimicry  
+
+> 10:
+
+end while  
+
+> 11:
+
+return {B′
+
+> i
+
+}, {A′rs i }
+
+Algorithm 3 CRISP PEFT Adaptation 
+
+Require: Downstream dataset D, compressed model with frozen bases {B′
+
+> i
+
+}, trainable mixers {A′rs i }, learning rate η
+
+Ensure: Task-adapted model  
+
+> 1:
+
+for (x, y ) ∈ D do  
+
+> 2:
+
+ˆy ← Forward (x; {B′
+
+> i
+
+}, {A′rs i }) ▷ Alg. 1  
+
+> 3:
+
+Ltask ← CrossEntropy (ˆ y, y ) 
+
+> 4:
+
+{A′rs i } ← { A′rs i } − η∇{A′rs i }Ltask ▷ Freeze {B′
+
+> i
+
+} 
+
+> 5:
+
+end for  
+
+> 6:
+
+return adapted {A′rs i }
+
+variance-aware rescaling. A short calibration stage (Stage 2) refines the compressed model using a weighted combina-tion of weight reconstruction and language modeling loss, yielding further gains (Tab. 11). 
+
+6.3. Joint MC+PEFT Pipeline 
+
+Algorithm 6 presents the complete pipeline for simultane-ous compression and task adaptation. Compression (ViT: Alg. 4; LLaMA: Alg. 5) is applied first, after which basis matrices are frozen and only mixer matrices are updated for downstream tasks via Alg. 3. This unified pipeline achieves state-of-the-art on both MC (Tab. 2, main paper; Tab. 11) and PEFT (Tab. 1, main paper; Tab. 10) without requiring separate optimization procedures. Algorithm 4 CRISP-ViT Compression via Distillation 
+
+Require: Teacher model Mteacher (full CRISP from Alg. 2), target compression rtarget , s target , distillation dataset Ddist (2% ImageNet), loss weights λKL , λ feat 
+
+Ensure: Compressed student model Mstudent  
+
+> 1:
+
+Initialize {B′
+
+> student
+
+}, {A′rs 
+
+> student
+
+} with top rtarget eigenvec-tors from Mteacher  
+
+> 2:
+
+for (x, y ) ∈ D dist do  
+
+> 3:
+
+ˆyteacher ← M teacher (x) 
+
+> 4:
+
+ˆystudent ← M student (x) 
+
+> 5:
+
+LKL ← KL (ˆ ystudent ∥ˆyteacher ) ▷ Output logit distillation  
+
+> 6:
+
+Lfeat ← P 
+
+> ℓ
+
+MSE (f student  
+
+> ℓ
+
+, f teacher  
+
+> ℓ
+
+) ▷ Per-layer feature alignment  
+
+> 7:
+
+L ← λKL LKL + λfeat Lfeat  
+
+> 8:
+
+Update {B′
+
+> student
+
+}, {A′rs 
+
+> student
+
+} via gradient descent on 
+
+L 
+
+> 9:
+
+end for  
+
+> 10:
+
+return Mstudent 
+
+## 7. Datasets 
+
+PEFT Evaluation (ViT). Tab. 6 details the 19 tasks in the VTAB-1K [93] benchmark used to evaluate PEFT on ViT-S/16. Tasks are grouped into three categories: Natural (7 tasks), Specialized (4 tasks, including medical and satellite imagery), and Structured (8 tasks requiring geometric and relational reasoning). Each task provides 1K training sam-ples, making it well-suited for evaluating sample efficiency and cross-domain generalization. 
+
+Compression Evaluation (ViT). Tab. 7 details the six fine-grained classification benchmarks used for ViT-B/16 com-pression evaluation, corresponding to the results in Tab. 2 of the main paper and Tabs. 8 and 9. These datasets span a wider range of training budgets than VTAB-1K, allow-ing us to assess compression quality under less constrained finetuning conditions. 
+
+## 8. Ablation Studies 
+
+We conduct ablation studies to validate key design choices in CRISP’s architecture, focusing on three critical compo-nents: constraint placement, initialization strategies, and re-construction loss functions during neural mimicry. 
+
+Regularization via Coefficient Constraints. Fig. 6 com-pares three strategies for where to apply the regulariza-tion constraint in the CRISP transformation: PRE applies the constraint to the mixer before combining σ(A′rs ) ⊙
+
+A′rs ), POST applies it after reconstruction ( ϕ(B′A′rs )), and TEMP applies it to the basis matrices ( B′ϕ(A′rs )). Our formulation (PRE with SiLU-style gating) consistently out-performs alternatives across all benchmarks, providing im-
+
+Algorithm 5 CRISP-Llama Compression Pipeline 
+
+Require: CRISP model with template banks {B(p) 
+
+> g
+
+}, coef-ficients {A(p) 
+
+> i
+
+}, per-projection compression rates {ρp},calibration data Dcal (optional) 
+
+Ensure: Compressed model with reduced ranks r′ 
+
+> p
+
+=
+
+⌊r(1 − ρp)⌋ 
+
+> 1:
+
+Stage 1: Data-Free Basis Reduction  
+
+> 2:
+
+for each group g, projection p ∈{up, gate, down, q, k, v, o } do  
+
+> 3:
+
+w ← IMPORTANCE (B(p) 
+
+> g
+
+, {A(p) 
+
+> i
+
+}, Dcal ) ▷ Eq. 1 + optional variance  
+
+> 4:
+
+π ← CLUSTER (B(p) 
+
+> g
+
+, {A(p) 
+
+> i
+
+}, w, r ′
+
+> p
+
+) ▷ KMeans + random projection  
+
+> 5:
+
+B(p) 
+
+> g
+
+← MERGE (B(p) 
+
+> g
+
+, π, w ) ▷ Weighted avg. + rescaling  
+
+> 6:
+
+{A(p) 
+
+> i
+
+} ← AGGREGATE ({A(p) 
+
+> i
+
+}, π ) ▷ Sum per cluster  
+
+> 7:
+
+end for  
+
+> 8:
+
+Stage 1b: Coefficient Re-solve ▷ Least-squares: 
+
+A(p) 
+
+> i
+
+← W (p)
+
+> teacher
+
+(B(p) 
+
+> g
+
+)† 
+
+> 9:
+
+Stage 2: Activation Calibration  
+
+> 10:
+
+for e = 1 to Ecalib do  
+
+> 11:
+
+L ← w1
+
+P 
+
+> i,p
+
+∥W (p) 
+
+> i
+
+− W (p)
+
+> teacher
+
+∥2 
+
+> F
+
++ w2LLM  
+
+> 12:
+
+Update {B(p) 
+
+> g
+
+}, {A(p) 
+
+> i
+
+} via gradient descent  
+
+> 13:
+
+end for  
+
+> 14:
+
+return Compressed model 
+
+Sub-procedures:  
+
+> 1:
+
+function IMPORTANCE (B, {Ai}, D) 
+
+> 2:
+
+w ← ∥ B∥2 + λ P 
+
+> i
+
+∥Ai∥1 ▷ Per Eq. 1; boost by σ2
+
+if D provided  
+
+> 3:
+
+return w 
+
+> 4:
+
+end function  
+
+> 5:
+
+function CLUSTER (B, {Ai}, w, r ′) 
+
+> 6:
+
+Φ ← [RandomProj (B); concat (Ai)] weighted by w 
+
+> 7:
+
+return KMeans (Φ , r ′) 
+
+> 8:
+
+end function  
+
+> 9:
+
+function MERGE (B, π, w ) 
+
+> 10:
+
+return Importance-weighted average with variance rescaling  
+
+> 11:
+
+end function  
+
+> 12:
+
+function AGGREGATE ({Ai}, π ) 
+
+> 13:
+
+return Sum coefficients per cluster  
+
+> 14:
+
+end function 
+
+plicit regularization on the mixer coefficients without con-straining the final weight space. POST and TEMP con-figurations can slightly hurt performance as they constrain the output weight space directly, which acts as a hard con-straint on the layer weights as discussed in Sec. 3.1 of the main paper. Notably, ReLU performs catastrophically Algorithm 6 CRISP Joint MC+PEFT 
+
+Require: Pretrained weights {W ip}, target compression rate, downstream task D
+
+Ensure: Compressed and task-adapted model  
+
+> 1:
+
+{B′}, {A′rs } ← NeuralMimicry ({W ip}, r full , s full ) ▷
+
+Alg. 2  
+
+> 2:
+
+Mstudent ← Compress (Mteacher , r target , s target ) ▷ Alg. 4  
+
+> 3:
+
+Freeze {B′
+
+> student
+
+} 
+
+> 4:
+
+{A′rs 
+
+> adapted
+
+} ← PEFT (D, {B′
+
+> student
+
+}, {A′rs 
+
+> student
+
+}) ▷ Alg. 3  
+
+> 5:
+
+return Mstudent with {B′
+
+> student
+
+}, {A′rs 
+
+> adapted
+
+}
+
+Table 6. Details of VTAB-1K [93] Benchmark used for PEFT on ViT-S/16 [13]. 
+
+Dataset #Cat #Train #Val #Test CIFAR100 100 800/1000 200 10000 Caltech101 102 6084 – –DTD 47 1880 – –Flower102 102 6149 – –Pets 37 3669 – –SVHN 10 26032 – –Sun397 397 21750 – –Camelyon 2 800/1000 200 32768 EuroSAT 10 5400 – –Resisc45 45 6300 – –Retinopathy 5 42670 – –Clevr-Count 8 800/1000 200 15000 Clevr-Dist 6 15000 – –DMLab 6 22735 – –KITTI-Dist 4 711 – –dSpr-Loc 16 73728 – –dSpr-Ori 16 73728 – –sNORB-Azim 18 12150 – –sNORB-Ele 9 12150 – –
+
+Table 7. Details on the Benchmarking Datasets used for fine-tuning Compressed ViT-B/16 [13] 
+
+Dataset Classes #Sample Oxford Flowers [55] 102 6553 FGVC Aircrafts [50] 55 10001 MIT Scenes [59] 67 15614 CIFAR100 [34] 100 60000 CIFAR10 [34] 10 60000 CUBs (Birds) [74] 200 11789 across all placements due to excessive sparsification of the mixer matrices, consistent with the ablation results in Tab. 4 of the main paper. GELU shows competitive performance to SiLU, but SiLU’s smooth gating better balances expres-sivity and regularization without introducing additional hy-AIRCRAFT BIRDS CIFAR100 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Accuracy (%)
+> PRE vs TEMP vs POST Accuracy Across Activation Functions
+> GELU (PRE) GELU (TEMP) GELU (POST) RELU (PRE) RELU (TEMP) RELU (POST) SILU (PRE) SILU (TEMP) SILU (POST)
+
+Figure 6. Impact of regularization constraint placement across PRE, POST, and TEMP configurations. PRE (our method) achieves the most consistent performance, while ReLU causes se-vere degradation due to weight sparsification. 
+
+perparameters. 
+
+Initialization methods. Fig. 8 evaluates four initialization strategies for the mixer matrices A′rs during Algorithm 2: uniform, Kaiming, Xavier, and orthogonal. Results show remarkable robustness across initialization schemes, with all methods achieving within 1% of each other on most tasks. This insensitivity to initialization validates that the neural mimicry objective effectively guides the learning process regardless of starting point. The slight advantage of Kaiming and orthogonal initializations on certain tasks mo-tivated our choice of orthogonal initialization as mentioned in the paper, but practitioners can confidently use simpler schemes without significant performance degradation. 
+
+Loss functions for neural mimicry. Fig. 7 compares re-construction losses in Algorithm 2: Huber, smooth-L1, MSE, and L1. All robust losses (Huber, smooth-L1) per-form comparably, with smooth-L1 showing marginal ad-vantages on fine-grained tasks like Aircraft. The consistent performance across loss functions suggests that the choice of reconstruction objective is less critical than the overall factorization framework, though smooth-L1’s robustness to outliers during weight decomposition motivated its adop-tion in our implementation. Notably, L1 loss shows com-petitive or superior performance on some tasks, indicating potential for further exploration of sparsity-inducing objec-tives during retrofitting. 
+
+Compression ablations. Tab. 8 evaluates design choices for compressing ViT-B/16 by 50% across six benchmarks (see Tab. 7). Neural mimicry alone (Eq. 5 on main paper) significantly underperforms using distillation, demonstrat-AIRCRAFT BIRDS CIFAR100    
+
+> 70.0
+> 72.5
+> 75.0
+> 77.5
+> 80.0
+> 82.5
+> 85.0
+> 87.5
+> 90.0
+> Accuracy (%)
+> Accuracy Across Loss Functions
+> HUBER SMOOTH_L1 MSE L1
+
+Figure 7. Effect of reconstruction loss functions during neural mimicry. We compare four loss functions (Huber, Smooth-L1, MSE, L1) used in the neural mimicry stage (Equation 5 of main paper) for retrofitting pretrained weights into CRISP’s basis-mixer decomposition. AIRCRAFT BIRDS CIFAR100    
+
+> 70.0
+> 72.5
+> 75.0
+> 77.5
+> 80.0
+> 82.5
+> 85.0
+> 87.5
+> 90.0
+> Accuracy (%)
+> Accuracy Across Initialization Methods
+> Uniform Kaiming Xavier Orthogonal
+
+Figure 8. Robustness to initialization methods. We evaluate four standard initialization schemes (Uniform, Kaiming, Xavier, Or-thogonal) for the mixer matrices A′rs during both neural mimicry retrofitting and subsequent task adaptation. 
+
+ing that weight-space reconstruction without data is insuf-ficient for aggressive compression. In contrast, distillation boosts accuracy by 31%, validating our two-stage approach. We also show that using SVD initialization is important (re-placing it with random orthogonal initialization) as it pro-vides a boost of almost 4%, confirming that eigenvector-based warm-starting provides a stronger initialization for the compressed parameter space. 
+
+Additional ViT Compression Results Tab. 9 reports per-formance on 75% compression to supplement our 50% compression results from our main paper. We find that CRISP outperforms other PR methods like RECAST [71] by 10% on MC. This gap is increased when combined with PEFT methods, where we boost performance by 11%. This helps further highlight the benefits of our approach over prior general PR approaches. 
+
+## 9. Experiments on Large Language Models 
+
+Following standard protocols, we initialize LLaMA models with our CRISP reparameterization via neural mimicry and then fine-tune only the mixer matrices while keeping ba-sis matrices frozen. We evaluate at two parameter budgets: an ultra-low regime with approximately 0.004% trainable parameters and a moderate regime at 0.01%, both substan-tially lower than conventional PEFT methods which typi-cally use around 0.7-0.8% of base model parameters. Tab. 10 demonstrates that CRISP is on par or better than its competitors with an order of magnitude fewer parame-ters. We also show that we can reduce the number of train-able parameters by another order of magnitude with only a minimal impact to performance. Note that prior work has shown PR methods like CRISP can also be composed with methods like HiRA and DoRA for further gains [71]. Fur-ther, most of these methods we compare to can only be ap-plied to PEFT, whereas our approach can be used for com-pression as well, easing the implementation costs. Algorithm 5 describes the LLaMA compression pipeline, which reduces basis rank via importance-weighted clustering and a short calibration stage using language modeling loss. Tab. 11 evaluates this against compression+PEFT combinations on commonsense rea-soning at 30% parameter reduction. We follow the same procedure outlined in the main paper for adapter-finetuning and evaluation. In the compression-only setting (main paper Tab. 3), CRISP outperforms all baselines by around 5 points - a gap consistent with the ViT results in Tab. 2 of the main paper. In the Tab. 11, we evaluate compressed models as initializa-tions for downstream PEFT. CRISP with coefficient tuning achieves surpasses Basis-Sharing [77] and DFJR [57] com-binations by a significant margin. PruneNet [65] combined with LoRA [28] or DoRA [47] achieves higher accuracy, though these combinations use substantially more trainable parameters during adaptation than CRISP’s lightweight co-efficient tuning. This highlights a parameter-accuracy trade-off: CRISP provides a unified compress-once-adapt-freely framework at a lower adaptation cost, whereas pruning-based methods require a separate PEFT pipeline with a larger parameter budget to reach their best performance. Table 8. Compression results on ViT-B/16 [13] with 50% weight compression across six diverse tasks (See Table 7). We find that using the distillation loss with SVD initialization described in Sec. 3.2 of our paper provides best performance. 
+
+Compression Params(%) Flowers Aircraft Scene CFR100 CFR10 Birds Avg Neural Mimicry (Eq. 5 of main paper) 44M 83.9 56.3 51.2 49.8 79.4 26.3 57.8 Distillation Loss 44M 99.0 89.5 81.8 86.2 97.4 79.1 88.8 
+
+w/o SVD Init 44M 98.8 85.9 77.4 82.0 95.3 71.6 85.1 
+
+Table 9. Compression results on ViT-B/16 [13] at 75% parameter reduction evaluated on six fine-grained classification benchmarks (see Tab. 2 of the main paper for 50% reduction). Upper section: post-compression accuracy with only classifier adaptation. Lower section: 
+
+MC+PEFT combinations demonstrate compressed models as initialization for downstream tasks. We find that CRISP outperforms prior work by up to 11%. 
+
+Compression PEFT Params(%) Flowers Aircraft Scene CFR100 CFR10 Birds Avg ViT-B/16 [13] – 86M 96.7 70.9 84.5 76.3 97.0 84.6 85.0 SVD – 21M 70.7 25.7 33.2 39.6 62.5 8.6 40.0 RECAST [71] – 21M 90.0 59.1 67.2 67.1 85.3 52.9 70.2 CRISP (ours) – 21M 95.1 73.0 77.7 74.1 89.7 73.6 80.5 
+
+SVD Eigenvalues 21M 87.8 55.9 62.1 65.0 85.3 40.1 66.0 RECAST [71] RECAST 21M 94.7 67.4 71.0 71.4 89.5 58.9 75.5 CRISP (ours) CRISP (ours) 21M 98.8 85.2 79.6 82.6 95.9 75.1 86.2 
+
+## References 
+
+[1] P. Agand. Knowledge distillation from single-task teachers to multi-task student for end-to-end autonomous driving. 
+
+Proceedings of the AAAI Conference on Artificial Intelli-gence , 38:23375–23376, 2024. 2 [2] Parakh Agarwal, Manu Mathew, Kunal Ranjan Patel, Varun Tripathi, and Pramod Swami. Prune efficiently by soft prun-ing. In Proceedings of the IEEE/CVF Conference on Com-puter Vision and Pattern Recognition (CVPR) Workshops ,pages 2210–2217, 2024. 2 [3] Sabbir Ahmed, Abdullah Al Arafat, Deniz Najafi, Akhlak Mahmood, Mamshad Nayeem Rizve, Mohaiminul Al Nahian, Ranyang Zhou, Shaahin Angizi, and Ad-nan Siraj Rakin. Deepcompress-vit: Rethinking model compression to enhance efficiency of vision transformers at the edge. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 30147–30156, 2025. 1, 2, 4, 5 [4] Yonatan Bisk, Rowan Zellers, Jianfeng Gao, Yejin Choi, et al. Piqa: Reasoning about physical commonsense in nat-ural language. In Proceedings of the AAAI conference on artificial intelligence , pages 7432–7439, 2020. 4 [5] Yuhao Cao. Fcp dis vit: Efficient vision transformer with neural network pruning. In 2024 IEEE 4th International Conference on Power, Electronics and Computer Applica-tions (ICPECA) , pages 1216–1221, 2024. 2 [6] Liang Chen, Haozhe Zhao, Tianyu Liu, Shuai Bai, Junyang Lin, Chang Zhou, and Baobao Chang. An image is worth 1/2 tokens after layer 2: Plug-and-play inference accelera-tion for large vision-language models. In Proceedings of the European Conference on Computer Vision (ECCV) , 2024. 1[7] Shoufa Chen, Chongjian Ge, Zhan Tong, Jiangliu Wang, Yibing Song, Jue Wang, and Ping Luo. Adaptformer: adapting vision transformers for scalable visual recogni-tion. In Proceedings of the 36th International Conference on Neural Information Processing Systems , Red Hook, NY, USA, 2022. Curran Associates Inc. 1 [8] Tianyi Chen, Tianyu Ding, Badal Yadav, Ilya Zharkov, and Luming Liang. Lorashear: Efficient large language model structured pruning and knowledge recovery, 2023. 2 [9] Christopher Clark, Kenton Lee, Ming-Wei Chang, Tom Kwiatkowski, Michael Collins, and Kristina Toutanova. BoolQ: Exploring the surprising difficulty of natural yes/no questions. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computa-tional Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) , pages 2924–2936, Minneapolis, Minnesota, 2019. Association for Computational Linguis-tics. 4 [10] Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. Think you have solved question answering? try arc, the ai2 reasoning challenge, 2018. 4 [11] Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In 2009 IEEE Conference on Computer Vision and Pattern Recognition , pages 248–255, 2009. 4, 5, 6, 7, 1[12] Julien Denize, Mykola Liashuha, Jaonary Rabarisoa, Astrid Orcesi, and Romain H´ erault. Comedian: Self-supervised learning and knowledge distillation for action spotting us-ing transformers. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) Workshops , pages 530–540, 2024. 2 Table 10. Comparison of PEFT methods on commonsense reasoning benchmarks. Results from LoRA and DoRA are taken from Liu et al. [47], HiRA results are from Huang et al. [30]. We find that CRISP is on par or better than custom PEFT methods while using an order of magnitude fewer parameters. Further, CRISP can also support MC, as we show in Tab. 11, demonstrating its ability to generalize to more PR tasks than prior PEFT methods. .Model PEFT Params(%) Accuracy ( ↑)BQ PIQ SIQ Hell. Win. ARC-e ARC-c OBQ Avg. ChatGPT — — 73.1 85.4 68.5 78.5 66.1 89.8 79.9 74.8 77.0 LoRA [28] 0.83 69.8 79.9 79.5 83.6 82.6 79.8 64.7 81.0 77.6 Llama2-7B DoRA half [47] 0.42 72.0 83.1 79.9 89.1 83.0 84.5 71.0 81.2 80.5 DoRA [47] 0.84 71.8 83.7 76.0 89.1 82.6 83.7 68.2 82.4 79.7 HiRA [30] 0.83 71.2 83.4 79.5 88.1 84.0 86.7 73.8 84.6 81.4 
+
+CRISP 0.004 68.9 81.4 80.4 91.0 80.1 84.1 69.1 73.6 78.6 CRISP 0.01 69.5 81.8 80.4 91.7 83.6 84.6 69.2 78.2 80.0 LoRA [28] 0.70 70.8 85.2 79.9 91.7 84.3 84.2 71.2 79.0 80.8 Llama3-8B DoRA half [47] 0.36 74.5 88.8 80.3 95.5 84.7 90.1 79.1 87.2 85.0 DoRA [47] 0.71 74.6 89.3 79.9 95.5 85.6 90.5 80.4 85.8 85.2 HiRA [30] 0.70 75.4 89.7 81.2 95.4 87.7 93.3 82.9 88.3 86.7 
+
+CRISP 0.004 72.3 87.6 81.5 94.3 87.0 91.5 79.1 83.8 84.7 CRISP 0.01 73.6 89.1 80.8 94.8 85.7 93.1 83.0 87.6 86.0 Table 11. LLaMA3.2-1B [22] MC+PEFT results at 30% parameter reduction across seven commonsense reasoning benchmarks. All baselines pair a compression method with a separate PEFT method, whereas CRISP compresses and adapts within the same factorized framework using lightweight coefficient tuning. 
+
+Compression PEFT Accuracy ( ↑)BQ PIQ Hell. Wino ARC-e ARC-c OBQ Avg. LLaMA3.2-1B [22] – 60.0 90.0 30.0 70.0 70.0 30.0 10.0 51.4 Basis-Sharing [77] LoRA [28] 37.8 52.8 26.8 48.6 28.2 19.3 16.2 32.8 Basis-Sharing [77] DoRA [47] 37.8 53.8 26.8 51.0 28.9 19.2 13.2 33.0 DFJR [57] LoRA [28] 48.9 53.5 26.4 50.3 28.6 20.6 14.4 34.7 DFJR [57] DoRA [47] 57.2 54.7 27.3 50.9 29.2 19.8 13.6 36.1 PruneNet [65] LoRA [28] 62.4 57.8 32.3 54.6 39.4 22.1 16.8 40.8 PruneNet [65] DoRA [47] 62.3 60.3 32.6 55.4 40.4 21.5 17.6 41.4 CRISP (ours) CRISP (ours) 57.4 53.4 27.9 51.4 30.8 23.4 26.6 38.7 
+
+[13] Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An im-age is worth 16x16 words: Transformers for image recog-nition at scale. CoRR , abs/2010.11929, 2020. 2, 4, 5, 6, 7, 3[14] Stefan Elfwing, Eiji Uchibe, and Kenji Doya. Sigmoid-weighted linear units for neural network function approx-imation in reinforcement learning. Neural Networks , 107: 3–11, 2018. Special issue on deep reinforcement learning. 4[15] Ziya Erkoc ¸, Fangchang Ma, Qi Shan, Matthias Nießner, and Angela Dai. Hyperdiffusion: Generating implicit neu-ral fields with weight-space diffusion. 2023 IEEE/CVF In-ternational Conference on Computer Vision (ICCV) , pages 14254–14264, 2023. 1 [16] Gongfan Fang, Xinyin Ma, Michael Bi Mi, and Xinchao Wang. Isomorphic pruning for vision models. In Computer Vision – ECCV 2024: 18th European Conference, Milan, Italy, September 29–October 4, 2024, Proceedings, Part XXX , page 232–250, Berlin, Heidelberg, 2024. Springer-Verlag. 2, 5, 6 [17] Leo Gao, Jonathan Tow, Baber Abbasi, Stella Biderman, Sid Black, Anthony DiPofi, Charles Foster, Laurence Gold-ing, Jeffrey Hsu, Alain Le Noac’h, Haonan Li, Kyle Mc-Donell, Niklas Muennighoff, Chris Ociepa, Jason Phang, Laria Reynolds, Hailey Schoelkopf, Aviya Skowron, Lin-tang Sutawika, Eric Tang, Anish Thite, Ben Wang, Kevin Wang, and Andy Zou. The language model evaluation har-ness, 2024. 5 [18] Ross Girshick. Fast r-cnn. In Proceedings of the IEEE In-ternational Conference on Computer Vision (ICCV) , 2015. 4[19] Patrick Glandorf and Bodo Rosenhahn. Pruning by block benefit: Exploring the properties of vision transformer blocks during domain adaptation. In International Confer-ence on Computer Vision Workshop , 2025. 1 [20] Xavier Glorot, Antoine Bordes, and Yoshua Bengio. Deep sparse rectifier neural networks. In Proceedings of the Four-teenth International Conference on Artificial Intelligence and Statistics , pages 315–323, Fort Lauderdale, FL, USA, 2011. PMLR. 3 [21] David Gonz´ alez-Mart´ ınez. Balf: Budgeted activation-aware low-rank factorization for fine-tuning-free model compression, 2025. 5, 6 [22] Aaron Grattafiori and et al. The llama 3 herd of models, 2024. 2, 4, 6 [23] Diana-Nicoleta Grigore, Mariana-Iuliana Georgescu, Jon Alvarez Justo, Tor Johansen, Andreea Iuliana Ionescu, and Radu Tudor Ionescu. Weight copy and low-rank adaptation for few-shot distillation of vision transformers. In Proceedings of the Winter Conference on Applications of Computer Vision (WACV) , pages 7368–7378, 2025. 2, 5, 6, 7 [24] David Ha, Andrew M. Dai, and Quoc V. Le. Hypernet-works. In 5th International Conference on Learning Repre-sentations, ICLR 2017, Toulon, France, April 24-26, 2017, Conference Track Proceedings , 2017. 3 [25] Ligong Han, Yinxiao Li, Han Zhang, Peyman Milanfar, Dimitris Metaxas, and Feng Yang. Svdiff: Compact pa-rameter space for diffusion fine-tuning. 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2023. 2 [26] Zhiwei Hao, Jianyuan Guo, Ding Jia, Kai Han, Yehui Tang, Chao Zhang, Han Hu, and Yunhe Wang. Learning effi-cient vision transformers via fine-grained manifold distil-lation. In Advances in Neural Information Processing Sys-tems , 2022. 1, 2 [27] Zejiang Hou and Sun-Yuan Kung. Multi-dimensional model compression of vision transformer. In 2022 IEEE International Conference on Multimedia and Expo (ICME) ,pages 01–06, 2022. 2 [28] Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: Low-rank adaptation of large language mod-els. In International Conference on Learning Representa-tions , 2022. 1, 2, 3, 5, 6, 7, 4 [29] Zhiqiang Hu, Lei Wang, Yihuai Lan, Wanyu Xu, Ee-Peng Lim, Lidong Bing, Xing Xu, Soujanya Poria, and Roy Lee. LLM-adapters: An adapter family for parameter-efficient fine-tuning of large language models. In Proceedings of the 2023 Conference on Empirical Methods in Natural Lan-guage Processing , pages 5254–5276, Singapore, 2023. As-sociation for Computational Linguistics. 4 [30] Qiushi Huang, Tom Ko, Zhan Zhuang, Lilian Tang, and Yu Zhang. HiRA: Parameter-efficient hadamard high-rank adaptation for large language models. In The Thirteenth In-ternational Conference on Learning Representations , 2025. 6[31] Leonardo Iurada, Marco Ciccone, and Tatiana Tommasi. Finding lottery tickets in vision models via data-driven spectral foresight pruning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 16142–16151, 2024. 2 [32] Minchan Kang, Sanghyeok Son, and Daeshik Kim. Adap-tive class token knowledge distillation for efficient vi-sion transformer. Knowledge-Based Systems , 304:112531, 2024. 2 [33] Samir Khaki and Konstantinos N Plataniotis. The need for speed: Pruning transformers with one recipe. In The Twelfth International Conference on Learning Representa-tions , 2024. 2 [34] A. Krizhevsky and G. Hinton. Learning multiple layers of features from tiny images. Master’s thesis, Department of Computer Science, University of Toronto , 2009. 4, 5, 3 [35] Jongho Lee and Hyun Kim. Dct-vit: High-frequency pruned vision transformer with discrete cosine transform. 
+
+IEEE Access , 12:80386–80396, 2024. 2 [36] Lujun Li, Peijie Dong, Zhenheng Tang, Xiang Liu, Qiang Wang, Wenhan Luo, Wei Xue, Qifeng Liu, Xiaowen Chu, and Yike Guo. Discovering sparsity allocation for layer-wise pruning of large language models. In Proceedings of the 38th International Conference on Neural Information Processing Systems , Red Hook, NY, USA, 2024. Curran Associates Inc. 2 [37] Yang Li, Shaobo Han, and Shihao Ji. Vb-lora: Extreme parameter efficient fine-tuning with vector banks. In The 38th Conference on Neural Information Processing Systems (NeurIPS) , 2024. 2, 5, 7 [38] Yanwei Li, Chengyao Wang, and Jiaya Jia. LLaMA-VID: An image is worth 2 tokens in large language models. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition , 2024. 1, 2, 4 [39] Dongze Lian, Daquan Zhou, Jiashi Feng, and Xinchao Wang. Scaling & shifting your features: A new baseline for efficient model tuning. In Advances in Neural Informa-tion Processing Systems (NeurIPS) , 2022. 5, 6, 7 [40] Yan-Shuo Liang and Wu-Jun Li. Inflora: Interference-free low-rank adaptation for continual learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pat-tern Recognition , pages 23638–23647, 2024. 1 [41] Baohao Liao and Christof Monz. 3-in-1: 2d rotary adapta-tion for efficient finetuning, efficient batching and compos-ability. In The Thirty-eighth Annual Conference on Neural Information Processing Systems , 2024. 2, 5, 7 [42] Gui Ling, Ziyang Wang, Yuliang Yan, and Qingwen Liu. Slimgpt: Layer-wise structured pruning for large language models. In Advances in Neural Information Processing Sys-tems , pages 107112–107137. Curran Associates, Inc., 2024. 2[43] Vijay Lingam, Atula Tejaswi Neerkaje, Aditya Vavre, Aneesh Shetty, Gautham Krishna Gudur, Joydeep Ghosh, Eunsol Choi, Alex Dimakis, Aleksandar Bojchevski, and sujay sanghavi. SVFT: Parameter-efficient fine-tuning with singular vectors. In The Thirty-eighth Annual Conference on Neural Information Processing Systems , 2024. 5, 6, 7 [44] Deyuan Liu, Zhanyue Qin, Hairu Wang, Zhao Yang, Zecheng Wang, Fangying Rong, Qingbin Liu, Yanchao Hao, Bo Li, Xi Chen, Cunhang Fan, Zhao Lv, Dianhui Chu, Zhiying Tu, and Dianbo Sui. Pruning via merging: Com-pressing LLMs via manifold alignment based layer merg-ing. In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing , pages 17817– 17829, Miami, Florida, USA, 2024. Association for Com-putational Linguistics. 2 [45] Haokun Liu, Derek Tam, Mohammed Muqeeth, Jay Mohta, Tenghao Huang, Mohit Bansal, and Colin Raffel. Few-shot parameter-efficient fine-tuning is better and cheaper than in-context learning. In Proceedings of the 36th Interna-tional Conference on Neural Information Processing Sys-tems , Red Hook, NY, USA, 2022. Curran Associates Inc. 2, 5, 7 [46] He Liu, Yikai Wang, Huaping Liu, Fuchun Sun, and An-bang Yao. Small scale data-free knowledge distillation. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition (CVPR) , pages 6008–6016, 2024. 2 [47] Shih-Yang Liu, Chien-Yi Wang, Hongxu Yin, Pavlo Molchanov, Yu-Chiang Frank Wang, Kwang-Ting Cheng, and Min-Hung Chen. Dora: weight-decomposed low-rank adaptation. In Proceedings of the 41st International Con-ference on Machine Learning . JMLR.org, 2024. 1, 2, 5, 7, 4, 6 [48] Weiyang Liu, Zeju Qiu, Yao Feng, Yuliang Xiu, Yuxuan Xue, Longhui Yu, Haiwen Feng, Zhen Liu, Juyeon Heo, Songyou Peng, Yandong Wen, Michael J. Black, Adrian Weller, and Bernhard Sch¨ olkopf. Parameter-efficient or-thogonal finetuning via butterfly factorization. In ICLR ,2024. 2, 5, 7 [49] Ilya Loshchilov and Frank Hutter. Decoupled weight de-cay regularization. In International Conference on Learn-ing Representations , 2019. 4 [50] S. Maji, J. Kannala, E. Rahtu, M. Blaschko, and A. Vedaldi. Fine-grained visual classification of aircraft. -, 2013. 4, 5, 3[51] Junzhu Mao, Yang Shen, Jinyang Guo, Yazhou Yao, Xian-sheng Hua, and Hengtao Shen. Prune and merge: Efficient token compression for vision transformer with spatial in-formation preserved. IEEE Transactions on Multimedia ,27:4670–4683, 2025. 1 [52] Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish Sab-harwal. Can a suit of armor conduct electricity? a new dataset for open book question answering. In Proceed-ings of the 2018 Conference on Empirical Methods in Natu-ral Language Processing , pages 2381–2391, Brussels, Bel-gium, 2018. Association for Computational Linguistics. 4 [53] Mahdi Nikdan, Soroush Tabesh, Elvir Crnˇ cevi´ c, and Dan Alistarh. RoSA: Accurate parameter-efficient fine-tuning via robust adaptation. In Forty-first International Confer-ence on Machine Learning , 2024. 2, 5 [54] Mahdi Nikdan, Soroush Tabesh, Elvir Crnˇ cevi´ c, and Dan Alistarh. RoSA: Accurate parameter-efficient fine-tuning via robust adaptation. In Proceedings of the 41st Inter-national Conference on Machine Learning , pages 38187– 38206. PMLR, 2024. 1, 2 [55] Maria-Elena Nilsback and Andrew Zisserman. Automated flower classification over a large number of classes. In In-dian Conference on Computer Vision, Graphics and Image Processing , 2008. 4, 3 [56] Sungho Park and Hyeran Byun. Fair-vpt: Fair visual prompt tuning for image classification. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 12268–12278, 2024. 2 [57] Runyu Peng, Yunhua Zhou, Qipeng Guo, Yang Gao, Hang Yan, Xipeng Qiu, and Dahua Lin. Data-freeweight com-press and denoise for large language models. CoRR ,abs/2402.16319, 2024. 6, 4 [58] Bryan A. Plummer, Nikoli Dryden, Julius Frost, Torsten Hoefler, and Kate Saenko. Neural parameter allocation search. In International Conference on Learning Repre-sentations , 2022. 2, 3, 4 [59] Ariadna Quattoni and Antonio Torralba. Recognizing in-door scenes. In 2009 IEEE Conference on Computer Vision and Pattern Recognition , pages 413–420, 2009. 4, 3 [60] Harsh Rangwani, Pradipto Mondal, Mayank Mishra, Ashish Ramayee Asokan, and R. Venkatesh Babu. Deit-lt: Distillation strikes back for vision transformer training on long-tailed datasets. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 23396–23406, 2024. 1, 2 [61] Pengjie Ren, Chengshun Shi, Shiguang Wu, Mengqi Zhang, Zhaochun Ren, Maarten Rijke, Zhumin Chen, and Jiahuan Pei. MELoRA: Mini-ensemble low-rank adapters for parameter-efficient fine-tuning. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 3052–3064, Bangkok, Thailand, 2024. Association for Computational Linguistics. 2 [62] Keisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavat-ula, and Yejin Choi. Winogrande: an adversarial winograd schema challenge at scale. Commun. ACM , 64(9):99–106, 2021. 4 [63] Maarten Sap, Hannah Rashkin, Derek Chen, Ronan Le Bras, and Yejin Choi. Social IQa: Commonsense rea-soning about social interactions. In Proceedings of the 2019 Conference on Empirical Methods in Natural Lan-guage Processing and the 9th International Joint Confer-ence on Natural Language Processing (EMNLP-IJCNLP) ,pages 4463–4473, Hong Kong, China, 2019. Association for Computational Linguistics. 4 [64] Pedro Savarese and Michael Maire. Learning implicitly re-current CNNs through parameter sharing. In International Conference on Learning Representations , 2019. 2 [65] Ayan Sengupta, Siddhant Chaudhary, and Tanmoy Chakraborty. You only prune once: Designing calibration-free model compression with policy learning. In The Thir-teenth International Conference on Learning Representa-tions , 2025. 2, 6, 4 [66] Chikai Shang, Mengke Li, Yiqun Zhang, Zhen Chen, Jinlin Wu, Fangqing Gu, Yang Lu, and Yiu-Ming Cheung. Pro-vpt: Distribution-adaptive visual prompt tuning via prompt relocation. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pages 1558–1568, 2025. 2 [67] Chengchao Shen, Hourun Zhu, Gongfan Fang, Jianxin Wang, and Xinchao Wang. Diversity-guided mlp reduc-tion for efficient large vision transformers. arXiv preprint arXiv:2506.07138 , 2025. 5, 6 [68] Dachuan Shi, Chaofan Tao, Ying Jin, Zhendong Yang, Chun Yuan, and Jiaqi Wang. UPop: Unified and progressive pruning for compressing vision-language transformers. In 
+
+Proceedings of the 40th International Conference on Ma-chine Learning , pages 31292–31311. PMLR, 2023. 1 [69] Chongjie Si, Xiaokang Yang, and Wei Shen. See further for parameter efficient fine-tuning by standing on the shoulders of decomposition. arXiv preprint arXiv:2407.05417 , 2024. 1[70] Sridhar Swaminathan, Deepak Garg, Rajkumar Kannan, and Frederic Andres. Sparse low rank factorization for deep neural network compression. Neurocomputing , 398:185– 196, 2020. 2 [71] Nazia Tasnim and Bryan A. Plummer. Recast: Reparam-eterized, compact weight adaptation for sequential tasks. In International Conference on Learning Representations (ICLR) , 2025. 2, 3, 4, 5, 6, 7 [72] M. Tukan, A. Maalouf, M. Weksler, and D. Feldman. No fine-tuning, no cry: robust svd for compressing deep net-works. Sensors , 21:5599, 2021. 2 [73] Mojtaba Valipour, Mehdi Rezagholizadeh, Ivan Kobyzev, and Ali Ghodsi. DyLoRA: Parameter-efficient tuning of pre-trained models using dynamic search-free low-rank adaptation. In Proceedings of the 17th Conference of the European Chapter of the Association for Computational Linguistics , pages 3274–3287, Dubrovnik, Croatia, 2023. Association for Computational Linguistics. 2 [74] C. Wah, S. Branson, P. Welinder, P. Perona, and S. Be-longie. The caltech-ucsd birds-200-2011 dataset. Technical Report CNS-TR-2011-001, California Institute of Technol-ogy, 2011. 4, 5, 3 [75] Ao Wang, Hui Chen, Zijia Lin, Sicheng Zhao, Jungong Han, and Guiguang Ding. Cait: Triple-win compression towards high accuracy, fast inference, and favorable trans-ferability for vits. IEEE Transactions on Pattern Analysis and Machine Intelligence , pages 1–17, 2025. 2 [76] H. Wang, J. Chang, Y. Zhai, X. Luo, J. Sun, Z. Lin, and Q. Tian. Lion: implicit vision prompt tuning. Proceedings of the AAAI Conference on Artificial Intelligence , 38:5372– 5380, 2024. 2 [77] Jingcun Wang, Yu-Guang Chen, Ing-Chao Lin, Bing Li, and Grace Li Zhang. Basis sharing: Cross-layer parameter sharing for large language model compression. In The Thir-teenth International Conference on Learning Representa-tions , 2025. 1, 2, 3, 4, 5, 6 [78] Kaili Wang, Zhaopan Xu, Yukun Zhou, Zelin Zang, Trevor Darrell, Zhuang Liu, and Yang You. Neural network pa-rameter diffusion. In -, 2024. 1 [79] Xin Wang, Yu Zheng, Zhongwei Wan, and Mi Zhang. SVD-LLM: Truncation-aware singular value decomposition for large language model compression. In The Thirteenth In-ternational Conference on Learning Representations , 2025. 2, 3 [80] Yuzhu Wang, Lechao Cheng, Chaowei Fang, Dingwen Zhang, Manni Duan, and Meng Wang. Revisiting the power of prompt for visual tuning. In Proceedings of the 41st In-ternational Conference on Machine Learning . JMLR.org, 2024. 2 [81] Yu Wang, Xin Li, Shengzhao Weng, Gang Zhang, Haix-iao Yue, Haocheng Feng, Junyu Han, and Errui Ding. Kd-detr: Knowledge distillation for detection transformer with consistent distillation points sampling. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 16016–16025, 2024. 2 [82] Zifeng Wang, Zizhao Zhang, Chen-Yu Lee, Han Zhang, Ruoxi Sun, Xiaoqi Ren, Guolong Su, Vincent Perot, Jen-nifer Dy, and Tomas Pfister. Learning to prompt for contin-ual learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 139– 149, 2022. 2 [83] Hao Wu, Patrick Judd, Xiaojie Zhang, Mikhail Isaev, and Paulius Micikevicius. Integer quantization for deep learn-ing inference: Principles and empirical evaluation, 2020. 6, 7[84] Kaixin Xu, Zhe Wang, Runtao Huang, Xue Geng, Jie Lin, Xulei Yang, Min Wu, Xiaoli Li, and Weisi Lin. Efficient Distortion-Minimized Layerwise Pruning . IEEE Transac-tions on Pattern Analysis & Machine Intelligence , 47(10): 9298–9315, 2025. 5, 6 [85] Yifei Yang, Zouying Cao, and Hai Zhao. LaCo: Large lan-guage model pruning via layer collapse. In Findings of the Association for Computational Linguistics: EMNLP 2024 ,pages 6401–6417, Miami, Florida, USA, 2024. Association for Computational Linguistics. 2 [86] Zhendong Yang, Zhe Li, Ailing Zeng, Zexian Li, Chun Yuan, and Yu Li. Vitkd: Feature-based knowledge distil-lation for vision transformers. In 2024 IEEE/CVF Confer-ence on Computer Vision and Pattern Recognition Work-shops (CVPRW) , pages 1379–1388, 2024. 1, 2 [87] Linli Yao, Lei Li, Shuhuai Ren, Lean Wang, Yuanxin Liu, Xu Sun, and Lu Hou. DeCo: Decoupling token compres-sion from semantic abstraction in multimodal large lan-guage models. arXiv:2405.20985 , 2024. 1 [88] Hancheng Ye, Chong Yu, Peng Ye, Renqiu Xia, Yansong Tang, Jiwen Lu, Tao Chen, and Bo Zhang. Once for both: Single stage of importance and sparsity search for vision transformer compression. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 5578–5588, 2024. 2 [89] Bruce X.B. Yu, Jianlong Chang, Haixin Wang, Lingbo Liu, Shijie Wang, Zhiyu Wang, Junfan Lin, Lingxi Xie, Haojie Li, Zhouchen Lin, Qi Tian, and Chang Wen Chen. Visual tuning. ACM Comput. Surv. , 56(12), 2024. 2 [90] H. Yu and J. Wu. A unified pruning framework for vi-sion transformers. Science China Information Sciences , 66, 2023. 1 [91] Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. Hellaswag: Can a machine really finish your sentence? In Proceedings of the 57th Annual Meet-ing of the Association for Computational Linguistics , pages 4791–4800, 2019. 4 [92] Runjia Zeng, Cheng Han, Qifan Wang, Chunshu Wu, Tong Geng, Lifu Huang, Ying Nian Wu, and Dongfang Liu. Vi-sual fourier prompt tuning. In Advances in Neural Infor-mation Processing Systems , pages 5552–5585. Curran As-sociates, Inc., 2024. 2 [93] Xiaohua Zhai, Joan Puigcerver, Alexander Kolesnikov, Pierre Ruyssen, Carlos Riquelme, Mario Lucic, Josip Djo-longa, Andre Susano Pinto, Maxim Neumann, Alexey Dosovitskiy, Lucas Beyer, Olivier Bachem, Michael Tschannen, Marcin Michalski, Olivier Bousquet, Sylvain Gelly, and Neil Houlsby. A large-scale study of represen-tation learning with the visual task adaptation benchmark, 2020. 1, 4, 5, 2, 3 [94] Baoquan Zhang, Chuyao Luo, Demin Yu, Xutao Li, Hui-wei Lin, Yunming Ye, and Bowen Zhang. Metadiff: Meta-learning with conditional diffusion for few-shot learning. 
+
+Proceedings of the AAAI Conference on Artificial Intelli-gence , 38(15):16687–16695, 2024. 1 [95] Hanxiao Zhang, Yifan Zhou, and Guo-Hua Wang. Dense vision transformer compression with few samples. In Pro-ceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition (CVPR) , pages 15825–15834, 2024. 2 [96] Jinnian Zhang, Houwen Peng, Kan Wu, Mengchen Liu, Bin Xiao, Jianlong Fu, and Lu Yuan. Minivit: Compressing vi-sion transformers with weight multiplexing. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pat-tern Recognition (CVPR) , pages 12145–12154, 2022. 1, 2 [97] J. Zhang, X. Ma, X. Wang, L. Qiu, J. Wang, Y. Jiang, and J. Sang. Adversarial prompt tuning for vision-language mod-els. Lecture Notes in Computer Science , pages 56–72, 2024. 2[98] Mingyang Zhang, Hao Chen, Chunhua Shen, Zhen Yang, Linlin Ou, Xinyi Yu, and Bohan Zhuang. LoRAPrune: Structured pruning meets low-rank parameter-efficient fine-tuning. In Findings of the Association for Computational Linguistics: ACL 2024 , pages 3013–3026, Bangkok, Thai-land, 2024. Association for Computational Linguistics. 2 [99] Peng Zhang, Cong Tian, Liang Zhao, and Zhenhua Duan. Intra-head pruning for vision transformers via inter-layer dimension relationship modeling. Neural Networks , 190: 107656, 2025. 2 [100] Qingru Zhang, Minshuo Chen, Alexander Bukharin, Pengcheng He, Yu Cheng, Weizhu Chen, and Tuo Zhao. Adaptive budget allocation for parameter-efficient fine-tuning. In The Eleventh International Conference on Learn-ing Representations , 2023. 2 [101] Yuan Zhang, Chun-Kai Fan, Junpeng Ma, Wenzhao Zheng, Tao Huang, Kuan Cheng, Denis A Gudovskiy, Tomoyuki Okuno, Yohei Nakata, Kurt Keutzer, and Shanghang Zhang. SparseVLM: Visual token sparsification for efficient vision-language model inference. In Forty-second International Conference on Machine Learning , 2025. 1 [102] Yitao Zhu, Zhenrong Shen, Zihao Zhao, Sheng Wang, Xin Wang, Xiangyu Zhao, Dinggang Shen, and Qian Wang. Melo: Low-rank adaptation is better than fine-tuning for medical image diagnosis. In 2024 IEEE International Sym-posium on Biomedical Imaging (ISBI) , pages 1–5, 2024. 1

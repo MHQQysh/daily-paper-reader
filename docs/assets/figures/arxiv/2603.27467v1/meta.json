@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.27467v1/fig-001.webp",
+      "caption": "Table 1: Angular vs scalar quantization. ∆PPL (lower is better). TurboAngle bit rates count angle bits only; norms are stored in fp32.",
+      "page": 6,
+      "index": 1,
+      "width": 690,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27467v1/fig-002.webp",
+      "caption": "Table 2: Per-layer early-boost results on seven models. WikiText-2 perplexity at 32K tokens. “Uniform” is the K128V64 baseline (3.25 angle bits/element). Best per-layer config is the optimal configuration found through systematic sweep. Angle bits count only angular indices; norms are in fp32.",
+      "page": 6,
+      "index": 2,
+      "width": 668,
+      "height": 263
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27467v1/fig-003.webp",
+      "caption": "Table 4: Layer-group sensitivity for phi-1.5. Each row boosts one 4-layer group to K256V128 (3.33 angle bits) while the rest stays at K128V64 (3.25 bits). Uniform baseline ∆PPL = +0.0245.",
+      "page": 7,
+      "index": 3,
+      "width": 668,
+      "height": 203
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27467v1/fig-004.webp",
+      "caption": "Table 3: Optimal per-layer configurations. nearly K , nearly V are the angle codebook sizes for boosted layers; remaining layers use nK=128, nV =64.",
+      "page": 7,
+      "index": 4,
+      "width": 860,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27467v1/fig-005.webp",
+      "caption": "Table 5: Norm quantization results. ∆PPL relative to fp16 inference. “FP32” column reproduces the best per-layer angle-only results from Table 2. “norm8” applies 8-bit per-vector min-max quantization to all norms. “K8V4-log” uses 8-bit linear K norms and 4-bit log-space V norms. Total bits includes angle bits, norm bits, and per-vector min-max overhead.",
+      "page": 8,
+      "index": 5,
+      "width": 852,
+      "height": 227
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27467v1/fig-006.webp",
+      "caption": "Figure 1: TurboAngle pipeline. Top: the compression path applies a random diagonal rotation D, the normalized FWHT H, polar decomposition of consecutive pairs, and uniform angle quantization on S1, storing angle indices ki and norms ri. Bottom: reconstruction maps (ki, ri) back to Cartesian coordinates via trigonometric lookup, then applies the inverse FWHT to recover the approximate KV vector.",
+      "page": 4,
+      "index": 6,
+      "width": 979,
+      "height": 550
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27467v1/fig-007.webp",
+      "caption": "Table 6: Comparison with calibration-based KV cache quantizers. ∆PPL is the reported perplexity degradation on the respective evaluation model. TurboAngle requires zero calibration data and no per-channel statistics.",
+      "page": 9,
+      "index": 7,
+      "width": 844,
+      "height": 188
+    }
+  ]
+}

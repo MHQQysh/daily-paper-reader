@@ -1,0 +1,110 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-001.webp",
+      "caption": "Figure 1. PR approach comparison. (a) Prior work in PR typically focuses on PEFT or MC alone [3, 7, 15, 19, 26, 28, 40, 47, 54, 60, 68, 69, 77, 78, 86, 90, 94, 96, 102], which can result in efficient combinations when deployed together. (b) Our unified PR approach CRISP decomposes a pretrained models weights that support both MC and PEFT, enabling us to more effectively use parameter budgets even as tasks scale.",
+      "page": 1,
+      "index": 1,
+      "width": 487,
+      "height": 343
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-002.webp",
+      "caption": "Table 3. LLaMA3.2-1B [22] compression at 30% parameter reduction across seven commonsense reasoning benchmarks. CRISP’s 5% average gain shows it can perform well on LLMs, demonstrating an ability generalize across architectures we found many prior works lack.",
+      "page": 6,
+      "index": 2,
+      "width": 652,
+      "height": 211
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-003.webp",
+      "caption": "Table 2. ViT-B/16 [13] compression at 50% parameter reduction across six fine-grained benchmarks. Upper: post-compression accuracy with classifier-only adaptation; CRISP leads all baselines using only 2% of ImageNet-1K [11] for distillation. Lower: compressed backbones used as initialization for PEFT; CRISP achieves state-of-the-art, outperforming the best pruning+PEFT combination by about 1 point and RECAST with coefficient tuning by 5 points, suggesting that compression quality directly bounds downstream task adaptability.",
+      "page": 6,
+      "index": 3,
+      "width": 972,
+      "height": 720
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-004.webp",
+      "caption": "Table 11. LLaMA3.2-1B [22] MC+PEFT results at 30% parameter reduction across seven commonsense reasoning benchmarks. All baselines pair a compression method with a separate PEFT method, whereas CRISP compresses and adapts within the same factorized framework using lightweight coefficient tuning.",
+      "page": 15,
+      "index": 4,
+      "width": 1024,
+      "height": 695
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-005.webp",
+      "caption": "Table 10. Comparison of PEFT methods on commonsense reasoning benchmarks. Results from LoRA and DoRA are taken from Liu et al. [47], HiRA results are from Huang et al. [30]. We find that CRISP is on par or better than custom PEFT methods while using an order of magnitude fewer parameters. Further, CRISP can also support MC, as we show in Tab. 11, demonstrating its ability to generalize to more PR tasks than prior PEFT methods.",
+      "page": 15,
+      "index": 5,
+      "width": 751,
+      "height": 420
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-006.webp",
+      "caption": "Table 5. Efficiency using a NVIDIA L40S for task adaptation on ViT-B/16 [13] backbone under matched finetuning parameter budgets (∼150K–240K trainable parameters, excluding head).",
+      "page": 7,
+      "index": 6,
+      "width": 442,
+      "height": 335
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-007.webp",
+      "caption": "Table 9. Compression results on ViT-B/16 [13] at 75% parameter reduction evaluated on six fine-grained classification benchmarks (see Tab. 2 of the main paper for 50% reduction). Upper section: post-compression accuracy with only classifier adaptation. Lower section: MC+PEFT combinations demonstrate compressed models as initialization for downstream tasks. We find that CRISP outperforms prior work by up to 11%.",
+      "page": 14,
+      "index": 7,
+      "width": 968,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-008.webp",
+      "caption": "Figure 2. CRISP decomposes a pretrained weight matrix into a frozen shared basis and small, learnable mixer matrices, then retrofits these components back into the model (Sec. 3.2). Compression is achieved by reducing the basis size, while adaptation is enabled by fine-tuning only the lightweight, nonlinearly gated mixer matrices (Sec. 3.1) - allowing both Parameter Recombination (PR) applications to coexist within a single factorized structure with no redundant adapters).",
+      "page": 3,
+      "index": 8,
+      "width": 1034,
+      "height": 189
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-009.webp",
+      "caption": "Figure 8. Robustness to initialization methods. We evaluate four standard initialization schemes (Uniform, Kaiming, Xavier, Orthogonal) for the mixer matrices A′rs during both neural mimicry retrofitting and subsequent task adaptation.",
+      "page": 13,
+      "index": 9,
+      "width": 471,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-010.webp",
+      "caption": "Figure 7. Effect of reconstruction loss functions during neural mimicry. We compare four loss functions (Huber, Smooth-L1, MSE, L1) used in the neural mimicry stage (Equation 5 of main paper) for retrofitting pretrained weights into CRISP’s basis-mixer decomposition.",
+      "page": 13,
+      "index": 10,
+      "width": 463,
+      "height": 386
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-011.webp",
+      "caption": "Figure 5. Impact of mixer matrix dimensions on model capacity and performance. (a) Fixed columns (s = 16): Increasing rows reduces parameters but collapses accuracy. (b) Fixed rows (r = 16): Increasing columns scales capacity and recovers performance. Results across CIFAR-100, CUB-Birds, and FGVCAircraft demonstrate that basis capacity (columns) is the dominant factor for maintaining model quality, while coefficient expressivity (rows) plays a secondary role. Red dotted line: original model.",
+      "page": 8,
+      "index": 11,
+      "width": 480,
+      "height": 728
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-012.webp",
+      "caption": "Table 7. Details on the Benchmarking Datasets used for finetuning Compressed ViT-B/16 [13]",
+      "page": 12,
+      "index": 12,
+      "width": 392,
+      "height": 506
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27383v1/fig-013.webp",
+      "caption": "Figure 6. Impact of regularization constraint placement across PRE, POST, and TEMP configurations. PRE (our method) achieves the most consistent performance, while ReLU causes severe degradation due to weight sparsification.",
+      "page": 12,
+      "index": 13,
+      "width": 538,
+      "height": 386
+    }
+  ]
+}

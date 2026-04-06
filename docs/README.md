@@ -6,100 +6,76 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-03-08 ~ 2026-04-06
-- 运行时间：2026-04-06 10:58:13 UTC
+- 最新运行日期：2026-03-28 ~ 2026-04-06
+- 运行时间：2026-04-06 11:59:47 UTC
 - 运行状态：成功
-- 本次总论文数：26
-- 精读区：15
+- 本次总论文数：18
+- 精读区：7
 - 速读区：11
 
 ### 今日简报（AI）
-本期深度复盘 26 篇多智能体强化学习前沿进展，聚焦去中心化协作与复杂系统控制。
-满分论文揭示了感知通信的无人机部署及反事实信用分配的新高度，LLM 驱动的可解释策略亦成亮点。
-建议优先研读两篇满分论文以掌握去中心化协作的最优解，并关注大模型在多智能体决策中的跨界应用。
-- 详情：[/20260308-20260406/README](/20260308-20260406/README)
+本期精选 18 篇前沿论文，深度攻克视频 LLM、语音识别及 3D 问答等复杂场景下的模型压缩与剪枝难题。
+核心突破在于 V-CAST 的视频曲率感知剪枝与 Whisper 编码器深度优化，实现了计算效率与多模态理解性能的双重飞跃。
+建议关注参数高效重组（DMA）与张量分解技术，探索在资源受限环境下部署高性能大模型的最佳实践。
+- 详情：[/20260328-20260406/README](/20260328-20260406/README)
 
 ### 精读区论文标签
-1. [Communication-Aware Multi-Agent Reinforcement Learning for Decentralized Cooperative UAV Deployment](/20260308-20260406/2603.16141v1-communication-aware-multi-agent-reinforcement-learning-for-decentralized-cooperative-uav-deployment)  
-   标签：评分：10.0/10、query:marl
-   evidence：在中心化训练分布式执行（CTDE）框架下训练
-2. [Counterfactual Credit Policy Optimization for Multi-Agent Collaboration](/20260308-20260406/2603.21563v1-counterfactual-credit-policy-optimization-for-multi-agent-collaboration)  
-   标签：评分：10.0/10、query:marl
-   evidence：多智能体协作的反事实信用分配
-3. [Agent Q-Mix: Selecting the Right Action for LLM Multi-Agent Systems through Reinforcement Learning](/20260308-20260406/2604.00344v1-agent-q-mix-selecting-the-right-action-for-llm-multi-agent-systems-through-reinforcement-learning)  
-   标签：评分：10.0/10、query:marl
-   evidence：使用QMIX价值分解的去中心化决策
-4. [A Recipe for Stable Offline Multi-agent Reinforcement Learning](/20260308-20260406/2603.08399v1-a-recipe-for-stable-offline-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：非线性价值分解的不稳定性及与VDN的比较
-5. [Strategically Robust Multi-Agent Reinforcement Learning with Linear Function Approximation](/20260308-20260406/2603.09208v1-strategically-robust-multi-agent-reinforcement-learning-with-linear-function-approximation)  
-   标签：评分：9.0/10、query:marl
-   evidence：一般博弈马尔可夫博弈中的均衡计算
-6. [STAIRS-Former: Spatio-Temporal Attention with Interleaved Recursive Structure Transformer for Offline Multi-task Multi-agent Reinforcement Learning](/20260308-20260406/2603.11691v1-stairs-former-spatio-temporal-attention-with-interleaved-recursive-structure-transformer-for-offline-multi-task-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：用于离线多任务多智能体强化学习的Transformer架构
-7. [EcoFair-CH-MARL: Scalable Constrained Hierarchical Multi-Agent RL with Real-Time Emission Budgets and Fairness Guarantees](/20260308-20260406/2603.14625v1-ecofair-ch-marl-scalable-constrained-hierarchical-multi-agent-rl-with-real-time-emission-budgets-and-fairness-guarantees)  
-   标签：评分：9.0/10、query:marl
-   evidence：受限分层多智能体强化学习框架
-8. [Markov Potential Game and Multi-Agent Reinforcement Learning for Autonomous Driving](/20260308-20260406/2603.19188v1-markov-potential-game-and-multi-agent-reinforcement-learning-for-autonomous-driving)  
-   标签：评分：9.0/10、query:marl
-   evidence：自动驾驶中的马尔可夫博弈与纳什均衡
-9. [Adaptive Robust Estimator for Multi-Agent Reinforcement Learning](/20260308-20260406/2603.21574v1-adaptive-robust-estimator-for-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：解决多智能体信用分配困难及鲁棒强化学习
-10. [COIN: Collaborative Interaction-Aware Multi-Agent Reinforcement Learning for Self-Driving Systems](/20260308-20260406/2603.24931v1-coin-collaborative-interaction-aware-multi-agent-reinforcement-learning-for-self-driving-systems)  
-   标签：评分：9.0/10、query:marl
-   evidence：用于信用分配的反事实个体-全局策略梯度
-11. [Decentralized MARL for Coarse Correlated Equilibrium in Aggregative Markov Games](/20260308-20260406/2603.27575v1-decentralized-marl-for-coarse-correlated-equilibrium-in-aggregative-markov-games)  
-   标签：评分：9.0/10、query:marl
-   evidence：马尔可夫博弈中粗相关均衡的去中心化学习
-12. [Robust Multi-Agent Reinforcement Learning for Small UAS Separation Assurance under GPS Degradation and Spoofing](/20260308-20260406/2603.28900v1-robust-multi-agent-reinforcement-learning-for-small-uas-separation-assurance-under-gps-degradation-and-spoofing)  
-   标签：评分：9.0/10、query:marl
-   evidence：MARL中智能体与对手之间的零和博弈
-13. [Internal State-Based Policy Gradient Methods for Partially Observable Markov Potential Games](/20260308-20260406/2604.00433v1-internal-state-based-policy-gradient-methods-for-partially-observable-markov-potential-games)  
-   标签：评分：9.0/10、query:marl
-   evidence：针对马尔可夫势博弈的基于内部状态的自然策略梯度方法
-14. [GRASP: Gradient Realignment via Active Shared Perception for Multi-Agent Collaborative Optimization](/20260308-20260406/2604.00717v1-grasp-gradient-realignment-via-active-shared-perception-for-multi-agent-collaborative-optimization)  
-   标签：评分：9.0/10、query:marl
-   evidence：解决 CTDE 框架中的非平稳性问题
-15. [LangMARL: Natural Language Multi-Agent Reinforcement Learning](/20260308-20260406/2604.00722v1-langmarl-natural-language-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：智能体级语言信用分配与策略梯度进化
+1. [V-CAST: Video Curvature-Aware Spatio-Temporal Pruning for Efficient Video Large Language Models](/20260328-20260406/2603.27650v1-v-cast-video-curvature-aware-spatio-temporal-pruning-for-efficient-video-large-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：针对视频大模型的免训练时空剪枝
+2. [On the Role of Encoder Depth: Pruning Whisper and LoRA Fine-Tuning in SLAM-ASR](/20260328-20260406/2603.27981v1-on-the-role-of-encoder-depth-pruning-whisper-and-lora-fine-tuning-in-slam-asr)  
+   标签：评分：9.0/10、query:llm
+   evidence：Whisper编码器的层剪枝及性能恢复
+3. [IWP: Token Pruning as Implicit Weight Pruning in Large Vision Language Models](/20260328-20260406/2604.00757v1-iwp-token-pruning-as-implicit-weight-pruning-in-large-vision-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：将Token剪枝视为视觉语言模型中的隐式权重剪枝
+4. [Swift-SVD: Theoretical Optimality Meets Practical Efficiency in Low-Rank LLM Compression](/20260328-20260406/2604.01609v1-swift-svd-theoretical-optimality-meets-practical-efficiency-in-low-rank-llm-compression)  
+   标签：评分：9.0/10、query:llm
+   evidence：使用激活感知的SVD进行低秩大模型压缩
+5. [AA-SVD : Anchored and Adaptive SVD for Large Language Model Compression](/20260328-20260406/2604.02119v1-aa-svd--anchored-and-adaptive-svd-for-large-language-model-compression)  
+   标签：评分：9.0/10、query:llm
+   evidence：无需重训的快速低秩分解大模型压缩
+6. [QAPruner: Quantization-Aware Vision Token Pruning for Multimodal Large Language Models](/20260328-20260406/2604.02816v1-qapruner-quantization-aware-vision-token-pruning-for-multimodal-large-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：多模态大语言模型的量化感知视觉Token剪枝
+7. [Collaborative Multi-Mode Pruning for Vision-Language Models](/20260328-20260406/2604.02956v1-collaborative-multi-mode-pruning-for-vision-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：视觉语言模型的协同参数与Token剪枝
 
 ### 速读区论文标签
-1. [Code-Space Response Oracles: Generating Interpretable Multi-Agent Policies with Large Language Models](/20260308-20260406/2603.10098v1-code-space-response-oracles-generating-interpretable-multi-agent-policies-with-large-language-models)  
-   标签：评分：8.0/10、query:marl
-   evidence：博弈论均衡的可解释策略
-2. [A Semi-Decentralized Approach to Multiagent Control](/20260308-20260406/2603.11802v1-a-semi-decentralized-approach-to-multiagent-control)  
-   标签：评分：8.0/10、query:marl
-   evidence：半去中心化多智能体控制算法
-3. [The price of decentralization in managing engineering systems through multi-agent reinforcement learning](/20260308-20260406/2603.11884v1-the-price-of-decentralization-in-managing-engineering-systems-through-multi-agent-reinforcement-learning)  
-   标签：评分：8.0/10、query:marl
-   evidence：多智能体强化学习中的去中心化与协作病理
-4. [A Robust and Efficient Multi-Agent Reinforcement Learning Framework for Traffic Signal Control](/20260308-20260406/2603.12096v1-a-robust-and-efficient-multi-agent-reinforcement-learning-framework-for-traffic-signal-control)  
-   标签：评分：8.0/10、query:marl
-   evidence：用于交通信号控制的多智能体强化学习框架
-5. [Multi-Agent Reinforcement Learning for UAV-Based Chemical Plume Source Localization](/20260308-20260406/2603.11582v1-multi-agent-reinforcement-learning-for-uav-based-chemical-plume-source-localization)  
-   标签：评分：7.0/10、query:marl
-   evidence：用于无人机协作导航和传感的MARL算法
-6. [Exploiting Expertise of Non-Expert and Diverse Agents in Social Bandit Learning: A Free Energy Approach](/20260308-20260406/2603.11757v1-exploiting-expertise-of-non-expert-and-diverse-agents-in-social-bandit-learning-a-free-energy-approach)  
-   标签：评分：7.0/10、query:marl
-   evidence：个体强化学习智能体群体与社会学习
-7. [Taming the Adversary: Stable Minimax Deep Deterministic Policy Gradient via Fractional Objectives](/20260308-20260406/2603.12110v1-taming-the-adversary-stable-minimax-deep-deterministic-policy-gradient-via-fractional-objectives)  
-   标签：评分：7.0/10、query:marl
-   evidence：用户策略与对抗策略之间的极大极小优化
-8. [Collaborative Multi-Agent Optimization for Personalized Memory System](/20260308-20260406/2603.12631v1-collaborative-multi-agent-optimization-for-personalized-memory-system)  
-   标签：评分：7.0/10、query:marl
-   evidence：多智能体系统的协作强化学习
-9. [Adaptive Collaboration with Humans: Metacognitive Policy Optimization for Multi-Agent LLMs with Continual Learning](/20260308-20260406/2603.07972v1-adaptive-collaboration-with-humans-metacognitive-policy-optimization-for-multi-agent-llms-with-continual-learning)  
-   标签：评分：6.0/10、query:marl
-   evidence：通过多智能体系统和策略优化扩展协作
-10. [SAGE: Multi-Agent Self-Evolution for LLM Reasoning](/20260308-20260406/2603.15255v1-sage-multi-agent-self-evolution-for-llm-reasoning)  
-   标签：评分：6.0/10、query:marl
-   evidence：利用自博弈进行大模型推理的多智能体框架
-11. [SQL-ASTRA: Alleviating Sparse Feedback in Agentic SQL via Column-Set Matching and Trajectory Aggregation](/20260308-20260406/2603.16161v1-sql-astra-alleviating-sparse-feedback-in-agentic-sql-via-column-set-matching-and-trajectory-aggregation)  
-   标签：评分：6.0/10、query:marl
-   evidence：智能体强化学习中的多轮信用分配问题
+1. [Decompose, Mix, Adapt: A Unified Framework for Parameter-Efficient Neural Network Recombination and Compression](/20260328-20260406/2603.27383v1-decompose-mix-adapt-a-unified-framework-for-parameter-efficient-neural-network-recombination-and-compression)  
+   标签：评分：8.0/10、query:llm
+   evidence：模型压缩与重组的统一框架
+2. [Compressing Transformer Language Models via Matrix Product Operator Decomposition: A Case Study on PicoGPT](/20260328-20260406/2603.28534v1-compressing-transformer-language-models-via-matrix-product-operator-decomposition-a-case-study-on-picogpt)  
+   标签：评分：8.0/10、query:llm
+   evidence：通过矩阵乘积算子分解压缩Transformer
+3. [SeGPruner: Semantic-Geometric Visual Token Pruner for 3D Question Answering](/20260328-20260406/2603.29437v1-segpruner-semantic-geometric-visual-token-pruner-for-3d-question-answering)  
+   标签：评分：8.0/10、query:llm
+   evidence：基于LLM的3D问答中的视觉Token剪枝以提升效率
+4. [Big2Small: A Unifying Neural Network Framework for Model Compression](/20260328-20260406/2603.29768v1-big2small-a-unifying-neural-network-framework-for-model-compression)  
+   标签：评分：8.0/10、query:llm
+   evidence：包含剪枝在内的模型压缩统一数学框架
+5. [TurboAngle: Near-Lossless KV Cache Compression via Uniform Angle Quantization](/20260328-20260406/2603.27467v1-turboangle-near-lossless-kv-cache-compression-via-uniform-angle-quantization)  
+   标签：评分：7.0/10、query:llm
+   evidence：大规模Transformer模型的KV缓存压缩
+6. [Rényi Entropy: A New Token Pruning Metric for Vision Transformers](/20260328-20260406/2603.27900v1-rnyi-entropy-a-new-token-pruning-metric-for-vision-transformers)  
+   标签：评分：7.0/10、query:llm
+   evidence：用于视觉Transformer推理加速的Token剪枝指标
+7. [Efficient Inference of Large Vision Language Models](/20260328-20260406/2603.27960v1-efficient-inference-of-large-vision-language-models)  
+   标签：评分：7.0/10、query:llm
+   evidence：包含视觉Token压缩在内的优化技术综述
+8. [HISA: Efficient Hierarchical Indexing for Fine-Grained Sparse Attention](/20260328-20260406/2603.28458v1-hisa-efficient-hierarchical-indexing-for-fine-grained-sparse-attention)  
+   标签：评分：7.0/10、query:llm
+   evidence：分层索引以剪枝稀疏注意力中的无关区域
+9. [KVSculpt: KV Cache Compression as Distillation](/20260328-20260406/2603.27819v1-kvsculpt-kv-cache-compression-as-distillation)  
+   标签：评分：6.0/10、query:llm
+   evidence：用于高效LLM推理的KV缓存压缩
+10. [ExFusion: Efficient Transformer Training via Multi-Experts Fusion](/20260328-20260406/2603.27965v1-exfusion-efficient-transformer-training-via-multi-experts-fusion)  
+   标签：评分：6.0/10、query:llm
+   evidence：通过多专家融合实现高效Transformer训练以减少开销
+11. [GPU-Accelerated Optimization of Transformer-Based Neural Networks for Real-Time Inference](/20260328-20260406/2603.28708v1-gpu-accelerated-optimization-of-transformer-based-neural-networks-for-real-time-inference)  
+   标签：评分：6.0/10、query:llm
+   evidence：通过混合精度优化实现Transformer模型的效率提升和加速
 
 
 <div class="dpr-home-promo-card">

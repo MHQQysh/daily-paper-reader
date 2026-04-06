@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-001.webp",
+      "caption": "Table 1. Performance comparison of LLaMA-7B on language modeling and zero-shot tasks. Baseline results are reported from their original papers. We mark the best and second-best results. Regarding specific variants: Swift-SVD employs a uniform rank allocation strategy, while Swift-SVD* utilizes our proposed dynamic compression. SVD-LLM(W) denotes the uniform compression of SVD-LLM with truncation-aware whitening only, and Dobi-SVD(w/o) / (w) represent the method without / with dynamic rank allocation.",
+      "page": 6,
+      "index": 1,
+      "width": 1017,
+      "height": 437
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-002.webp",
+      "caption": "Figure B.3. Layer-wise NER and Importance comparison (Part II).",
+      "page": 15,
+      "index": 2,
+      "width": 1002,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-003.webp",
+      "caption": "Figure 1. Swift-SVD for static weights and KV cache reduction.",
+      "page": 2,
+      "index": 3,
+      "width": 490,
+      "height": 262
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-004.webp",
+      "caption": "Figure 5. Throughput improvement and memory efficiency under batch size of 16. The generated sequence length is 1024.",
+      "page": 7,
+      "index": 4,
+      "width": 485,
+      "height": 257
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-005.webp",
+      "caption": "Figure B.2. Throughput improvement and memory efficiency under different batch sizes. The generated sequence length is 1024.",
+      "page": 14,
+      "index": 5,
+      "width": 1010,
+      "height": 294
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-006.webp",
+      "caption": "Figure B.1. Singular value distribution of Key (left) and Value (right) modules in Llama-7B. The y-axis is presented on a logarithmic scale to visualize the magnitude differences across layers.",
+      "page": 14,
+      "index": 6,
+      "width": 1004,
+      "height": 242
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-007.webp",
+      "caption": "Figure 2. Overview of Swift-SVD. a) Optimal Activation-Aware Low-Rank Compression: At each transformer layer, Swift-SVD hooks the output activation Y = XW and incrementally aggregates the covariance matrix Y TY . A single eigenvalue decomposition of this covariance yields the singular values Σ and right singular vectors V , from which the optimal activation-aware compression matrix W ∗ k and minimal reconstruction loss ϵ∗k are derived; b) Dynamic Compression: Swift-SVD generates a set of candidate dynamic rank allocation schemes that jointly consider local layer-wise Frobenius loss ϵ∗ and end-to-end layer importance β. A lightweight grid search is then performed over these candidates—each model is compressed using the optimal solution in a) and evaluated on a validation set—to select the configuration that yields the best end-to-end performance.",
+      "page": 3,
+      "index": 7,
+      "width": 1017,
+      "height": 361
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-008.webp",
+      "caption": "Table B.1. Benchmark results categorized by compression ratios and aware methods. The Original row is highlighted with gray text.",
+      "page": 13,
+      "index": 8,
+      "width": 758,
+      "height": 622
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-009.webp",
+      "caption": "Figure 3. Layer-wise NER across distinct modules and layer importance in Mistral-7B with dataset C4.",
+      "page": 4,
+      "index": 9,
+      "width": 492,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-010.webp",
+      "caption": "Figure A.1. Impact of hyperparameters α and δ on model performance for dynamic compression. Both configurations exhibit a U-shaped PPL curve.",
+      "page": 12,
+      "index": 10,
+      "width": 752,
+      "height": 236
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01609v1/fig-011.webp",
+      "caption": "Table B.2. Comparison of AI assistant responses across different datasets and compression ratios.",
+      "page": 16,
+      "index": 11,
+      "width": 1017,
+      "height": 1329
+    }
+  ]
+}

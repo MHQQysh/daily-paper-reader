@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.27819v1/fig-001.webp",
+      "caption": "Figure 1: Three paradigms for KV cache sequence-length reduction. (a) Eviction selects a subset of original KV pairs. (b) Merge combines similar pairs, modifying values but remaining anchored to original positions. (c) KVSCULPT distills the compress zone into k unconstrained pairs (orange) freely optimized in Rd via L-BFGS (keys) and least squares (values). All three keep the retain zone (green) intact. The key distinction is the degree of freedom: from discrete subset to weighted combination to fully continuous optimization.",
+      "page": 3,
+      "index": 1,
+      "width": 881,
+      "height": 257
+    }
+  ]
+}

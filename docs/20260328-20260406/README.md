@@ -1,37 +1,36 @@
 # 日报 · 2026-03-28 ~ 2026-04-06
 
-- 生成时间：2026-04-06 10:48:00 UTC
-- 当次推荐总数：19
-- 精读区：8
+- 生成时间：2026-04-06 11:59:47 UTC
+- 当次推荐总数：18
+- 精读区：7
 - 速读区：11
 
 ## 今日简报（AI）
-本期精选 19 篇前沿论文，深度探索大模型多智能体系统与强化学习在复杂博弈中的融合进化。
-重点关注 Agent Q-Mix 利用强化学习提升 LLM 多智能体决策精度，以及去中心化算法在聚合马尔可夫博弈均衡中的突破。
-建议优先研读满分论文 Agent Q-Mix，并关注多智能体 RAG 与视频推荐系统在实际协作场景中的落地潜力。
+本期精选 18 篇前沿论文，深度解析视频大模型时空剪枝与语音识别编码器优化的最新突破。
+重点关注 V-CAST 的曲率感知剪枝技术及 Whisper 模型的深度压缩，展现了多模态模型在保持高性能的同时实现极致轻量化的可能。
+建议开发者探索矩阵分解与语义几何剪枝方案，以加速大模型在 3D 问答及端侧场景的落地应用。
 
 ## 精读区
-1. [Agent Q-Mix: Selecting the Right Action for LLM Multi-Agent Systems through Reinforcement Learning](/20260328-20260406/2604.00344v1-agent-q-mix-selecting-the-right-action-for-llm-multi-agent-systems-through-reinforcement-learning) （10.0/10）
-2. [Decentralized MARL for Coarse Correlated Equilibrium in Aggregative Markov Games](/20260328-20260406/2603.27575v1-decentralized-marl-for-coarse-correlated-equilibrium-in-aggregative-markov-games) （9.0/10）
-3. [Learning Partial Action Replacement in Offline MARL](/20260328-20260406/2603.28573v1-learning-partial-action-replacement-in-offline-marl) （9.0/10）
-4. [Multi-AUV Cooperative Target Tracking Based on Supervised Diffusion-Aided Multi-Agent Reinforcement Learning](/20260328-20260406/2603.29426v1-multi-auv-cooperative-target-tracking-based-on-supervised-diffusion-aided-multi-agent-reinforcement-learning) （9.0/10）
-5. [Internal State-Based Policy Gradient Methods for Partially Observable Markov Potential Games](/20260328-20260406/2604.00433v1-internal-state-based-policy-gradient-methods-for-partially-observable-markov-potential-games) （9.0/10）
-6. [GRASP: Gradient Realignment via Active Shared Perception for Multi-Agent Collaborative Optimization](/20260328-20260406/2604.00717v1-grasp-gradient-realignment-via-active-shared-perception-for-multi-agent-collaborative-optimization) （9.0/10）
-7. [LangMARL: Natural Language Multi-Agent Reinforcement Learning](/20260328-20260406/2604.00722v1-langmarl-natural-language-multi-agent-reinforcement-learning) （9.0/10）
-8. [Fully Byzantine-Resilient Distributed Multi-Agent Q-Learning](/20260328-20260406/2604.02791v1-fully-byzantine-resilient-distributed-multi-agent-q-learning) （9.0/10）
+1. [V-CAST: Video Curvature-Aware Spatio-Temporal Pruning for Efficient Video Large Language Models](/20260328-20260406/2603.27650v1-v-cast-video-curvature-aware-spatio-temporal-pruning-for-efficient-video-large-language-models) （9.0/10）
+2. [On the Role of Encoder Depth: Pruning Whisper and LoRA Fine-Tuning in SLAM-ASR](/20260328-20260406/2603.27981v1-on-the-role-of-encoder-depth-pruning-whisper-and-lora-fine-tuning-in-slam-asr) （9.0/10）
+3. [IWP: Token Pruning as Implicit Weight Pruning in Large Vision Language Models](/20260328-20260406/2604.00757v1-iwp-token-pruning-as-implicit-weight-pruning-in-large-vision-language-models) （9.0/10）
+4. [Swift-SVD: Theoretical Optimality Meets Practical Efficiency in Low-Rank LLM Compression](/20260328-20260406/2604.01609v1-swift-svd-theoretical-optimality-meets-practical-efficiency-in-low-rank-llm-compression) （9.0/10）
+5. [AA-SVD : Anchored and Adaptive SVD for Large Language Model Compression](/20260328-20260406/2604.02119v1-aa-svd--anchored-and-adaptive-svd-for-large-language-model-compression) （9.0/10）
+6. [QAPruner: Quantization-Aware Vision Token Pruning for Multimodal Large Language Models](/20260328-20260406/2604.02816v1-qapruner-quantization-aware-vision-token-pruning-for-multimodal-large-language-models) （9.0/10）
+7. [Collaborative Multi-Mode Pruning for Vision-Language Models](/20260328-20260406/2604.02956v1-collaborative-multi-mode-pruning-for-vision-language-models) （9.0/10）
 
 ## 速读区
-1. [Corruption-robust Offline Multi-agent Reinforcement Learning From Human Feedback](/20260328-20260406/2603.28281v1-corruption-robust-offline-multi-agent-reinforcement-learning-from-human-feedback) （8.0/10）
-2. [Experience as a Compass: Multi-agent RAG with Evolving Orchestration and Agent Prompts](/20260328-20260406/2604.00901v2-experience-as-a-compass-multi-agent-rag-with-evolving-orchestration-and-agent-prompts) （8.0/10）
-3. [Multi-Agent Video Recommenders: Evolution, Patterns, and Open Challenges](/20260328-20260406/2604.02211v1-multi-agent-video-recommenders-evolution-patterns-and-open-challenges) （8.0/10）
-4. [Multi-agent Reinforcement Learning-based Joint Design of Low-Carbon P2P Market and Bidding Strategy in Microgrids](/20260328-20260406/2604.02728v1-multi-agent-reinforcement-learning-based-joint-design-of-low-carbon-p2p-market-and-bidding-strategy-in-microgrids) （8.0/10）
-5. [Heddle: A Distributed Orchestration System for Agentic RL Rollout](/20260328-20260406/2603.28101v1-heddle-a-distributed-orchestration-system-for-agentic-rl-rollout) （7.0/10）
-6. [Differentiable Normative Guidance for Nash Bargaining Solution Recovery](/20260328-20260406/2603.29297v1-differentiable-normative-guidance-for-nash-bargaining-solution-recovery) （7.0/10）
-7. [From Multi-Agent to Single-Agent: When Is Skill Distillation Beneficial?](/20260328-20260406/2604.01608v1-from-multi-agent-to-single-agent-when-is-skill-distillation-beneficial) （7.0/10）
-8. [GrandCode: Achieving Grandmaster Level in Competitive Programming via Agentic Reinforcement Learning](/20260328-20260406/2604.02721v1-grandcode-achieving-grandmaster-level-in-competitive-programming-via-agentic-reinforcement-learning) （7.0/10）
-9. [Gradient Manipulation in Distributed Stochastic Gradient Descent with Strategic Agents: Truthful Incentives with Convergence Guarantees](/20260328-20260406/2603.27962v1-gradient-manipulation-in-distributed-stochastic-gradient-descent-with-strategic-agents-truthful-incentives-with-convergence-guarantees) （6.0/10）
-10. [Dynamic Dual-Granularity Skill Bank for Agentic RL](/20260328-20260406/2603.28716v1-dynamic-dual-granularity-skill-bank-for-agentic-rl) （6.0/10）
-11. [Experience as a Compass: Multi-agent RAG with Evolving Orchestration and Agent Prompts](/20260328-20260406/2604.00901v1-experience-as-a-compass-multi-agent-rag-with-evolving-orchestration-and-agent-prompts) （6.0/10）
+1. [Decompose, Mix, Adapt: A Unified Framework for Parameter-Efficient Neural Network Recombination and Compression](/20260328-20260406/2603.27383v1-decompose-mix-adapt-a-unified-framework-for-parameter-efficient-neural-network-recombination-and-compression) （8.0/10）
+2. [Compressing Transformer Language Models via Matrix Product Operator Decomposition: A Case Study on PicoGPT](/20260328-20260406/2603.28534v1-compressing-transformer-language-models-via-matrix-product-operator-decomposition-a-case-study-on-picogpt) （8.0/10）
+3. [SeGPruner: Semantic-Geometric Visual Token Pruner for 3D Question Answering](/20260328-20260406/2603.29437v1-segpruner-semantic-geometric-visual-token-pruner-for-3d-question-answering) （8.0/10）
+4. [Big2Small: A Unifying Neural Network Framework for Model Compression](/20260328-20260406/2603.29768v1-big2small-a-unifying-neural-network-framework-for-model-compression) （8.0/10）
+5. [TurboAngle: Near-Lossless KV Cache Compression via Uniform Angle Quantization](/20260328-20260406/2603.27467v1-turboangle-near-lossless-kv-cache-compression-via-uniform-angle-quantization) （7.0/10）
+6. [Rényi Entropy: A New Token Pruning Metric for Vision Transformers](/20260328-20260406/2603.27900v1-rnyi-entropy-a-new-token-pruning-metric-for-vision-transformers) （7.0/10）
+7. [Efficient Inference of Large Vision Language Models](/20260328-20260406/2603.27960v1-efficient-inference-of-large-vision-language-models) （7.0/10）
+8. [HISA: Efficient Hierarchical Indexing for Fine-Grained Sparse Attention](/20260328-20260406/2603.28458v1-hisa-efficient-hierarchical-indexing-for-fine-grained-sparse-attention) （7.0/10）
+9. [KVSculpt: KV Cache Compression as Distillation](/20260328-20260406/2603.27819v1-kvsculpt-kv-cache-compression-as-distillation) （6.0/10）
+10. [ExFusion: Efficient Transformer Training via Multi-Experts Fusion](/20260328-20260406/2603.27965v1-exfusion-efficient-transformer-training-via-multi-experts-fusion) （6.0/10）
+11. [GPU-Accelerated Optimization of Transformer-Based Neural Networks for Real-Time Inference](/20260328-20260406/2603.28708v1-gpu-accelerated-optimization-of-transformer-based-neural-networks-for-real-time-inference) （6.0/10）
 
 ---
 使用键盘方向键可在日报/论文之间快速切换。

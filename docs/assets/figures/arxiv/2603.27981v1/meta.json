@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.27981v1/fig-001.webp",
+      "caption": "Table 4: Utterance-level degradation after removing two layers, with and without LoRA. ∆ Recov.: reduction in percentage of degraded utterances after applying LoRA.",
+      "page": 7,
+      "index": 1,
+      "width": 467,
+      "height": 332
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27981v1/fig-002.webp",
+      "caption": "Table 5: WER reduction from applying LoRA to full baseline and two-layer pruned models, measured in percentage points. Bold indicates the larger reduction. In seven of nine conditions, LoRA provides a larger reduction for the pruned model.",
+      "page": 7,
+      "index": 2,
+      "width": 480,
+      "height": 358
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27981v1/fig-003.webp",
+      "caption": "Table 3: Sweet-spot configurations (bold) per encoder scale, showing WER (%) on the test set. Net ∆ is relative to the full baseline. Reported params use the r=16 LoRA config (Dutch/English); Danish uses r=8 (∼0.8M vs. ∼1.5M overhead).",
+      "page": 7,
+      "index": 3,
+      "width": 704,
+      "height": 340
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27981v1/fig-004.webp",
+      "caption": "Figure 1: Overview of the SLAM-ASR architecture.",
+      "page": 3,
+      "index": 4,
+      "width": 412,
+      "height": 411
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27981v1/fig-005.webp",
+      "caption": "Table 7: Word-level error change (%) after applying LoRA to the two-layer pruned configurations. Sub: substitutions; Ins: insertions; Del: deletions; Tot: total word errors. Bold: error increase.",
+      "page": 9,
+      "index": 5,
+      "width": 459,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27981v1/fig-006.webp",
+      "caption": "Table 6: Representative error patterns where the pruned model produces severe errors (WER > 0.8) but LoRA achieves full recovery (WER = 0.0). Examples sampled across all three encoder variants.",
+      "page": 9,
+      "index": 6,
+      "width": 893,
+      "height": 520
+    }
+  ]
+}
