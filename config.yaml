@@ -57,6 +57,52 @@ subscriptions:
           source: manual
           note: ''
       updated_at: '2026-04-06T10:42:21.928Z'
+    - tag: 多模态大模型剪枝
+      description: 多模态大模型剪枝
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: Multimodal LLM pruning
+          keyword_cn: 多模态大模型剪枝
+          query: pruning techniques for multimodal large language models
+        - keyword: Vision-Language Model compression
+          keyword_cn: 视觉语言模型压缩
+          query: compression methods for vision-language models
+        - keyword: Structured pruning
+          keyword_cn: 结构化剪枝
+          query: structured pruning for multimodal architectures
+        - keyword: Unstructured pruning
+          keyword_cn: 非结构化剪枝
+          query: unstructured weight pruning in multimodal models
+        - keyword: Parameter efficiency
+          keyword_cn: 参数效率
+          query: improving parameter efficiency in multimodal models via pruning
+        - keyword: Model sparsity
+          keyword_cn: 模型稀疏化
+          query: inducing sparsity in multimodal large models
+      intent_queries:
+        - query: state of the art methods for multimodal large model pruning
+          query_cn: 多模态大模型剪枝的前沿方法
+          enabled: true
+          source: manual
+          note: ''
+        - query: how to prune vision language models without performance loss
+          query_cn: 如何在不损失性能的情况下对视觉语言模型进行剪枝
+          enabled: true
+          source: manual
+          note: ''
+        - query: comparison of structured and unstructured pruning in multimodal models
+          query_cn: 多模态模型中结构化与非结构化剪枝的对比
+          enabled: true
+          source: manual
+          note: ''
+        - query: efficient pruning algorithms for large scale multimodal architectures
+          query_cn: 大规模多模态架构的高效剪枝算法
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-04-06T10:44:59.566Z'
 source_backends:
   arxiv:
     papers_table: arxiv_papers
