@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.14549v2/fig-001.webp",
+      "caption": "Table 1: Performance comparison of ASAP with other pruning strategies on LLaVA-1.5-13B [31]. Ratio represents the FLOPs ratio (percentage of vanilla FLOPs retained). Avg refers to the average percentage performance across all benchmarks compared to the vanilla model. Best scores are highlighted in red.",
+      "page": 11,
+      "index": 1,
+      "width": 671,
+      "height": 267
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14549v2/fig-002.webp",
+      "caption": "Table 4: System efficiency comparison on LLaVA-1.5-7B. We evaluate the computational cost and memory footprint during the prefill phase.",
+      "page": 14,
+      "index": 2,
+      "width": 704,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14549v2/fig-003.webp",
+      "caption": "Table 3: Performance comparison of ASAP with other pruning strategies on InternVL 2.5 8B. Avg refers to the average percentage performance across all benchmarks compared to the vanilla model. Best scores within each token budget are highlighted in red.",
+      "page": 13,
+      "index": 3,
+      "width": 692,
+      "height": 213
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14549v2/fig-004.webp",
+      "caption": "Fig. 3: The two-stage ASAP architecture. After decoder layer L, a salience-guided bidirectional matrix retains top-k salient visual tokens. A feature-based similarity module then consolidates redundant tokens via salience-weighted merging and a salvage mechanism. This dual-filtering pipeline passes a compact, feature-dense visual set to layer L+ 1, strictly preserving all text and system prompts.",
+      "page": 8,
+      "index": 4,
+      "width": 725,
+      "height": 362
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14549v2/fig-005.webp",
+      "caption": "Fig. 5: Impact of integrating SG-BiMask in existing pruning frameworks.",
+      "page": 19,
+      "index": 5,
+      "width": 438,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14549v2/fig-006.webp",
+      "caption": "Table 2: Performance comparison of ASAP with other pruning strategies on LLaVA-NeXT-7B [30]. Avg refers to the average percentage performance across all benchmarks compared to the vanilla model. Best scores are highlighted in red.",
+      "page": 12,
+      "index": 6,
+      "width": 650,
+      "height": 251
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14549v2/fig-007.webp",
+      "caption": "Fig. 2: Qualitative comparison of token selection. Retained tokens (top 128) are visible, while dropped tokens are darkened. FastV demonstrates a bottom spatial bias, missing the distant third car. ASAP successfully mitigates this bias, preserving critical background features to accurately count all cars.",
+      "page": 5,
+      "index": 7,
+      "width": 723,
+      "height": 262
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-001.webp",
+      "caption": "Figure 2: Gumbel-Sigmoid temperature annealing over the course of the single-phase training. During the early epochs (e.g., τ = 2.0), the distribution resembles a Gaussian, acting as a soft, continuous regularizer. As training progresses and τ decays, the probability density sharply bi-furcates toward 0 and 1, naturally hardening the network into a discrete sub-architecture without inducing gradient shock.",
+      "page": 6,
+      "index": 1,
+      "width": 954,
+      "height": 510
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-002.webp",
+      "caption": "Figure 4: Top-1 Accuracy vs GFLOP evaluated at early training stage across different penalty configurations",
+      "page": 11,
+      "index": 2,
+      "width": 668,
+      "height": 493
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-003.webp",
+      "caption": "Table 2: Comparison of HiAP against other pruning methods on the DeiT-Small baseline. FLOPs are reported in Billions (G).",
+      "page": 7,
+      "index": 3,
+      "width": 698,
+      "height": 311
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-004.webp",
+      "caption": "Table 1: Comparison of recent structured pruning frameworks for ViTs. Existing methods target distinct subsets of the architecture, such as focusing on depth or a mix of attention heads and internal dimensions. HiAP unifies all architectural granularities to simultaneously optimize memory bandwidth (blocks/heads) and compute FLOPs (micro-structures).",
+      "page": 3,
+      "index": 4,
+      "width": 980,
+      "height": 212
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-005.webp",
+      "caption": "Figure 8: λmacro = 1.5, λmicro = 0.0",
+      "page": 13,
+      "index": 5,
+      "width": 960,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-006.webp",
+      "caption": "Figure 7: λmacro = 1.2, λmicro = 0.8",
+      "page": 13,
+      "index": 6,
+      "width": 954,
+      "height": 347
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-007.webp",
+      "caption": "Figure 9: λmacro = 0.0, λmicro = 1.5",
+      "page": 13,
+      "index": 7,
+      "width": 960,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-008.webp",
+      "caption": "Figure 1: Overview of the Hierarchical Auto-Pruning (HiAP) framework applied to a standard Vision Transformer block. The architecture’s topology is governed by learnable Gumbel-Sigmoid gates operating at two distinct granularities. Macro-gates (Block and Head logits) evaluate whether to retain or bypass entire MLP modules and attention heads. Concurrently, micro-gates (Neuron and Dimension logits) prune fine-grained structures within the surviving active structures. This dual-level formulation allows the network to autonomously carve out an optimal, hardware-efficient sub-network during a single end-to-end training phase.",
+      "page": 4,
+      "index": 8,
+      "width": 966,
+      "height": 660
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-009.webp",
+      "caption": "Figure 5: λmacro = 0.9, λmicro = 0.45",
+      "page": 12,
+      "index": 9,
+      "width": 960,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-010.webp",
+      "caption": "Figure 6: λmacro = 1.0, λmicro = 0.2",
+      "page": 12,
+      "index": 10,
+      "width": 960,
+      "height": 347
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12222v1/fig-011.webp",
+      "caption": "Table 3: Comparison with structured pruning baselines on CIFAR-10 (ViT-Tiny). All methods are constrained to specific structural MAC reduction targets.",
+      "page": 9,
+      "index": 11,
+      "width": 627,
+      "height": 207
+    }
+  ]
+}

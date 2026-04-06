@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.12646v1/fig-001.webp",
+      "caption": "Fig. 3. Attention memory per classifier session vs. sequence length. SDPA exceeds the ∼718 MB available (dashed line) at ∼6K tokens. FA stays below but grows linearly. With compression, all inputs are reduced to 512 tokens, yielding a constant footprint regardless of original prompt length.",
+      "page": 7,
+      "index": 1,
+      "width": 500,
+      "height": 318
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12646v1/fig-002.webp",
+      "caption": "TABLE XIII GPU RESOURCE REQUIREMENTS OF LLM ROUTING SYSTEMS. OUR ROUTER IS THE ONLY ONE DESIGNED TO CO-LOCATE ON THE SERVING GPU.",
+      "page": 10,
+      "index": 2,
+      "width": 509,
+      "height": 566
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12646v1/fig-003.webp",
+      "caption": "TABLE I COMPARISON OF PROMPT COMPRESSION APPROACHES. COMPRESSION LATENCY IS FOR A 16K-TOKEN INPUT. OUR METHOD IS THE ONLY ONE REQUIRING ZERO NEURAL INFERENCE, KEEPING COMPRESSION OVERHEAD TO ∼19 MS AT 16K TOKENS VS. SECONDS FOR NEURAL METHODS.†",
+      "page": 3,
+      "index": 3,
+      "width": 1060,
+      "height": 188
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12646v1/fig-004.webp",
+      "caption": "TABLE VIII STAGED ACCELERATION AT 8K TOKENS. EACH STAGE BUILDS ON THE PREVIOUS; PER-STAGE AND CUMULATIVE SPEEDUPS ARE MEASURED E2E THROUGH ENVOY (N=10 PER RUN, 2–3 RUNS; §V-A). THE 16K ROW SHOWS SCALING BEYOND THE CPU-OPERABLE REGIME.",
+      "page": 8,
+      "index": 4,
+      "width": 714,
+      "height": 295
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12646v1/fig-005.webp",
+      "caption": "Fig. 4. E2E latency comparison (log scale). GPU+FA with streaming and compression achieves 50 ms at 8K tokens. At 16K+, only GPU+FA operates (108 ms at 16K; Table VIII).",
+      "page": 8,
+      "index": 5,
+      "width": 754,
+      "height": 448
+    },
+    {
+      "url": "assets/figures/arxiv/2603.12646v1/fig-006.webp",
+      "caption": "TABLE X CLASSIFIER LATENCY UNDER CONCURRENT LOAD ON MI300X: RAW FA (TOP) VS. EFFECTIVE WITH COMPRESSION + STREAMING (BOTTOM). WITH COMPRESSION ALL INPUTS REDUCE TO ∼512 TOKENS. BOTTOM-PANEL C=1 VALUES AT 512–16K ARE MEASURED; 32K C=1 IS ESTIMATED. C>1 VALUES ARE DERIVED FROM C=1 OVERHEAD PLUS THE 512-TOKEN FA CONCURRENCY PROFILE.",
+      "page": 9,
+      "index": 6,
+      "width": 472,
+      "height": 302
+    }
+  ]
+}

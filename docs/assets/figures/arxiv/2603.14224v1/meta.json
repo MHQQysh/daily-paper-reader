@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.14224v1/fig-001.webp",
+      "caption": "Figure 4: Average task performance under different sparsity ratios on the 32K prompt Ruler Benchmark. Our method outperforms other method, with the 2-bit quantization at 7.5% sparsity.",
+      "page": 6,
+      "index": 1,
+      "width": 488,
+      "height": 313
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14224v1/fig-002.webp",
+      "caption": "Figure 5: KV cache memory overhead and latency of LlaMA3.1-8B at different prompt lengths. Our method dynamically select 7.5% tokens.",
+      "page": 6,
+      "index": 2,
+      "width": 488,
+      "height": 337
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14224v1/fig-003.webp",
+      "caption": "Table 2: Detail experimental results of Llama3.1-8B on the 32K prompt Ruler Benchmark.",
+      "page": 7,
+      "index": 3,
+      "width": 1052,
+      "height": 376
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14224v1/fig-004.webp",
+      "caption": "Figure 2: Overview of Self-Indexing KVCache. By leveraging custom kernels, we significantly reduce the runtime overhead typically associated with retrieval and dequantization. Under low-bit quantization, we optionally preserve a fixed number of full-precision sink tokens during the prefill stage to improve inference robustness, without sacrificing efficiency.",
+      "page": 3,
+      "index": 4,
+      "width": 944,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14224v1/fig-005.webp",
+      "caption": "Table 1: Performance comparison of LongBench. The best result is highlighted in underline.",
+      "page": 5,
+      "index": 5,
+      "width": 1018,
+      "height": 317
+    }
+  ]
+}

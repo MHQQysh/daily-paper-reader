@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-001.webp",
+      "caption": "Figure 4: Comparison of three baseline models and three variants of our method across different sizes. Our models converge slightly slower (left) but show better scaling of validation loss with compute, with a steeper trend vs. FLOPs (right).",
+      "page": 6,
+      "index": 1,
+      "width": 829,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-002.webp",
+      "caption": "Figure 1: Comparative diagram of dense and Hadamard layers.",
+      "page": 2,
+      "index": 2,
+      "width": 826,
+      "height": 358
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-003.webp",
+      "caption": "Figure 5: Prefill latency (ms) and throughput (tokens/s) as a function of sequence length at batch size 128. Our method consistently reduces latency and increases throughput across all model scales, with gains widening at longer sequences.",
+      "page": 7,
+      "index": 3,
+      "width": 559,
+      "height": 316
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-004.webp",
+      "caption": "Figure 6: Prefill speedup heatmap across varying batch sizes and sequence lengths. Speedup grows monotonically with the product of batch size and sequence length, consistent with the increasing dominance of the memory-bandwidth-bound regime at larger token counts.",
+      "page": 7,
+      "index": 4,
+      "width": 481,
+      "height": 362
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-005.webp",
+      "caption": "Figure 2: Computational flow of the Fast Walsh-Hadamard Transform (FWHT) showing the butterfly network structure with three stages",
+      "page": 3,
+      "index": 5,
+      "width": 826,
+      "height": 696
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-006.webp",
+      "caption": "Figure 7: Decode throughput (tokens/s) and latency (ms) as a function of batch size at sequence length T=32. Our method scales more favorably with batch size, reflecting improved memory-bandwidth utilization in the single-token (T=1) decode regime.",
+      "page": 8,
+      "index": 6,
+      "width": 479,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-007.webp",
+      "caption": "Table 4: Evaluation performance (%) across commonsense reasoning, science QA, and linguistic benchmarks. Our models are highlighted in gray.",
+      "page": 12,
+      "index": 7,
+      "width": 818,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-008.webp",
+      "caption": "Figure 8: Decode throughput comparison (batch size 1024, sequence length 2) between the pretrained baseline and our method across all model sizes. Our method consistently outperforms the baseline, with gains increasing with model scale.",
+      "page": 9,
+      "index": 8,
+      "width": 818,
+      "height": 189
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08343v1/fig-009.webp",
+      "caption": "Figure 3: Forward FLOPs for dense matrix multiplication (c2) versus the Fast Walsh–Hadamard Transform (c log2 c) across embedding dimensions used in GPT-2 (base: c=768). FWHT requires zero stored weights.",
+      "page": 5,
+      "index": 9,
+      "width": 885,
+      "height": 391
+    }
+  ]
+}

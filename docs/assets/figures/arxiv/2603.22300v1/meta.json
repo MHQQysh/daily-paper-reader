@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-001.webp",
+      "caption": "Figure 3: Latency vs. feature sparsity. Latency Comparison of dense attention and SFA (ours) at different modular levels in Transformers under 16k context length. Higher sparsity brings substantial decrease in latency.",
+      "page": 6,
+      "index": 1,
+      "width": 784,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-002.webp",
+      "caption": "Figure 11: Eigenvalue spectrum analysis for Qwen3-0.6B model. Layer-wise effective dimension of (a) query and (b) key activation with normalized cumulative eigenvalue of 0.9, evaluated on the same sampled subset of the Pile validation set in Appendix F.",
+      "page": 26,
+      "index": 2,
+      "width": 806,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-003.webp",
+      "caption": "Figure 6: Comparison of latencies in different attention scenarios: (a) full attention(Time-to-firsttoken) and (b) kv-cache attention(Time-to-next-token).",
+      "page": 15,
+      "index": 3,
+      "width": 817,
+      "height": 250
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-004.webp",
+      "caption": "Table 6: Operation counts for standard flash attention and flash attention sparse. The number of floating-point operations (FLOPs) and integer operations (INOPs) were counted separately for feature dimensions of 64 and 128 under different context lengths.",
+      "page": 15,
+      "index": 4,
+      "width": 818,
+      "height": 251
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-005.webp",
+      "caption": "Figure 7: Entropy of Top-K feature selection across layers and heads. We plot the normalized entropy of the TopK index distribution for each attention head and layer of Qwen3-0.6B when applying SFA. (a) Entropy of the TopK positions of query vectors Q (16 heads, due to GQA). (b) Entropy of the TopK positions of key vectors K (8 heads). Each cell corresponds to one (layer, head) pair, and brighter colors indicate higher entropy (more balanced use of feature dimensions).",
+      "page": 21,
+      "index": 5,
+      "width": 783,
+      "height": 764
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-006.webp",
+      "caption": "Figure 4: Latency vs. feature sparsity with various config. Latency Comparison of dense attention and SFA (ours) at different head dimensions and context lengths. Notably, the latency of SFA can be much lower than dense attention under high dimension per head and long context, e.g., Figure 4d.",
+      "page": 7,
+      "index": 6,
+      "width": 827,
+      "height": 283
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-007.webp",
+      "caption": "Figure 5: Scaling dense attention and SFA with context length. SFA can consistently reduce both the computatin cost and KV cache size by a constant factor of at least 2.",
+      "page": 7,
+      "index": 7,
+      "width": 785,
+      "height": 216
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-008.webp",
+      "caption": "Table 11: Comparison results with token-sparse, KV-pruning, low-rank, and kernel baselines on GPT-2. Token-sparse training methods include Routing(Roy et al., 2021) and Longformer(Beltagy et al., 2020); KV-pruning (training-free) methods include H2O(Zhang et al., 2023), Quest(Tang et al., 2024), and SnapKV(Li et al., 2024); Loki(Singhania et al., 2024) is a low-rank key compression method (training-free); Performer(Choromanski et al., 2021) is a kernel-based approximation. Rows marked “+SFA (k = 8)” apply our feature-sparse SFA to Longformer and SnapKV, showing that SFA is orthogonal to these approaches and can be combined with them.",
+      "page": 22,
+      "index": 8,
+      "width": 827,
+      "height": 473
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-009.webp",
+      "caption": "Table 5: Configurations for fine-tuning MoE models",
+      "page": 14,
+      "index": 9,
+      "width": 861,
+      "height": 243
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-010.webp",
+      "caption": "Figure 8: Ablation of sparsity k on GPT-2 124M with fixed head dimension d = 64. Perplexity on OpenWebText (left) and latency at 32K context (right) as a function of the Top-k sparsity level used by SFA. The dashed gray line denotes the dense (full) attention baseline; the red curve shows SFA with different k.",
+      "page": 23,
+      "index": 10,
+      "width": 647,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-011.webp",
+      "caption": "Figure 9: Ablation of head dimension dhead on GPT-2 124M with fixed sparsity k = 8. Perplexity on OpenWebText (left) and latency at 32K context (right) as a function of the head dimension dhead used by SFA. The dashed gray line denotes the dense (full) attention baseline; the red curve shows SFA with different dhead.",
+      "page": 23,
+      "index": 11,
+      "width": 646,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-012.webp",
+      "caption": "Table 3: Evaluation on general reasoning tasks and synthetic retrieval (NIAH). Accuracy is in %.",
+      "page": 8,
+      "index": 12,
+      "width": 748,
+      "height": 316
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-013.webp",
+      "caption": "Table 9: Latency (ms) versus context length.",
+      "page": 19,
+      "index": 13,
+      "width": 706,
+      "height": 753
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-014.webp",
+      "caption": "Figure 10: Validation loss curves of SFA on GPT-2 (124M) pre-training. We compare varying sparsity levels k ∈ {2, 4, 8, 16}. The curves decrease smoothly and monotonically without divergent spikes, demonstrating that SFA maintains training stability even under aggressive sparsity (k = 2).",
+      "page": 24,
+      "index": 14,
+      "width": 660,
+      "height": 342
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-015.webp",
+      "caption": "Table 10: Latency, Perplexity and Accuracy results comparison with various compression and acceleration techniques, categorized into Token-Level and Feature-Level Operations. For token-level operations, \"Longforemer\" (Beltagy et al., 2020) denotes fixed token sparsity pattern, \"NSA\" (Yuan et al., 2025) denotes dynamic token sparsity pattern. \"Dense (full)\" baselines use full hidden size and uncompressed KV cache; \"Short (d = X)\" denotes baselines with half feature dimensions; \"Quant\" denotes 8-bit quantization aware training (QAT (Liu et al., 2024b)) on weights and activations; \"Low-Rank\" denotes PCA-based projection matrix fine-tuning; \"MLA\" denotes multi head latent attention (Liu et al., 2024a), and \"MLA + SFA\" combines SFA with latent key/value. \"Latency@128k\" is measured by \"Decoding with KV cache (TTNT) (ms)\" and \"Prefilling with full attention (TTFT) (s)\". PPL is evaluated on OpenWebText for GPT-2 and Pile for Qwen3.",
+      "page": 20,
+      "index": 15,
+      "width": 830,
+      "height": 648
+    },
+    {
+      "url": "assets/figures/arxiv/2603.22300v1/fig-016.webp",
+      "caption": "Table 1: Perplexity and Accuracy results. Dense baselines use full hidden size and uncompressed KV cache; “Dense (d=X)” denotes short-embedding baselines with reduced feature dimension. PPL is evaluated on OpenWebText for GPT-2 and Pile for Qwen3. Note that “Dense (full)\" serves as a reference upper bound; we highlights the best results among the sparse/compressed baselines.",
+      "page": 5,
+      "index": 16,
+      "width": 830,
+      "height": 284
+    }
+  ]
+}

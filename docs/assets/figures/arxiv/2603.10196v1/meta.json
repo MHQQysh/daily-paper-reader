@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-001.webp",
+      "caption": "Fig. 9. Prediction error across 30 Polybench benchmarks under varying cache configurations. Columns represent fully associative (FA) and 12-way associative (12WA) caches at different sizes. The cell color reflects the amount of prediction error, while the digits in each cell indicate the simulated miss ratio value.",
+      "page": 15,
+      "index": 1,
+      "width": 815,
+      "height": 396
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-002.webp",
+      "caption": "Table 1. Analysis of Naive Matrix Multiplication (* containing imaginary RIs)",
+      "page": 7,
+      "index": 2,
+      "width": 652,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-003.webp",
+      "caption": "Fig. 3. Workflow diagram showing the existing Polygeist pipeline and our Symbolic Locality Compiler, interconnected via MLIR Affine representation.",
+      "page": 7,
+      "index": 3,
+      "width": 812,
+      "height": 266
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-004.webp",
+      "caption": "Fig. 8. Tensor Contraction Kernel Miss Count Curves",
+      "page": 14,
+      "index": 4,
+      "width": 827,
+      "height": 612
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-005.webp",
+      "caption": "Fig. 12. Comparing hardware-counter result with prediction and simulation",
+      "page": 18,
+      "index": 5,
+      "width": 827,
+      "height": 308
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-006.webp",
+      "caption": "Table 2. Affine program syntax",
+      "page": 8,
+      "index": 6,
+      "width": 656,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-007.webp",
+      "caption": "Fig. 2. An example of Infinite Repeat, with first-touch accesses (red), real reuses (blue), and imaginary reuses (green)",
+      "page": 4,
+      "index": 7,
+      "width": 729,
+      "height": 191
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-008.webp",
+      "caption": "Fig. 11. Violin plots of timing distributions for the model construction and prediction phases. The scales differ significantly between the two phases, hence they are plotted separately for clarity.",
+      "page": 17,
+      "index": 8,
+      "width": 818,
+      "height": 267
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-009.webp",
+      "caption": "Fig. 4. Formal Semantics of Timestamp Space Construction",
+      "page": 9,
+      "index": 9,
+      "width": 804,
+      "height": 508
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-010.webp",
+      "caption": "Fig. 5. Example Timestamp Space Derivation (Symbols are explained in Example 3.1).",
+      "page": 9,
+      "index": 10,
+      "width": 739,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10196v1/fig-011.webp",
+      "caption": "Fig. 10. Prediction error across 12 programs affected by MLIR affine loop fusion, under varying cache configurations. Columns represent fully associative (FA) and 12-way associative (12WA) caches at different sizes. The cell color reflects the amount of prediction error, while the digits in each cell indicate the simulated miss ratio value.",
+      "page": 16,
+      "index": 11,
+      "width": 815,
+      "height": 348
+    }
+  ]
+}

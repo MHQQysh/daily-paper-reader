@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.10353v1/fig-001.webp",
+      "caption": "Figure 9: Latency of attention serving across models with 128K input. S-HPLB outperforms the top-𝑝 method and achieves comparable performance to the top-𝑘 method.",
+      "page": 6,
+      "index": 1,
+      "width": 1046,
+      "height": 224
+    },
+    {
+      "url": "assets/figures/arxiv/2603.10353v1/fig-002.webp",
+      "caption": "Table 1: Performance (%) comparison of different models and methods on RULER. S-HPLB outperforms all other methods and maintains accuracy comparable to that of full attention across all models.",
+      "page": 5,
+      "index": 2,
+      "width": 1056,
+      "height": 358
+    }
+  ]
+}

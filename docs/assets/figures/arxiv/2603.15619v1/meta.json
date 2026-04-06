@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.15619v1/fig-001.webp",
+      "caption": "Table 4 Performance of the proposed MoDA models with varying model sizes on the downstream benchmarks. We train the 700M and 1.5B models on the 400B tokens of OLMo2 dataset. The width D, GQA group size G, sequence length T are set to 1024, 2, and 4096, respectively. We mark the best performance with the bold font.",
+      "page": 11,
+      "index": 1,
+      "width": 1009,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15619v1/fig-002.webp",
+      "caption": "Figure 4 Hardware view of MoDA depth-cache access. Left: flash-compatible hardware-efficient MoDA keeps a depth KV cache of length T × L for each sequence, so each query potentially scans a long concatenated depth KV. Right: chunk-aware MoDA groups queries by chunk size C and reorganizes depth KV by chunk, reducing the effective depth span from T × L to (C × L)/G per chunk, where G is the GQA group number. This layout improves depth KV calculation efficiency and reduces memory access overhead.",
+      "page": 7,
+      "index": 2,
+      "width": 972,
+      "height": 254
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15619v1/fig-003.webp",
+      "caption": "Table 3 Performance of different mixture-of-depths attention (MoDA) variants on the training set, C4 validation set, and downstream benchmarks. We train the 700M models on 400B tokens. For MoDA settings: ‘Sequence KV’ means the each token only attends to the sequence keys/values, can be regarded as the vanilla attention mechanism. ‘Depth KV’ means the each token attends to its depth keys/values. ‘Extra FFN KV Proj.’ means further project the FFN’s input X to the depth keys/values, which are then used in subsequent attention operations. ‘Extra Attn KV Proj.’ means set individual depth key/value projections rather than reuse the original key/value projections of sequence attention. The width D, GQA group size G, sequence length T are set to 1024, 2, and 4096, respectively. We further report the parameters and FLOPs of the models.",
+      "page": 10,
+      "index": 3,
+      "width": 1004,
+      "height": 254
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15619v1/fig-004.webp",
+      "caption": "Figure 5 Mixture-of-Depths Attention (MoDA) heatmaps with the combined-softmax formulation. Columns correspond to uniformly sampled layers {0, 11, 23, 35}, and rows correspond to randomly selected heads in each layer. The first column shows attention over sequence KV only, while the other columns show concatenated Sequence KV | Depth KV ; the red dashed line marks the boundary between the two KV blocks. Across layers and heads, substantial attention mass is consistently assigned to the depth-KV block, indicating that MoDA effectively leverages depth information in addition to standard sequence attention.",
+      "page": 14,
+      "index": 4,
+      "width": 986,
+      "height": 975
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15619v1/fig-005.webp",
+      "caption": "Figure 3 Conceptual comparison of mechanisms that utilize the depth stream. (a) Depth Residual [16] is the standard residual connection along depth: it reads the current representation and writes back by addition. (b) Depth Dense [20, 28] reads a set of historical representations and linearly projects them back to width D; it writes back by concatenation along depth, preserving all intermediate states. (c) We introduce Depth Attention as an intermediate formulation, which uses attention to read historical depth KV pairs in a data-dependent way. It writes back by concatenating the current layer’s keys and values along depth. (d) We propose the upgraded version of Depth Attention, i.e., Mixture-of-Depths Attention (MoDA), which combines depth attention with standard sequence attention. It writes both the current layer’s output and its KV pairs to depth streams for subsequent layers.",
+      "page": 4,
+      "index": 5,
+      "width": 982,
+      "height": 410
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15619v1/fig-006.webp",
+      "caption": "Table 6 Layer-number analysis of MoDA under deeper (48-layer) and shallower (24-layer) model settings. We compare vanilla attention (OLMo2) and MoDA variants with different MoDA choices, under both pre-norm and post-norm configurations. Models are trained with the same data recipe, and we report parameter count, FLOPs, and FineWeb-Edu validation loss. Across both depth regimes, introducing Depth KV consistently improves validation loss, and adding Extra FFN KV Projection yields further gains at moderate compute overhead.",
+      "page": 12,
+      "index": 6,
+      "width": 1000,
+      "height": 313
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15619v1/fig-007.webp",
+      "caption": "Table 1 Asymptotic complexity of depth-stream mechanisms. Here, T is the sequence length, D is the model width, G is the group size of Group Query Attention (GQA) [2], Hk is the number of key heads (equal to value heads Hv), Hq is the number of query heads (=GHk), d is the head dimension, and L is the number of layers. We report dominant terms and omit constant factors.",
+      "page": 5,
+      "index": 7,
+      "width": 840,
+      "height": 344
+    }
+  ]
+}

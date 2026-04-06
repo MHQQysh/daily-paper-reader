@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-001.webp",
+      "caption": "Figure 6 Roofline (left) and HBM bandwidth utilization (right) on B200 (D=4096, V =151k). The pattern matches H100 (Figure 4): FlashSampling uses bandwidth more efficiently in the memory-bound decode regime and narrows at large batch sizes where cuBLAS GEMM efficiency dominates.",
+      "page": 26,
+      "index": 1,
+      "width": 964,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-002.webp",
+      "caption": "Figure 4 Roofline (left) and HBM bandwidth utilization (right) on H100. Left: all methods track the memory-bound slope for B ≤ 64; FlashSampling sits slightly above baselines because it avoids the logits round-trip. Close to the ridge point (AI ≈ 295), performance flattens below the compute ceiling, where cuBLAS outperforms Triton. Right: FlashSampling achieves higher bandwidth utilization than all baselines in the decode regime, confirming that fusion removes overhead rather than shifting it. Appendix D shows the same pattern on B200.",
+      "page": 15,
+      "index": 2,
+      "width": 964,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-003.webp",
+      "caption": "Figure 3 Sampling runtime (left) and matmul runtime (right) in µs vs. batch size. Lower is better.",
+      "page": 15,
+      "index": 3,
+      "width": 959,
+      "height": 312
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-004.webp",
+      "caption": "Figure 1 Conventional multinomial sampling (left) materializes the full [B, V ] logits tensor in HBM between the matmul and the sampler. FlashSampling (right) fuses sampling into the matmul epilogue, followed by a lightweight reduction over vocabulary tiles. Logits are computed tile-by-tile in on-chip memory, perturbed with Gumbel noise, and reduced without ever writing the full logits tensor to HBM. Red arrows denote HBM traffic; green arrows denote on-chip data movement.",
+      "page": 2,
+      "index": 4,
+      "width": 785,
+      "height": 639
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-005.webp",
+      "caption": "Table 4 Sampling as a percentage of total kernel time. A high fraction spent on sampling rather than matmul is an indicator of inefficient sampling implementation. FlashSampling’s sampling fraction stays low because it is fused into the matmul epilogue; the baselines’ fraction grows with batch size B. Bold marks the highest sampling fraction for each method.",
+      "page": 14,
+      "index": 5,
+      "width": 906,
+      "height": 208
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-006.webp",
+      "caption": "Table 6 FlashSampling speedup vs. three baselines on the larger configuration (D=8192, V =128k). Values > 1 indicate FlashSampling is faster; bold marks the peak per GPU within each baseline. At B≥128 the advantage narrows and cuBLAS GEMM efficiency becomes increasingly important.",
+      "page": 23,
+      "index": 6,
+      "width": 968,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-007.webp",
+      "caption": "Table 3 FlashSampling speedup vs. three baselines (D=4096, V =151k). Values > 1 indicate FlashSampling is faster; bold marks the peak per GPU within each baseline. FI1: FlashInfer top-k/top-p kernel. FI2: FlashInfer Gumbel-Max kernel.",
+      "page": 13,
+      "index": 7,
+      "width": 968,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-008.webp",
+      "caption": "Figure 2 Relative performance on B300. Left: FlashSampling vs. the Multinomial Sampling (baseline = 1). Right: FlashSampling vs. FlashInfer FI1 and FI2 (baseline = 1). FlashSampling is faster than the Multinomial Sampling across all shown batch sizes, faster than FI1 throughout, and faster than FI2 in the decode regime.",
+      "page": 13,
+      "index": 8,
+      "width": 963,
+      "height": 314
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-009.webp",
+      "caption": "Figure 5 TPOT vs. concurrency on B200 for all four models. Top row: Qwen3-1.7B (up to 19% reduction) and Qwen3-8B (roughly 3–7%). Bottom row: Qwen3-32B and gpt-oss-120b, where gains are smaller because attention and FFN dominate decode time.",
+      "page": 17,
+      "index": 9,
+      "width": 963,
+      "height": 719
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-010.webp",
+      "caption": "Table 2 GPU specifications. Peak BF16 TFLOP/s are dense (without structured sparsity), since the LM-head matmul is a dense GEMM. The ops:byte ratio (peak compute / bandwidth) contextualizes the crossover between bandwidth- and compute-limited regimes, although the exact crossover is kernel-dependent.",
+      "page": 12,
+      "index": 10,
+      "width": 760,
+      "height": 196
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15854v1/fig-011.webp",
+      "caption": "Table 5 TPOT speedup (%) computed as (1− FlashSampling/baseline), and standard deviation across 5 runs. B is the maximum number of concurrent requests. Bold marks the peak per model.",
+      "page": 16,
+      "index": 11,
+      "width": 640,
+      "height": 254
+    }
+  ]
+}
