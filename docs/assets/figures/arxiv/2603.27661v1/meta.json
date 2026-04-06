@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.27661v1/fig-001.webp",
+      "caption": "Fig. 3: Qualitative comparisons between our method and baselines on three challenging samples from the BSDS500 test set [1].",
+      "page": 11,
+      "index": 1,
+      "width": 725,
+      "height": 251
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27661v1/fig-002.webp",
+      "caption": "Table 5: Quantitative comparison on the NYUDv2 test set [46]. All results are evaluated with single scale input.",
+      "page": 15,
+      "index": 2,
+      "width": 685,
+      "height": 388
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27661v1/fig-003.webp",
+      "caption": "Fig. 1: Non-edge pruning flowchart. As the backbone network extracts features, our method adaptively generates a binary decision mask by thresholding the intermediate edge score maps to determine which tokens should be pruned.",
+      "page": 2,
+      "index": 3,
+      "width": 360,
+      "height": 429
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27661v1/fig-004.webp",
+      "caption": "Fig. 4: Precision-recall curves on the BSDS500 test set [1].",
+      "page": 14,
+      "index": 4,
+      "width": 581,
+      "height": 527
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27661v1/fig-005.webp",
+      "caption": "Fig. 5: Visualization of progressive non-edge pruning for SED-SViT (top) and SEDViT (bottom). Most pruned tokens lie in smooth background regions, while tokens near object boundaries are largely preserved, especially for SED-SViT.",
+      "page": 14,
+      "index": 5,
+      "width": 568,
+      "height": 253
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27661v1/fig-006.webp",
+      "caption": "Table 4: Quantitative comparison on the BSDS500 test set [1]. All results are evaluated with single scale input.",
+      "page": 13,
+      "index": 6,
+      "width": 725,
+      "height": 511
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27661v1/fig-007.webp",
+      "caption": "Table 3: Results of Amped applied to the prior method EDTER [41] and our models SED-SViT and SED-ViT on BSDS500 [1] and NYUDv2 [46].",
+      "page": 12,
+      "index": 7,
+      "width": 725,
+      "height": 288
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27661v1/fig-008.webp",
+      "caption": "Fig. 2: Overview of the proposed Amped framework. Amped trims highconfidence non-edge tokens by computing the edge score map and comparing it against a stage-specific threshold. The proposed SED utilizes a simple linear decoder, a design that effectively reduces model complexity while maintaining high precision. Z(l) and M(l) denote the feature map and binary decision mask of pruning stage l, and Z̃(l) represents the recovered feature map of stage l.",
+      "page": 5,
+      "index": 8,
+      "width": 725,
+      "height": 290
+    }
+  ]
+}
