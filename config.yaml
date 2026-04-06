@@ -25,3 +25,50 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: MARL
+      description: 多智能体强化学习
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: Multi-agent reinforcement learning
+          keyword_cn: 多智能体强化学习
+          query: Fundamental concepts and algorithms of multi-agent reinforcement learning
+        - keyword: MARL
+          keyword_cn: 多智能体强化学习缩写
+          query: MARL architectures and frameworks
+        - keyword: Competitive MARL
+          keyword_cn: 竞争式多智能体强化学习
+          query: Competitive multi-agent reinforcement learning and zero-sum games
+        - keyword: Centralized training decentralized execution
+          keyword_cn: 集中式训练分布式执行
+          query: CTDE framework in multi-agent reinforcement learning
+        - keyword: Value decomposition
+          keyword_cn: 价值分解
+          query: Value decomposition methods in MARL like QMIX and VDN
+        - keyword: Multi-agent policy gradient
+          keyword_cn: 多智能体策略梯度
+          query: Policy gradient methods for multi-agent environments
+      intent_queries:
+        - query: Challenges and solutions for multi agent credit assignment
+          query_cn: 多智能体信用分配的挑战与解决方案
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-04-06T10:42:21.928Z'
+source_backends:
+  arxiv:
+    papers_table: arxiv_papers
+    use_vector_rpc: true
+    vector_rpc: match_arxiv_papers
+    vector_rpc_exact: match_arxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_arxiv_papers_bm25
+    sync_table: arxiv_sync_status
+    sync_success_value: success
+    schema: public
+    kind: supabase
+    enabled: true
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
