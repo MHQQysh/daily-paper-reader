@@ -18,6 +18,8 @@ try:
 except Exception:  # pragma: no cover
     yaml = None
 
+import run_context
+
 
 SRC_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.abspath(os.path.join(SRC_DIR, ".."))
@@ -178,6 +180,44 @@ def save_json(path: str, data: Any) -> None:
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def prepare_run_context(fetch_days: int | None, profile_tag: str) -> dict[str, str]:
+    run_date_token = resolve_run_date_token(fetch_days)
+    business_date_label = resolve_sidebar_date_label(fetch_days) or run_context.format_run_date_token(run_date_token)
+    started_at = datetime.now().astimezone()
+    if started_at.tzinfo is None:
+        started_at = started_at.replace(tzinfo=timezone.utc)
+    run_id = run_context.build_run_id(profile_tag=profile_tag, now=started_at)
+    run_label = run_context.build_run_label(
+        run_date_token,
+        profile_tag=profile_tag,
+        now=started_at,
+        business_label=business_date_label,
+    )
+    return {
+        "run_date_token": run_date_token,
+        "business_date_label": business_date_label,
+        "run_id": run_id,
+        "run_label": run_label,
+        "profile_tag": str(profile_tag or "").strip(),
+        "started_at": started_at.isoformat(),
+    }
+
+
+def write_archive_run_metadata(run_ctx: dict[str, str]) -> str:
+    archive_dir = os.path.join(ROOT_DIR, "archive", run_ctx["run_id"])
+    meta_path = os.path.join(archive_dir, run_context.RUN_META_FILENAME)
+    payload = {
+        "run_id": run_ctx["run_id"],
+        "run_date": run_ctx["run_date_token"],
+        "business_date_label": run_ctx["business_date_label"],
+        "run_label": run_ctx["run_label"],
+        "profile_tag": run_ctx["profile_tag"],
+        "started_at": run_ctx["started_at"],
+    }
+    save_json(meta_path, payload)
+    return meta_path
 
 
 def _read_env_text(*names: str) -> str:
@@ -587,16 +627,21 @@ def main() -> None:
 
     python = sys.executable
 
-    sidebar_date_label = resolve_sidebar_date_label(args.fetch_days)
-    run_date_token = resolve_run_date_token(args.fetch_days)
-    os.environ["DPR_RUN_DATE"] = run_date_token
-    print(f"[INFO] DPR_RUN_DATE={run_date_token}", flush=True)
     profile_tag = str(args.profile_tag or os.getenv("DPR_FILTER_PROFILE_TAG") or "").strip()
     if profile_tag:
         os.environ["DPR_FILTER_PROFILE_TAG"] = profile_tag
         print(f"[INFO] profile_tag={profile_tag}", flush=True)
     else:
         os.environ.pop("DPR_FILTER_PROFILE_TAG", None)
+    run_ctx = prepare_run_context(args.fetch_days, profile_tag)
+    os.environ["DPR_RUN_DATE"] = run_ctx["run_date_token"]
+    os.environ["DPR_RUN_ID"] = run_ctx["run_id"]
+    os.environ["DPR_RUN_LABEL"] = run_ctx["run_label"]
+    os.environ["DPR_RUN_STARTED_AT"] = run_ctx["started_at"]
+    print(f"[INFO] DPR_RUN_DATE={run_ctx['run_date_token']}", flush=True)
+    print(f"[INFO] DPR_RUN_ID={run_ctx['run_id']}", flush=True)
+    print(f"[INFO] DPR_RUN_LABEL={run_ctx['run_label']}", flush=True)
+    write_archive_run_metadata(run_ctx)
     fetch_mode = (args.fetch_mode or "auto").strip().lower()
     if fetch_mode == "skims":
         use_skims_mode = True
@@ -614,26 +659,26 @@ def main() -> None:
     if trace_ids:
         print(f"[TRACE] 启用论文追踪: {', '.join(trace_ids)}", flush=True)
 
-    archive_dir = os.path.join(ROOT_DIR, "archive", run_date_token)
-    raw_path = os.path.join(archive_dir, "raw", f"arxiv_papers_{run_date_token}.json")
+    archive_dir = os.path.join(ROOT_DIR, "archive", run_ctx["run_id"])
+    raw_path = os.path.join(archive_dir, "raw", f"arxiv_papers_{run_ctx['run_date_token']}.json")
     bm25_path = os.path.join(
         archive_dir,
         "filtered",
-        f"arxiv_papers_{run_date_token}.bm25.json",
+        f"arxiv_papers_{run_ctx['run_date_token']}.bm25.json",
     )
     embedding_path = os.path.join(
         archive_dir,
         "filtered",
-        f"arxiv_papers_{run_date_token}.embedding.json",
+        f"arxiv_papers_{run_ctx['run_date_token']}.embedding.json",
     )
-    rrf_path = os.path.join(archive_dir, "filtered", f"arxiv_papers_{run_date_token}.json")
-    rerank_path = os.path.join(archive_dir, "rank", f"arxiv_papers_{run_date_token}.json")
-    llm_path = os.path.join(archive_dir, "rank", f"arxiv_papers_{run_date_token}.llm.json")
+    rrf_path = os.path.join(archive_dir, "filtered", f"arxiv_papers_{run_ctx['run_date_token']}.json")
+    rerank_path = os.path.join(archive_dir, "rank", f"arxiv_papers_{run_ctx['run_date_token']}.json")
+    llm_path = os.path.join(archive_dir, "rank", f"arxiv_papers_{run_ctx['run_date_token']}.llm.json")
     recommend_mode = "skims" if use_skims_mode else "standard"
     recommend_path = os.path.join(
         archive_dir,
         "recommend",
-        f"arxiv_papers_{run_date_token}.{recommend_mode}.json",
+        f"arxiv_papers_{run_ctx['run_date_token']}.{recommend_mode}.json",
     )
 
     if args.run_enrich:
@@ -664,6 +709,8 @@ def main() -> None:
                 os.path.join(SRC_DIR, "maintain", "fetchers", "fetch_arxiv.py"),
                 *(["--days", str(args.fetch_days)] if args.fetch_days is not None else []),
                 *(["--ignore-seen"] if args.fetch_ignore_seen else []),
+                "--output",
+                raw_path,
             ],
         )
     if trace_ids:
@@ -729,10 +776,14 @@ def main() -> None:
         [
             python,
             os.path.join(SRC_DIR, "6.generate_docs.py"),
+            "--date",
+            run_ctx["run_date_token"],
+            "--run-id",
+            run_ctx["run_id"],
             *(["--mode", "skims"] if use_skims_mode else []),
             *(
-                ["--sidebar-date-label", sidebar_date_label]
-                if sidebar_date_label
+                ["--sidebar-date-label", run_ctx["run_label"]]
+                if run_ctx["run_label"]
                 else []
             ),
         ],

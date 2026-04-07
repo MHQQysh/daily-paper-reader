@@ -159,6 +159,52 @@ class GenerateDocsMetaParseTest(unittest.TestCase):
         self.assertEqual(len(figures), 1)
         self.assertEqual(calls[0]["source_key"], "biorxiv")
 
+    def test_list_day_report_links_includes_snapshot_runs(self):
+        with tempfile.TemporaryDirectory() as d:
+            docs_dir = Path(d)
+
+            older_dir = docs_dir / "llm__20260407-090000-000000"
+            older_dir.mkdir(parents=True, exist_ok=True)
+            (older_dir / "README.md").write_text("# older\n", encoding="utf-8")
+            (older_dir / "run.meta.json").write_text(
+                json.dumps(
+                    {
+                        "run_id": "llm__20260407-090000-000000",
+                        "run_date": "20260407",
+                        "run_label": "llm · 2026-04-07 09:00",
+                        "generated_at": "2026-04-07T09:00:00+08:00",
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            newer_dir = docs_dir / "llm__20260407-103000-000000"
+            newer_dir.mkdir(parents=True, exist_ok=True)
+            (newer_dir / "README.md").write_text("# newer\n", encoding="utf-8")
+            (newer_dir / "run.meta.json").write_text(
+                json.dumps(
+                    {
+                        "run_id": "llm__20260407-103000-000000",
+                        "run_date": "20260407",
+                        "run_label": "llm · 2026-04-07 10:30",
+                        "generated_at": "2026-04-07T10:30:00+08:00",
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            legacy_dir = docs_dir / "202604" / "06"
+            legacy_dir.mkdir(parents=True, exist_ok=True)
+            (legacy_dir / "README.md").write_text("# legacy\n", encoding="utf-8")
+
+            links = self.mod.list_day_report_links(str(docs_dir))
+
+        self.assertEqual(links[0], ("llm · 2026-04-07 10:30", "/llm__20260407-103000-000000/README"))
+        self.assertEqual(links[1], ("llm · 2026-04-07 09:00", "/llm__20260407-090000-000000/README"))
+        self.assertIn(("2026-04-06", "/202604/06/README"), links)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -26,8 +26,8 @@ class MainPipelineTest(unittest.TestCase):
     def setUpClass(cls):
         cls.mod = _load_module()
 
-    def _write_rrf_input(self, root: Path, token: str) -> Path:
-        filtered_dir = root / "archive" / token / "filtered"
+    def _write_rrf_input(self, root: Path, run_id: str, token: str) -> Path:
+        filtered_dir = root / "archive" / run_id / "filtered"
         filtered_dir.mkdir(parents=True, exist_ok=True)
         path = filtered_dir / f"arxiv_papers_{token}.json"
         payload = {
@@ -80,7 +80,16 @@ class MainPipelineTest(unittest.TestCase):
             src_dir = root / "src"
             src_dir.mkdir(parents=True, exist_ok=True)
             token = "20260310"
-            self._write_rrf_input(root, token)
+            run_id = "test__20260310-000000-000000"
+            self._write_rrf_input(root, run_id, token)
+            run_ctx = {
+                "run_date_token": token,
+                "business_date_label": "2026-03-10",
+                "run_id": run_id,
+                "run_label": "test · 2026-03-10 · 2026-03-10 00:00:00",
+                "profile_tag": "",
+                "started_at": "2026-03-10T00:00:00+00:00",
+            }
             calls = []
 
             def fake_run_step(label, args, env=None):
@@ -89,9 +98,7 @@ class MainPipelineTest(unittest.TestCase):
             with patch.object(self.mod, "ROOT_DIR", str(root)), patch.object(
                 self.mod, "SRC_DIR", str(src_dir)
             ), patch.object(
-                self.mod, "resolve_run_date_token", return_value=token
-            ), patch.object(
-                self.mod, "resolve_sidebar_date_label", return_value=None
+                self.mod, "prepare_run_context", return_value=run_ctx
             ), patch.object(
                 self.mod, "parse_trace_ids", return_value=[]
             ), patch.object(
@@ -109,7 +116,17 @@ class MainPipelineTest(unittest.TestCase):
             self.assertNotIn("Step 3 - Rerank", labels)
             self.assertIn("Step 4 - LLM refine", labels)
 
-            rerank_path = root / "archive" / token / "rank" / f"arxiv_papers_{token}.json"
+            docs_call = next(args for label, args, _env in calls if label == "Step 6 - Generate Docs")
+            self.assertIn("--date", docs_call)
+            self.assertIn(token, docs_call)
+            self.assertIn("--run-id", docs_call)
+            self.assertIn(run_id, docs_call)
+
+            run_meta = root / "archive" / run_id / "run.meta.json"
+            self.assertTrue(run_meta.exists())
+            self.assertEqual(json.loads(run_meta.read_text(encoding="utf-8"))["run_id"], run_id)
+
+            rerank_path = root / "archive" / run_id / "rank" / f"arxiv_papers_{token}.json"
             self.assertTrue(rerank_path.exists())
             data = json.loads(rerank_path.read_text(encoding="utf-8"))
             ranked = data["queries"][0]["ranked"]
@@ -123,7 +140,16 @@ class MainPipelineTest(unittest.TestCase):
             src_dir = root / "src"
             src_dir.mkdir(parents=True, exist_ok=True)
             token = "20260310"
-            self._write_rrf_input(root, token)
+            run_id = "test__20260310-000000-000000"
+            self._write_rrf_input(root, run_id, token)
+            run_ctx = {
+                "run_date_token": token,
+                "business_date_label": "2026-03-10",
+                "run_id": run_id,
+                "run_label": "test · 2026-03-10 · 2026-03-10 00:00:00",
+                "profile_tag": "",
+                "started_at": "2026-03-10T00:00:00+00:00",
+            }
             calls = []
 
             def fake_run_step(label, args, env=None):
@@ -132,9 +158,7 @@ class MainPipelineTest(unittest.TestCase):
             with patch.object(self.mod, "ROOT_DIR", str(root)), patch.object(
                 self.mod, "SRC_DIR", str(src_dir)
             ), patch.object(
-                self.mod, "resolve_run_date_token", return_value=token
-            ), patch.object(
-                self.mod, "resolve_sidebar_date_label", return_value=None
+                self.mod, "prepare_run_context", return_value=run_ctx
             ), patch.object(
                 self.mod, "parse_trace_ids", return_value=[]
             ), patch.object(

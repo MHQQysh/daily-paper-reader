@@ -11,12 +11,14 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List
 
 from llm import BltClient
+import run_context
 from subscription_plan import build_pipeline_inputs
 
 SCRIPT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 TODAY_STR = str(os.getenv("DPR_RUN_DATE") or "").strip() or datetime.now(timezone.utc).strftime("%Y%m%d")
-ARCHIVE_DIR = os.path.join(ROOT_DIR, "archive", TODAY_STR)
+RUN_ID = run_context.get_run_id(default=TODAY_STR)
+ARCHIVE_DIR = os.path.join(ROOT_DIR, "archive", RUN_ID)
 RANKED_DIR = os.path.join(ARCHIVE_DIR, "rank")
 CONFIG_FILE = os.path.join(ROOT_DIR, "config.yaml")
 

@@ -19,6 +19,7 @@ try:
     from source_config import load_config_with_source_migration
 except Exception:  # pragma: no cover - 兼容 package 导入路径
     from src.source_config import load_config_with_source_migration
+import run_context
 
 # 项目根目录（当前脚本位于 src/maintain/fetchers/ 下）
 SCRIPT_DIR = os.path.dirname(__file__)
@@ -64,6 +65,10 @@ def get_run_date_token(end_date: datetime) -> str:
     if re.match(r"^\d{8}$", token) or RANGE_TOKEN_RE.match(token):
         return token
     return end_date.strftime("%Y%m%d")
+
+
+def get_archive_dir_token(end_date: datetime) -> str:
+    return run_context.get_run_id(default=get_run_date_token(end_date))
 
 
 def resolve_supabase_time_window(
@@ -452,7 +457,7 @@ def fetch_all_domains_metadata_robust(
             if papers:
                 if not output_file:
                     run_token = get_run_date_token(end_date)
-                    archive_dir = os.path.join(ROOT_DIR, "archive", run_token)
+                    archive_dir = os.path.join(ROOT_DIR, "archive", get_archive_dir_token(end_date))
                     raw_dir = os.path.join(archive_dir, "raw")
                     output_file = os.path.join(raw_dir, f"arxiv_papers_{run_token}.json")
 
@@ -541,7 +546,7 @@ def fetch_all_domains_metadata_robust(
         # <ROOT_DIR>/archive/<YYYYMMDD 或 YYYYMMDD-YYYYMMDD>/raw/arxiv_papers_<token>.json
         if not output_file:
             run_token = get_run_date_token(end_date)
-            archive_dir = os.path.join(ROOT_DIR, "archive", run_token)
+            archive_dir = os.path.join(ROOT_DIR, "archive", get_archive_dir_token(end_date))
             raw_dir = os.path.join(archive_dir, "raw")
             output_file = os.path.join(
                 raw_dir,

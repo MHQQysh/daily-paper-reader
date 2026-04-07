@@ -31,6 +31,7 @@ from supabase_source import (
   get_supabase_read_config,
   match_papers_by_embedding,
 )
+import run_context
 
 
 # 当前脚本位于 src/ 下，config.yaml 在上一级目录
@@ -38,7 +39,8 @@ SCRIPT_DIR = os.path.dirname(__file__)
 CONFIG_FILE = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "config.yaml"))
 ROOT_DIR = os.path.dirname(CONFIG_FILE)
 TODAY_STR = str(os.getenv("DPR_RUN_DATE") or "").strip() or datetime.now(timezone.utc).strftime("%Y%m%d")
-ARCHIVE_DIR = os.path.join(ROOT_DIR, "archive", TODAY_STR)
+RUN_ID = run_context.get_run_id(default=TODAY_STR)
+ARCHIVE_DIR = os.path.join(ROOT_DIR, "archive", RUN_ID)
 RAW_DIR = os.path.join(ARCHIVE_DIR, "raw")
 FILTERED_DIR = os.path.join(ARCHIVE_DIR, "filtered")
 DATE_RE_DAY = re.compile(r"^\d{8}$")

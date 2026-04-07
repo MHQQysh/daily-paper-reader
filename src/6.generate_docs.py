@@ -25,6 +25,8 @@ ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
+import run_context
+
 try:
     from paper_figures import ensure_paper_figures
 except Exception:  # pragma: no cover
@@ -32,6 +34,7 @@ except Exception:  # pragma: no cover
 
 CONFIG_FILE = os.path.join(ROOT_DIR, "config.yaml")
 TODAY_STR = str(os.getenv("DPR_RUN_DATE") or "").strip() or datetime.now(timezone.utc).strftime("%Y%m%d")
+RUN_ID = run_context.get_run_id(default=TODAY_STR)
 RANGE_DATE_RE = re.compile(r"^(\d{8})-(\d{8})$")
 
 # LLM 配置（使用 llm.py 内的 BLT 客户端）
@@ -864,29 +867,44 @@ def format_date_str(date_str: str) -> str:
     return date_str
 
 
-def prepare_paper_paths(docs_dir: str, date_str: str, title: str, arxiv_id: str) -> Tuple[str, str, str]:
+def resolve_docs_path_parts(date_str: str, run_id: str | None = None) -> Tuple[str, ...]:
+    safe_run_id = str(run_id or "").strip()
+    if safe_run_id and safe_run_id != str(date_str or "").strip():
+        return (safe_run_id,)
+    if RANGE_DATE_RE.match(date_str):
+        return (date_str,)
+    ym = date_str[:6]
+    day = date_str[6:]
+    return (ym, day)
+
+
+def build_docs_route_prefix(date_str: str, run_id: str | None = None) -> str:
+    return "/".join(resolve_docs_path_parts(date_str, run_id=run_id))
+
+
+def resolve_docs_target_dir(docs_dir: str, date_str: str, run_id: str | None = None) -> str:
+    return os.path.join(docs_dir, *resolve_docs_path_parts(date_str, run_id=run_id))
+
+
+def prepare_paper_paths(
+    docs_dir: str,
+    date_str: str,
+    title: str,
+    arxiv_id: str,
+    run_id: str | None = None,
+) -> Tuple[str, str, str]:
     slug = slugify(title)
     basename = f"{arxiv_id}-{slug}" if arxiv_id else slug
-    if RANGE_DATE_RE.match(date_str):
-        target_dir = os.path.join(docs_dir, date_str)
-        paper_id = f"{date_str}/{basename}"
-    else:
-        ym = date_str[:6]
-        day = date_str[6:]
-        target_dir = os.path.join(docs_dir, ym, day)
-        paper_id = f"{ym}/{day}/{basename}"
+    route_prefix = build_docs_route_prefix(date_str, run_id=run_id)
+    target_dir = resolve_docs_target_dir(docs_dir, date_str, run_id=run_id)
+    paper_id = f"{route_prefix}/{basename}"
     md_path = os.path.join(target_dir, f"{basename}.md")
     txt_path = os.path.join(target_dir, f"{basename}.txt")
     return md_path, txt_path, paper_id
 
 
-def prepare_day_report_paths(docs_dir: str, date_str: str) -> Tuple[str, str]:
-    if RANGE_DATE_RE.match(date_str):
-        day_dir = os.path.join(docs_dir, date_str)
-    else:
-        ym = date_str[:6]
-        day = date_str[6:]
-        day_dir = os.path.join(docs_dir, ym, day)
+def prepare_day_report_paths(docs_dir: str, date_str: str, run_id: str | None = None) -> Tuple[str, str]:
+    day_dir = resolve_docs_target_dir(docs_dir, date_str, run_id=run_id)
     day_readme = os.path.join(day_dir, "README.md")
     return day_dir, day_readme
 
@@ -1049,6 +1067,7 @@ def build_docsify_id_href(path_no_ext: str) -> str:
 def build_latest_report_section(
     date_str: str,
     date_label: str | None,
+    run_id: str | None,
     generated_at: str,
     recommend_exists: bool,
     deep_entries: List[Tuple[str, str, List[Tuple[str, str]]]],
@@ -1077,12 +1096,7 @@ def build_latest_report_section(
         lines.append("")
         lines.append("### 今日简报（AI）")
         lines.append(summary)
-    if RANGE_DATE_RE.match(date_str):
-        report_href = build_docsify_id_href(f"{date_str}/README")
-    else:
-        ym = date_str[:6]
-        day = date_str[6:]
-        report_href = build_docsify_id_href(f"{ym}/{day}/README")
+    report_href = build_docsify_id_href(f"{build_docs_route_prefix(date_str, run_id=run_id)}/README")
     lines.append(f"- 详情：[{report_href}]({report_href})")
     lines.append("")
     lines.append("### 精读区论文标签")
@@ -1456,12 +1470,13 @@ def process_paper(
     section: str,
     date_str: str,
     docs_dir: str,
+    run_id: str | None = None,
     glance_only: bool = False,
     force_glance: bool = False,
 ) -> Tuple[str, str]:
     title = (paper.get("title") or "").strip()
     arxiv_id = str(paper.get("id") or paper.get("paper_id") or "").strip()
-    md_path, txt_path, paper_id = prepare_paper_paths(docs_dir, date_str, title, arxiv_id)
+    md_path, txt_path, paper_id = prepare_paper_paths(docs_dir, date_str, title, arxiv_id, run_id=run_id)
     abstract_en = (paper.get("abstract") or "").strip()
     pdf_url = str(paper.get("link") or paper.get("pdf_url") or "").strip()
 
@@ -1698,6 +1713,7 @@ def process_paper(
 def update_sidebar(
     sidebar_path: str,
     date_str: str,
+    run_id: str | None,
     deep_entries: List[Tuple[str, str, List[Tuple[str, str]]]],
     quick_entries: List[Tuple[str, str, List[Tuple[str, str]]]],
     paper_evidence_by_id: Dict[str, str],
@@ -1740,7 +1756,8 @@ def update_sidebar(
 
     effective_label = (date_label or "").strip() or format_date_str(date_str)
     # 用隐藏 marker 做稳定定位，避免“展示标题”变更导致无法覆盖更新
-    marker = f"<!--dpr-date:{date_str}-->"
+    marker_key = str(run_id or date_str).strip() or date_str
+    marker = f"<!--dpr-run:{marker_key}-->"
     day_heading = f"  * {effective_label} {marker}\n"
     legacy_day_heading = f"  * {format_date_str(date_str)}\n"
 
@@ -1895,11 +1912,12 @@ def write_day_report_readme(
     docs_dir: str,
     date_str: str,
     date_label: str | None,
+    run_id: str | None,
     deep_entries: List[Tuple[str, str, List[Tuple[str, str]]]],
     quick_entries: List[Tuple[str, str, List[Tuple[str, str]]]],
     recommend_exists: bool,
 ) -> str:
-    day_dir, day_readme = prepare_day_report_paths(docs_dir, date_str)
+    day_dir, day_readme = prepare_day_report_paths(docs_dir, date_str, run_id=run_id)
     os.makedirs(day_dir, exist_ok=True)
     content = build_day_report_markdown(
         date_str=date_str,
@@ -1917,6 +1935,25 @@ def list_day_report_links(docs_dir: str) -> List[Tuple[str, str]]:
     out: List[Tuple[str, str]] = []
     if not os.path.isdir(docs_dir):
         return out
+    snapshot_dirs: List[Tuple[str, str, str]] = []
+    for name in os.listdir(docs_dir):
+        run_dir = os.path.join(docs_dir, name)
+        if not os.path.isdir(run_dir):
+            continue
+        meta_path = os.path.join(run_dir, run_context.RUN_META_FILENAME)
+        readme_path = os.path.join(run_dir, "README.md")
+        if not (os.path.exists(meta_path) and os.path.exists(readme_path)):
+            continue
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                meta = json.load(f) or {}
+        except Exception:
+            meta = {}
+        label = str(meta.get("run_label") or name).strip() or name
+        generated_at = str(meta.get("generated_at") or "").strip()
+        snapshot_dirs.append((generated_at, label, name))
+    for _generated_at, label, name in sorted(snapshot_dirs, reverse=True):
+        out.append((label, build_docsify_id_href(f"{name}/README")))
     # 1) 区间目录：YYYYMMDD-YYYYMMDD
     range_dirs = sorted(
         [d for d in os.listdir(docs_dir) if RANGE_DATE_RE.fullmatch(d)],
@@ -1950,6 +1987,7 @@ def build_home_readme_content(
     docs_dir: str,
     date_str: str,
     date_label: str | None,
+    run_id: str | None,
     generated_at: str,
     recommend_exists: bool,
     deep_entries: List[Tuple[str, str, List[Tuple[str, str]]]],
@@ -1962,6 +2000,7 @@ def build_home_readme_content(
     latest_report_md = build_latest_report_section(
         date_str=date_str,
         date_label=date_label,
+        run_id=run_id,
         generated_at=generated_at,
         recommend_exists=recommend_exists,
         deep_entries=deep_entries,
@@ -1984,6 +2023,7 @@ def sync_home_readme_from_day_report(
     docs_dir: str,
     date_str: str,
     date_label: str | None,
+    run_id: str | None,
     generated_at: str,
     recommend_exists: bool,
     deep_entries: List[Tuple[str, str, List[Tuple[str, str]]]],
@@ -1996,6 +2036,7 @@ def sync_home_readme_from_day_report(
         docs_dir=docs_dir,
         date_str=date_str,
         date_label=date_label,
+        run_id=run_id,
         generated_at=generated_at,
         recommend_exists=recommend_exists,
         deep_entries=deep_entries,
@@ -2013,6 +2054,8 @@ def get_paper_sidebar_evidence(paper: Dict[str, Any]) -> str:
 
 def write_run_daily_log(
     date_str: str,
+    run_id: str,
+    run_label: str | None,
     mode: str,
     recommend_path: str,
     recommend_exists: bool,
@@ -2021,11 +2064,13 @@ def write_run_daily_log(
     docs_dir: str,
     day_readme: str,
 ) -> str:
-    log_dir = os.path.join(ROOT_DIR, "archive", date_str, "logs")
+    log_dir = os.path.join(ROOT_DIR, "archive", run_id, "logs")
     os.makedirs(log_dir, exist_ok=True)
     out_path = os.path.join(log_dir, "daily_report.json")
     payload = {
+        "run_id": run_id,
         "date": format_date_str(date_str),
+        "run_label": str(run_label or "").strip(),
         "mode": mode,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "recommend_path": recommend_path,
@@ -2035,6 +2080,27 @@ def write_run_daily_log(
         "total_count": int(deep_count + quick_count),
         "docs_dir": docs_dir,
         "day_readme": day_readme,
+    }
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    return out_path
+
+
+def write_docs_run_metadata(
+    docs_dir: str,
+    date_str: str,
+    run_id: str,
+    run_label: str | None,
+) -> str:
+    target_dir = resolve_docs_target_dir(docs_dir, date_str, run_id=run_id)
+    os.makedirs(target_dir, exist_ok=True)
+    out_path = os.path.join(target_dir, run_context.RUN_META_FILENAME)
+    payload = {
+        "run_id": run_id,
+        "run_date": date_str,
+        "run_label": str(run_label or "").strip(),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
@@ -2366,18 +2432,14 @@ def write_day_meta_index_json(
     docs_dir: str,
     date_str: str,
     date_label: str | None,
+    run_id: str | None,
     deep_list: List[Dict[str, Any]],
     quick_list: List[Dict[str, Any]],
 ) -> str:
     """
     在对应的 docs 日期目录下生成索引 JSON 文件，供前端一键下载。
     """
-    if RANGE_DATE_RE.match(date_str):
-        target_dir = os.path.join(docs_dir, date_str)
-    else:
-        ym = date_str[:6]
-        day = date_str[6:]
-        target_dir = os.path.join(docs_dir, ym, day)
+    target_dir = resolve_docs_target_dir(docs_dir, date_str, run_id=run_id)
     os.makedirs(target_dir, exist_ok=True)
     out_path = os.path.join(target_dir, "papers.meta.json")
 
@@ -2390,7 +2452,7 @@ def write_day_meta_index_json(
             try:
                 title = (paper.get("title") or "").strip()
                 arxiv_id = str(paper.get("id") or paper.get("paper_id") or "").strip()
-                md_path, _, pid = prepare_paper_paths(docs_dir, date_str, title, arxiv_id)
+                md_path, _, pid = prepare_paper_paths(docs_dir, date_str, title, arxiv_id, run_id=run_id)
                 item = _parse_generated_md_to_meta(
                     md_path,
                     pid,
@@ -2408,6 +2470,7 @@ def write_day_meta_index_json(
                 )
 
     payload = {
+        "run_id": str(run_id or "").strip(),
         "label": effective_label,
         "date": format_date_str(date_str),
         "generated_at": datetime.now().isoformat(timespec="seconds"),
@@ -2426,6 +2489,7 @@ def write_day_meta_index_json(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Step 6: generate docs for deep/quick sections.")
     parser.add_argument("--date", type=str, default=TODAY_STR, help="date string YYYYMMDD.")
+    parser.add_argument("--run-id", type=str, default=RUN_ID, help="unique run snapshot id.")
     parser.add_argument("--mode", type=str, default=None, help="mode for recommend file.")
     parser.add_argument("--docs-dir", type=str, default=None, help="override docs dir.")
     parser.add_argument(
@@ -2487,6 +2551,7 @@ def main() -> None:
     args = parser.parse_args()
 
     date_str = args.date or TODAY_STR
+    run_id = str(args.run_id or RUN_ID or date_str).strip() or date_str
     mode = args.mode
     if not mode:
         config = load_config()
@@ -2525,6 +2590,7 @@ def main() -> None:
                 section,
                 single_date,
                 docs_dir,
+                run_id=None,
                 glance_only=args.glance_only,
                 force_glance=args.force_glance,
             )
@@ -2536,7 +2602,7 @@ def main() -> None:
             log_substep("6.p", "单篇论文生成", "END")
             return
 
-    archive_dir = os.path.join(ROOT_DIR, "archive", date_str, "recommend")
+    archive_dir = os.path.join(ROOT_DIR, "archive", run_id, "recommend")
     recommend_path = os.path.join(archive_dir, f"arxiv_papers_{date_str}.{mode}.json")
     recommend_exists = os.path.exists(recommend_path)
     if not recommend_exists:
@@ -2573,7 +2639,7 @@ def main() -> None:
             for paper in lst:
                 title = (paper.get("title") or "").strip()
                 arxiv_id = str(paper.get("id") or paper.get("paper_id") or "").strip()
-                md_path, _, _ = prepare_paper_paths(docs_dir, date_str, title, arxiv_id)
+                md_path, _, _ = prepare_paper_paths(docs_dir, date_str, title, arxiv_id, run_id=run_id)
                 if not os.path.exists(md_path):
                     continue
                 total_files += 1
@@ -2616,6 +2682,7 @@ def main() -> None:
                     section,
                     date_str,
                     docs_dir,
+                    run_id,
                     args.glance_only,
                     args.force_glance,
                 )
@@ -2642,14 +2709,14 @@ def main() -> None:
         for paper in deep_list:
             title = (paper.get("title") or "").strip()
             arxiv_id = str(paper.get("id") or paper.get("paper_id") or "").strip()
-            _, _, pid = prepare_paper_paths(docs_dir, date_str, title, arxiv_id)
+            _, _, pid = prepare_paper_paths(docs_dir, date_str, title, arxiv_id, run_id=run_id)
             sidebar_evidence_by_id[str(pid).strip()] = get_paper_sidebar_evidence(paper)
             deep_entries.append((pid, title, extract_sidebar_tags(paper)))
 
         for paper in quick_list:
             title = (paper.get("title") or "").strip()
             arxiv_id = str(paper.get("id") or paper.get("paper_id") or "").strip()
-            _, _, pid = prepare_paper_paths(docs_dir, date_str, title, arxiv_id)
+            _, _, pid = prepare_paper_paths(docs_dir, date_str, title, arxiv_id, run_id=run_id)
             sidebar_evidence_by_id[str(pid).strip()] = get_paper_sidebar_evidence(paper)
             quick_entries.append((pid, title, extract_sidebar_tags(paper)))
         log_substep("6.3", "跳过生成文章（仅更新侧边栏）", "SKIP")
@@ -2668,6 +2735,7 @@ def main() -> None:
         docs_dir=docs_dir,
         date_str=date_str,
         date_label=args.sidebar_date_label,
+        run_id=run_id,
         deep_entries=deep_entries,
         quick_entries=quick_entries,
         recommend_exists=recommend_exists,
@@ -2676,6 +2744,7 @@ def main() -> None:
         docs_dir=docs_dir,
         date_str=date_str,
         date_label=args.sidebar_date_label,
+        run_id=run_id,
         generated_at=run_generated_at,
         recommend_exists=recommend_exists,
         deep_entries=deep_entries,
@@ -2692,6 +2761,7 @@ def main() -> None:
         update_sidebar(
             sidebar_path,
             date_str,
+            run_id,
             deep_entries,
             quick_entries,
             sidebar_evidence_by_id,
@@ -2708,6 +2778,7 @@ def main() -> None:
             docs_dir,
             date_str,
             args.sidebar_date_label,
+            run_id,
             deep_list,
             quick_list,
         )
@@ -2716,9 +2787,14 @@ def main() -> None:
         log(f"[WARN] 生成元数据索引失败：{e}")
     log_substep("6.6", "生成可下载元数据索引（JSON）", "END")
 
+    run_meta_path = write_docs_run_metadata(docs_dir, date_str, run_id, args.sidebar_date_label)
+    log(f"[OK] docs run metadata saved: {run_meta_path}")
+
     log_substep("6.7", "写入运行日志（日报）", "START")
     run_log = write_run_daily_log(
         date_str=date_str,
+        run_id=run_id,
+        run_label=args.sidebar_date_label,
         mode=mode,
         recommend_path=recommend_path,
         recommend_exists=recommend_exists,

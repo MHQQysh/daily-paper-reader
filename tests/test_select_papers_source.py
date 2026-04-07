@@ -194,6 +194,36 @@ class SelectPapersSourceTagTest(unittest.TestCase):
         self.assertEqual(seen_ahd, {"paper-ahd"})
         self.assertEqual(seen_all, {"paper-ahd", "paper-gene"})
 
+    def test_collect_seen_ids_skips_same_business_date_for_snapshot_runs(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = pathlib.Path(tmpdir)
+
+            same_run_dir = root / "GENE__20260328-010101-000001" / "recommend"
+            same_run_dir.mkdir(parents=True, exist_ok=True)
+            (same_run_dir.parent / "run.meta.json").write_text(
+                json.dumps({"run_id": "GENE__20260328-010101-000001", "run_date": "20260328"}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (same_run_dir / "arxiv_papers_20260328.standard.json").write_text(
+                json.dumps({"deep_dive": [{"id": "paper-same"}], "quick_skim": []}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+
+            prev_run_dir = root / "GENE__20260327-235959-999999" / "recommend"
+            prev_run_dir.mkdir(parents=True, exist_ok=True)
+            (prev_run_dir.parent / "run.meta.json").write_text(
+                json.dumps({"run_id": "GENE__20260327-235959-999999", "run_date": "20260327"}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (prev_run_dir / "arxiv_papers_20260327.standard.json").write_text(
+                json.dumps({"deep_dive": [{"id": "paper-prev"}], "quick_skim": []}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+
+            seen = self.mod.collect_seen_ids(str(root), "20260328")
+
+        self.assertEqual(seen, {"paper-prev"})
+
 
 class SelectPapersDeepPriorityModeTest(unittest.TestCase):
     @classmethod

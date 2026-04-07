@@ -11,11 +11,14 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Tuple
 
+import run_context
+
 
 SCRIPT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 TODAY_STR = str(os.getenv("DPR_RUN_DATE") or "").strip() or datetime.now(timezone.utc).strftime("%Y%m%d")
-ARCHIVE_DIR = os.path.join(ROOT_DIR, "archive", TODAY_STR)
+RUN_ID = run_context.get_run_id(default=TODAY_STR)
+ARCHIVE_DIR = os.path.join(ROOT_DIR, "archive", RUN_ID)
 FILTERED_DIR = os.path.join(ARCHIVE_DIR, "filtered")
 
 def log(message: str) -> None:

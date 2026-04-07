@@ -8,13 +8,15 @@ import re
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Dict, List, Tuple
 
+import run_context
 from subscription_plan import count_subscription_tags
 
 SCRIPT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 ARCHIVE_ROOT = os.path.join(ROOT_DIR, "archive")
 TODAY_STR = str(os.getenv("DPR_RUN_DATE") or "").strip() or datetime.now(timezone.utc).strftime("%Y%m%d")
-ARCHIVE_DIR = os.path.join(ARCHIVE_ROOT, TODAY_STR)
+RUN_ID = run_context.get_run_id(default=TODAY_STR)
+ARCHIVE_DIR = os.path.join(ARCHIVE_ROOT, RUN_ID)
 RANKED_DIR = os.path.join(ARCHIVE_DIR, "rank")
 RECOMMEND_DIR = os.path.join(ARCHIVE_DIR, "recommend")
 CARRYOVER_PATH = os.path.join(ARCHIVE_ROOT, "carryover.json")
@@ -107,9 +109,33 @@ def list_date_dirs(archive_root: str) -> List[str]:
         return []
     result: List[str] = []
     for name in os.listdir(archive_root):
-        if re.match(r"^\d{8}$", name) or re.match(r"^\d{8}-\d{8}$", name):
+        run_dir = os.path.join(archive_root, name)
+        if not os.path.isdir(run_dir):
+            continue
+        if (
+            re.match(r"^\d{8}$", name)
+            or re.match(r"^\d{8}-\d{8}$", name)
+            or os.path.isdir(os.path.join(run_dir, "recommend"))
+            or os.path.exists(os.path.join(run_dir, run_context.RUN_META_FILENAME))
+        ):
             result.append(name)
     return sorted(result)
+
+
+def resolve_archive_run_date(archive_root: str, dir_name: str) -> str:
+    run_dir = os.path.join(archive_root, dir_name)
+    meta_path = os.path.join(run_dir, run_context.RUN_META_FILENAME)
+    if os.path.exists(meta_path):
+        try:
+            payload = load_json(meta_path)
+        except Exception:
+            payload = {}
+        token = str((payload or {}).get("run_date") or "").strip()
+        if token:
+            return token
+    if re.match(r"^\d{8}$", dir_name) or re.match(r"^\d{8}-\d{8}$", dir_name):
+        return dir_name
+    return ""
 
 
 def parse_payload_date(payload: Dict[str, Any]) -> date | None:
@@ -359,16 +385,15 @@ def collect_seen_ids(
     }
 
     seen = set()
-    for day in list_date_dirs(archive_root):
-        if day == today_str:
+    for run_dir_name in list_date_dirs(archive_root):
+        run_date_token = resolve_archive_run_date(archive_root, run_dir_name)
+        if run_date_token == today_str:
             continue
-        rec_dir = os.path.join(archive_root, day, "recommend")
+        rec_dir = os.path.join(archive_root, run_dir_name, "recommend")
         if not os.path.isdir(rec_dir):
             continue
         for name in os.listdir(rec_dir):
-            if not name.endswith(".json"):
-                continue
-            if not name.startswith(f"arxiv_papers_{day}."):
+            if not name.endswith(".json") or not name.startswith("arxiv_papers_"):
                 continue
             rec_path = os.path.join(rec_dir, name)
             try:
