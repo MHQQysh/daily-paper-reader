@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03950v1/fig-001.webp",
+      "caption": "Table 3. Comparison of attention implementations on LLaMA3.23B and LLaMA3.1-8B. “Native” refers to SDPA implementation supported by PyTorch.",
+      "page": 7,
+      "index": 1,
+      "width": 506,
+      "height": 633
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03950v1/fig-002.webp",
+      "caption": "Figure 1. Visualization of quantization error of MXFP4 and NVFP4 format for query, key and attention score.",
+      "page": 3,
+      "index": 2,
+      "width": 491,
+      "height": 395
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03950v1/fig-003.webp",
+      "caption": "Table 7. Latency breakdown of the non-fused MX encoding pipeline and our fused implementation.",
+      "page": 8,
+      "index": 3,
+      "width": 431,
+      "height": 499
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03950v1/fig-004.webp",
+      "caption": "Figure 2. Overview workflow of our Diagonal-Tiled Mixed-Precision Attention. It first applies fused mixed-precision quantization to produce low-bit and high-bit Q and K representations, and then performs diagonal-tiled mixed-precision attention, using higher precision near the diagonal and lower precision elsewhere to balance accuracy and efficiency.",
+      "page": 4,
+      "index": 4,
+      "width": 1012,
+      "height": 389
+    }
+  ]
+}

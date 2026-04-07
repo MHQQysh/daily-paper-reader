@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.00821v1/fig-001.webp",
+      "caption": "Table 1. Low-rank decomposition results of LLaMA2/3 Models. We use 128 samples from C4 dataset to compress the pretrained LLM by 10%∼40% and report the wikitext2 and C4 perplexity.",
+      "page": 6,
+      "index": 1,
+      "width": 912,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00821v1/fig-002.webp",
+      "caption": "Table 2. Low-rank decomposition of LLaMA2/3 Models (20% compression ratio). We report 8 different zero-shot downstream task accuracy and the average performance.",
+      "page": 6,
+      "index": 2,
+      "width": 985,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00821v1/fig-003.webp",
+      "caption": "Table 3. Comparison of quantization/pruning + low-rank adapter compensation. We compare No LRC (no low-rank compensation), SVD compensation, EoRA and our OBD-LLM. The adapter has 128 rank.",
+      "page": 7,
+      "index": 3,
+      "width": 821,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00821v1/fig-004.webp",
+      "caption": "Figure 2. Overview of our compression pipeline. To decompose a layer, we collect both the input activation and output activation gradient covariance matrices, and then utilize them to whiten the weight matrix for SVD. After decomposition, we utilize the inverse Cholesky to “color” the weight back.",
+      "page": 3,
+      "index": 4,
+      "width": 1000,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00821v1/fig-005.webp",
+      "caption": "Figure 5. Latency comparison of decomposition runtime.",
+      "page": 8,
+      "index": 5,
+      "width": 492,
+      "height": 390
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00821v1/fig-006.webp",
+      "caption": "Figure 4. Visualization of correlation factor across all projection layers in LLaMA-3-8B.",
+      "page": 5,
+      "index": 6,
+      "width": 470,
+      "height": 289
+    }
+  ]
+}

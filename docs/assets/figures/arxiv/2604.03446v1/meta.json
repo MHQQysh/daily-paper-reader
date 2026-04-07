@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03446v1/fig-001.webp",
+      "caption": "Fig. 10. (a) Specific numeric values are assigned to loop boundaries to illustrate the tiling decision. (b) The loop is unrolled to reveal the computation ordering. (c) The buffer-utilization chart demonstrates buffer management: buffering levels are assigned to each operand, and the levels for A and E are placed within the inter-tile loops, meaning two tiles of A and two tiles of E are retained in the buffer.",
+      "page": 6,
+      "index": 1,
+      "width": 1076,
+      "height": 202
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03446v1/fig-002.webp",
+      "caption": "Fig. 18. Dataflow optimization results on energy and latency for Accel. 2.",
+      "page": 11,
+      "index": 2,
+      "width": 1076,
+      "height": 218
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03446v1/fig-003.webp",
+      "caption": "Fig. 17. Dataflow optimization results on energy and latency for Accel. 1. The overall energy is the sum of four components, and the overall latency is determined by the larger value between computation latency (Comp. Lat.) and DRAM latency (DRAM Lat.).",
+      "page": 10,
+      "index": 3,
+      "width": 1068,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03446v1/fig-004.webp",
+      "caption": "Fig. 25. Comparison of Chimera, TileFlow, Orojenesis, MMEE* (MMEE without recomputation), and MMEE in terms of energy, latency, and DRAM access. The attention of PaLM-62B is fused under latency-driven optimization.",
+      "page": 13,
+      "index": 4,
+      "width": 529,
+      "height": 289
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03446v1/fig-005.webp",
+      "caption": "Fig. 8. Buffer management and its impact. (a) The dataflow follows Fig. 7(a). (b) a1 and a2 are retained once loaded into the buffer, eliminating repeated DRAM accesses for a1 and a2 from stage 5⃝ to stage 6⃝.",
+      "page": 4,
+      "index": 5,
+      "width": 529,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03446v1/fig-006.webp",
+      "caption": "Fig. 9. Pseudo nested loop example and components. Loop boundaries come from integer factorization (e.g., I = iD × iG). Red arrows mark buffering levels; yellow arrows show transition between iteration spaces.",
+      "page": 4,
+      "index": 6,
+      "width": 529,
+      "height": 304
+    }
+  ]
+}

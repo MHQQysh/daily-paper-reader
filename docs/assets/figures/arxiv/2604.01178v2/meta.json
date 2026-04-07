@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.01178v2/fig-001.webp",
+      "caption": "Figure 10: Distance-aware relevance maps across layers and heads. Each map shows the distanceaware relevance, with rows and columns corresponding to query and key positions. Darker gray regions indicate positions outside the learned screening window. Each tile is annotated with its layer and head indices, the learned window width w, the acceptance width 1/r, and the fraction of nonzero relevance values Pr(αd ij > 0) within the window.",
+      "page": 22,
+      "index": 1,
+      "width": 826,
+      "height": 894
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01178v2/fig-002.webp",
+      "caption": "Figure 6: (a) Example prompt for ABCDigits. (b) Retrieval accuracy heatmaps over context length (columns) and target depth (rows). Columns correspond to the two training settings: base models trained with context length 212 (left) and models after continual pretraining with context length 215 (right). Rows correspond to 353M Transformer (top), 286M Multiscreen (middle), and 28M Multiscreen (bottom). Colors indicate exact-match retrieval accuracy. For Transformer, each cell shows accuracy under the best-performing RoPE scaling factor selected from multiple candidates, and the number inside the cell indicates the selected factor. A dash (“-”) indicates that no correct retrieval occurred. The dashed and dotted vertical lines mark the context lengths used during base pretraining (212) and long-context continual pretraining (215), respectively.",
+      "page": 13,
+      "index": 2,
+      "width": 821,
+      "height": 466
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01178v2/fig-003.webp",
+      "caption": "Figure 7: Scaling behavior under alternative definitions of model size. Left: scaling behavior of Transformer and Multiscreen with respect to non-embedding parameters. Right: scaling behavior of Multiscreen with respect to the supraparameter Ψ. The 4B Multiscreen model deviates from the scaling trend, which we attribute to undertraining.",
+      "page": 19,
+      "index": 3,
+      "width": 664,
+      "height": 294
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01178v2/fig-004.webp",
+      "caption": "Figure 5: Long-context perplexity comparison between 353M Transformer and 286M Multiscreen models. The horizontal axis is context position, and the vertical axis is perplexity. The left panel shows the base models, while the right panel shows models after long-context continual pretraining. The black curve corresponds to Multiscreen, while colored curves correspond to Transformer with different RoPE scaling factors. Shaded regions indicate one standard deviation across three independently trained models. The dashed and dotted vertical lines indicate the sequence lengths used during base pretraining (212) and long-context continual pretraining (215), respectively.",
+      "page": 12,
+      "index": 4,
+      "width": 829,
+      "height": 402
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01178v2/fig-005.webp",
+      "caption": "Table 3: Parameter shapes and initialization of Multiscreen.",
+      "page": 9,
+      "index": 5,
+      "width": 736,
+      "height": 312
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01178v2/fig-006.webp",
+      "caption": "Figure 8: Training loss trajectories from the same runs as in fig. 4, shown for representative learning rates. Curves are smoothed using a moving average over 256 training steps. Transformer becomes unstable at moderately large learning rates, exhibiting noisy and eventually divergent behavior, whereas Multiscreen maintains stable convergence even at very large learning rates (e.g., 20).",
+      "page": 20,
+      "index": 6,
+      "width": 829,
+      "height": 330
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01178v2/fig-007.webp",
+      "caption": "Figure 1: (a) Multiscreen architecture. The model comprises a stack of NL residual layers, each containing NH parallel gated screening tiles. The input embedding matrix is normalized and shared with the language-modeling head, with learned scalars esE and esF controlling input and output scaling. (b) A gated screening tile. The tile computes query, key, value, and gate projections, applies a screening unit to the projected queries, keys, and values, modulates the result with a nonlinear gate, and projects back to the model dimension. (c) A screening unit. The unit normalizes queries, keys, and values to unit length, applies minimal positional encoding (MiPE) to queries and keys, computes distance-aware relevance through Trim, Square, and Softmask, aggregates the surviving values, and applies TanhNorm. In the diagrams, “@” denotes matrix multiplication and “/RSS” denotes row-wise normalization to unit length.",
+      "page": 5,
+      "index": 7,
+      "width": 820,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01178v2/fig-008.webp",
+      "caption": "Table 1: Architectural hyperparameters of Multiscreen and their scaling with the supraparameter Ψ.",
+      "page": 5,
+      "index": 8,
+      "width": 625,
+      "height": 211
+    }
+  ]
+}

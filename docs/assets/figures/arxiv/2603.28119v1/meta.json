@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.28119v1/fig-001.webp",
+      "caption": "Figure 3: Relevance density vs. context size. Relevance den-",
+      "page": 6,
+      "index": 1,
+      "width": 481,
+      "height": 253
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28119v1/fig-002.webp",
+      "caption": "Figure 1: Agentless + SWEzze generates a correct patch because SWEzze retains the fix ingredients in the compressed context. In",
+      "page": 2,
+      "index": 2,
+      "width": 1002,
+      "height": 566
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28119v1/fig-003.webp",
+      "caption": "Figure 7: SWE-Pruner retains a distracting fragment that",
+      "page": 10,
+      "index": 3,
+      "width": 456,
+      "height": 722
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28119v1/fig-004.webp",
+      "caption": "Figure 2: A fragment of Agentless’ code context for resolv-",
+      "page": 3,
+      "index": 4,
+      "width": 506,
+      "height": 658
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28119v1/fig-005.webp",
+      "caption": "Figure 5: UpSet plots of resolved-instance overlaps across compressionmethods on SWE-bench Verified. Each panel corresponds",
+      "page": 8,
+      "index": 5,
+      "width": 1040,
+      "height": 341
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28119v1/fig-006.webp",
+      "caption": "Figure 6: Tradeoff between compression rate, resolution rate improvement over the no-compression baseline (Δ = 0%,",
+      "page": 9,
+      "index": 6,
+      "width": 460,
+      "height": 383
+    }
+  ]
+}

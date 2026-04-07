@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.27979v1/fig-001.webp",
+      "caption": "Figure 4. Visual comparison between different architectures on UHD-LL [14].",
+      "page": 6,
+      "index": 1,
+      "width": 1033,
+      "height": 284
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27979v1/fig-002.webp",
+      "caption": "Figure 5. Visual comparison between different architectures on 4K-Rain13K dataset [5].",
+      "page": 6,
+      "index": 2,
+      "width": 1033,
+      "height": 283
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27979v1/fig-003.webp",
+      "caption": "Table 3. Final ranking of NTIRE 2026 Day and Night Raindrop Removal for Dual-Focused Images Challenge.",
+      "page": 6,
+      "index": 3,
+      "width": 487,
+      "height": 325
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27979v1/fig-004.webp",
+      "caption": "Table 2. UHD-LL Quantitative Comparison",
+      "page": 6,
+      "index": 4,
+      "width": 450,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27979v1/fig-005.webp",
+      "caption": "Table 4. Final ranking of NTIRE 2026 Joint Noise Low-light enhancement Challenge.",
+      "page": 7,
+      "index": 5,
+      "width": 940,
+      "height": 325
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27979v1/fig-006.webp",
+      "caption": "Figure 6. Visual results of our proposed method on multiple image restoration tasks from NTIRE 2026 test datasets.",
+      "page": 8,
+      "index": 6,
+      "width": 1000,
+      "height": 863
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27979v1/fig-007.webp",
+      "caption": "Figure 3. RetinexDualV2 Overview. Based on retinex theory, it decomposes the UHD image into Reff and Leff and operates on them using 2 sub-networks: Physical-Grounded Scale Attentive MaMBA (PG-SAMBA), and Physical-Grounded Frequency Illumination Adaptor (PG-FIA), respectively. Both branches recieves guidance pm from the Task-Specific Physical Grounding Module (TS-PGM). Noting that each output from a different level has a convolution layer before it for processing, which wasn’t illustrated for simplicity.",
+      "page": 4,
+      "index": 7,
+      "width": 1018,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27979v1/fig-008.webp",
+      "caption": "Table 1. 4K-Rain13k Quantitative Comparison",
+      "page": 5,
+      "index": 8,
+      "width": 471,
+      "height": 256
+    }
+  ]
+}
