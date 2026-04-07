@@ -1,0 +1,1335 @@
+{
+  "mode": "skims",
+  "generated_at": "2026-04-07T01:28:22.136480+00:00",
+  "stats": {
+    "mode": "skims",
+    "forced_all_quick": true,
+    "min_score": 8.0,
+    "deep_divecandidates": 34,
+    "deep_cap": null,
+    "deep_selected": 0,
+    "quick_candidates": 34,
+    "quick_skim_target": null,
+    "quick_selected": 34
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2603.16141v1",
+      "source": "arxiv",
+      "title": "Communication-Aware Multi-Agent Reinforcement Learning for Decentralized Cooperative UAV Deployment",
+      "abstract": "Autonomous Unmanned Aerial Vehicle (UAV) swarms are increasingly used as rapidly deployable aerial relays and sensing platforms, yet practical deployments must operate under partial observability and intermittent peer-to-peer links. We present a graph-based multi-agent reinforcement learning framework trained under centralized training with decentralized execution (CTDE): a centralized critic and global state are available only during training, while each UAV executes a shared policy using local observations and messages from nearby neighbors. Our architecture encodes local agent state and nearby entities with an agent-entity attention module, and aggregates inter-UAV messages with neighbor self-attention over a distance-limited communication graph. We evaluate primarily on a cooperative relay deployment task (DroneConnect) and secondarily on an adversarial engagement task (DroneCombat). In DroneConnect, the proposed method achieves high coverage under restricted communication and partial observation (e.g. 74% coverage with M = 5 UAVs and N = 10 nodes) while remaining competitive with a mixed-integer linear programming (MILP) optimization-based offline upper bound, and it generalizes to unseen team sizes without fine-tuning. In the adversarial setting, the same framework transfers without architectural changes and improves win rate over non-communicating baselines.",
+      "authors": [
+        "Enguang Fan",
+        "Yifan Chen",
+        "Zihan Shan",
+        "Matthew Caesar",
+        "Jae Kim"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.LG",
+        "cs.NI"
+      ],
+      "published": "2026-03-17T05:48:51+00:00",
+      "link": "https://arxiv.org/pdf/2603.16141v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "MARL framework trained under centralized training with decentralized execution (CTDE)",
+      "llm_evidence_cn": "在中心化训练分布式执行（CTDE）下训练的多智能体强化学习框架",
+      "llm_evidence": "在中心化训练分布式执行（CTDE）下训练的多智能体强化学习框架",
+      "canonical_evidence": "在中心化训练分布式执行（CTDE）下训练的多智能体强化学习框架",
+      "llm_tldr_en": "Presents a graph-based MARL framework using CTDE for cooperative UAV deployment under partial observability.",
+      "llm_tldr_cn": "提出了一种基于图的多智能体强化学习框架，采用CTDE模式实现无人机群的协同部署。",
+      "llm_tldr": "提出了一种基于图的多智能体强化学习框架，采用CTDE模式实现无人机群的协同部署。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "CTDE framework in multi-agent reinforcement learning",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.20604v1",
+      "source": "arxiv",
+      "title": "Bayesian Learning in Episodic Zero-Sum Games",
+      "abstract": "We study Bayesian learning in episodic, finite-horizon zero-sum Markov games with unknown transition and reward models. We investigate a posterior algorithm in which each player maintains a Bayesian posterior over the game model, independently samples a game model at the beginning of each episode, and computes an equilibrium policy for the sampled model. We analyze two settings: (i) Both players use the posterior sampling algorithm, and (ii) Only one player uses posterior sampling while the opponent follows an arbitrary learning algorithm. In each setting, we provide guarantees on the expected regret of the posterior sampling agent. Our notion of regret compares the expected total reward of the learning agent against the expected total reward under equilibrium policies of the true game. Our main theoretical result is an expected regret bound for the posterior sampling agent of order $O(HS\\sqrt{ABHK\\log(SABHK)})$ where $K$ is the number of episodes, $H$ is the episode length, $S$ is the number of states, and $A,B$ are the action space sizes of the two players. Experiments in a grid-world predator--prey domain illustrate the sublinear regret scaling and show that posterior sampling competes favorably with a fictitious-play baseline.",
+      "authors": [
+        "Chang-Wei Yueh",
+        "Andy Zhao",
+        "Ashutosh Nayyar",
+        "Rahul Jain"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.GT"
+      ],
+      "published": "2026-03-21T02:34:47+00:00",
+      "link": "https://arxiv.org/pdf/2603.20604v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Bayesian learning in episodic zero-sum Markov games",
+      "llm_evidence_cn": "回合制零和马尔可夫博弈中的贝叶斯学习",
+      "llm_evidence": "回合制零和马尔可夫博弈中的贝叶斯学习",
+      "canonical_evidence": "回合制零和马尔可夫博弈中的贝叶斯学习",
+      "llm_tldr_en": "Analyzes posterior sampling algorithms for equilibrium policy learning in zero-sum Markov games.",
+      "llm_tldr_cn": "分析了在零和马尔可夫博弈中学习均衡策略的后验采样算法。",
+      "llm_tldr": "分析了在零和马尔可夫博弈中学习均衡策略的后验采样算法。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Competitive multi-agent reinforcement learning and zero-sum games",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.21563v1",
+      "source": "arxiv",
+      "title": "Counterfactual Credit Policy Optimization for Multi-Agent Collaboration",
+      "abstract": "Collaborative multi-agent large language models (LLMs) can solve complex reasoning tasks by decomposing roles and aggregating diverse hypotheses. Yet, reinforcement learning (RL) for such systems is often undermined by credit assignment: a shared global reward obscures individual contributions, inflating update variance and encouraging free-riding. We introduce Counterfactual Credit Policy Optimization (CCPO), a framework that assigns agent-specific learning signals by estimating each agent's marginal contribution through counterfactual trajectories. CCPO builds dynamic counterfactual baselines that simulate outcomes with an agent's contribution removed, yielding role-sensitive advantages for policy optimization. To further improve stability under heterogeneous tasks and data distributions, we propose a global-history-aware normalization scheme that calibrates advantages using global rollout statistics. We evaluate CCPO on two collaboration topologies: a sequential Think--Reason dyad and multi-agent voting. Across mathematical and logical reasoning benchmarks, CCPO mitigates free-riding and outperforms strong multi-agent RL baselines, yielding finer-grained and more effective credit assignment for collaborative LLM training. Our code is available at https://github.com/bhai114/ccpo.",
+      "authors": [
+        "Zhongyi Li",
+        "Wan Tian",
+        "Yikun Ban",
+        "Jinju Chen",
+        "Huiming Zhang",
+        "Yang Liu",
+        "Fuzhen Zhuang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-23T04:35:02+00:00",
+      "link": "https://arxiv.org/pdf/2603.21563v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "counterfactual credit assignment for multi-agent LLMs",
+      "llm_evidence_cn": "多智能体大语言模型的反事实信用分配",
+      "llm_evidence": "多智能体大语言模型的反事实信用分配",
+      "canonical_evidence": "多智能体大语言模型的反事实信用分配",
+      "llm_tldr_en": "Introduces CCPO to assign agent-specific signals using counterfactual trajectories for multi-agent LLM collaboration.",
+      "llm_tldr_cn": "引入CCPO框架，通过反事实轨迹为多智能体大模型协作分配特定智能体的学习信号。",
+      "llm_tldr": "引入CCPO框架，通过反事实轨迹为多智能体大模型协作分配特定智能体的学习信号。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Challenges and solutions for multi agent credit assignment",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00344v1",
+      "source": "arxiv",
+      "title": "Agent Q-Mix: Selecting the Right Action for LLM Multi-Agent Systems through Reinforcement Learning",
+      "abstract": "Large Language Models (LLMs) have shown remarkable performance in completing various tasks. However, solving complex problems often requires the coordination of multiple agents, raising a fundamental question: how to effectively select and interconnect these agents. In this paper, we propose \\textbf{Agent Q-Mix}, a reinforcement learning framework that reformulates topology selection as a cooperative Multi-Agent Reinforcement Learning (MARL) problem. Our method learns decentralized communication decisions using QMIX value factorization, where each agent selects from a set of communication actions that jointly induce a round-wise communication graph. At its core, Agent Q-Mix combines a topology-aware GNN encoder, GRU memory, and per-agent Q-heads under a Centralized Training with Decentralized Execution (CTDE) paradigm. The framework optimizes a reward function that balances task accuracy with token cost. Across seven core benchmarks in coding, reasoning, and mathematics, Agent Q-Mix achieves the highest average accuracy compared to existing methods while demonstrating superior token efficiency and robustness against agent failure. Notably, on the challenging Humanity's Last Exam (HLE) using Gemini-3.1-Flash-Lite as a backbone, Agent Q-Mix achieves 20.8\\% accuracy, outperforming Microsoft Agent Framework (19.2\\%) and LangGraph (19.2\\%), followed by AutoGen and Lobster by OpenClaw. These results underscore the effectiveness of learned, decentralized topology optimization in pushing the boundaries of multi-agent reasoning.",
+      "authors": [
+        "Eric Hanchen Jiang",
+        "Levina Li",
+        "Rui Sun",
+        "Xiao Liang",
+        "Yubei Li",
+        "Yuchen Wu",
+        "Haozheng Luo",
+        "Hengli Li",
+        "Zhi Zhang",
+        "Zhaolu Kang",
+        "Kai-Wei Chang",
+        "Ying Nian Wu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "stat.AP"
+      ],
+      "published": "2026-04-01T00:38:24+00:00",
+      "link": "https://arxiv.org/pdf/2604.00344v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "decentralized communication decisions using QMIX value factorization",
+      "llm_evidence_cn": "使用QMIX价值分解进行去中心化通信决策",
+      "llm_evidence": "使用QMIX价值分解进行去中心化通信决策",
+      "canonical_evidence": "使用QMIX价值分解进行去中心化通信决策",
+      "llm_tldr_en": "Applies QMIX value factorization to optimize agent topology and communication in LLM multi-agent systems.",
+      "llm_tldr_cn": "将QMIX价值分解应用于优化大模型多智能体系统中的拓扑选择与通信决策。",
+      "llm_tldr": "将QMIX价值分解应用于优化大模型多智能体系统中的拓扑选择与通信决策。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Value decomposition methods in MARL like QMIX and VDN",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00717v1",
+      "source": "arxiv",
+      "title": "GRASP: Gradient Realignment via Active Shared Perception for Multi-Agent Collaborative Optimization",
+      "abstract": "Non-stationarity arises from concurrent policy updates and leads to persistent environmental fluctuations. Existing approaches like Centralized Training with Decentralized Execution (CTDE) and sequential update schemes mitigate this issue. However, since the perception of the policies of other agents remains dependent on sampling environmental interaction data, the agent essentially operates in a passive perception state. This inevitably triggers equilibrium oscillations and significantly slows the convergence speed of the system. To address this issue, we propose Gradient Realignment via Active Shared Perception (GRASP), a novel framework that defines generalized Bellman equilibrium as a stable objective for policy evolution. The core mechanism of GRASP involves utilizing the independent gradients of agents to derive a defined consensus gradient, enabling agents to actively perceive policy updates and optimize team collaboration. Theoretically, we leverage the Kakutani Fixed-Point Theorem to prove that the consensus direction $u^*$ guarantees the existence and attainability of this equilibrium. Extensive experiments on StarCraft II Multi-Agent Challenge (SMAC) and Google Research Football (GRF) demonstrate the scalability and promising performance of the framework.",
+      "authors": [
+        "Sihan Zhou",
+        "Tiantian He",
+        "Yifan Lu",
+        "Yaqing Hou",
+        "Yew-Soon Ong"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.AI"
+      ],
+      "published": "2026-04-01T10:26:22+00:00",
+      "link": "https://arxiv.org/pdf/2604.00717v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "addresses non-stationarity in CTDE via active shared perception",
+      "llm_evidence_cn": "通过主动共享感知解决CTDE中的非平稳性问题",
+      "llm_evidence": "通过主动共享感知解决CTDE中的非平稳性问题",
+      "canonical_evidence": "通过主动共享感知解决CTDE中的非平稳性问题",
+      "llm_tldr_en": "Introduces GRASP to mitigate non-stationarity in CTDE frameworks using gradient realignment.",
+      "llm_tldr_cn": "引入GRASP框架，通过梯度重对齐缓解CTDE架构中的非平稳性问题。",
+      "llm_tldr": "引入GRASP框架，通过梯度重对齐缓解CTDE架构中的非平稳性问题。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "CTDE framework in multi-agent reinforcement learning",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00722v1",
+      "source": "arxiv",
+      "title": "LangMARL: Natural Language Multi-Agent Reinforcement Learning",
+      "abstract": "Large language model (LLM) agents struggle to autonomously evolve coordination strategies in dynamic environments, largely because coarse global outcomes obscure the causal signals needed for local policy refinement. We identify this bottleneck as a multi-agent credit assignment problem, which has long been studied in classical multi-agent reinforcement learning (MARL) but remains underaddressed in LLM-based systems. Building on this observation, we propose LangMARL, a framework that brings credit assignment and policy gradient evolution from cooperative MARL into the language space. LangMARL introduces agent-level language credit assignment, pioneers gradient evolution in language space for policy improvement, and summarizes task-relevant causal relations from replayed trajectories to provide dense feedback and improve convergence under sparse rewards. Extensive experiments across diverse cooperative multi-agent tasks demonstrate improved sample efficiency, interpretability, and strong generalization.",
+      "authors": [
+        "Huaiyuan Yao",
+        "Longchao Da",
+        "Xiaoou Liu",
+        "Charles Fleming",
+        "Tianlong Chen",
+        "Hua Wei"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-01T10:32:00+00:00",
+      "link": "https://arxiv.org/pdf/2604.00722v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "agent-level language credit assignment and policy gradient evolution",
+      "llm_evidence_cn": "智能体级语言信用分配与策略梯度演化",
+      "llm_evidence": "智能体级语言信用分配与策略梯度演化",
+      "canonical_evidence": "智能体级语言信用分配与策略梯度演化",
+      "llm_tldr_en": "Adapts credit assignment and policy gradient methods from MARL to improve LLM agent coordination.",
+      "llm_tldr_cn": "借鉴多智能体强化学习中的信用分配和策略梯度方法，提升大模型智能体的协作能力。",
+      "llm_tldr": "借鉴多智能体强化学习中的信用分配和策略梯度方法，提升大模型智能体的协作能力。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Challenges and solutions for multi agent credit assignment",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.08399v1",
+      "source": "arxiv",
+      "title": "A Recipe for Stable Offline Multi-agent Reinforcement Learning",
+      "abstract": "Despite remarkable achievements in single-agent offline reinforcement learning (RL), multi-agent RL (MARL) has struggled to adopt this paradigm, largely persisting with on-policy training and self-play from scratch. One reason for this gap comes from the instability of non-linear value decomposition, leading prior works to avoid complex mixing networks in favor of linear value decomposition (e.g., VDN) with value regularization used in single-agent setups. In this work, we analyze the source of instability in non-linear value decomposition within the offline MARL setting. Our observations confirm that they induce value-scale amplification and unstable optimization. To alleviate this, we propose a simple technique, scale-invariant value normalization (SVN), that stabilizes actor-critic training without altering the Bellman fixed point. Empirically, we examine the interaction among key components of offline MARL (e.g., value decomposition, value learning, and policy extraction) and derive a practical recipe that unlocks its full potential.",
+      "authors": [
+        "Dongsu Lee",
+        "Daehee Lee",
+        "Amy Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.RO"
+      ],
+      "published": "2026-03-09T13:57:08+00:00",
+      "link": "https://arxiv.org/pdf/2603.08399v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "analyzes non-linear value decomposition and VDN in offline MARL",
+      "llm_evidence_cn": "分析了离线多智能体强化学习中的非线性价值分解和VDN",
+      "llm_evidence": "分析了离线多智能体强化学习中的非线性价值分解和VDN",
+      "canonical_evidence": "分析了离线多智能体强化学习中的非线性价值分解和VDN",
+      "llm_tldr_en": "Proposes scale-invariant value normalization to stabilize non-linear value decomposition in offline MARL.",
+      "llm_tldr_cn": "提出尺度不变价值归一化，以解决离线多智能体强化学习中非线性价值分解的不稳定问题。",
+      "llm_tldr": "提出尺度不变价值归一化，以解决离线多智能体强化学习中非线性价值分解的不稳定问题。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Value decomposition methods in MARL like QMIX and VDN",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.09208v1",
+      "source": "arxiv",
+      "title": "Strategically Robust Multi-Agent Reinforcement Learning with Linear Function Approximation",
+      "abstract": "Provably efficient and robust equilibrium computation in general-sum Markov games remains a core challenge in multi-agent reinforcement learning. Nash equilibrium is computationally intractable in general and brittle due to equilibrium multiplicity and sensitivity to approximation error. We study Risk-Sensitive Quantal Response Equilibrium (RQRE), which yields a unique, smooth solution under bounded rationality and risk sensitivity. We propose \\texttt{RQRE-OVI}, an optimistic value iteration algorithm for computing RQRE with linear function approximation in large or continuous state spaces. Through finite-sample regret analysis, we establish convergence and explicitly characterize how sample complexity scales with rationality and risk-sensitivity parameters. The regret bounds reveal a quantitative tradeoff: increasing rationality tightens regret, while risk sensitivity induces regularization that enhances stability and robustness. This exposes a Pareto frontier between expected performance and robustness, with Nash recovered in the limit of perfect rationality and risk neutrality. We further show that the RQRE policy map is Lipschitz continuous in estimated payoffs, unlike Nash, and RQRE admits a distributionally robust optimization interpretation. Empirically, we demonstrate that \\texttt{RQRE-OVI} achieves competitive performance under self-play while producing substantially more robust behavior under cross-play compared to Nash-based approaches. These results suggest \\texttt{RQRE-OVI} offers a principled, scalable, and tunable path for equilibrium learning with improved robustness and generalization.",
+      "authors": [
+        "Jake Gonzales",
+        "Max Horwitz",
+        "Eric Mazumdar",
+        "Lillian J. Ratliff"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.GT",
+        "cs.MA"
+      ],
+      "published": "2026-03-10T05:24:10+00:00",
+      "link": "https://arxiv.org/pdf/2603.09208v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "equilibrium computation in general-sum Markov games and Nash equilibrium",
+      "llm_evidence_cn": "一般博弈马尔可夫博弈中的均衡计算与纳什均衡",
+      "llm_evidence": "一般博弈马尔可夫博弈中的均衡计算与纳什均衡",
+      "canonical_evidence": "一般博弈马尔可夫博弈中的均衡计算与纳什均衡",
+      "llm_tldr_en": "Proposes an optimistic value iteration algorithm for computing robust equilibria in multi-agent Markov games.",
+      "llm_tldr_cn": "提出一种乐观价值迭代算法，用于在多智能体马尔可夫博弈中计算鲁棒均衡。",
+      "llm_tldr": "提出一种乐观价值迭代算法，用于在多智能体马尔可夫博弈中计算鲁棒均衡。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Competitive multi-agent reinforcement learning and zero-sum games",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11691v1",
+      "source": "arxiv",
+      "title": "STAIRS-Former: Spatio-Temporal Attention with Interleaved Recursive Structure Transformer for Offline Multi-task Multi-agent Reinforcement Learning",
+      "abstract": "Offline multi-agent reinforcement learning (MARL) with multi-task datasets is challenging due to varying numbers of agents across tasks and the need to generalize to unseen scenarios. Prior works employ transformers with observation tokenization and hierarchical skill learning to address these issues. However, they underutilize the transformer attention mechanism for inter-agent coordination and rely on a single history token, which limits their ability to capture long-horizon temporal dependencies in partially observable MARL settings. In this paper, we propose STAIRS-Former, a transformer architecture augmented with spatial and temporal hierarchies that enables effective attention over critical tokens while capturing long interaction histories. We further introduce token dropout to enhance robustness and generalization across varying agent populations. Extensive experiments on diverse multi-agent benchmarks, including SMAC, SMAC-v2, MPE, and MaMuJoCo, with multi-task datasets demonstrate that STAIRS-Former consistently outperforms prior methods and achieves new state-of-the-art performance.",
+      "authors": [
+        "Jiwon Jeon",
+        "Myungsik Cho",
+        "Youngchul Sung"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-12T08:56:20+00:00",
+      "link": "https://arxiv.org/pdf/2603.11691v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "transformer architecture for offline multi-task multi-agent reinforcement learning",
+      "llm_evidence_cn": "用于离线多任务多智能体强化学习的Transformer架构",
+      "llm_evidence": "用于离线多任务多智能体强化学习的Transformer架构",
+      "canonical_evidence": "用于离线多任务多智能体强化学习的Transformer架构",
+      "llm_tldr_en": "Proposes STAIRS-Former to improve inter-agent coordination and temporal dependencies in offline MARL.",
+      "llm_tldr_cn": "提出STAIRS-Former架构，旨在增强离线多智能体强化学习中的智能体协调和长程依赖捕捉。",
+      "llm_tldr": "提出STAIRS-Former架构，旨在增强离线多智能体强化学习中的智能体协调和长程依赖捕捉。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11802v1",
+      "source": "arxiv",
+      "title": "A Semi-Decentralized Approach to Multiagent Control",
+      "abstract": "We introduce an expressive framework and algorithms for the semi-decentralized control of cooperative agents in environments with communication uncertainty. Whereas semi-Markov control admits a distribution over time for agent actions, semi-Markov communication, or what we refer to as semi-decentralization, gives a distribution over time for what actions and observations agents can store in their histories. We extend semi-decentralization to the partially observable Markov decision process (POMDP). The resulting SDec-POMDP unifies decentralized and multiagent POMDPs and several existing explicit communication mechanisms. We present recursive small-step semi-decentralized A* (RS-SDA*), an exact algorithm for generating optimal SDec-POMDP policies. RS-SDA* is evaluated on semi-decentralized versions of several standard benchmarks and a maritime medical evacuation scenario. This paper provides a well-defined theoretical foundation for exploring many classes of multiagent communication problems through the lens of semi-decentralization.",
+      "authors": [
+        "Mahdi Al-Husseini",
+        "Mykel J. Kochenderfer",
+        "Kyle H. Wray"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-12T11:05:20+00:00",
+      "link": "https://arxiv.org/pdf/2603.11802v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "framework for semi-decentralized control of cooperative agents",
+      "llm_evidence_cn": "合作智能体半去中心化控制框架",
+      "llm_evidence": "合作智能体半去中心化控制框架",
+      "canonical_evidence": "合作智能体半去中心化控制框架",
+      "llm_tldr_en": "Introduces SDec-POMDP and RS-SDA* for optimal policy generation in multi-agent systems with communication uncertainty.",
+      "llm_tldr_cn": "提出SDec-POMDP框架和RS-SDA*算法，解决通信不确定性下的多智能体最优策略生成问题。",
+      "llm_tldr": "提出SDec-POMDP框架和RS-SDA*算法，解决通信不确定性下的多智能体最优策略生成问题。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.15054v1",
+      "source": "arxiv",
+      "title": "Interference-Aware K-Step Reachable Communication in Multi-Agent Reinforcement Learning",
+      "abstract": "Effective communication is pivotal for addressing complex collaborative tasks in multi-agent reinforcement learning (MARL). Yet, limited communication bandwidth and dynamic, intricate environmental topologies present significant challenges in identifying high-value communication partners. Agents must consequently select collaborators under uncertainty, lacking a priori knowledge of which partners can deliver task-critical information. To this end, we propose Interference-Aware K-Step Reachable Communication (IA-KRC), a novel framework that enhances cooperation via two core components: (1) a K-Step reachability protocol that confines message passing to physically accessible neighbors, and (2) an interference-prediction module that optimizes partner choice by minimizing interference while maximizing utility. Compared to existing methods, IA-KRC enables substantially more persistent and efficient cooperation despite environmental interference. Comprehensive evaluations confirm that IA-KRC achieves superior performance compared to state-of-the-art baselines, while demonstrating enhanced robustness and scalability in complex topological and highly dynamic multi-agent scenarios.",
+      "authors": [
+        "Ziyu Cheng",
+        "Jinsheng Ren",
+        "Zhouxian Jiang",
+        "Chenzhihang Li",
+        "Rongye Shi",
+        "Bin Liang",
+        "Jun Yang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-16T10:07:33+00:00",
+      "link": "https://arxiv.org/pdf/2603.15054v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "MARL framework for communication and cooperation",
+      "llm_evidence_cn": "用于通信与合作的MARL框架",
+      "llm_evidence": "用于通信与合作的MARL框架",
+      "canonical_evidence": "用于通信与合作的MARL框架",
+      "llm_tldr_en": "Proposes IA-KRC to optimize communication partner selection and enhance cooperation in multi-agent environments.",
+      "llm_tldr_cn": "提出IA-KRC框架，通过优化通信伙伴选择来增强多智能体环境中的协作效率。",
+      "llm_tldr": "提出IA-KRC框架，通过优化通信伙伴选择来增强多智能体环境中的协作效率。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.15418v1",
+      "source": "arxiv",
+      "title": "MA-VLCM: A Vision Language Critic Model for Value Estimation of Policies in Multi-Agent Team Settings",
+      "abstract": "Multi-agent reinforcement learning (MARL) commonly relies on a centralized critic to estimate the value function. However, learning such a critic from scratch is highly sample-inefficient and often lacks generalization across environments. At the same time, large vision-language-action models (VLAs) trained on internet-scale data exhibit strong multimodal reasoning and zero-shot generalization capabilities, yet directly deploying them for robotic execution remains computationally prohibitive, particularly in heterogeneous multi-robot systems with diverse embodiments and resource constraints. To address these challenges, we propose Multi-Agent Vision-Language-Critic Models (MA-VLCM), a framework that replaces the learned centralized critic in MARL with a pretrained vision-language model fine-tuned to evaluate multi-agent behavior. MA-VLCM acts as a centralized critic conditioned on natural language task descriptions, visual trajectory observations, and structured multi-agent state information. By eliminating critic learning during policy optimization, our approach significantly improves sample efficiency while producing compact execution policies suitable for deployment on resource-constrained robots. Results show good zero-shot return estimation on models with differing VLM backbones on in-distribution and out-of-distribution scenarios in multi-agent team settings",
+      "authors": [
+        "Shahil Shaik",
+        "Aditya Parameshwaran",
+        "Anshul Nayak",
+        "Jonathon M. Smereka",
+        "Yue Wang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-03-16T15:29:41+00:00",
+      "link": "https://arxiv.org/pdf/2603.15418v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "centralized critic for value estimation in multi-agent team settings",
+      "llm_evidence_cn": "多智能体团队设置中用于价值估计的中心化评论员模型",
+      "llm_evidence": "多智能体团队设置中用于价值估计的中心化评论员模型",
+      "canonical_evidence": "多智能体团队设置中用于价值估计的中心化评论员模型",
+      "llm_tldr_en": "Proposes MA-VLCM, using vision-language models as critics to improve sample efficiency in MARL.",
+      "llm_tldr_cn": "提出MA-VLCM框架，利用视觉语言模型作为评论员，提升多智能体强化学习的采样效率。",
+      "llm_tldr": "提出MA-VLCM框架，利用视觉语言模型作为评论员，提升多智能体强化学习的采样效率。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.16161v1",
+      "source": "arxiv",
+      "title": "SQL-ASTRA: Alleviating Sparse Feedback in Agentic SQL via Column-Set Matching and Trajectory Aggregation",
+      "abstract": "Agentic Reinforcement Learning (RL) shows promise for complex tasks, but Text-to-SQL remains mostly restricted to single-turn paradigms. A primary bottleneck is the credit assignment problem. In traditional paradigms, rewards are determined solely by the final-turn feedback, which ignores the intermediate process and leads to ambiguous credit evaluation. To address this, we propose Agentic SQL, a framework featuring a universal two-tiered reward mechanism designed to provide effective trajectory-level evaluation and dense step-level signals. First, we introduce Aggregated Trajectory Reward (ATR) to resolve multi-turn credit assignment. Using an asymmetric transition matrix, ATR aggregates process-oriented scores to incentivize continuous improvement. Leveraging Lyapunov stability theory, we prove ATR acts as an energy dissipation operator, guaranteeing a cycle-free policy and monotonic convergence. Second, Column-Set Matching Reward (CSMR) provides immediate step-level rewards to mitigate sparsity. By executing queries at each turn, CSMR converts binary (0/1) feedback into dense [0, 1] signals based on partial correctness. Evaluations on BIRD show a 5% gain over binary-reward GRPO. Notably, our approach outperforms SOTA Arctic-Text2SQL-R1-7B on BIRD and Spider 2.0 using identical models, propelling Text-to-SQL toward a robust multi-turn agent paradigm.",
+      "authors": [
+        "Long Li",
+        "Zhijian Zhou",
+        "Jiangxuan Long",
+        "Peiyang Liu",
+        "Weidi Xu",
+        "Zhe Wang",
+        "Shirui Pan",
+        "Chao Qu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-17T06:26:36+00:00",
+      "link": "https://arxiv.org/pdf/2603.16161v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "resolving multi-turn credit assignment with trajectory rewards",
+      "llm_evidence_cn": "通过轨迹奖励解决多轮信用分配问题",
+      "llm_evidence": "通过轨迹奖励解决多轮信用分配问题",
+      "canonical_evidence": "通过轨迹奖励解决多轮信用分配问题",
+      "llm_tldr_en": "Proposes SQL-ASTRA with a two-tiered reward mechanism to solve credit assignment in agentic SQL.",
+      "llm_tldr_cn": "提出SQL-ASTRA框架，通过双层奖励机制解决智能体SQL任务中的信用分配问题。",
+      "llm_tldr": "提出SQL-ASTRA框架，通过双层奖励机制解决智能体SQL任务中的信用分配问题。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Challenges and solutions for multi agent credit assignment",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.19188v1",
+      "source": "arxiv",
+      "title": "Markov Potential Game and Multi-Agent Reinforcement Learning for Autonomous Driving",
+      "abstract": "Autonomous driving (AD) requires safe and reliable decision-making among interacting agents, e.g., vehicles, bicycles, and pedestrians. Multi-agent reinforcement learning (MARL) modeled by Markov games (MGs) provides a suitable framework to characterize such agents' interactions during decision-making. Nash equilibria (NEs) are often the desired solution in an MG. However, it is typically challenging to compute an NE in general-sum games, unless the game is a Markov potential game (MPG), which ensures the NE attainability under a few learning algorithms such as gradient play. However, it has been an open question how to construct an MPG and whether these construction rules are suitable for AD applications. In this paper, we provide sufficient conditions under which an MG is an MPG and show that these conditions can accommodate general driving objectives for autonomous vehicles (AVs) using highway forced merge scenarios as illustrative examples. A parameter-sharing neural network (NN) structure is designed to enable decentralized policy execution. The trained driving policy from MPGs is evaluated in both simulated and naturalistic traffic datasets. Comparative studies with single-agent RL and with human drivers whose behaviors are recorded in the traffic datasets are reported, respectively.",
+      "authors": [
+        "Huiwen Yan",
+        "Mushuang Liu"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY"
+      ],
+      "published": "2026-03-19T17:43:19+00:00",
+      "link": "https://arxiv.org/pdf/2603.19188v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Markov potential games and Nash equilibria in MARL",
+      "llm_evidence_cn": "多智能体强化学习中的马尔可夫势博弈与纳什均衡",
+      "llm_evidence": "多智能体强化学习中的马尔可夫势博弈与纳什均衡",
+      "canonical_evidence": "多智能体强化学习中的马尔可夫势博弈与纳什均衡",
+      "llm_tldr_en": "Explores Markov potential games to ensure Nash equilibrium attainability in multi-agent autonomous driving.",
+      "llm_tldr_cn": "探讨了马尔可夫势博弈，以确保多智能体自动驾驶决策中纳什均衡的可达性。",
+      "llm_tldr": "探讨了马尔可夫势博弈，以确保多智能体自动驾驶决策中纳什均衡的可达性。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Fundamental concepts and algorithms of multi-agent reinforcement learning",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.21574v1",
+      "source": "arxiv",
+      "title": "Adaptive Robust Estimator for Multi-Agent Reinforcement Learning",
+      "abstract": "Multi-agent collaboration has emerged as a powerful paradigm for enhancing the reasoning capabilities of large language models, yet it suffers from interaction-level ambiguity that blurs generation, critique, and revision, making credit assignment across agents difficult. Moreover, policy optimization in this setting is vulnerable to heavy-tailed and noisy rewards, which can bias advantage estimation and trigger unstable or even divergent training. To address both issues, we propose a robust multi-agent reinforcement learning framework for collaborative reasoning, consisting of two components: Dual-Agent Answer-Critique-Rewrite (DACR) and an Adaptive Robust Estimator (ARE). DACR decomposes reasoning into a structured three-stage pipeline: answer, critique, and rewrite, while enabling explicit attribution of each agent's marginal contribution to its partner's performance. ARE provides robust estimation of batch experience means during multi-agent policy optimization. Across mathematical reasoning and embodied intelligence benchmarks, even under noisy rewards, our method consistently outperforms the baseline in both homogeneous and heterogeneous settings. These results indicate stronger robustness to reward noise and more stable training dynamics, effectively preventing optimization failures caused by noisy reward signals.",
+      "authors": [
+        "Zhongyi Li",
+        "Wan Tian",
+        "Jingyu Chen",
+        "Kangyao Huang",
+        "Huiming Zhang",
+        "Hui Yang",
+        "Tao Ren",
+        "Jinyang Jiang",
+        "Yijie Peng",
+        "Yikun Ban",
+        "Fuzhen Zhuang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-23T04:51:15+00:00",
+      "link": "https://arxiv.org/pdf/2603.21574v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "credit assignment across agents in LLM multi-agent collaboration",
+      "llm_evidence_cn": "大语言模型多智能体协作中的信用分配问题",
+      "llm_evidence": "大语言模型多智能体协作中的信用分配问题",
+      "canonical_evidence": "大语言模型多智能体协作中的信用分配问题",
+      "llm_tldr_en": "Proposes a robust MARL framework to solve credit assignment and noisy rewards in LLM-based collaborative reasoning.",
+      "llm_tldr_cn": "提出一种鲁棒的多智能体强化学习框架，解决大模型协作推理中的信用分配和噪声奖励问题。",
+      "llm_tldr": "提出一种鲁棒的多智能体强化学习框架，解决大模型协作推理中的信用分配和噪声奖励问题。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Challenges and solutions for multi agent credit assignment",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.24324v1",
+      "source": "arxiv",
+      "title": "Large Language Model Guided Incentive Aware Reward Design for Cooperative Multi-Agent Reinforcement Learning",
+      "abstract": "Designing effective auxiliary rewards for cooperative multi-agent systems remains a precarious task; misaligned incentives risk inducing suboptimal coordination, especially where sparse task feedback fails to provide sufficient grounding. This study introduces an automated reward design framework that leverages large language models to synthesize executable reward programs from environment instrumentation. The procedure constrains candidate programs within a formal validity envelope and evaluates their efficacy by training policies from scratch under a fixed computational budget; selection depends exclusively on the sparse task return. The framework is evaluated across four distinct Overcooked-AI layouts characterized by varied corridor congestion, handoff dependencies, and structural asymmetries. Iterative search generations consistently yield superior task returns and delivery counts, with the most pronounced gains occurring in environments dominated by interaction bottlenecks. Diagnostic analysis of the synthesized shaping components indicates increased interdependence in action selection and improved signal alignment in coordination-intensive tasks. These results demonstrate that the search for objectivegrounded reward programs can mitigate the burden of manual engineering while producing shaping signals compatible with cooperative learning under finite budgets.",
+      "authors": [
+        "Dogan Urgun",
+        "Gokhan Gungor"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "eess.SY"
+      ],
+      "published": "2026-03-25T14:05:59+00:00",
+      "link": "https://arxiv.org/pdf/2603.24324v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "LLM-guided reward design for cooperative MARL",
+      "llm_evidence_cn": "大模型引导的合作式多智能体强化学习奖励设计",
+      "llm_evidence": "大模型引导的合作式多智能体强化学习奖励设计",
+      "canonical_evidence": "大模型引导的合作式多智能体强化学习奖励设计",
+      "llm_tldr_en": "Uses LLMs to automate auxiliary reward design for cooperative MARL to improve coordination in sparse feedback tasks.",
+      "llm_tldr_cn": "利用大模型自动设计辅助奖励，以解决合作式多智能体强化学习中的稀疏反馈和协调问题。",
+      "llm_tldr": "利用大模型自动设计辅助奖励，以解决合作式多智能体强化学习中的稀疏反馈和协调问题。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.24324v2",
+      "source": "arxiv",
+      "title": "Large Language Model Guided Incentive Aware Reward Design for Cooperative Multi-Agent Reinforcement Learning",
+      "abstract": "Designing effective auxiliary rewards for cooperative multi-agent systems remains a challenging task. Misaligned incentives risk inducing suboptimal coordination, especially when sparse task feedback fails to provide sufficient grounding. This study introduces an automated reward design framework that leverages large language models to synthesize executable reward programs from environment instrumentation. The procedure constrains candidate programs within a formal validity envelope and evaluates their efficacy by training policies from scratch under a fixed computational budget. Selection across generations depends exclusively on the sparse task return. The framework is evaluated across four distinct Overcooked-AI layouts characterized by varied corridor congestion, handoff dependencies, and structural asymmetries. Iterative search generations consistently yield superior task returns and delivery counts, with the most pronounced gains occurring in environments dominated by interaction bottlenecks. Diagnostic analysis of the synthesized shaping components indicates increased interdependence in action selection and improved signal alignment in coordination-intensive tasks. These results demonstrate that the search for objective-grounded reward programs can mitigate the burden of manual engineering while producing shaping signals compatible with cooperative learning under finite budgets.",
+      "authors": [
+        "Dogan Urgun",
+        "Gokhan Gungor"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "eess.SY"
+      ],
+      "published": "2026-03-25T14:05:59+00:00",
+      "link": "https://arxiv.org/pdf/2603.24324v2",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "automated reward design framework for cooperative MARL",
+      "llm_evidence_cn": "合作式多智能体强化学习的自动奖励设计框架",
+      "llm_evidence": "合作式多智能体强化学习的自动奖励设计框架",
+      "canonical_evidence": "合作式多智能体强化学习的自动奖励设计框架",
+      "llm_tldr_en": "Leverages LLMs to synthesize reward programs for cooperative MARL, addressing coordination challenges.",
+      "llm_tldr_cn": "利用大模型合成奖励程序，解决合作式多智能体强化学习中的激励对齐和协调挑战。",
+      "llm_tldr": "利用大模型合成奖励程序，解决合作式多智能体强化学习中的激励对齐和协调挑战。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.24366v1",
+      "source": "arxiv",
+      "title": "CoordLight: Learning Decentralized Coordination for Network-Wide Traffic Signal Control",
+      "abstract": "Adaptive traffic signal control (ATSC) is crucial in alleviating congestion, maximizing throughput and promoting sustainable mobility in ever-expanding cities. Multi-Agent Reinforcement Learning (MARL) has recently shown significant potential in addressing complex traffic dynamics, but the intricacies of partial observability and coordination in decentralized environments still remain key challenges in formulating scalable and efficient control strategies. To address these challenges, we present CoordLight, a MARL-based framework designed to improve intra-neighborhood traffic by enhancing decision-making at individual junctions (agents), as well as coordination with neighboring agents, thereby scaling up to network-level traffic optimization. Specifically, we introduce the Queue Dynamic State Encoding (QDSE), a novel state representation based on vehicle queuing models, which strengthens the agents' capability to analyze, predict, and respond to local traffic dynamics. We further propose an advanced MARL algorithm, named Neighbor-aware Policy Optimization (NAPO). It integrates an attention mechanism that discerns the state and action dependencies among adjacent agents, aiming to facilitate more coordinated decision-making, and to improve policy learning updates through robust advantage calculation. This enables agents to identify and prioritize crucial interactions with influential neighbors, thus enhancing the targeted coordination and collaboration among agents. Through comprehensive evaluations against state-of-the-art traffic signal control methods over three real-world traffic datasets composed of up to 196 intersections, we empirically show that CoordLight consistently exhibits superior performance across diverse traffic networks with varying traffic flows. The code is available at https://github.com/marmotlab/CoordLight",
+      "authors": [
+        "Yifeng Zhang",
+        "Harsh Goel",
+        "Peizhuo Li",
+        "Mehul Damani",
+        "Sandeep Chinchali",
+        "Guillaume Sartoretti"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.RO"
+      ],
+      "published": "2026-03-25T14:46:31+00:00",
+      "link": "https://arxiv.org/pdf/2603.24366v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "MARL-based framework for decentralized coordination",
+      "llm_evidence_cn": "基于MARL的去中心化协调框架",
+      "llm_evidence": "基于MARL的去中心化协调框架",
+      "canonical_evidence": "基于MARL的去中心化协调框架",
+      "llm_tldr_en": "Presents CoordLight, a MARL framework for decentralized traffic signal control and network-level coordination.",
+      "llm_tldr_cn": "提出CoordLight框架，利用多智能体强化学习实现去中心化交通信号控制与网络级协调。",
+      "llm_tldr": "提出CoordLight框架，利用多智能体强化学习实现去中心化交通信号控制与网络级协调。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.24931v1",
+      "source": "arxiv",
+      "title": "COIN: Collaborative Interaction-Aware Multi-Agent Reinforcement Learning for Self-Driving Systems",
+      "abstract": "Multi-Agent Self-Driving (MASD) systems provide an effective solution for coordinating autonomous vehicles to reduce congestion and enhance both safety and operational efficiency in future intelligent transportation systems. Multi-Agent Reinforcement Learning (MARL) has emerged as a promising approach for developing advanced end-to-end MASD systems. However, achieving efficient and safe collaboration in dynamic MASD systems remains a significant challenge in dense scenarios with complex agent interactions. To address this challenge, we propose a novel collaborative(CO-) interaction-aware(-IN) MARL framework, named COIN. Specifically, we develop a new counterfactual individual-global twin delayed deep deterministic policy gradient (CIG-TD3) algorithm, crafted in a \"centralized training, decentralized execution\" (CTDE) manner, which aims to jointly optimize the individual objectives (navigation) and the global objectives (collaboration) of agents. We further introduce a dual-level interaction-aware centralized critic architecture that captures both local pairwise interactions and global system-level dependencies, enabling more accurate global value estimation and improved credit assignment for collaborative policy learning. We conduct extensive simulation experiments in dense urban traffic environments, which demonstrate that COIN consistently outperforms other advanced baseline methods in both safety and efficiency across various system sizes. These results highlight its superiority in complex and dynamic MASD scenarios, as further validated through real-world robot demonstrations. Supplementary videos are available at https://marmotlab.github.io/COIN/",
+      "authors": [
+        "Yifeng Zhang",
+        "Jieming Chen",
+        "Tingguang Zhou",
+        "Tanishq Duhan",
+        "Jianghong Dong",
+        "Yuhong Cao",
+        "Guillaume Sartoretti"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-03-26T01:48:25+00:00",
+      "link": "https://arxiv.org/pdf/2603.24931v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "counterfactual individual-global twin delayed deep deterministic policy gradient",
+      "llm_evidence_cn": "反事实个体-全局双延迟深度确定性策略梯度",
+      "llm_evidence": "反事实个体-全局双延迟深度确定性策略梯度",
+      "canonical_evidence": "反事实个体-全局双延迟深度确定性策略梯度",
+      "llm_tldr_en": "Proposes a collaborative interaction-aware MARL framework using counterfactual policy gradients for self-driving.",
+      "llm_tldr_cn": "提出一种协作交互感知框架，利用反事实策略梯度解决自动驾驶中的多智能体协作问题。",
+      "llm_tldr": "提出一种协作交互感知框架，利用反事实策略梯度解决自动驾驶中的多智能体协作问题。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Policy gradient methods for multi-agent environments",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.27575v1",
+      "source": "arxiv",
+      "title": "Decentralized MARL for Coarse Correlated Equilibrium in Aggregative Markov Games",
+      "abstract": "This paper studies the problem of decentralized learning of Coarse Correlated Equilibrium (CCE) in aggregative Markov games (AMGs), where each agent's instantaneous reward depends only on its own action and an aggregate quantity. Existing CCE learning algorithms for general Markov games are not designed to leverage the aggregative structure, and research on decentralized CCE learning for AMGs remains limited. We propose an adaptive stage-based V-learning algorithm that exploits the aggregative structure under a fully decentralized information setting. Based on the two-timescale idea, the algorithm partitions learning into stages and adjusts stage lengths based on the variability of aggregate signals, while using no-regret updates within each stage. We prove the algorithm achieves an epsilon-approximate CCE in O(S Amax T5 / epsilon2) episodes, avoiding the curse of multiagents which commonly arises in MARL. Numerical results verify the theoretical findings, and the decentralized, model-free design enables easy extension to large-scale multi-agent scenarios.",
+      "authors": [
+        "Siying Huang",
+        "Yifen Mu",
+        "Ge Chen"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT",
+        "eess.SY"
+      ],
+      "published": "2026-03-29T08:25:08+00:00",
+      "link": "https://arxiv.org/pdf/2603.27575v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "decentralized learning of Coarse Correlated Equilibrium in Markov games",
+      "llm_evidence_cn": "马尔可夫博弈中粗相关均衡的去中心化学习",
+      "llm_evidence": "马尔可夫博弈中粗相关均衡的去中心化学习",
+      "canonical_evidence": "马尔可夫博弈中粗相关均衡的去中心化学习",
+      "llm_tldr_en": "Proposes a V-learning algorithm for decentralized equilibrium learning in aggregative Markov games.",
+      "llm_tldr_cn": "针对聚合马尔可夫博弈，提出了一种用于去中心化均衡学习的V-learning算法。",
+      "llm_tldr": "针对聚合马尔可夫博弈，提出了一种用于去中心化均衡学习的V-learning算法。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Competitive multi-agent reinforcement learning and zero-sum games",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28573v1",
+      "source": "arxiv",
+      "title": "Learning Partial Action Replacement in Offline MARL",
+      "abstract": "Offline multi-agent reinforcement learning (MARL) faces a critical challenge: the joint action space grows exponentially with the number of agents, making dataset coverage exponentially sparse and out-of-distribution (OOD) joint actions unavoidable. Partial Action Replacement (PAR) mitigates this by anchoring a subset of agents to dataset actions, but existing approach relies on enumerating multiple subset configurations at high computational cost and cannot adapt to varying states. We introduce PLCQL, a framework that formulates PAR subset selection as a contextual bandit problem and learns a state-dependent PAR policy using Proximal Policy Optimisation with an uncertainty-weighted reward. This adaptive policy dynamically determines how many agents to replace at each update step, balancing policy improvement against conservative value estimation. We prove a value-error bound showing that the estimation error scales linearly with the expected number of deviating agents. Compared with the previous PAR-based method SPaCQL, PLCQL reduces the number of per-iteration Q-function evaluations from n to 1, significantly improving computational efficiency. Empirically, PLCQL achieves the highest normalised scores on 66% of tasks across MPE, MaMuJoCo, and SMAC benchmarks, outperforming SPaCQL on 84% of tasks while substantially reducing computational cost.",
+      "authors": [
+        "Yue Jin",
+        "Giovanni Montana"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.MA"
+      ],
+      "published": "2026-03-30T15:28:13+00:00",
+      "link": "https://arxiv.org/pdf/2603.28573v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Offline MARL framework addressing joint action space and OOD challenges",
+      "llm_evidence_cn": "解决联合动作空间和离分布挑战的离线多智能体强化学习框架",
+      "llm_evidence": "解决联合动作空间和离分布挑战的离线多智能体强化学习框架",
+      "canonical_evidence": "解决联合动作空间和离分布挑战的离线多智能体强化学习框架",
+      "llm_tldr_en": "Introduces PLCQL to adaptively manage action replacement in offline MARL, improving efficiency in large action spaces.",
+      "llm_tldr_cn": "引入 PLCQL 框架，通过自适应动作替换解决离线多智能体强化学习中的动作空间爆炸和分布外问题。",
+      "llm_tldr": "引入 PLCQL 框架，通过自适应动作替换解决离线多智能体强化学习中的动作空间爆炸和分布外问题。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00433v1",
+      "source": "arxiv",
+      "title": "Internal State-Based Policy Gradient Methods for Partially Observable Markov Potential Games",
+      "abstract": "This letter studies multi-agent reinforcement learning in partially observable Markov potential games. Solving this problem is challenging due to partial observability, decentralized information, and the curse of dimensionality. First, to address the first two challenges, we leverage the common information framework, which allows agents to act based on both shared and local information. Second, to ensure tractability, we study an internal state that compresses accumulated information, preventing it from growing unboundedly over time. We then implement an internal state-based natural policy gradient method to find Nash equilibria of the Markov potential game. Our main contribution is to establish a non-asymptotic convergence bound for this method. Our theoretical bound decomposes into two interpretable components: a statistical error term that also arises in standard Markov potential games, and an approximation error capturing the use of finite-state controllers. Finally, simulations across multiple partially observable environments demonstrate that the proposed method using finite-state controllers achieves consistent improvements in performance compared to the setting where only the current observation is used.",
+      "authors": [
+        "Wonseok Yang",
+        "Thinh T. Doan"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.LG"
+      ],
+      "published": "2026-04-01T03:25:21+00:00",
+      "link": "https://arxiv.org/pdf/2604.00433v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "internal state-based natural policy gradient method for MARL",
+      "llm_evidence_cn": "基于内部状态的多智能体自然策略梯度方法",
+      "llm_evidence": "基于内部状态的多智能体自然策略梯度方法",
+      "canonical_evidence": "基于内部状态的多智能体自然策略梯度方法",
+      "llm_tldr_en": "Develops a policy gradient method for partially observable Markov potential games with convergence bounds.",
+      "llm_tldr_cn": "为部分可观测马尔可夫势博弈开发了一种具有收敛界限的策略梯度方法。",
+      "llm_tldr": "为部分可观测马尔可夫势博弈开发了一种具有收敛界限的策略梯度方法。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Policy gradient methods for multi-agent environments",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.02791v1",
+      "source": "arxiv",
+      "title": "Fully Byzantine-Resilient Distributed Multi-Agent Q-Learning",
+      "abstract": "We study Byzantine-resilient distributed multi-agent reinforcement learning (MARL), where agents must collaboratively learn optimal value functions over a compromised communication network. Existing resilient MARL approaches typically guarantee almost sure convergence only to near-optimal value functions, or require restrictive assumptions to ensure convergence to optimal solution. As a result, agents may fail to learn the optimal policies under these methods. To address this, we propose a novel distributed Q-learning algorithm, under which all agents' value functions converge almost surely to the optimal value functions despite Byzantine edge attacks. The key idea is a redundancy-based filtering mechanism that leverages two-hop neighbor information to validate incoming messages, while preserving bidirectional information flow. We then introduce a new topological condition for the convergence of our algorithm, present a systematic method to construct such networks, and prove that this condition can be verified in polynomial time. We validate our results through simulations, showing that our method converges to the optimal solutions, whereas prior methods fail under Byzantine edge attacks.",
+      "authors": [
+        "Haejoon Lee",
+        "Dimitra Panagou"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "eess.SY"
+      ],
+      "published": "2026-04-03T06:57:45+00:00",
+      "link": "https://arxiv.org/pdf/2604.02791v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Byzantine-resilient distributed multi-agent Q-learning algorithm",
+      "llm_evidence_cn": "拜占庭容错分布式多智能体Q学习算法",
+      "llm_evidence": "拜占庭容错分布式多智能体Q学习算法",
+      "canonical_evidence": "拜占庭容错分布式多智能体Q学习算法",
+      "llm_tldr_en": "Introduces a Byzantine-resilient distributed Q-learning algorithm for MARL over compromised networks.",
+      "llm_tldr_cn": "引入了一种拜占庭容错的分布式Q学习算法，用于受损网络环境下的多智能体强化学习。",
+      "llm_tldr": "引入了一种拜占庭容错的分布式Q学习算法，用于受损网络环境下的多智能体强化学习。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Fundamental concepts and algorithms of multi-agent reinforcement learning",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.10098v1",
+      "source": "arxiv",
+      "title": "Code-Space Response Oracles: Generating Interpretable Multi-Agent Policies with Large Language Models",
+      "abstract": "Recent advances in multi-agent reinforcement learning, particularly Policy-Space Response Oracles (PSRO), have enabled the computation of approximate game-theoretic equilibria in increasingly complex domains. However, these methods rely on deep reinforcement learning oracles that produce `black-box' neural network policies, making them difficult to interpret, trust or debug. We introduce Code-Space Response Oracles (CSRO), a novel framework that addresses this challenge by replacing RL oracles with Large Language Models (LLMs). CSRO reframes the best response computation as a code generation task, prompting an LLM to generate policies directly as human-readable code. This approach not only yields inherently interpretable policies but also leverages the LLM's pretrained knowledge to discover complex, human-like strategies. We explore multiple ways to construct and enhance an LLM-based oracle: zero-shot prompting, iterative refinement and \\emph{AlphaEvolve}, a distributed LLM-based evolutionary system. We demonstrate that CSRO achieves performance competitive with baselines while producing a diverse set of explainable policies. Our work presents a new perspective on multi-agent learning, shifting the focus from optimizing opaque policy parameters to synthesizing interpretable algorithmic behavior.",
+      "authors": [
+        "Daniel Hennes",
+        "Zun Li",
+        "John Schultz",
+        "Marc Lanctot"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-03-10T17:37:06+00:00",
+      "link": "https://arxiv.org/pdf/2603.10098v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Policy-Space Response Oracles (PSRO) and game-theoretic equilibria",
+      "llm_evidence_cn": "策略空间响应先知（PSRO）与博弈论均衡",
+      "llm_evidence": "策略空间响应先知（PSRO）与博弈论均衡",
+      "canonical_evidence": "策略空间响应先知（PSRO）与博弈论均衡",
+      "llm_tldr_en": "Replaces RL oracles with LLMs in the PSRO framework to generate interpretable multi-agent policies as code.",
+      "llm_tldr_cn": "在PSRO框架中用大模型取代强化学习，生成可解释的代码形式多智能体策略。",
+      "llm_tldr": "在PSRO框架中用大模型取代强化学习，生成可解释的代码形式多智能体策略。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Competitive multi-agent reinforcement learning and zero-sum games",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11582v1",
+      "source": "arxiv",
+      "title": "Multi-Agent Reinforcement Learning for UAV-Based Chemical Plume Source Localization",
+      "abstract": "Undocumented orphaned wells pose significant health and environmental risks to nearby communities by releasing toxic gases and contaminating water sources, with methane emissions being a primary concern. Traditional survey methods such as magnetometry often fail to detect older wells effectively. In contrast, aerial in-situ sensing using unmanned aerial vehicles (UAVs) offers a promising alternative for methane emission detection and source localization. This study presents a robust and efficient framework based on a multi-agent deep reinforcement learning (MARL) algorithm for the chemical plume source localization (CPSL) problem. The proposed approach leverages virtual anchor nodes to coordinate UAV navigation, enabling collaborative sensing of gas concentrations and wind velocities through onboard and shared measurements. Source identification is achieved by analyzing the historical trajectory of anchor node placements within the plume. Comparative evaluations against the fluxotaxis method demonstrate that the MARL framework achieves superior performance in both localization accuracy and operational efficiency.",
+      "authors": [
+        "Zhirun Li",
+        "Derek Hollenbeck",
+        "Ruikun Wu",
+        "Michelle Sherman",
+        "Sihua Shao",
+        "Xiang Sun",
+        "Mostafa Hassanalian"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY",
+        "cs.MA"
+      ],
+      "published": "2026-03-12T06:15:17+00:00",
+      "link": "https://arxiv.org/pdf/2603.11582v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "MARL algorithm for collaborative sensing and navigation in UAV swarms",
+      "llm_evidence_cn": "用于无人机群协作感知与导航的多智能体强化学习算法",
+      "llm_evidence": "用于无人机群协作感知与导航的多智能体强化学习算法",
+      "canonical_evidence": "用于无人机群协作感知与导航的多智能体强化学习算法",
+      "llm_tldr_en": "Develops a MARL framework using virtual anchor nodes for collaborative chemical plume source localization by UAVs.",
+      "llm_tldr_cn": "开发了一种基于多智能体强化学习的框架，利用虚拟锚节点协调无人机群协作定位化学羽流源。",
+      "llm_tldr": "开发了一种基于多智能体强化学习的框架，利用虚拟锚节点协调无人机群协作定位化学羽流源。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11884v1",
+      "source": "arxiv",
+      "title": "The price of decentralization in managing engineering systems through multi-agent reinforcement learning",
+      "abstract": "Inspection and maintenance (I&M) planning involves sequential decision making under uncertainties and incomplete information, and can be modeled as a partially observable Markov decision process (POMDP). While single-agent deep reinforcement learning provides approximate solutions to POMDPs, it does not scale well in multi-component systems. Scalability can be achieved through multi-agent deep reinforcement learning (MADRL), which decentralizes decision-making across multiple agents, locally controlling individual components. However, this decentralization can induce cooperation pathologies that degrade the optimality of the learned policies. To examine these effects in I&M planning, we introduce a set of deteriorating systems in which redundancy is varied systematically. These benchmark environments are designed such that computation of centralized (near-)optimal policies remains tractable, enabling direct comparison of solution methods. We implement and benchmark a broad set of MADRL algorithms spanning fully centralized and decentralized training paradigms, from value-factorization to actor-critic methods. Our results show a clear effect of redundancy on coordination: MADRL algorithms achieve near-optimal performance in series-like settings, whereas increasing redundancy amplifies coordination challenges and can lead to optimality losses. Nonetheless, decentralized agents learn structured policies that consistently outperform optimized heuristic baselines, highlighting both the promise and current limitations of decentralized learning for scalable maintenance planning.",
+      "authors": [
+        "Prateek Bhustali",
+        "Pablo G. Morato",
+        "Konstantinos G. Papakonstantinou",
+        "Charalampos P. Andriotis"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA"
+      ],
+      "published": "2026-03-12T13:00:21+00:00",
+      "link": "https://arxiv.org/pdf/2603.11884v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-agent deep reinforcement learning (MADRL) for decentralized decision-making",
+      "llm_evidence_cn": "用于分布式决策的多智能体深度强化学习（MADRL）",
+      "llm_evidence": "用于分布式决策的多智能体深度强化学习（MADRL）",
+      "canonical_evidence": "用于分布式决策的多智能体深度强化学习（MADRL）",
+      "llm_tldr_en": "Analyzes the impact of decentralization and cooperation pathologies in multi-agent reinforcement learning.",
+      "llm_tldr_cn": "分析了多智能体强化学习中去中心化带来的影响以及协作病态问题。",
+      "llm_tldr": "分析了多智能体强化学习中去中心化带来的影响以及协作病态问题。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.12096v1",
+      "source": "arxiv",
+      "title": "A Robust and Efficient Multi-Agent Reinforcement Learning Framework for Traffic Signal Control",
+      "abstract": "Reinforcement Learning (RL) in Traffic Signal Control (TSC) faces significant hurdles in real-world deployment due to limited generalization to dynamic traffic flow variations. Existing approaches often overfit static patterns and use action spaces incompatible with driver expectations. This paper proposes a robust Multi-Agent Reinforcement Learning (MARL) framework validated in the Vissim traffic simulator. The framework integrates three mechanisms: (1) Turning Ratio Randomization, a training strategy that exposes agents to dynamic turning probabilities to enhance robustness against unseen scenarios; (2) a stability-oriented Exponential Phase Duration Adjustment action space, which balances responsiveness and precision through cyclical, exponential phase adjustments; and (3) a Neighbor-Based Observation scheme utilizing the MAPPO algorithm with Centralized Training with Decentralized Execution (CTDE). By leveraging centralized updates, this approach approximates the efficacy of global observations while maintaining scalable local communication. Experimental results demonstrate that our framework outperforms standard RL baselines, reducing average waiting time by over 10%. The proposed model exhibits superior generalization in unseen traffic scenarios and maintains high control stability, offering a practical solution for adaptive signal control.",
+      "authors": [
+        "Sheng-You Huang",
+        "Hsiao-Chuan Chang",
+        "Yen-Chi Chen",
+        "Ting-Han Wei",
+        "I-Hau Yeh",
+        "Sheng-Yao Kuan",
+        "Chien-Yao Wang",
+        "Hsuan-Han Lee",
+        "I-Chen Wu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-12T16:02:28+00:00",
+      "link": "https://arxiv.org/pdf/2603.12096v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "MARL framework for traffic signal control with randomization strategies",
+      "llm_evidence_cn": "用于交通信号控制的MARL框架及随机化策略",
+      "llm_evidence": "用于交通信号控制的MARL框架及随机化策略",
+      "canonical_evidence": "用于交通信号控制的MARL框架及随机化策略",
+      "llm_tldr_en": "Develops a robust MARL framework for traffic signal control using turning ratio randomization.",
+      "llm_tldr_cn": "开发了一个鲁棒的多智能体强化学习框架，通过转向比随机化优化交通信号控制。",
+      "llm_tldr": "开发了一个鲁棒的多智能体强化学习框架，通过转向比随机化优化交通信号控制。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.14625v1",
+      "source": "arxiv",
+      "title": "EcoFair-CH-MARL: Scalable Constrained Hierarchical Multi-Agent RL with Real-Time Emission Budgets and Fairness Guarantees",
+      "abstract": "Global decarbonisation targets and tightening market pressures demand maritime logistics solutions that are simultaneously efficient, sustainable, and equitable. We introduce EcoFair-CH-MARL, a constrained hierarchical multi-agent reinforcement learning framework that unifies three innovations: (i) a primal-dual budget layer that provably bounds cumulative emissions under stochastic weather and demand; (ii) a fairness-aware reward transformer with dynamically scheduled penalties that enforces max-min cost equity across heterogeneous fleets; and (iii) a two-tier policy architecture that decouples strategic routing from real-time vessel control, enabling linear scaling in agent count. New theoretical results establish O(\\sqrt{T}) regret for both constraint violations and fairness loss. Experiments on a high-fidelity maritime digital twin (16 ports, 50 vessels) driven by automatic identification system traces, plus an energy-grid case study, show up to 15% lower emissions, 12% higher through-put, and a 45% fair-cost improvement over state-of-the-art hierarchical and constrained MARL baselines. In addition, EcoFair-CH-MARL achieves stronger equity (lower Gini and higher min-max welfare) than fairness-specific MARL baselines (e.g., SOTO, FEN), and its modular design is compatible with both policy- and value-based learners. EcoFair-CH-MARL therefore advances the feasibility of large-scale, regulation-compliant, and socially responsible multi-agent coordination in safety-critical domains.",
+      "authors": [
+        "Saad Alqithami"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.AI",
+        "cs.LG",
+        "eess.SY"
+      ],
+      "published": "2026-03-15T21:40:40+00:00",
+      "link": "https://arxiv.org/pdf/2603.14625v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "constrained hierarchical multi-agent reinforcement learning framework",
+      "llm_evidence_cn": "受约束的分层多智能体强化学习框架",
+      "llm_evidence": "受约束的分层多智能体强化学习框架",
+      "canonical_evidence": "受约束的分层多智能体强化学习框架",
+      "llm_tldr_en": "Presents a hierarchical MARL framework for maritime logistics with emission budgets and fairness guarantees.",
+      "llm_tldr_cn": "提出一种用于航运物流的分层多智能体强化学习框架，兼顾排放预算与公平性。",
+      "llm_tldr": "提出一种用于航运物流的分层多智能体强化学习框架，兼顾排放预算与公平性。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.16470v1",
+      "source": "arxiv",
+      "title": "Multi-Agent Reinforcement Learning Counteracts Delayed CSI in Multi-Satellite Systems",
+      "abstract": "The integration of satellite communication networks with next-generation (NG) technologies is a promising approach towards global connectivity. However, the quality of services is highly dependant on the availability of accurate channel state information (CSI). Channel estimation in satellite communications is challenging due to the high propagation delay between terrestrial users and satellites, which results in outdated CSI observations on the satellite side. In this paper, we study the downlink transmission of multiple satellites acting as distributed base stations (BS) to mobile terrestrial users. We propose a multi-agent reinforcement learning (MARL) algorithm which aims for maximising the sum-rate of the users, while coping with the outdated CSI. We design a novel bi-level optimisation, procedure themes as dual stage proximal policy optimisation (DS-PPO), for tackling the problem of large continuous action spaces as well as of independent and non-identically distributed (non-IID) environments in MARL. Specifically, the first stage of DS-PPO maximises the sum-rate for an individual satellite and the second stage maximises the sum-rate when all the satellites cooperate to form a distributed multi-antenna BS. Our numerical results demonstrate the robustness of DS-PPO to CSI imperfections as well as the sum-rate improvement attached by the use of DS-PPO. In addition, we provide the convergence analysis for the DS-PPO along with the computational complexity.",
+      "authors": [
+        "Marios Aristodemou",
+        "Yasaman Omid",
+        "Sangarapillai Lambotharan",
+        "Mahsa Derakhshan",
+        "Lajos Hanzo"
+      ],
+      "primary_category": "cs.IT",
+      "categories": [
+        "cs.IT",
+        "cs.AI",
+        "eess.SP"
+      ],
+      "published": "2026-03-17T12:58:22+00:00",
+      "link": "https://arxiv.org/pdf/2603.16470v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "MARL algorithm for multi-satellite systems to maximize sum-rate under delayed CSI",
+      "llm_evidence_cn": "多卫星系统中用于在延迟信道状态信息下最大化总速率的多智能体强化学习算法",
+      "llm_evidence": "多卫星系统中用于在延迟信道状态信息下最大化总速率的多智能体强化学习算法",
+      "canonical_evidence": "多卫星系统中用于在延迟信道状态信息下最大化总速率的多智能体强化学习算法",
+      "llm_tldr_en": "Applies MARL to optimize downlink transmission in multi-satellite systems, counteracting high propagation delays.",
+      "llm_tldr_cn": "应用多智能体强化学习优化多卫星系统下行传输，有效应对高传播延迟带来的信道信息过期问题。",
+      "llm_tldr": "应用多智能体强化学习优化多卫星系统下行传输，有效应对高传播延迟带来的信道信息过期问题。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.20295v1",
+      "source": "arxiv",
+      "title": "MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery",
+      "abstract": "Uncovering causal structures from observational data is crucial for understanding complex systems and making informed decisions. While reinforcement learning (RL) has shown promise in identifying these structures in the form of a directed acyclic graph (DAG), existing methods often lack efficiency, making them unsuitable for online applications. In this paper, we propose MARLIN, an efficient multi agent RL based approach for incremental DAG learning. MARLIN uses a DAG generation policy that maps a continuous real valued space to the DAG space as an intra batch strategy, then incorporates two RL agents state specific and state invariant to uncover causal relationships and integrates these agents into an incremental learning framework. Furthermore, the framework leverages a factored action space to enhance parallelization efficiency. Extensive experiments on synthetic and real datasets demonstrate that MARLIN outperforms state of the art methods in terms of both efficiency and effectiveness.",
+      "authors": [
+        "Dong Li",
+        "Zhengzhang Chen",
+        "Xujiang Zhao",
+        "Linlin Yu",
+        "Zhong Chen",
+        "Yi He",
+        "Haifeng Chen",
+        "Chen Zhao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-19T02:59:42+00:00",
+      "link": "https://arxiv.org/pdf/2603.20295v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Multi-agent RL architecture for incremental causal structure discovery",
+      "llm_evidence_cn": "用于增量因果结构发现的多智能体强化学习架构",
+      "llm_evidence": "用于增量因果结构发现的多智能体强化学习架构",
+      "canonical_evidence": "用于增量因果结构发现的多智能体强化学习架构",
+      "llm_tldr_en": "Presents MARLIN, a multi-agent RL approach that efficiently learns causal DAGs in an incremental fashion.",
+      "llm_tldr_cn": "提出 MARLIN，一种利用多智能体强化学习高效进行增量式因果有向无环图（DAG）发现的方法。",
+      "llm_tldr": "提出 MARLIN，一种利用多智能体强化学习高效进行增量式因果有向无环图（DAG）发现的方法。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.20333v1",
+      "source": "arxiv",
+      "title": "Bounded Coupled AI Learning Dynamics in Tri-Hierarchical Drone Swarms",
+      "abstract": "Modern autonomous multi-agent systems combine heterogeneous learning mechanisms operating at different timescales. An open question remains: can one formally guarantee that coupled dynamics of such mechanisms stay within the admissible operational regime? This paper studies a tri-hierarchical swarm learning system where three mechanisms act simultaneously: (1) local Hebbian online learning at individual agent level (fast timescale, 10-100 ms); (2) multi-agent reinforcement learning (MARL) for tactical group coordination (medium timescale, 1-10 s); (3) meta-learning (MAML) for strategic adaptation (slow timescale, 10-100 s). Four results are established. The Bounded Total Error Theorem shows that under contractual constraints on learning rates, Lipschitz continuity of inter-level mappings, and weight stabilization, total suboptimality admits a component-wise upper bound uniform in time. The Bounded Representation Drift Theorem gives a worst-case estimate of how Hebbian updates affect coordination-level embeddings during one MARL cycle. The Meta-Level Compatibility Theorem provides sufficient conditions under which strategic adaptation preserves lower-level invariants. The Non-Accumulation Theorem proves that error does not grow unboundedly over time.",
+      "authors": [
+        "Oleksii Bychkov"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.MA"
+      ],
+      "published": "2026-03-20T07:23:32+00:00",
+      "link": "https://arxiv.org/pdf/2603.20333v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "MARL for tactical group coordination in drone swarms",
+      "llm_evidence_cn": "用于无人机群战术协调的多智能体强化学习",
+      "llm_evidence": "用于无人机群战术协调的多智能体强化学习",
+      "canonical_evidence": "用于无人机群战术协调的多智能体强化学习",
+      "llm_tldr_en": "Analyzes the stability of coupled learning dynamics involving MARL in hierarchical drone swarms.",
+      "llm_tldr_cn": "分析了分层无人机群中包含多智能体强化学习的耦合学习动力学稳定性。",
+      "llm_tldr": "分析了分层无人机群中包含多智能体强化学习的耦合学习动力学稳定性。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Fundamental concepts and algorithms of multi-agent reinforcement learning",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.24238v1",
+      "source": "arxiv",
+      "title": "Decentralized End-to-End Multi-AAV Pursuit Using Predictive Spatio-Temporal Observation via Deep Reinforcement Learning",
+      "abstract": "Decentralized cooperative pursuit in cluttered environments is challenging for autonomous aerial swarms, especially under partial and noisy perception. Existing methods often rely on abstracted geometric features or privileged ground-truth states, and therefore sidestep perceptual uncertainty in real-world settings. We propose a decentralized end-to-end multi-agent reinforcement learning (MARL) framework that maps raw LiDAR observations directly to continuous control commands. Central to the framework is the Predictive Spatio-Temporal Observation (PSTO), an egocentric grid representation that aligns obstacle geometry with predictive adversarial intent and teammate motion in a unified, fixed-resolution projection. Built on PSTO, a single decentralized policy enables agents to navigate static obstacles, intercept dynamic targets, and maintain cooperative encirclement. Simulations demonstrate that the proposed method achieves superior capture efficiency and competitive success rates compared to state-of-the-art learning-based approaches relying on privileged obstacle information. Furthermore, the unified policy scales seamlessly across different team sizes without retraining. Finally, fully autonomous outdoor experiments validate the framework on a quadrotor swarm relying on only onboard sensing and computing.",
+      "authors": [
+        "Yude Li",
+        "Zhexuan Zhou",
+        "Huizhe Li",
+        "Yanke Sun",
+        "Yenan Wu",
+        "Yichen Lai",
+        "Yiming Wang",
+        "Youmin Gong",
+        "Jie Mei"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-03-25T12:23:35+00:00",
+      "link": "https://arxiv.org/pdf/2603.24238v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Decentralized MARL framework for multi-agent pursuit with spatio-temporal observations",
+      "llm_evidence_cn": "基于时空观测的去中心化多智能体追逐强化学习框架",
+      "llm_evidence": "基于时空观测的去中心化多智能体追逐强化学习框架",
+      "canonical_evidence": "基于时空观测的去中心化多智能体追逐强化学习框架",
+      "llm_tldr_en": "Proposes a decentralized MARL framework using PSTO to map raw LiDAR data to control for multi-AAV pursuit.",
+      "llm_tldr_cn": "提出一种去中心化多智能体强化学习框架，利用时空观测将原始激光雷达数据映射为无人机群控制指令。",
+      "llm_tldr": "提出一种去中心化多智能体强化学习框架，利用时空观测将原始激光雷达数据映射为无人机群控制指令。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28281v1",
+      "source": "arxiv",
+      "title": "Corruption-robust Offline Multi-agent Reinforcement Learning From Human Feedback",
+      "abstract": "We consider robustness against data corruption in offline multi-agent reinforcement learning from human feedback (MARLHF) under a strong-contamination model: given a dataset $D$ of trajectory-preference tuples (each preference being an $n$-dimensional binary label vector representing each of the $n$ agents' preferences), an $ε$-fraction of the samples may be arbitrarily corrupted. We model the problem using the framework of linear Markov games. First, under a uniform coverage assumption - where every policy of interest is sufficiently represented in the clean (prior to corruption) data - we introduce a robust estimator that guarantees an $O(ε^{1 - o(1)})$ bound on the Nash equilibrium gap. Next, we move to the more challenging unilateral coverage setting, in which only a Nash equilibrium and its single-player deviations are covered. In this case, our proposed algorithm achieves an $O(\\sqrtε)$ bound on the Nash gap. Both of these procedures, however, suffer from intractable computation. To address this, we relax our solution concept to coarse correlated equilibria (CCE). Under the same unilateral coverage regime, we derive a quasi-polynomial-time algorithm whose CCE gap scales as $O(\\sqrtε)$. To the best of our knowledge, this is the first systematic treatment of adversarial data corruption in offline MARLHF.",
+      "authors": [
+        "Andi Nika",
+        "Debmalya Mandal",
+        "Parameswaran Kamalaruban",
+        "Adish Singla",
+        "Goran Radanović"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-30T11:03:36+00:00",
+      "link": "https://arxiv.org/pdf/2603.28281v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "robust estimator for Nash equilibrium in multi-agent reinforcement learning from human feedback",
+      "llm_evidence_cn": "多智能体人类反馈强化学习中纳什均衡的鲁棒估计器",
+      "llm_evidence": "多智能体人类反馈强化学习中纳什均衡的鲁棒估计器",
+      "canonical_evidence": "多智能体人类反馈强化学习中纳什均衡的鲁棒估计器",
+      "llm_tldr_en": "Introduces a corruption-robust estimator for MARL from human feedback under linear Markov games.",
+      "llm_tldr_cn": "在多智能体人类反馈强化学习中引入了一种针对数据污染的鲁棒估计器。",
+      "llm_tldr": "在多智能体人类反馈强化学习中引入了一种针对数据污染的鲁棒估计器。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Competitive multi-agent reinforcement learning and zero-sum games",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.29426v1",
+      "source": "arxiv",
+      "title": "Multi-AUV Cooperative Target Tracking Based on Supervised Diffusion-Aided Multi-Agent Reinforcement Learning",
+      "abstract": "In recent years, advances in underwater networking and multi-agent reinforcement learning (MARL) have significantly expanded multi-autonomous underwater vehicle (AUV) applications in marine exploration and target tracking. However, current MARL-driven cooperative tracking faces three critical challenges: 1) non-stationarity in decentralized coordination, where local policy updates destabilize teammates' observation spaces, preventing convergence; 2) sparse-reward exploration inefficiency from limited underwater visibility and constrained sensor ranges, causing high-variance learning; and 3) water disturbance fragility combined with handcrafted reward dependency that degrades real-world robustness under unmodeled hydrodynamic conditions. To address these challenges, this paper proposes a hierarchical MARL architecture comprising four layers: global training scheduling, multi-agent coordination, local decision-making, and real-time execution. This architecture optimizes task allocation and inter-AUV coordination through hierarchical decomposition. Building on this foundation, we propose the Supervised Diffusion-Aided MARL (SDA-MARL) algorithm featuring three innovations: 1) a dual-decision architecture with segregated experience pools mitigating nonstationarity through structured experience replay; 2) a supervised learning mechanism guiding the diffusion model's reverse denoising process to generate high-fidelity training samples that accelerate convergence; and 3) disturbance-robust policy learning incorporating behavioral cloning loss to guide the Deep Deterministic Policy Gradient network update using high-quality replay actions, eliminating handcrafted reward dependency. The tracking algorithm based on SDA-MARL proposed in this paper achieves superior precision compared to state-of-the-art methods in comprehensive underwater simulations.",
+      "authors": [
+        "Jiaao Ma",
+        "Chuan Lin",
+        "Guangjie Han",
+        "Shengchao Zhu",
+        "Zhenyu Wang",
+        "Chen An"
+      ],
+      "primary_category": "cs.NI",
+      "categories": [
+        "cs.NI",
+        "cs.LG"
+      ],
+      "published": "2026-03-31T08:32:32+00:00",
+      "link": "https://arxiv.org/pdf/2603.29426v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "non-stationarity and sparse rewards in MARL-driven cooperative tracking",
+      "llm_evidence_cn": "MARL驱动的协作追踪中的非平稳性和稀疏奖励",
+      "llm_evidence": "MARL驱动的协作追踪中的非平稳性和稀疏奖励",
+      "canonical_evidence": "MARL驱动的协作追踪中的非平稳性和稀疏奖励",
+      "llm_tldr_en": "Addresses non-stationarity and exploration efficiency in multi-AUV tracking using diffusion-aided MARL.",
+      "llm_tldr_cn": "利用扩散辅助的多智能体强化学习解决多AUV追踪中的非平稳性和探索效率问题。",
+      "llm_tldr": "利用扩散辅助的多智能体强化学习解决多AUV追踪中的非平稳性和探索效率问题。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Fundamental concepts and algorithms of multi-agent reinforcement learning",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ]
+}

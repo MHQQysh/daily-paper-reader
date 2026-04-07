@@ -1,0 +1,879 @@
+Title: Multi-Agent Reinforcement Learning Counteracts Delayed CSI in Multi-Satellite Systems
+
+URL Source: https://arxiv.org/pdf/2603.16470v1
+
+Published Time: Wed, 18 Mar 2026 01:11:06 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+> 1
+
+# Multi-Agent Reinforcement Learning Counteracts Delayed CSI in Multi-Satellite Systems 
+
+Marios Aristodemou §, Yasaman Omid ∗, Sangarapillai Lambotharan †, Mahsa Derakhshani ∗, Lajos Hanzo ‡§Department of Computer Science, University of York, York, U.K. 
+
+∗Wolfson School of Mechanical, Electrical and Manufacturing Engineering, Loughborough University, Loughborough, U.K. 
+
+†Institute for Digital Technologies, Loughborough University (London Campus), London, U.K. 
+
+‡School of Electronics and Computer Science, University of Southampton, Southampton, U.K. 
+
+Abstract—The integration of satellite communication net-works with next-generation (NG) technologies is a promising approach towards global connectivity. However, the quality of services is highly dependant on the availability of accurate channel state information (CSI). Channel estimation in satellite communications is challenging due to the high propagation delay between terrestrial users and satellites, which results in outdated CSI observations on the satellite side. In this paper, we study the downlink transmission of multiple satellites acting as distributed base stations (BS) to mobile terrestrial users. We propose a multi-agent reinforcement learning (MARL) algorithm which aims for maximising the sum-rate of the users, while coping with the outdated CSI. We design a novel bi-level optimisation, procedure themes as dual stage proximal policy optimisation (DS-PPO), for tackling the problem of large continuous action spaces as well as of independent and non-identically distributed (non-IID) environments in MARL. Specifically, the first stage of DS-PPO maximises the sum-rate for an individual satellite and the second stage maximises the sum-rate when all the satellites cooperate to form a distributed multi-antenna BS. Our numerical results demonstrate the robustness of DS-PPO to CSI imperfections as well as the sum-rate improvement attached by the use of DS-PPO. In addition, we provide the convergence analysis for the DS-PPO along with the computational com-plexity. Index Terms—LEO Satellite Communication, Non-terrestrial Networks, Outdated CSI, Multi-Agent Reinforcement Learning, Distributed MIMO 
+
+I. Introduction 
+
+# NON-TERRESTRIAL networks (NTN) and particu-larly satellite communications (SatComs) are emerg-ing technologies that are expected to find their way in the next-generation (NG) communication systems. Low-earth orbit (LEO) satellites provide extended coverage for numerous devices, while maintaining a relatively low latency compared to geostationary satellites [1]. Examples like the Starlink mega-constellation are already providing a dense network of satellites, enabling users roaming in off-the-grid areas to stay connected [2], [3]. The high-altitude platforms, such as unmanned aerial vehicles, are unable to provide continuous, long-term connectivity. Thus, the integration of terrestrial networks with satellites is a vital step for NG systems. Integrating SatComs with terrestrial networks poses significant challenges in achieving high-throughput con-nectivity. Some of these challenges include high Doppler shifts, frequent satellite handovers, and long propagation delays [4]. Specifically, propagation delays pose challenges for the channel estimation process in the uplink, as the delay exceeds the channel’s coherence interval. To estimate the CSI, users transmit unique pilot sequences, allowing the satellites to estimate the channels between the two parties. However, the propagation delay results in a mis-match between the estimated channel state information (CSI) and the actual CSI. This issue is known as the “outdated/delayed CSI problem,” which we aim to address. In the literature, several authors have considered the effect of delayed CSI in downlink satellite-user transmis-sion. The authors of [5] proposed a deep learning (DL)-based satellite channel predictor that used long short-term memory units for eliminating the detrimental impact of the outdated CSI. In [6], a pair of deep neural networks (DNN) were proposed, one for satellite channel prediction (SatCP) and another for satellite hybrid beamforming (SatHB). In SatCP, the correlation between the uplink and the downlink CSI was exploited for predicting the downlink CSI by a DNN. By feeding the output of the SatCP network into the SatHB network, the SatHB maps the predicted CSI to a desired hybrid beamformer. Furthermore, in [7], an RL algorithm using the deep deterministic policy gradient (DDPG) technique is introduced for coping with the effects of delayed CSI. Unlike previous research, in [7], the delayed CSI is directly mapped to the optimised transmit precod-ing matrix (TPM), skipping over the channel prediction entirely. In LEO satellite networks, the dense constellation of satellites ensures that multiple satellites are visible to terrestrial users at any given time [8]. This allows the satel-lites to operate as a distributed multiple-input multiple-output (MIMO) base station (BS), providing significant diversity gain to improve the throughput, enhance reli-ability, and mitigate fading effects. These satellites are connected by inter-satellite links, enabling them to share 
+
+> arXiv:2603.16470v1 [cs.IT] 17 Mar 2026 2
+
+their information effectively [9]. To maximise throughput, the satellites must collaboratively form a distributed TPM, while accounting for the challenges of outdated CSI. To the best of our knowledge, the consideration of outdated CSI in a cooperative multi-satellite system has only been dis-cussed in [10], where the authors harnessed the statistical information of the channel estimation errors to cope with the deleterious effects of outdated CSI. The simplicity of the technique makes it compatible with systems having low operating frequencies of up to 1 GHz. While it is theoret-ically possible to model such delays probabilistically and apply robust or stochastic optimisation [11], in practice, high user/satellite mobility and the increasing carrier fre-quency (e.g., above 1 GHz) introduce rapidly time-varying channels. As shown in [10], the error induced by delayed CSI under these conditions becomes excessive to model accurately via a simple statistical distribution. This renders conventional convex optimisation approaches ineffective due to high statistical uncertainty. For higher operating frequencies, the current literature of multi-satellite systems either considers the unrealistic scenario of perfect CSI or they only rely on statistical CSI. To fill the knowledge gaps, we aim for directly mapping the delayed CSI to an optimised TPM in a multi-satellite system. However, the technique conceived in [7] cannot be applied here due to the independent and non-identically distributed (non-iid) nature of the environment, where each satellite’s path uniquely determines its CSI. Hence, the RL agent(s) must track and adapt to the dynamic changes across multiple channels, significantly increasing the complexity of the task. In this paper, we explore the potential of multi-agent reinforcement learning (MARL) in counteracting the outdated CSI challenge in cooperative multi-satellite systems, where satellites act as distributed agents. Our contributions are as follows: 1) We address the challenge of channel aging in multi-satellite downlink communication to mobile devices. In constrast to [5], [6], our work bypasses channel prediction altogether by directly mapping the de-layed CSI to the TPMs. Furthermore, in contrast to [10], our approach is specifically designed for high-frequency scenarios and incorporates distributed TPM optimisation. This eliminates the reliance on a high-performance network controller and effectively dis-tributes the processing load across satellites. 2) We propose a novel algorithm termed as Dual-Stage Proximal Policy optimisation (DS-PPO). Unlike the method in [7], the DS-PPO algorithm is specifically de-signed for cooperative multi-satellite communications with non-iid environments. We introduce a bi-level optimisation framework for handling the complexity of the environment: In a given satellite, the first proximal policy optimisation (PPO) optimises the satellite’s TPM to maximise its individual sum-rate. The second PPO leverages the singular values of the first stage TPM across other satellites to optimise its TPM as part of a distributed satellite system. Sharing these singular values limits the information exchanged among satellites, enabling them to handle the non-iid environment through distributed learning. 3) We provide the computational complexity and the convergence analysis of the DS-PPO, proving that DS-PPO provides a performance improvement to the global sum-rate, and that DS-PPO can be considered as a light weight algorithm. 4) We demonstrate the robustness of DS-PPO to CSI delays and its superior performance in handling com-plex multi-satellite scenarios through numerical eval-uations. As for the rest of this paper, the system model and problem formulation are presented in Section II. Section IV explains the proposed algorithm in details. The numerical results are given in Section VII, and Section VIII concludes the paper. II. System Model and Problem Formulation In this paper, we consider a dense LEO satellite con-stellation where L satellites are collaborating with each other through their intersatellite links to provide connec-tivity for K single-antenna mobile users on the ground. Each satellite is equipped with a uniform planar array (UPA) of M = Mx × My antennas. Since in SatComs the channels mostly consist of line of sight (LOS) links, this collaboration among satellites increases the diversity overall, which can enhance the system throughput. At each time instant, these satellites aim for transmitting a vector of symbols s(t) = [ s[1] (t), ..., s [K](t)] T to the users, and they precode this data via a TPM formulated by 
+
+V(t, f ) = [ v[1] (t, f ), ..., v[K](t, f )] ∈ CM L ×K . Note that each M rows of this matrix is in fact a precoding sub-matrix for an individual satellite. In other words, Vl(t, f ) ∈ CM ×K
+
+is a sub-TPM for the lth satellite, which contains the rows 
+
+[( l − 1) M + 1] to (M l ) of the matrix V(t, f ).A cluster is referred to as the set of satellites that are collaborating with each other for data transmission and form a distributed MIMO system. We use a LEO constellation of satellites similar to Starlink. As in any other LEO constellation, the satellites orbit the earth with a high speed (in the range of 7 km/sec for Starlink). This means that a given satellite has a short window of connection to a given ground user (in the range of 5 minutes). We say a satellite is visible to a ground user when it is within the user’s 30 degree elevation angle. At any given time, for a user located in the UK, around 40 satellites are in sight. At a given time t, we select L satellites from the set of satellites that are visible to a certain coverage region on earth, to form a cluster. These L satellites are selected based on their distance to the centre of the coverage area, i.e. the L
+
+satellites that are closest to the centre of the coverage area at time instant t are selected to form the cluster. However, 3
+
+Fig. 1: System model: a cluster of L satellites providing service for K users. due to satellites’ mobility, these satellites move away from the coverage region and they are replaced in the cluster by satellites with shorter distances to the users. This is called a satellite handover. We use the distance metric for satellite handovers rather than the received power or channel gain, to avoid performing a handover due to short-term channel fluctuations. Instead we base our handover mechanism on the free-space path-loss (FSPL). The satellites in a cluster are aiming for optimising their local TPMs in order to maximise the overall sum-rate. Thus, we form our problem with the objective of maximising the sum-rate of the users, as 
+
+max  
+
+> V(t,f )
+> K
+
+∑
+
+> k=1
+
+log 
+
+(
+
+1 + |h[k]H (t, f )v[k](t, f )|2
+
+∑Ki̸ =k |h[k]H (t, f )v[i](t, f )|2 + σ2
+
+)
+
+s.t. Tr (Vl(t, f )VHl (t, f )) ≤ Pl, l ∈ { 1, ..., L },
+
+(1) where h[k](t, f ) ∈ CM L ×1 is the CSI of user k, σ2 is the variance of the additive white Gaussian noise at the user side, and Pl is the power budget for the lth satellite. In order to solve this optimisation problem, we need accurate CSI at the satellite side. The users transmit pilot sequences, so that the satellites can estimate the channels, but due to the large propagation delay, the CSI that the satellites estimate become outdated. The propagation delay between a given user k and a satellite l is τd(k, l ) = dk,l  
+
+> c
+
+where 
+
+d(k, l ) is the distance of the two nodes and c is the speed of light. Assuming that the pilots are transmitted every ∆T
+
+seconds, we could say that the CSI is delayed for Td(k, l )
+
+time instances where Td(k, l ) = ⌈ τd(k,l )∆T ⌉ is the discrete version of the delay. Now, at a given time instant t the satellite l has the CSI at t − Td(k, l ). by defining the delay of the cluster of satellites as Td = max k,l (Td(k, l )) , we aim to design the TPMs Vl(t, f ), ∀l by having access to the channels at t − Td, e.g. h[k](t − Td, f ), ∀k. This is referred to as the delayed CSI problem with constant delay. In addition, the global sum-rate optimisation problem is non-convex due to the structure of the rate expression. Specifically, the TPM v[i](t, f ) (which is an M L × 1
+
+precoding vector from all satellites to the user i) appears in both the numerator and the denominator of the SINR expression, and the sum-rate is calculated across users not across the satellites, introducing coupling between agents and dependencies that are hard to isolate. Also, as mentioned above, the CSI available to each satellite is outdated, which can be interpreted as a statistical perturbation of the actual channel (similar to [10]). While it is theoretically possible to model such delays proba-bilistically and apply robust or stochastic optimisation, in practice, high user/satellite mobility and the increasing carrier frequency (e.g., above 1 GHz) introduce rapidly time-varying channels. As shown in [10], the error induced by delayed CSI under these conditions becomes excessive to model accurately via a simple statistical distribution. This renders conventional convex optimisation approaches ineffective due to high statistical uncertainty. III. Background and Preliminaries In the following sub-sections we review the basic prelim-inaries of our proposed algorithm, namely the Augemented Markov Decision Process (MDP) in order to tackle the Delayed CSI, and the Proximal Policy Optimisation (PPO). Then, we discuss the limitations of other novel algo-rithms in Multi Agent Reinforcement Learning (MARL) in comparison to our problem formulation and enviromental constraints. A. Augmented Markov Decision Process for Delayed CSI To address the challenge of delayed information, we employ an augmented MDP instead of the traditional MDP. The concept of an augmented MDP was introduced in [12], where the authors propose solutions for managing MDPs with constant delays. Specifically, the authors sug-gested that, to construct an equivalent MDP with perfect state information, the agent’s previous actions should be included in the state information, as 
+
+{s(t − Td), a (t − Td), a (t − Td + 1) , ..., a (t − 1) } ∈ S ′
+
+, (2) where s(t − Td) is the delayed observation, and 
+
+a(t − Td), a (t − Td + 1) , ..., a (t − 1) are the previous actions during the delay period. B. Proximal Policy Optimisation PPO is an on-policy, model-free RL algorithm designed to take smaller steps using the most recent available data [13]. PPO addresses two key challenges: determining the appropriate step size for policy updates and maintaining training stability. It builds upon concepts used in trust region policy optimisation [14]. The core idea behind PPO is to make gradual improvements during policy updates [13]. It has the ability to optimise the policy using smaller steps and converging faster than other methodologies, thus, 4
+
+it is deemed for our problem formulation with a non-iid distribution and delays. PPO has a critic network ( Vϕ)to estimate the value function and an actor network ( πθ )that represents the policy that selects actions. During each iteration, the algorithm goes through a phase known as ”rollout,” where the current policy samples actions over T
+
+time steps and computes the rewards. At the end of the rollout, PPO calculates the advantage using generalized advantage estimation (GAE), which is given by 
+
+ˆAπt = δt + ( γλ )δt+1 + · · · + ( γλ )(T −1) δT −1, (3) where rt is the reward function, γ is the discount factor, λ
+
+is the GAE discount factor and δt is the advantage function that estimates the advantage of an action a in state s under policy π and is given by, 
+
+Aπ (s, a ) = Qπ (s, a ) − V π (s) (4) where Qπ (s, a ) = r(s, a ) + γEs′∼P (·| s,a )[V π (s′)] is the action-value function. Next, the rollout data is divided into small mini-batches, which PPO iterates over for K epochs. During the update epochs, we calculate the ratio between the new policy and the old policy. This ratio is then used to compute the loss for the clipped surrogate objective, which is given by 
+
+Lclip (θ) = ˆEt[min (rt(θ)) ˆAπt , clip (rt(θ), 1 − ϵ, 1 + ϵ) ˆAπt ] (5) where, ϵ balances the exploration and exploitation of the clipped surrogate function. Then, the total loss is computed as the sum of three components: the clipped surrogate objective, the value function loss, and the entropy bonus, which is given by 
+
+Ltotal = ˆEt[Lclip (θ) − c1 · LV F (θ) + c2 · H(πθ |st)] , (6) where, c1, c 2 are the coefficients, and H(·) is the entropy function and LV F is given by LV F = ( Vθ (st)−V target t (st)) 2,where Vθ and Vtarget are the current value function and the target value, respectively. We use the combined loss in (6) in order to update the parameters using the Adam optimiser. With this technique, PPO balances exploration, stability, and learning efficiency. C. Limitations of Existing MARL Approaches There are several prominent multi-agent reinforcement learning algorithms, which are not directly applicable to our problem formulation due to fundamental architectural and environmental constraints [15], [16]. For example, Multi Agent Deep Deterministic Policy Gradient (MADDPG) [17] employs a centralised training with decentralised execution, where each agent’s critic requires access to the observations and actions from all agents during training. In our LEO satellite network, this would necessitate gath-ering O(LM K ) dimensional state and action information from all L satellites at a central location, incurring alarge inter-satellite communication overhead. This becomes more problematic considering the large action space in our system. Similarly the Multi Agent Proximal Policy Optimisation [18] relies on a centralised value function that conditions on global state, which is infeasible when satellites cannot share their full CSI in a timely manner. In QMIX (Monotonic Value Function Factorisation) [19] and Counterfactual Multi-Agent Policy Gradients (COMA) [20], it is assumed that there is access to a mixing network or a centralised critic that combines individual agent util-ities, requiring synchronous global information exchange that violates the distributed nature of our system. More-over, these algorithms assume stationary environments where the global policy converges to a fixed equilibrium. For example, recent work on fully decentralised MARL with networked agents [21] has established convergence guarantees for actor-critic algorithms with linear function approximation, but assumes stationary environments which do not apply to our scenario. In contrast, our satellite network exhibits inherent non-stationarity environments due to the satellite mobility with continuous handovers and cluster reconfiguration, the time-varying delayed channels, and user mobility, introducing unpredictable interference patterns. IV. Proposed DS-PPO Algorithm In this section, we discuss the methodology used for solving the problem in (1). By exploiting the advantages of PPO, we conceive a bi-level optimisation procedure for first optimising each satellite’s individual sum rate and then optimise the overall sum rate for the scenario when the satellites work as a distributed MIMO. By taking into account that the CSI observations are delayed, this problem becomes a constant delay Markov decision process (MDP), which is discussed in the following sub-section. Note that the value of this constant delay in observations is dependent on both the propagation delay and on the pilot transmission rate, which determines the duration of each time step. A. Algorithm In our MARL model, each agent represents a satellite and it is tasked with calculating the precoding sub-matrix specific to its satellite. This computation is performed using information shared by other satellites within the cluster, enabling coordinated and efficient operation. The DS-PPO MARL algorithm we develop is a derivation of the PPO RL algorithm defined in [13]. Again, the proposed algorithm operates in two stages to optimise the TPM based on the delayed CSI for a distributed multi-satellite communication system, as shown in Figure 2. This DS-PPO MARL algorithm is particularly useful for distributed learning scenarios where agents are dealing with non-IID environments. In the first stage, the algorithm determines the initial TPM for each satellite, assuming that each satellite is transmitting to the users independently. We employ PPO RL of [13] to optimise each satellite’s sum-rate based on its 5
+
+Fig. 2: DS-PPO for enhanced TPM generation. own CSI and reward structure. Next, the algorithm calcu-lates the singular values of the individual TPMs obtained in the first stage. These singular values are then shared among the satellites in the cluster, providing compact and meaningful information about each satellite’s transmission characteristics. This stage helps reduce the dimensionality of the information exchanged among satellites, making the process more efficient. Additionally, in the first stage of DS-PPO, sharing singular values enables each satellite to assess how much power other satellites are allocating to each user individually. This helps the agents to track the pattern of changes in the CSI of each satellite. In the second stage, the algorithm updates the TPMs by incorporating the shared singular values and the delayed CSI, treating the satellites as part of a distributed MIMO system. An additional agent is trained for each satellite using the second stage of PPO, aiming for maximising the global sum-rate for the entire satellite network. This cooperative update allows the system to track satellite movements and adapt to changes in the CSI, improving the overall transmission performance. The DS-PPO method is given in Algorithm 1. B. State Space Due to the fact that there are two different stages in DS-PPO, we define two different state spaces and reward functions. The state space in the first stage uses the augmented state from Section III-A. To reduce both the computational complexity and the resources in each satellite, we have selected the pilot transmission rate for ensuring that the CSI observed would have only a single time step transmission delay. In other words, the time duration between two consecutive CSI observations matches the propagation delay of the environment. Thus, the state space of the first stage slt, 1 at time step t for the 
+
+l-th satellite is 
+
+slt, 1 = {Hl(t − Td, f ), Vl(t − Td, f )}
+
+where H l(t − Td, f ) ∈ CM ×K , is the outdated CSI of the 
+
+lth satellite, while, the V l(t − Td, f ) is its TPM. Algorithm 1: DS-PPO Algorithm for MARL Input : CSI H
+
+Output: Optimal TPMs V ′ 
+
+> 1
+
+for iteration = 1, 2, ... do  
+
+> 2
+
+for t = 1, ..., T do  
+
+> 3
+
+V ← First Stage Agents ( H) 
+
+> 4
+
+Calculate Reward for (V, H ) 
+
+> 5
+
+Find the singular values of V to form Λ 
+
+> 6
+
+V ′ ← Second Stage Agents (V, Λ)  
+
+> 7
+
+end  
+
+> 8
+
+Perform PPO Training for both stages  
+
+> 9
+
+end The second stage uses the action from the previous stage and the singular values from the other satellites. Therefore, the state space st, 2 of the second stage is defined as, 
+
+slt, 2 = {Vl(t − Td, f ), Λl}, Λl =
+
+> L
+
+⋃ 
+
+> j̸=l
+
+λj , λ j ∈ R1×K
+
+where Λl is the set of all singular values of V′
+
+> l
+
+(t −
+
+Td, f ), ∀l′̸ = l gleaned from the other satellites in the cluster. C. Action Space The action space is a continuous space, defined by the real and imaginary components of the TPM coefficients. Thus, its dimensionality is determined by 2KM . The action spaces for the first and second stages at time step t for the 
+
+lth satellite are denoted by, Stage 1: alt, 1 = {Vl(t, f )}
+
+Stage 2: alt, 2 = {V′
+
+> l
+
+(t, f )}
+
+D. Reward function For each stage we use two different reward function. The first stage reward function is aiming to help the agents to learn and optimise the TPM individually in order to maximise their sum rate and the second stage reward function to incorporate the optimisation objective to optimise the TPM collaboratively. 1) First Stage: Our reward function consists of three components: f (·), which is associated with the current sum-rate; g(·), which considers both the current and past sum-rates; and a term representing the power constraint. The reward rlt for the first stage of PPO, at time step t for the 
+
+l-th satellite is given by 
+
+rlt = f (ct) + g(ct, c t−1) − pl (7) 6
+
+where ct is the sum rate of users at time t in case only the satellite l is providing service for the users individually. The functions f (ct), g(ct, c t−1), and pl are denoted by 
+
+f (ct) = 
+
+
+
+−2, ct ≤ ξ1
+
+−1, ξ1 < c t ≤ ξ2
+
+0, ξ2 < c t ≤ ξ3
+
+1, ξ3 < c t ≤ ξ4
+
+2, ξ4 < c t ≤ ξ5
+
+2 + ⌈ct⌉ − ξ5, ct > ξ 5
+
+(8) 
+
+g(ct, c t−1) = sign (ct − ct−1) · 1.5 − 0.5, (9) 
+
+pl = 310 
+
+∣∣tr (Vl(t, f ) · Vl(t, f )H ) − Pl
+
+∣∣ , (10) with Pl representing the power budget for the lth satellite. Note that in order for the agent in satellite l to calculate 
+
+ct for the second stage, all satellites in the cluster need to share their CSI observations and their final precoding matrices with each other. The first part of the reward function f (ct) is designed in a quantized form to support the learning process of the RL agents. The choice of hyperparameters for this quantization was guided by the target sum-rate we wanted to achieve. In particular, our goal was to ensure a minimum guaranteed sum-rate of around 300 Mbps, and thus the following parameters in Table I. Besides focusing on the sum-rate itself, we also take into account whether the sum-rate has improved during training. For this, we use the function g(ct, c t−1) which simply adds or subtracts a constant from the reward depending on whether the sum-rate has increased compared to the previous time step. Finally, to regulate the power consumption of the TPM, we include the term pl.            
+
+> ξ1ξ2ξ3ξ4ξ5
+> 120 5ξ1
+> 4= 150 7ξ1
+> 4= 210 9ξ1
+> 4= 270 3ξ1= 360
+
+TABLE I: Parameters used in f (ct), that ensure a minimum guaranteed sum-rate of around 300 Mbps Note that in (4), with the Pl, we represent the power budget for the lth satellite to regulate the power consump-tion of the TPM. The addition of power constraint pl aims to optimise the TPM such that to maintain the TPM inside the feasibility region. To guarantee this we have project the predicted TPM Vl into a sphere of radius P [7]. Proposition 1 (Power Budget Projection). Given the TPM 
+
+Vl, the projection of Vl into a set S is given by, 
+
+min  
+
+> P∈S
+
+∥Vl − P∥ (11) Given that S is a sphere centred at the origin with radius 
+
+P , such that ( S = {Vl|∥ Vl∥ ≤ P }), the projection of Vl is obtained by 
+
+P × Vl
+
+∥Vl∥ + max(0 , P − ∥ Vl∥) (12) 2) Second Stage: The reward function for the second stage is a simplified representation of our objective, in-corporating the logarithm of the sum-rate of users being served by the satellite cluster, denoted as c′
+
+> t
+
+, and the power constraint pl, given by 
+
+rt =
+
+{log (c′
+
+> t
+
+) − pl − 1, c ′ 
+
+> t−1
+
+> c ′
+
+> t
+
+,log (c′
+
+> t
+
+) − pl + 1 , c ′ 
+
+> t−1
+
+< c ′
+
+> t
+
+. . (13) Note that the logarithmic function is used here to constrain the variations in the reward function, ensuring more stable and manageable updates during optimisation. V. Convergence Analysis In this section, we provide the convergence analysis for the DS-PPO. Our convergence analysis builds upon the policy mirror descent framework [22], which establishes linear convergence rates for policy optimisation methods. Given the fact that capacity depends on the state of Stage 1, and action of State 2, we have considered how the action of Stage 2 converged to the optimal solution To recap, we model each satellite’s decision process as a Markov Decision Process (MDP) M = (S , A, P, r, γ, ρ 0)
+
+where S is the state space, A is the action space, P : S ×A →
+
+∆(S) is the transition kernel, r : S × A → R is the reward function, γ ∈ [0 , 1) is the discount factor, and ρ0 ∈ ∆(S) is the initial state distribution [23]. Also, note that π1 and π2
+
+are the policies for the first and second stage, respectively. Our analysis follows the framework established in [24] for analysing policy gradient convergence. The following definitions are important for the convergence analysis and prove that stage 2 converges to an optimal solution. Definition 1 (Policy Performance). The expected cumula-tive discounted reward under policy π is: 
+
+η(π) = Eτ ∼π
+
+[ ∞∑
+
+> t=0
+
+γtr(st, a t)
+
+]
+
+= Es0∼ρ0 [V π (s0)] (14) where V π (s) = Eπ [∑∞ 
+
+> t=0
+
+γtr(st, a t)|s0 = s] is the value function. Definition 2 (Advantage Function). The advantage of ac-tion a in state s under policy π is: 
+
+Aπ (s, a ) = Qπ (s, a ) − V π (s) (15) where Qπ (s, a ) = r(s, a ) + γEs′∼P (·| s,a )[V π (s′)] is the action-value function. We make the following assumptions in order establish several technical lemmas that will be used in order to provide the upper bound the policy improvement. Assumption 1 (Bounded Rewards). There exists Rmax > 0
+
+such that |r(s, a )| ≤ Rmax for all (s, a ) ∈ S × A.Assumption 2 (Lipschitz Policy). Given the policy πθ is Lipschitz continuous in parameters, there exists Lπ > 0
+
+such that for all s ∈ S:
+
+∥πθ1 (·| s) − πθ2 (·| s)∥1 ≤ Lπ ∥θ1 − θ2∥ (16) 7
+
+Assumption 3 (Learning Rate Conditions). The learning rates {αn}n≥0 and {βn}n≥0 for Stage 1 and Stage 2 satisfy the following conditions:  
+
+> •
+
+αn, β n > 0 for all n
+
+> •
+
+∑∞ 
+
+> n=0
+
+αn = ∑∞ 
+
+> n=0
+
+βn = ∞
+
+> •
+
+∑∞ 
+
+> n=0
+
+α2 
+
+> n
+
+< ∞ and ∑∞ 
+
+> n=0
+
+β2 
+
+> n
+
+< ∞
+
+Based on the above assumptions, we have express the following. Theorem 1 (Stage 2 Performance Improvement). Let π1
+
+be the converged Stage 1 policy and π2 the Stage 2 policy obtained by DS-PPO. Under Assumptions 1–2: 
+
+η(π2) ≥ η(π1) − 4ϵmax γ
+
+(1 − γ)2 · Dmax  
+
+> T V
+
+(π1, π 2)2 (17) where ϵmax = max s,a |Aπ1 (s, a )| ≤ 2Rmax  
+
+> 1−γ
+
+is the maximum advantage, and Dmax  
+
+> T V
+
+(π, π ′) = max s DT V (π(·| s)∥π′(·| s)) is the maximum total variation divergence. The above theorem is consistent with recent results on policy gradient methods [25] A. Preliminaries Before expressing the upper bound for convergence analysis [26], we have established the following lemmas. Lemma 1 (Bounded Value Function [25], [26]). Under Assumption 1, for any policy π:
+
+|V π (s)| ≤ Rmax 
+
+1 − γ , |Qπ (s, a )| ≤ Rmax 
+
+1 − γ , (18) 
+
+|Aπ (s, a )| ≤ 2Rmax 
+
+1 − γ
+
+for all s ∈ S and a ∈ A.Lemma 2 (Performance Difference Lemma [27]). For any two policies π and ˜π:
+
+η(˜ π) = η(π) + Eτ ∼˜π
+
+[ ∞∑
+
+> t=0
+
+γtAπ (st, a t)
+
+]
+
+(19) where the expectation is over trajectories τ =(s0, a 0, s 1, a 1, . . . ) with s0 ∼ ρ0, at ∼ ˜π(·| st), and st+1 ∼
+
+P (·| st, a t).Lemma 3 (Discounted State Visitation). Define the dis-counted state visitation frequency under policy π as: 
+
+ρπ (s) = (1 − γ)
+
+> ∞
+
+∑
+
+> t=0
+
+γtP (st = s|π, s 0 ∼ ρ0) (20) Then ρπ is a valid probability distribution over S, and the performance difference can be written as: 
+
+η(˜ π) − η(π) = 11 − γ
+
+∑
+
+> s
+
+ρ˜π (s) ∑
+
+> a
+
+˜π(a|s)Aπ (s, a ) (21) Lemma 4 (Coupling Lemma [28]). For any two probability distributions p and q over a finite set X with total variation distance DT V (p∥q) = 12
+
+∑ 
+
+> x
+
+|p(x)−q(x)| = α, there exists a joint distribution (X, Y ) with marginals X ∼ p and Y ∼ q
+
+such that: 
+
+P (X̸ = Y ) = α = DT V (p∥q) (22) B. Proof of Theorem 1 The proof follows the approach of Schulman et al. [14] with detailed exposition. We first begin to define the surrogate objective from the PPO. From Lemma 2, the performance of π2 relative to π1 is: 
+
+η(π2) = η(π1) + Eτ ∼π2
+
+[ ∞∑
+
+> t=0
+
+γtAπ1 (st, a t)
+
+]
+
+(23) The difficulty is that the expectation is over trajectories from π2, which we are trying to optimise. We instead define a surrogate objective that uses trajectories from π1:
+
+Lπ1 (π2) = η(π1) (24) 
+
++ Eτ ∼π1
+
+[ ∞∑
+
+> t=0
+
+γt π2(at|st)
+
+π1(at|st) Aπ1 (st, a t)
+
+]
+
+Using Lemma 3, this can be written as: 
+
+Lπ1 (π2) = η(π1) (25) 
+
++ 11 − γ
+
+∑
+
+> s
+
+ρπ1 (s) ∑
+
+> a
+
+π2(a|s)Aπ1 (s, a )
+
+Here the key observation is when π2 = π1, meaning that there is no improvement over the baseline policy (Stage 1), by definition, advantage becomes zero, because the expected advantage of a policy over itself is always zero. Therefore, 
+
+Lπ1 (π1) = η(π1) (26) Also, at this point, the gradient will match as below, 
+
+∇π2 Lπ1 (π2)
+
+∣∣∣π2=π1
+
+= ∇π2 η(π2)
+
+∣∣∣π2=π1
+
+(27) This means the surrogate Lπ1 is a first-order approxima-tion to η around π1.The next step in the proof is to bound the gap between 
+
+η(π2) and Lπ1 (π2). The gap arises because the η(π2) uses state visitation ρπ2 and the Lπ1 (π2) uses state visitation 
+
+ρπ1 . We first need to define the expected advantage under 
+
+π2 at state s:
+
+¯Aπ1 (s) = Ea∼π2(·| s)[Aπ1 (s, a )] (28) 
+
+= ∑
+
+> a
+
+π2(a|s)Aπ1 (s, a )
+
+From Lemma 3 we can express the difference between two policies such as: 
+
+η(π2) − Lπ1 (π2) = (29) 
+
+11 − γ
+
+∑
+
+> s
+
+(ρπ2 (s) − ρπ1 (s)) ¯Aπ1 (s)8
+
+We now bound |ρπ2 (s) − ρπ1 (s)| using coupling argu-ments. First, let 
+
+α = Dmax  
+
+> T V
+
+(π1, π 2) = max  
+
+> s
+
+DT V (π1(·| s)∥π2 (30) By Lemma 4, at each state s, we can couple the actions under π1 and π2 such that they differ with probability at most α. We consider that there are two trajectories:  
+
+> •
+
+τ (1) = ( s0, a 0,1, s 1,1, a 1,1, . . . ) with at, 1 ∼ π1(·| st, 1) 
+
+> •
+
+τ (2) = ( s0, a 0,2, s 1,2, a 1,2, . . . ) with at, 2 ∼ π2(·| st, 2)
+
+starting from the same initial state s0. Using the coupling, we can ensure that at each step, given the trajectories have not diverged: 
+
+P (at, 1̸ = at, 2|st, 1 = st, 2) ≤ α
+
+Let T be the first time the trajectories diverge (i.e., at, 1̸ =
+
+at, 2 or equivalently s(1)  
+
+> T+1
+
+̸ = s(2)  
+
+> T+1
+
+). Then: 
+
+P (T > t ) = P (trajectories identical up to time t) ≥ (1 −α)t
+
+Therefore, the probability that the trajectories have diverged by time t is: 
+
+P (T ≤ t) ≤ 1 − (1 − α)t (31) Using the inequality 1 − (1 − α)t ≤ tα for α ∈ [0 , 1] :
+
+P (st, 1̸ = st, 2) ≤ tα (32) Now we need to find a relationship in order to bound correctly the state visitation difference. For any function 
+
+f : S → R with |f (s)| ≤ fmax :
+
+|Est∼π2 [f (st)] − Est∼π1 [f (st)] |
+
+= |E[f (st, 2) − f (st, 1)] |
+
+= |E[f (st, 2) − f (st, 1)|st, 1̸ = st, 2] · P (st, 1̸ = st, 2)|
+
++ |E[f (st, 2) − f (st, 1)|st, 1 = st, 2] · P (st, 1 = st, 2)|≤ 2fmax · P (st, 1̸ = st, 2) + 0 (33) 
+
+≤ 2fmax · tα (34) Applying this with f (s) = ¯Aπ1 (s) and fmax = ϵmax =max s,a |Aπ1 (s, a )|:
+
+∣∣Est∼π2 [ ¯Aπ1 (st)] − Est∼π1 [ ¯Aπ1 (st)] ∣∣ ≤ 2ϵmax · tα (35) If we go through the summation over time we can find a bound. 
+
+|η(π2) − Lπ1 (π2)|
+
+=
+
+∣∣∣∣∣
+
+> ∞
+
+∑
+
+> t=0
+
+γt (Est∼π2 [ ¯Aπ1 (st)] − Est∼π1 [ ¯Aπ1 (st)] )∣∣∣∣∣
+
+≤
+
+> ∞
+
+∑
+
+> t=0
+
+γt · 2ϵmax · tα 
+
+= 2 ϵmax α
+
+> ∞
+
+∑
+
+> t=0
+
+tγ t (36) We compute the sum ∑∞ 
+
+> t=0
+
+tγ t. Let S = ∑∞ 
+
+> t=0
+
+tγ t. Then: 
+
+S = 0 + γ + 2 γ2 + 3 γ3 + · · · 
+
+γS = γ2 + 2 γ3 + 3 γ4 + · · · 
+
+S − γS = γ + γ2 + γ3 + · · · = γ
+
+1 − γS = γ
+
+(1 − γ)2
+
+Therefore if substitute the above into 35 
+
+|η(π2) − Lπ1 (π2)| ≤ 2ϵmax α · γ
+
+(1 − γ)2
+
+= 2ϵmax γα 
+
+(1 − γ)2 (37) The bound (37) is linear in α, and while mathematically valid, a linear bound is insufficient for guaranteeing policy improvement, thus we need refine α for a quadratic. Following [14], we use the fact that for small α:
+
+1 − (1 − α)t ≤ min(1 , tα ) (38) For the coupled trajectories, the probability of divergence by time t satisfies: 
+
+P (T ≤ t) = 1 − (1 − α)t+1 ≤ (t + 1) α (39) A more careful analysis in [14] (Appendix) shows that we can obtain a quadratic form of α thus: 
+
+|η(π2) − Lπ1 (π2)| ≤ 4ϵmax γ
+
+(1 − γ)2 α2 (40) The PPO’s update maximises the surrogate objective 
+
+Lπ1 (π2) over policies π2. Since the Stage 2 update seeks to improve the surrogate: 
+
+Lπ1 (π2) ≥ Lπ1 (π1) = η(π1) (41) Combining with (40): 
+
+η(π2) ≥ Lπ1 (π2) − 4ϵmax γ
+
+(1 − γ)2 α2 (42) 
+
+≥ η(π1) − 4ϵmax γ
+
+(1 − γ)2 α2 (43) With substituting α = Dmax  
+
+> T V
+
+(π1, π 2) completes the proof. C. Remarks The analysis above involves Aπ1 (s, a ) rather than 
+
+Aπ2 (s, a ). This follows directly from the Performance Dif-ference Lemma, which states that for any two policies π
+
+and ˜π:
+
+η(˜ π) = η(π) + Eτ ∼˜π
+
+[ ∞∑
+
+> t=0
+
+γtAπ (st, a t)
+
+]
+
+. (44) Thus, the advantage function is always evaluated with respect to the baseline policy π, not the new policy ˜π. This is because Aπ (s, a ) = Qπ (s, a ) − V π (s) measures how much better action a is compared to the average performance under π. To evaluate the improvement of π2 over π1, we must use π2’s actions against π1’s value function which 9
+
+quantifies the improvement relative to π1. Using Aπ2 will provide no information about the improvement of π2 over 
+
+π1. Thus, ¯Aπ1 (s) captures the expected benefit of following 
+
+π2’s action selection while measuring performance gains relative to the Stage 1 baseline. Also, note that the above analysis is to prove that there is a lower bound of π2’s improvement over π1 and it has not implemented as described above. VI. Computational Complexity This section analyses the floating-point operations (FLOPS) required by DS-PPO. We follow standard con-ventions for counting operations in neural networks and matrix computations [29], [30]. For matrix operations, we use established results from numerical linear algebra [30]. The matrix multiplication of C = AB where A ∈ Rm×n and B ∈ Rn×p requires 
+
+2mnp FLOPS. Each of the mp output elements requires n
+
+multiplications and n − 1 additions). For a neural network layer with input dimension din , output dimension dout , and batch size B, the forward pass requires 2B·din ·dout FLOPS, while the backward pass for computing the gradients with respect to both weights and inputs, requires double the amount of the forward pass computation [29]. Thus, for an MLP with ℓ hidden layers, input dimension din , and output dimension dout , the total forward pass FLOPS are: 
+
+F MLP forward = 2 
+
+(
+
+din · dh1 +
+
+> ℓ−1
+
+∑
+
+> i=1
+
+dhi · dhi+1 + dhℓ · dout 
+
+)
+
+(45) The backward pass requires approximately 2× the forward pass FLOPS [29], giving a total of F MLP train ≈ 3 · F MLP forward for one training iteration. In our implementation, the actor network uses three layers with 64 neurons each, while the critic network uses layers of 128, 64, and 64 neurons. For DS-PPO, the input/output dimensions are deter-mined by system parameters: Stage 1: d(1)  
+
+> in
+
+= 4 M K, d(1)  
+
+> out
+
+= 2 M K (46) Stage 2: d(2)  
+
+> in
+
+= 2 M K + ( L − 1) K, d(2)  
+
+> out
+
+= 2 M K (47) where the Stage 1 input is the complex CSI (real and imag-inary parts) and the past action, and Stage 2 additionally receives (L − 1) K singular values Λl from other satellites. The SVD of a complex M × K matrix requires approxi-mately FSVD ≈ 8M K 2 FLOPS [30]. The complexity for each time and single satellite Fstep is given by, 
+
+Fstep = F (1)  
+
+> actor
+
++ F (1)  
+
+> critic
+
++ FSVD + F (2)  
+
+> actor
+
++ F (2) 
+
+> critic
+
+F (1) = F (1)  
+
+> actor
+
++ F (1) 
+
+> critic
+
+F (2) = F (2)  
+
+> actor
+
++ F (2) 
+
+> critic
+
+where, F (1)  
+
+> actor
+
+is the Stage 1 actor network, F (1)  
+
+> critic
+
+is the Stage 2 critic network, FSVD is singular values decomposi-tion, F (2)  
+
+> actor
+
+is the Stage 2 actor network, F (2)  
+
+> critic
+
+is the Stage 1 critic network, F (1) is the Stage 1 networks and F (2) is the Stage 2 networks. For the total episode that combines rollout and training is given by, 
+
+Fepis = T · L · Fstep 
+
+︸ ︷︷ ︸
+
+> rollout
+
++ 3 · T · L ·
+
+(
+
+E(1) · F (1) + E(2) · F (2) )︸ ︷︷ ︸
+
+> training (fwd + bwd)
+
+(48) where T is the total amount of time steps, and E(1) , E(2) 
+
+are the local epochs for stage 1 and stage 2 respectively. Combining all components, the total training complexity scales as: 
+
+Ftotal = O(Nep · T · L · (dh · M K + dh · LK 
+
++ ℓ · d2 
+
+> h
+
++ M K 2)) (49) where Nep is the number of episodes. For fixed network architecture ( dh, ℓ constant), this simplifies to: 
+
+Ftotal = O (Nep · T · L · K · (M + L + K)) (50) The dominant terms are: linear in L (satellites), linear in 
+
+M (antennas), and quadratic in K (users) due to SVD. For small K, the neural network terms O(M K + LK )
+
+dominate; for large K, the SVD term O(M K 2) becomes significant. In Table II, we summarise the FLOPS for different configurations, showing how complexity scales with L and K. The dominant cost is neural network training (forward + backward passes), accounting for over 99% of total FLOPS. The SVD computation contributes less than 1%. TABLE II: FLOPS Analysis for DS-PPO ( M = 9 , T = 512 ,389 episodes, 200K samples)                        
+
+> LKPer-Episode (GFLOPS) Total Training (TFLOPS) 421.7 0.66 442.9 1.13 464.3 1.67 622.6 1.01 644.5 1.75 666.7 2.61 20 30 368 143.2
+
+VII. Numerical Results In this section, we present our numerical results to evaluate the performance of the proposed DS-PPO MARL algorithm. We incorporate a four-layer constellation of 4236 
+
+LEO satellites modelled after Starlink, each equipped with a UPA of M = 9 antennas. The constellation details are provided in [7]. In this constellation, at each instant, several satellites are visible to any user on the ground. The center of the coverage area on Earth has the latitude of 54 .5260000 ◦ and the longitude of −3.3000000 ◦, and the radius of the area is 50 km. A number of K ∈ { 2, 4, 6}
+
+single-antenna users are randomly located, and they move in arbitrary directions with various speeds of up to 3m/s. We select the L ∈ { 4, 6, 8} nearest satellites to the centre of the coverage area to form a cluster. As time passes and the satellites move in their orbit, some of the satellites in 10 
+
+the cluster may distance themselves from the users and give their position in the cluster to another satellite. The transmission frequency is set to f = 2 GHz, the bandwidth is set to BW = 0 .02 f , and the channel model is the same as in [7]. The propagation delay is in the range of 2.5 msec based on the specific frequency and constellation used. Note that, the delay is given by the satellite that has the longest distance from the users, because the signal transmission should be performed synchronously. In our study, the pilots are transmitted every ∆t = 1 ms; thus, the environment experiences a delay of Td = 3 time steps. Both stages of PPO are run with identical parameters for all agents. The actor network uses the default neural net-work architecture for PPO, and a Multi-Layer Perceptron (MLP) consisting of three layers with 64 neurons each. The critic network has been modified to include three layers of 128, 64, and 64 neurons, respectively. Both stages share this network structure and they use the ADAM optimiser. The hyperparameters for the first and second stages of PPO are listed in Table III, and they closely follow the guidelines of [31] with minimal deviations. TABLE III: PPO Hyper Parameters                                  
+
+> Parameters Symbol First Stage Second stage Discount Factor γ0.99 0.95 GAE λ0.95 0.9 Learning Rate η0.003 0.004 Minibatches γ32 6Clip coefficient ϵ0.1 0.01 Maximum Gradient Norm ∥∇ s,a ∥10.6 Value function coefficient c10.1 0.01 Entropy coefficient c20.001 0.1 Epochs N30 10 Time steps T512 512
+
+A. DS-PPO Performance In order to understand and evaluate the performance of DS-PPO, we have run experiments in four different settings. Specifically, we evaluate the performance of the DS-PPO in a system of L = 4 satellites supporting 
+
+K ∈ { 2, 4} users and in the context of perfect CSI with no observation delays ( Td = 0 ) and delayed CSI ( Td = 1 
+
+and Td = 3 ). Fig. 3 shows the average episodic rate and demonstrates that the episodic rate in the perfect CSI scenario is that for the delayed CSI. However, the gap between the perfect and delayed CSI scenarios is negligible, which shows the robustness of the algorithm to the delays in CSI observations. In addition, for all the scenarios, the algorithm provides a minimum guaranteed sum rate of 300mbps just after the 100th episode. The effect of handovers is also shown in this figure, represented by the periodic dips in performance. The handover effect on throughput is studied in [7] in more details. Note that as more users are served, the inter-user interference increases, leading to a reduction in the rate per user. However, this is offset by an overall increase in the sum-rate of all users. In the algorithmic design, though, there are significant implications that have to be considered, such as the size of the action space, which grows by 2M with the addition of each user. B. DS-PPO with varying amount of satellites Another important study constructed for multi-satellite systems is understanding the impacts of increasing the number of satellites on the sum-rate. In Fig. 4, we characterize the performance of DS-PPO in perfect CSI (Td = 0 ) and delayed CSI ( Td = 1 , 3) scenarios along with L ∈ {4, 6} satellites. It is evident that in both the scenarios of perfect and delayed CSI, the additional satellites have helped increase the average episodic sum rate due to the increased diversity. In addition, in the scenarios of L ∈ { 4, 6} satellites, the delayed CSI scenarios have achieved a similar average episodic sum rate as in the case of perfect CSI, recording evidence that DS-PPO can cope with the delayed environment. In the case of perfect CSI with L = 4 satellites, the agent displays shallow learning, resulting in a degraded performance, but, at the convergence stage we can see that all three cases achieve almost the same sum rate. This phenomenon is evidently associated with the PPO’s sensitivity to the hyperparam-eters [31], meaning that the second stage might require tuning the hyperparameters to achieve better results. C. DS-PPO’s empirical degree of freedom In this section, we want to understand where DS-PPO achieves its maximum performance and identify what im-provements are needed to further enhance its effectiveness. In Fig. 5, we evaluate the performance of DS-PPO in the delayed CSI (Td = 3) scenario in a system with 
+
+L = 4, 6, 8 satellites and K = 6 users. The sum rate is generally expected to increase by having more satellites in the system, due to the added diversity. This is shown when we increase L = 4 to L = 6 . However, as shown in this figure, we see a 25% fall in the sum rate when we increase the number of satellites to L = 8 .This is as a result of the added complexity to the agents. As we increase L, the patterns of change in the overall CSI, driven by the movements of the satellites, become more significant, making the environment increasingly non-identically distributed. Our DS-PPO algorithm is capable of handling this added complexity up to a certain point. However, beyond that, the complexity becomes too great to manage effectively. In other words, as the number of satellites grows, the optimisation problem faced by each agent becomes more challenging, which in turn impacts the performance of the second stage of PPO. D. DS-PPO vs Other Algorithms Finally, we compare the proposed DS-PPO MARL method, to other algorithms such as MARL with individual learning PPO (IPPO) [18]. The agents in IPPO share only rewards between each other but no other information 11 0 0 00  0 00  0 00  0 00                           
+
+> 0
+> 
+> 
+> 
+> 
+> 0
+> 
+>     !
+>     
+> 
+> 
+> 
+> 
+> 
+>     
+>   
+>   
+>   
+>   
+>   
+>   
+
+Fig. 3: DS-PPO performance with K ∈ { 2, 4} users in perfect CSI and delayed CSI , in presence of handovers. The delayed observations effects are neglectable in both cases. that influences their individual training. The algorithm for MAPPO shared information betweeen the actor and critic values which we deemed that this can increase the communication overhead between the agents, and thus, we have used the IPPO which shares only the rewards. In Figure 6, we show the results for a system of L = 4 
+
+satellites and K = 4 users. It is apparent from this figure that the DS-PPO MARL scheme achieves more than 75% higher sum rate than the IPPO MARL, with an achieved average sum rate of 350 Mbps and variance of 15%. This variation of the sum rate is caused by the occurrence of handovers. The results prove the expectation that MARL-IPPO will have difficulties in optimising the network due to the very large action space ( 2M K = 72 ) without the help of bi-level optimisation. Even though we use a global reward, which we expect to assist the PPO to learn and increase the sum-rate, the sum-rate is lower than the expectation. The DS-PPO offers an advantage by enabling the sharing of not only the rewards but also the singular values of the individual TPMs. This shared information allows the second stage of each agent to optimise its TPM 0 0 00  0 00  0 00  0 00                 
+
+> 
+> 0
+> 00
+> 0
+> 00
+> 0
+> 00
+> 0
+> 00
+> 0
+>      
+>   0
+>   0
+>   
+>   
+>   
+>   
+
+Fig. 4: Comparative results with L ∈ { 4, 6} satellites and 
+
+K = 6 users in perfect CSI and delayed CSI scenarios.The increment in satellites clearly increases the sum rate by 
+
+20% 0 0 00  0 00  0 00  0 00           
+
+> 
+> 0
+> 00
+> 0
+> 00
+> 0
+> 00
+> 0
+> 00
+> 0
+>    
+>   
+>   
+>   
+
+Fig. 5: Comparative results with L ∈ [4 , 8] satellites and 
+
+K = 6 users in delayed CSI scenarios. The highest sum rate is guaranteed with L = 6 
+
+in coordination with the individual TPMs of other agents, leading to improved overall performance. In this figure, we also compare our proposed DS-PPO method—which bypasses explicit channel estimation—with other approaches that rely on CSI prediction and estima-tion. Specifically, if each of the L = 4 satellites predicts its own CSI using the SatCP method [6], and the aggregated precoding matrix is calculated using the method of [10], the resulting sum rate is approximately 100 Mbps. This is only about one-third of the performance achieved by our DS-PPO method. VIII. Conclusions We have proposed a novel multi-agent reinforcement learning algorithm termed as DS-PPO, which aims for maximising the sum-rate of a distributed multi-satellite 12 50 100 150 200 250 300 
+
+Episodes 
+
+> 50 100 150 200 250 300 350 400 450 500
+> Avg. Episodic Sum-Rate (Mbps)
+> MARL, DS-PPO, delayed CSI
+> MARL, IPPO, delayed CSI
+> Channel prediction in [6] and multi-satellite precoding in [8], Perfect CSI
+> Channel prediction in [6] and multi-satellite precoding in [8], Imperfect CSI
+
+Fig. 6: Comparative results with other algorithms. system. Our approach aims to enhance MARL algorithms to effectively handle complex environments characterized by diverse dynamic patterns, non-i.i.d. behavior, and large continuous action spaces, as commonly found in multi-satellite systems. Additionally, we have provided a poten-tial solution for handling the outdated CSI observations in multi-satellite systems, where traditional methods strug-gle to compensate for the delay. The numerical results demonstrate the capability of DS-PPO to achieve a high average sum-rate of 350 Mbps, exceeding the specifications of current state-of-the-art satellite systems. Furthermore, we show that DS-PPO is resilient to delayed CSI, with minor drops in performance compared to the perfect CSI scenario. In addition, we show that the computational complexity of the DS-PPO is minimal, and based on con-vergence analysis, there is performance improvement on the second stage’s action from the first stage’s action. We also evaluate the performance of DS-PPO for different numbers of users, varying numbers of satellites, in comparisons to other algorithms. Our future work will focus on further enhancing DS-PPO to develop a more robust algorithm capable of effectively managing handovers, and extending its evaluation to other systems suffering from delayed observations. References 
+
+[1] Z. Xu, G. Chen, R. Fernandez, Y. Gao, and R. Tafazolli, “Enhancement of Direct LEO Satellite-to-Smartphone Commu-nications by Distributed Beamforming,” IEEE Transactions on Vehicular Technology, vol. 73, no. 8, pp. 11 543–11 555, 2024. [2] C.-H. Lin, S.-C. Lin, and L. C. Chu, “A Low-Overhead Dynamic Formation Method for LEO Satellite Swarm Using Imperfect CSI,” IEEE Transactions on Vehicular Technology, vol. 73, no. 5, pp. 6923–6936, 2024. [3] Y. Omid, Z. M. Bakhsh, F. Kayhan, Y. Ma, and R. Tafazolli, “Space MIMO: Direct Unmodified Handheld to Multi-Satellite Communication,” in GLOBECOM 2023 - 2023 IEEE Global Communications Conference, 2023, pp. 1447–1452. [4] S. Mahboob and L. Liu, “Revolutionizing Future Connectivity: A Contemporary Survey on AI-Empowered Satellite-Based Non-Terrestrial Networks in 6G,” IEEE Communications Surveys and Tutorials, vol. 26, no. 2, pp. 1279–1321, 2024. [5] Y. Zhang, Y. Wu, A. Liu, X. Xia, T. Pan, and X. Liu, “Deep Learning-Based Channel Prediction for LEO Satellite Massive MIMO Communication System,” IEEE Wireless Communica-tions Letters, vol. 10, no. 8, pp. 1835–1839, 2021. [6] Y. Zhang, A. Liu, P. Li, and S. Jiang, “Deep Learning (DL)-Based Channel Prediction and Hybrid Beamforming for LEO Satellite Massive MIMO System,” IEEE Internet of Things Journal, vol. 9, no. 23, pp. 23 705–23 715, 2022. [7] Y. Omid, M. Aristodemou, S. Lambotharan, M. Derakhshani, and L. Hanzo, “Reinforcement learning-based downlink transmit precoding for mitigating the impact of delayed csi in satellite systems,” IEEE Transactions on Communications, pp. 1–1, 2025. [8] Z. M. Bakhsh, Y. Omid, G. Chen, F. Kayhan, Y. Ma, and R. Tafazolli, “Multi-Satellite MIMO Systems for Direct Satellite-to-Device Communications: A Survey,” IEEE Communications Surveys & Tutorials, vol. 27, no. 3, pp. 1536–1564, 2025. [9] M. Y. Abdelsadek, G. K. Kurt, and H. Yanikomeroglu, “Dis-tributed Massive MIMO for LEO Satellite Networks,” IEEE Open Journal of the Communications Society, vol. 3, pp. 2162– 2177, 2022. [10] Y. Omid, S. Lambotharan, and M. Derakhshani, “Tackling De-layed CSI in a Distributed Multi-Satellite MIMO Communication System,” in 2024 19th International Symposium on Wireless Communication Systems (ISWCS), 2024, pp. 1–6. [11] Y. Shi, J. Zhang, and K. B. Letaief, “Optimal stochastic coor-dinated beamforming for wireless cooperative networks with csi uncertainty,” IEEE Transactions on Signal Processing, vol. 63, no. 4, pp. 960–973, 2015. [12] E. Altman and P. Nain, “Closed-Loop Control with Delayed Information,” ACM sigmetrics performance evaluation review, vol. 20, no. 1, pp. 193–204, 1992. [13] J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. Klimov, “Proximal policy optimization algorithms,” ArXiv, vol. abs/1707.06347, 2017. [14] J. Schulman, S. Levine, P. Moritz, M. I. Jordan, and P. Abbeel, “Trust region policy optimization,” ArXiv, vol. abs/1502.05477, 2015. [15] S. V. Albrecht, F. Christianos, and L. Schäfer, Multi-Agent Reinforcement Learning: Foundations and Modern Approaches. MIT Press, 2024. [16] K. Zhang, Z. Yang, and T. Başar, “Multi-agent reinforcement learning: A selective overview of theories and algorithms,” Hand-book of Reinforcement Learning and Control, pp. 321–384, 2021. [17] R. Lowe, Y. I. Wu, A. Tamar, J. Harb, P. Abbeel, and I. Mordatch, “Multi-agent actor-critic for mixed cooperative-competitive environments,” Advances in Neural Information Processing Systems, vol. 30, 2017. [18] C. Yu, A. Velu, E. Vinitsky, J. Gao, Y. Wang, A. Baez, B. Bhosale, and H. Claure, “The surprising effectiveness of ppo in cooperative multi-agent games,” Advances in Neural Information Processing Systems, vol. 35, pp. 24 611–24 624, 2022. [19] T. Rashid, M. Samvelyan, C. Schroeder, G. Farquhar, J. Foerster, and S. Whiteson, “Qmix: Monotonic value function factorisation for deep multi-agent reinforcement learning,” in Proceedings of the 35th International Conference on Machine Learning (ICML), 2018, pp. 4295–4304. [20] J. Foerster, G. Farquhar, T. Afouras, N. Nardelli, and S. White-son, “Counterfactual multi-agent policy gradients,” in Proceed-ings of the AAAI Conference on Artificial Intelligence, vol. 32, no. 1, 2018. [21] K. Zhang, Z. Yang, H. Liu, T. Zhang, and T. Başar, “Fully decentralized multi-agent reinforcement learning with networked agents,” in International Conference on Machine Learning. PMLR, 2018, pp. 5872–5881. [22] G. Lan, “Policy mirror descent for reinforcement learning: Linear convergence, new sampling complexity, and generalized problem classes,” Mathematical Programming, vol. 198, pp. 1059–1106, 2023. [23] R. S. Sutton and A. G. Barto, Reinforcement learning: an intro-duction, 2nd edn. Adaptive computation and machine learning. The MIT Press, Cambridge, 2018. [24] A. Agarwal, S. M. Kakade, J. D. Lee, and G. Mahajan, “On the theory of policy gradient methods: Optimality, approximation, and distribution shift,” vol. 22, no. 98, 2021, pp. 1–76. 13 
+
+[25] Y. Lin, G. Qu, Y. Lin, and Y. Wei, “On the convergence rates of policy gradient methods,” Journal of Machine Learning Research, vol. 23, no. 282, pp. 1–36, 2022. [26] V. R. Konda and J. N. Tsitsiklis, “On actor-critic algorithms,” SIAM Journal on Control and Optimization, vol. 42, no. 4, pp. 1143–1166, 2004. [27] S. Kakade and J. Langford, “Approximately optimal approxi-mate reinforcement learning,” in Proceedings of the 19th Interna-tional Conference on Machine Learning (ICML). San Francisco, CA, USA: Morgan Kaufmann Publishers Inc., 2002, pp. 267–274, introduces the performance difference lemma. [28] D. A. Levin, Y. Peres, and E. L. Wilmer, Markov Chains and Mixing Times. Providence, RI: American Mathematical Society, 2009. [29] I. Goodfellow, Y. Bengio, and A. Courville, Deep Learning. Cambridge, MA: MIT Press, 2016. [30] G. H. Golub and C. F. Van Loan, Matrix Computations, 4th ed. Baltimore, MD: Johns Hopkins University Press, 2013. [31] S. Huang, R. F. J. Dossa, A. Raffin, A. Kanervisto, and W. Wang, “The 37 implementation details of proximal policy optimization,” in ICLR Blog Track, 2022.
