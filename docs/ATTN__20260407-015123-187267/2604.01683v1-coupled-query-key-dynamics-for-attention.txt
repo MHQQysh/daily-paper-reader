@@ -1,0 +1,640 @@
+Title: Coupled Query-Key Dynamics for Attention
+
+URL Source: https://arxiv.org/pdf/2604.01683v1
+
+Published Time: Fri, 03 Apr 2026 00:33:12 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+Preprint. Under review. 
+
+# Coupled Query-Key Dynamics for Attention 
+
+Barak Gahtan 1 Alex M. Bronstein 1,2 1Technion – Israel Institute of Technology 
+
+> 2
+
+ISTA – Institute of Science and Technology Austria 
+
+{barakgahtan, bron }@cs.technion.ac.il 
+
+Abstract 
+
+Standard scaled dot-product attention computes scores from static, inde-pendent projections of the input. We show that evolving queries and keys 
+
+jointly through shared learned dynamics before scoring - which we call cou-pled QK dynamics - improves language modeling perplexity and training stability. On WikiText-103 at 60M parameters, coupled dynamics achieves 22.55–22.62 perplexity vs. 24.22 for standard attention ( −6.6–6.9%), with only 0.11% additional parameters (shared across both instantiations). A structural ablation isolates coupling as the active ingredient: a symplectic (Hamiltonian) and a non-symplectic (Euler) integrator perform identically when both couple Q and K, while an uncoupled MLP baseline of matched capacity reaches only 23.81 with 8 × higher seed variance. The integration step count (1–7) is similarly irrelevant - a single coupled step suffices. A compute-matched comparison reveals that coupling is a sample-efficiency 
+
+mechanism: standard attention trained for 2.4 × longer (matching wall-clock) reaches the same perplexity, but requires 2.4 × more tokens. The ad-vantage scales to 150M ( −6.7%) but narrows at 350M ( −1.0%), where Differ-ential Attention (18.93) overtakes coupled dynamics (19.35). The benefit is corpus-dependent: coupling helps on domain-coherent text (WikiText-103 
+
+−6.6%, PubMed −4.5%) but degrades on heterogeneous web text ( +10.3%) and shows no benefit on GLUE. We characterize when coupling helps and when it does not, providing practical guidelines. 
+
+1 Introduction 
+
+The attention mechanism (Vaswani et al., 2017) is the core computational primitive of modern transformers. Despite its empirical success, standard scaled dot-product attention exhibits well-documented structural pathologies. Attention weights converge toward uniform distributions as context grows, causing representational collapse (Dong et al., 2021). Spectral analysis reveals a widening gap between the leading singular values of the attention matrix - a failure mode unique to softmax that worsens with both depth and sequence length (Nait Saada et al., 2024). Pathologically low attention entropy destabilizes training, as the fixed 1 /√dk temperature provides no adaptive mechanism to prevent collapse (Zhai et al., 2023). These are not edge cases: attention sinks, hallucinations, and head redundancy are downstream symptoms of the same missing structural guarantees. Recent work has addressed these issues along two axes: efficiency - reducing memory and compute via head sharing (Ainslie et al., 2023), KV compression (Liu et al., 2024), or optimized kernels (Dao et al., 2022) - and quality - improving the scoring function via noise cancellation (Ye et al., 2025) or learnable temperature (Sun et al., 2024). However, both lines treat modifications as engineering heuristics. Recent spectral analysis suggests that methods like Differential Attention implicitly address the spectral gap problem (Nait Saada et al., 2024), but without a principled framework, these improvements remain ad hoc. 
+
+A coupling lens for attention. Standard attention computes queries and keys as inde-pendent linear projections of the input - they never interact before the dot product that produces attention scores. In physical systems, conjugate variables such as position and 1
+
+> arXiv:2604.01683v1 [cs.LG] 2 Apr 2026
+
+Preprint. Under review. momentum co-evolve through shared dynamics, each influencing the other’s trajectory. This correspondence inspired us to try the same for Q and K: evolve them jointly through shared learned dynamics before scoring. The Hamiltonian formulation was our entry point, but ablations reveal that the benefit comes from coupling itself, not from the physics - a non-symplectic Euler integrator matches the symplectic Hamiltonian one exactly. 
+
+Contributions. (1) Coupled QK Dynamics (§2.1): A framework that evolves Q and K jointly through shared learned dynamics before scoring. We instantiate it with two integrators - Hamiltonian (symplectic leapfrog) and Euler (non-symplectic) - and show both achieve comparable improvements over standard attention (22.55–22.62 vs. 24.22 at 60M scale, −6.6–6.9%). 
+
+(2) Structural ablation isolating coupling (§3.1): We show that coupling is necessary (uncoupled MLP: +1.3 PPL, 8 × higher variance), symplecticity is irrelevant (Euler matches Hamiltonian), and step count does not matter ( n=1 through n=7 flat). 
+
+(3) Characterization of scope : Coupled dynamics helps on domain-coherent corpora (WikiText-103 −6.6%, PubMed −4.5%) but degrades on heterogeneous web text (OpenWeb-Text +10.3%) and shows no GLUE benefit. At 350M, Differential Attention overtakes. We distinguish pre-scoring enrichment (corpus-sensitive) from post-scoring noise cancellation (corpus-robust). We evaluate on MQAR (Arora et al., 2024) associative recall, WikiText-103 (Merity et al., 2017) language modeling at 60M, 150M, and 350M parameters, OpenWebText (Gokaslan & Cohen, 2019), and GLUE downstream tasks. We compare against GQA (Ainslie et al., 2023) and Differential Attention (Ye et al., 2025), and include structural ablations (Euler, MLP-Only, step count) and RoPE compatibility tests. 
+
+2 Method 
+
+Preliminaries. Standard scaled dot-product attention (Vaswani et al., 2017) computes Attn (Q, K, V) = softmax QK ⊤
+
+√dk
+
+!
+
+V, (1) where the fixed scaling 1 /√dk ensures unit-variance logits at initialization but provides no mechanism for adapting attention sharpness to layer depth or task demands. We propose 
+
+coupled QK dynamics : evolving queries and keys jointly through shared learned dynamics before scoring. The key insight is that standard attention treats Q and K as independent static projections; coupling them through a shared transformation enriches the representational space available for scoring. 
+
+2.1 Coupled QK Dynamics Motivation. In standard attention, Q and K are independent linear projections of the input. Dong et al. (2021) show these projections suffer from rank collapse as depth increases. We propose enriching them by letting Q and K interact through a shared dynamical system before scoring. The core structural property is indirect coupling : Q’s update uses K as a velocity, while 
+
+K’s update uses a learned coupling function f (Q). This creates an information exchange between query and key spaces - Q moves according to K, and K is deflected by f (Q) -enriching both representations before scoring. This is in contrast to uncoupled approaches that transform Q or K independently. 
+
+General formulation. Given Q, K from standard linear projections, we apply n steps of a coupled update rule: 
+
+qt+1 = qt + ∆t · kt, kt+1 = kt + ∆t · f (qt), (2) 2Preprint. Under review. The step size ∆t = exp (τh) is a learnable per-head scalar. After n steps, the evolved (qn, kn)
+
+replace the original Q, K in standard scaled dot-product scoring. We instantiate this framework with two integrators that differ in their coupling structure: a Hamiltonian (leapfrog) integrator and a forward Euler integrator. As we show in §3.1, both achieve comparable performance. 
+
+2.2 Instantiations Hamiltonian (leapfrog). Inspired by Hamiltonian mechanics, we treat Q as generalized position and K as generalized momentum with a separable Hamiltonian H(q, k) = 12 ∥k∥2 +
+
+V(q). A leapfrog (St ¨ ormer–Verlet) integrator evolves (Q, K) for n steps: 
+
+kt+ 12
+
+= kt + ∆t 
+
+> 2
+
+f (qt), qt+1 = qt + ∆t · kt+ 12
+
+, kt+1 = kt+ 12
+
++ ∆t 
+
+> 2
+
+f (qt+1), (3) where f (q) is a two-layer MLP with SiLU activation that models the coupling from queries to keys. This integrator is symplectic (volume-preserving), which historically motivated our in-vestigation; however, our ablations show this property is not the source of the improvement (§3.1). 
+
+Euler (non-symplectic). The simplest coupled integrator applies forward Euler updates: 
+
+qt+1 = qt + ∆t · kt, kt+1 = kt + ∆t · f (qt). (4) This uses the same coupling network f (q) and learnable step size as the Hamiltonian variant, but is not symplectic - it does not preserve phase-space volume. Euler matches Hamiltonian in perplexity (§3.1), confirming that symplecticity is unnecessary. 
+
+Coupling network. Both instantiations share the same coupling network f (q): a two-layer MLP ( dk → dk) with SiLU activation and no bias, operating independently per head. This adds 0.11% parameters at 60M scale. The coupling network is a learned function that mediates the interaction between Q and K without requiring an explicit potential function or its gradient. 
+
+2.3 Ablation Baselines 
+
+To isolate the effect of coupling, we compare against: 
+
+MLP-Only applies the same two-layer MLP to queries as a residual update ( q′ = q + f (q))without modifying keys. This has identical parameter count to the coupled variants but no Q-K coupling, testing whether the improvement comes from added nonlinear capacity or from coupling. 
+
+Standard Attention uses Q, K directly from linear projections with no pre-scoring enrich-ment. We also compare against two published baselines that modify attention through different mechanisms: Grouped Query Attention (GQA) (Ainslie et al., 2023), which shares KV pro-jections across head groups, and Differential Attention (Ye et al., 2025), which cancels noise via dual-softmax post-scoring - a complementary axis to our pre-scoring coupled dynamics. 
+
+3 Experiments 
+
+3.1 Structural Ablation: Coupling Is the Active Ingredient 
+
+We conduct a controlled ablation at 60M scale on WikiText-103 to isolate what drives the improvement. Table 1 compares six configurations that vary along two axes: (1) whether Q and K are coupled through shared dynamics before scoring, and (2) whether that coupling is symplectic. Three findings emerge: 3Preprint. Under review. Table 1: Structural ablation (60M, WikiText-103, 30K steps). “Coupling” means Q and K are evolved through shared dynamics before scoring. “Symplectic” means the integrator preserves phase-space volume. The key finding: coupling is the active ingredient; symplec-ticity is irrelevant. 
+
+Method Coupling? Symplectic? Val PPL Params 
+
+Standard No N/A 24.22 ± 0.12 60.3M GQA No N/A 24.66 ± 0.07 57.2M Diff Attention No (post-scoring) N/A 23.92 ± 0.12 60.3M MLP-Only No N/A 23.81 ± 0.31 60.4M Euler (coupled) Yes No 22.55 ± 0.04 60.4M Hamiltonian (coupled) Yes Yes 22.62 ± 0.04 60.4M 
+
+(1) Coupled ≫ uncoupled. Both coupled methods (Euler 22.55, Hamiltonian 22.62) outper-form all uncoupled methods (23.81–24.66) by a wide margin. The best uncoupled method, MLP-Only (23.81), still trails the worst coupled method by 1.19 PPL. This confirms that coupling Q and K through shared dynamics before scoring - not additional capacity or integration scheme - is the mechanism driving the improvement. 
+
+(2) Euler ≈ Hamiltonian. The non-symplectic Euler integrator matches the symplectic Hamiltonian within noise (22.55 vs. 22.62). Volume preservation provides no measurable benefit; the coupling structure alone drives the improvement. 
+
+(3) Coupling stabilizes training. Both coupled methods exhibit remarkably low variance (std 0.04) compared to MLP-Only (std 0.31, an 8 × increase). The shared dynamics constrain the joint QK trajectory, reducing sensitivity to initialization. 
+
+Step count ablation. Table 2 varies the number of integration steps in the Hamiltonian variant. A single step suffices; additional steps provide no benefit. Table 2: Integration step count ablation (Hamiltonian, 60M, WikiText-103, 3 seeds). 
+
+n steps 1 3 5 7
+
+Val PPL 22.58 ± 0.05 22.62 ± 0.04 22.56 ± 0.03 22.61 ± 0.04 
+
+Performance is flat across n = 1 to 7 (22.56–22.62), indicating that a single coupled update captures the essential interaction. This is consistent with the Euler result above: the cou-pling structure matters, not the fidelity of the integration. A single step also minimizes computational overhead. 
+
+MLP capacity analysis. To obtain a robust estimate of the uncoupled baseline, we train MLP-Only across 10 seeds (mean 23.81, std 0.31). A two-sample t-test against Hamiltonian (3 seeds, mean 22.62, std 0.04) yields p < 0.001, confirming that coupling provides a statistically significant improvement beyond what added MLP capacity alone explains. 
+
+3.2 Language Modeling 
+
+We evaluate on two corpora: WikiText-103 (Merity et al., 2017) (100M tokens, curated) and OpenWebText (Gokaslan & Cohen, 2019) (100M token subset, web-scale). Both use GPT-2 BPE tokenization (vocab=50,257) with cosine LR schedule. All variants share identical training infrastructure, differing only in the attention mechanism. Figure 1 shows the 60M convergence dynamics (perplexity values are in Table 1). 
+
+Medium scale (150M parameters). Table 3 reports results at 150M parameters ( d=768, 
+
+H=12, L=12, 30K steps with gradient checkpointing), each averaged over 3 seeds. Figure 2 shows convergence. 4Preprint. Under review. 0 5000 10000 15000 20000 25000 30000       
+
+> Training Step
+> 0
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 200
+> Train Perplexity
+> Training Loss
+> Diff Attn
+> GQA
+> Coupled QK
+> Standard
+> 05000 10000 15000 20000 25000 30000
+> Training Step
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 200
+> Validation Perplexity
+> Validation Perplexity
+> Diff Attn
+> GQA
+> Coupled QK
+> Standard
+
+Figure 1: Training and validation perplexity vs. step (60M model, WikiText-103). Three convergence tiers emerge: (1) Coupled QK separates below the pack from ∼step 10K, (2) Standard and Diff Attn cluster tightly (23.92–24.22), (3) GQA trails. Training curves are cropped to step 5K+ and PPL ≤200 to show the informative region. Table 3: WikiText-103 validation perplexity at 150M scale ( d=768, H=12, L=12), mean ±
+
+std over 3 seeds. Coupled QK dynamics achieves the best perplexity by a clear margin. 
+
+Attention Best Val PPL Params 
+
+Standard (baseline) 21.57 ± 0.02 152.3M GQA (baseline) 21.87 ± 0.04 144.4M Diff Attention 21.11 ± 0.07 152.3M 
+
+Coupled QK 20.12 ± 0.08 152.4M At 150M parameters, coupled QK dynamics extends its lead , achieving 20.12 ± 0.08 - a 6.7% improvement over the standard baseline (21.57 ± 0.02) and 0.99 PPL ahead of the next-best method, Differential Attention (21.11 ± 0.07). Standard clusters with GQA (21.57–21.87). The top three non-coupled variants span only 0.76 PPL - methods converge as capacity grows, but coupled dynamics remains clearly separated. 
+
+Large scale (350M parameters). To test whether the benefits persist at larger scale, we train three key variants at 350M parameters ( d=1024, H=16, L=24, 30K steps with gradient checkpointing). Table 4 reports results across 3 seeds. Differential Attention achieves the best perplexity (18.93 ± 0.02), overtaking coupled QK dynamics (19.35 ± 0.07) for the first time. Coupled QK dynamics still improves over the standard baseline (19.55 ± 0.06) by 1.0%, but the gap narrows substantially: 6.6% at 60M, 6.7% at 150M, and 1.0% at 350M. Meanwhile, Differential Attention’s advantage over Standard grows with scale (1.2% at 60M, 2.1% at 150M, 3.2% at 350M), suggesting that the post-scoring noise cancellation mechanism scales more favorably than pre-scoring QK coupling. Table 4: WikiText-103 validation perplexity at 350M scale ( d=1024, H=16, L=24). Mean ±
+
+std over 3 seeds. 
+
+Attention Best Val PPL Params 
+
+Standard (baseline) 19.55 ± 0.06 ∼350M Coupled QK 19.35 ± 0.07 ∼350M 
+
+Diff Attention 18.93 ± 0.02 ∼350M 
+
+When does coupled QK dynamics help? To test corpus sensitivity, we repeat the 60M experiments on two additional corpora: OpenWebText (Gokaslan & Cohen, 2019) (100M 5Preprint. Under review. 0 5000 10000 15000 20000 25000 30000       
+
+> Training Step
+> 0
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 200
+> Train Perplexity
+> Training Loss
+> Diff Attn
+> GQA
+> Coupled QK
+> Standard
+> 05000 10000 15000 20000 25000 30000
+> Training Step
+> 50
+> 100
+> 150
+> 200
+> 250
+> Validation Perplexity
+> Validation Perplexity
+> Diff Attn
+> GQA
+> Coupled QK
+> Standard
+
+Figure 2: Training and validation perplexity vs. step (150M model, WikiText-103). Coupled QK dynamics separates early and maintains its lead throughout training. Final ranking: Coupled QK (20.12), Diff Attn (21.11), Standard (21.57), GQA (21.87). tokens, heterogeneous web text) and PubMed abstracts (100M tokens, scientific articles). Table 5 reports results. Table 5: Corpus sensitivity (60M model, 100M tokens). Coupled QK dynamics benefits structurally uniform corpora (WikiText-103, PubMed) but degrades on heterogeneous web text (OpenWebText). 
+
+Attention WikiText-103 PubMed OpenWebText 
+
+Standard 24.22 ± 0.12 16.84 ± 0.09 40.64 ± 0.23 
+
+Diff Attention 23.92 ± 0.12 16.68 ± 0.11 40.19 ± 0.13 
+
+Coupled QK 22.62 ± 0.04 16.08 ± 0.06 44.85 ± 0.14 
+
+Coupled QK vs. Standard −6.6% −4.5% +10.3% A clear pattern emerges: coupled dynamics helps on domain-coherent corpora (WikiText-103 −6.6%, PubMed −4.5%) but actively degrades performance on heterogeneous web text (OpenWebText +10.3%). WikiText-103 and PubMed share a key property: both are single-domain corpora with consistent register and compositional conventions (encyclopedic articles and scientific abstracts, respectively). OpenWebText spans diverse domains, styles, and registers where a single learned coupling landscape introduces conflicting dynamics. We hypothesize the relevant property is domain coherence : the learned coupling network defines a single dynamical landscape for QK interactions, which is effective when documents share a consistent domain but introduces conflicting dynamics across diverse domains. This is consistent with the GLUE null result (§3.4), where short, heterogeneous sentences lack the structural uniformity that coupled dynamics exploits. The results illuminate a broader design axis: coupled QK dynamics operates pre-scoring (en-riching QK representations before softmax), making its learned dynamics corpus-sensitive. Differential Attention operates post-scoring (cancelling noise between two softmax maps), a content-agnostic mechanism that is corpus-robust. Practitioners should prefer coupled dynamics for domain-coherent corpora (scientific text, encyclopedic text, code) and post-scoring methods for heterogeneous or multi-domain settings. 
+
+3.3 MQAR: Associative Recall 
+
+We evaluate on MQAR (Arora et al., 2024) at three difficulty levels (Table 6). All models use the tiny configuration ( d=256, H=4, L=6, ∼6M params) trained for 10K–20K steps. 6Preprint. Under review. Table 6: MQAR accuracy by attention variant and difficulty. Coupled QK dynamics achieves perfect accuracy on easy and medium, where standard attention plateaus. 
+
+Attention Easy Medium Hard 
+
+Standard 0.667 0.930 0.173 
+
+Coupled QK (20K) 1.000 1.000 0.142 
+
+Coupled QK dynamics achieves perfect accuracy (1.000) on easy and medium given 20K steps, where standard plateaus at 0.930 on medium - the coupled dynamics enriches the QK representation space before scoring. Both methods struggle on hard (16 KV pairs, seq len=256), a fundamental capacity limitation at these scales. 
+
+3.4 Downstream Transfer: GLUE 
+
+Perplexity measures token prediction quality but does not directly test whether the structural inductive biases improve downstream task performance. We fine-tune all 60M pretrained models (WikiText-103) on three GLUE tasks (Wang et al., 2019): SST-2 (sentiment, 2-class), MNLI (NLI, 3-class), and QNLI (QA-NLI, 2-class). Each pretrained checkpoint is fine-tuned with a linear classification head using standard BERT-style hyperparameters (lr=2 ×10 −5, 5 epochs for SST-2/QNLI, 3 for MNLI) across 3 seeds. Table 7 reports validation accuracy. Table 7: GLUE validation accuracy (mean ± std, 3 seeds) from 60M WikiText-103 pretrained checkpoints. All variants perform within noise of standard attention, consistent with the structural uniformity hypothesis. 
+
+Attention SST-2 MNLI QNLI 
+
+Standard (baseline) 87.1 ± 0.3 72.9 ± 0.4 81.8 ± 0.4 
+
+GQA (baseline) 87.5 ± 0.5 72.9 ± 0.4 81.2 ± 0.8 
+
+Diff Attention 86.4 ± 0.3 73.7 ± 0.2 82.2 ± 0.2 
+
+Coupled QK 86.8 ± 0.5 73.1 ± 0.7 81.7 ± 0.1 
+
+All variants perform within noise on GLUE, consistent with the structural uniformity analysis (§3.2). Diff Attention leads on MNLI and QNLI. 
+
+3.5 Analysis Attention matrix rank. We directly measure the effective rank of the attention matrix 
+
+A = softmax (QK ⊤/√dk) across layers (Table 12 in the Appendix). Coupled QK dynamics achieves higher attention matrix rank in 6 of 8 layers, with the largest gains at the network boundaries ( +15% at Layer 0, +23% at Layer 7). This confirms that coupling enriches the attention scoring beyond what static QK projections provide. 
+
+Overhead and sample efficiency. The coupled dynamics adds 65,600 parameters (coupling MLPs, 0.11% overhead). GQA reduces parameters by 5.2% via KV head sharing. The leapfrog integration costs 0.82 × throughput - comparable to Differential Attention’s dual-softmax overhead. Including the 2 × gradient accumulation overhead (smaller micro-batches), the effective wall-clock training cost is ∼2.4 × standard. To disentangle the coupling benefit from this compute overhead, we train Standard Attention for 72K steps - matching the 2.4 × wall-clock budget of coupled QK at 30K steps. Standard at 72K achieves 22.58 PPL, matching coupled QK (22.55–22.62) but requiring 2.4 × more training tokens. This reveals that coupled QK dynamics is a sample-efficiency mechanism :it extracts the same representational quality from 2.4 × fewer tokens by enriching QK interactions before scoring. When data is abundant, longer training on a simpler architecture yields equivalent results; when data is the bottleneck - domain-specific corpora, low-resource 7Preprint. Under review. languages, privacy-constrained settings - coupled dynamics achieves the same quality with substantially less data. See Tables 10–11 in the Appendix for full benchmarks. RoPE compatibility is verified in Appendix D. 
+
+4 Related Work 
+
+Physics-informed neural networks. Hamiltonian Neural Networks (Greydanus et al., 2019) learn dynamics respecting energy conservation, and Neural ODEs (Chen et al., 2018) parameterize continuous-time dynamics with guaranteed properties. Modern Hopfield networks (Ramsauer et al., 2021) reinterpret attention as energy minimization; Geshkovski et al. (2024) analyze self-attention as interacting particle dynamics; the Energy Trans-former (Hoover et al., 2024) uses an energy-based Hopfield update for attention weights. These works inspired our investigation of coupled dynamics for Q and K. However, our ablations show that the benefit stems from the coupling structure rather than from physics conservation laws - Euler (non-symplectic) matches Hamiltonian (symplectic) integration. 
+
+Efficient and structured attention. GQA (Ainslie et al., 2023) reduces KV cache memory via head sharing. Differential Attention (Ye et al., 2025) cancels noise via differential softmax. Multi-Head Latent Attention (Liu et al., 2024) compresses KV representations into a low-rank latent space. FlashAttention (Dao et al., 2022) optimizes memory access patterns for exact attention. Our coupled dynamics operate pre-scoring on Q and K representations and are orthogonal to these techniques. 
+
+Pre-scoring QK manipulation. Several works transform query or key representations before scoring. QK-Norm (Henry et al., 2020) normalizes Q and K to stabilize training at scale. Dehghani et al. (2023) apply per-head scaling to prevent attention logit growth. Talking-Heads Attention (Shazeer et al., 2020) applies learned linear maps across heads in the logit space, mixing QK interactions pre-softmax. The Synthesizer (Tay et al., 2021) replaces dot-product attention entirely with learned or random attention maps, questioning whether explicit QK interaction is necessary. Performer (Choromanski et al., 2021) approximates attention via random feature maps that implicitly transform the QK kernel. Our coupled QK dynamics is distinct from these: rather than normalizing, mixing across heads, or replacing the dot product, we introduce intra-head bidirectional co-evolution of Q and K through a shared coupling network, adding expressive capacity to each head’s QK interaction before standard dot-product scoring. 
+
+Attention analysis and failure modes. Dong et al. (2021) prove that pure self-attention loses rank doubly exponentially with depth, providing theoretical justification for the representational collapse that coupled dynamics addresses empirically. Nait Saada et al. (2024) identify a widening spectral gap in the attention matrix as a failure mode unique to softmax. Our coupled dynamics enriches the QK representation space before scoring, empirically mitigating rank collapse at small to medium scale. 
+
+5 Conclusion 
+
+Coupled query-key dynamics improves language modeling on structurally uniform corpora (−6.6% at 60M, −6.7% at 150M, −1.0% at 350M on WikiText-103) by enriching QK represen-tations before scoring. Ablations isolate coupling as the active ingredient over symplecticity, integration scheme, step count, and raw MLP capacity. A compute-matched comparison reveals coupling is a sample-efficiency mechanism, achieving equivalent perplexity with 2.4 × fewer training tokens. The advantage is corpus-dependent: coupling helps on domain-coherent text (WikiText-103, PubMed) but degrades on heterogeneous web text (OpenWebText +10.3%) and shows no GLUE benefit. At 350M, Differential Attention overtakes, suggesting that post-scoring noise cancellation scales more favorably than pre-scoring QK enrichment. 8Preprint. Under review. 
+
+Limitations. Our evaluation spans 60M–350M parameters; whether coupled dynamics helps or hurts at billion-parameter scale remains open. The corpus-dependence limits applicability to coherent-domain settings, and characterizing which corpus properties are sufficient for benefit requires further study. The Euler result - showing symplecticity is unnecessary - suggests our understanding of why coupling helps remains incomplete. 
+
+Future work. Understanding the mechanistic basis of the coupling benefit - particularly the striking 8 × variance reduction, which suggests coupling constrains optimization to more stable basins. Combining coupled dynamics with Differential Attention (pre-scoring enrichment + post-scoring noise cancellation) is architecturally straightforward. Exploring simpler coupling mechanisms (linear mixing, shared MLPs) would clarify whether the ODE-inspired formulation is necessary or merely sufficient. More broadly, these results illustrate that how query and key representations interact before scoring matters more than the specific mathematical properties of that interaction - and that identifying the active ingredient through careful ablation is as important as demonstrating that a method works. 
+
+References 
+
+Joshua Ainslie, James Lee-Thorp, Michiel de Jong, Yury Zemlyanskiy, Federico Lebr ´on, and Sumit Sanghai. GQA: Training generalized multi-query transformer models from multi-head checkpoints. arXiv preprint arXiv:2305.13245 , 2023. Vladimir I Arnold. Mathematical Methods of Classical Mechanics . Springer, 1989. Simran Arora, Sabri Eyuboglu, Aman Timalsina, Isys Johnson, Michael Poli, James Zou, Atri Rudra, and Christopher R ´e. Zoology: Measuring and improving recall in efficient language models. In ICLR , 2024. Ricky T. Q. Chen, Yulia Rubanova, Jesse Bettencourt, and David Duvenaud. Neural ordinary differential equations. In NeurIPS , 2018. Krzysztof Choromanski, Valerii Likhosherstov, David Dohan, Xingyou Song, Andreea Gane, Tamas Sarlos, Peter Hawkins, Jared Davis, Afroz Mohiuddin, Lukasz Kaiser, et al. Rethinking attention with performers. In ICLR , 2021. Tri Dao, Dan Fu, Stefano Ermon, Atri Rudra, and Christopher R ´e. FlashAttention: Fast and memory-efficient exact attention with io-awareness. In NeurIPS , 2022. Mostafa Dehghani, Josip Djolonga, Basil Mustafa, Piotr Padlewski, Jonathan Heek, Justin Gilmer, Andreas Peter Steiner, Mathilde Caron, Robert Geirhos, Ibrahim Alabdulmohsin, et al. Scaling vision transformers to 22 billion parameters. In ICML , 2023. Yihe Dong, Jean-Baptiste Cordonnier, and Andreas Loukas. Attention is not all you need: Pure attention loses rank doubly exponentially with depth. arXiv preprint arXiv:2103.03404 ,2021. Borjan Geshkovski, Cyril Letrouit, Yury Polyanskiy, and Philippe Rigollet. A mathematical perspective on transformers. arXiv preprint arXiv:2312.10794 , 2024. Aaron Gokaslan and Vanya Cohen. OpenWebText corpus. http://Skylion007.github.io/ OpenWebTextCorpus , 2019. Samuel Greydanus, Misko Dzamba, and Jason Yosinski. Hamiltonian neural networks. In 
+
+NeurIPS , 2019. Alex Henry, Prudhvi Raj Dachapally, Shubham Shantaram Pawar, and Yuxuan Chen. Query-key normalization for transformers. Findings of EMNLP , 2020. Benjamin Hoover, Yuchen Liang, Bao Pham, Rameswar Panda, Hendrik Strobelt, Duen Horng Chau, Mohammed J Zaki, and Dmitry Krotov. Energy transformer. In 
+
+NeurIPS , 2024. 9Preprint. Under review. Aixin Liu et al. DeepSeek-V2: A strong, economical, and efficient mixture-of-experts language model. arXiv preprint arXiv:2405.04434 , 2024. Stephen Merity, Caiming Xiong, James Bradbury, and Richard Socher. Pointer sentinel mixture models. arXiv preprint arXiv:1609.07843 , 2017. Jazib Nait Saada, John Gower, and Steven Sherr. Mind the gap: Analyzing representational collapse in multi-head attention. arXiv preprint arXiv:2410.07799 , 2024. Hubert Ramsauer, Bernhard Sch ¨afl, Johannes Lehner, Philipp Seidl, Michael Widrich, Thomas Adler, Lukas Gruber, Markus Holzleitner, Milena Pavlovi ´c, Geir Kjetil Sandve, et al. Hopfield networks is all you need. ICLR , 2021. Noam Shazeer, Zhenzhong Gong, Nando de Freitas, et al. Talking-heads attention. arXiv preprint arXiv:2003.02436 , 2020. Jianlin Su, Murtadha Ahmed, Yu Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu. RoFormer: Enhanced transformer with rotary position embedding. Neurocomputing , 568:127063, 2024. Yifan Sun et al. Scalable softmax attention. In NeurIPS , 2024. Yi Tay, Dara Bahri, Donald Metzler, Da-Cheng Juan, Zhe Zhao, and Che Zheng. Synthesizer: Rethinking self-attention for transformer models. In ICML , 2021. Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Lukasz Kaiser, and Illia Polosukhin. Attention is all you need. In NeurIPS , 2017. Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, and Samuel R. Bowman. GLUE: A multi-task benchmark and analysis platform for natural language understanding. In International Conference on Learning Representations , 2019. Tianzhu Ye, Li Li, Huazheng Huang, Songchen Shi, Jianxi Gao, Xin Liu, Zhirong Liu, Saining Liu, and Jiwen Sun. Differential transformer. In ICLR , 2025. Shuangfei Zhai, Tatiana Likhomanenko, Etai Littwin, Dan Busbridge, Jason Raber, Josh Teg, and Joshua Susskind. Stabilizing transformer training by preventing attention entropy collapse. In ICML , 2023. 
+
+A Physics Motivation: From Hamiltonian Mechanics to Coupled Dynamics 
+
+Coupled QK dynamics was originally inspired by Hamiltonian mechanics. This section describes the physics analogy that led to the architecture. As shown in §3.1, the symplectic properties described here are not the source of the empirical improvement - coupling is. We include this derivation for readers interested in the intellectual path from physics to architecture. 
+
+Treating Q and K as a dynamical system. We treat queries Q as generalized position and keys K as generalized momentum in a Hamiltonian system with separable energy 
+
+H(q, k) = 12 ∥k∥2 + V(q). Hamilton’s equations dictate how q and k co-evolve: ˙q = ∂H
+
+∂k = k, ˙k = − ∂H
+
+∂q = −∇ qV(q). (5) Positions drift with their momenta; momenta are deflected by the gradient of the potential. This creates the indirect coupling described in §2.1: Q’s update uses K, and K’s update uses a function of Q.10 Preprint. Under review. 
+
+The leapfrog integrator. We discretize using the leapfrog (St ¨ ormer–Verlet) integrator: 
+
+kt+ 12
+
+= kt + ∆t 
+
+> 2
+
+f (qt) (half-step momentum kick) (6) 
+
+qt+1 = qt + ∆t · kt+ 12
+
+(full-step position drift) (7) 
+
+kt+1 = kt+ 12
+
++ ∆t 
+
+> 2
+
+f (qt+1) (half-step momentum kick) (8) where f (q) is a two-layer MLP approximating the force −∇ qV(q), and ∆t = exp (τh) is a learnable per-head step size. 
+
+Volume preservation (symplecticity). Each leapfrog step is a composition of three shear maps with unit Jacobian determinant: 
+
+JΦ1 =
+
+ I 0 
+
+> ∆t
+> 2
+
+∇q f I
+
+
+
+, det JΦ1 = 1. (9) The same holds for Φ2 (upper-triangular) and Φ3, so det JΦ3◦Φ2◦Φ1 = 1. By Liouville’s theorem (Arnold, 1989), the flow preserves phase-space volume. However, our ablations show this property is empirically irrelevant: a non-symplectic Euler integrator achieves the same perplexity (§3.1). 
+
+Amortized force field. The force f (q) is a learned MLP rather than an exact gradient 
+
+−∇ qV. The volume-preservation guarantee holds regardless, since symplecticity depends on the structure of the update (shear maps), not the form of f .
+
+B Experimental Setup 
+
+Table 8: Model configurations used in experiments. 
+
+Config dmodel nheads nlayers dff Params 
+
+Tiny 256 4 6 1024 ∼6M †
+
+Small 512 8 8 2048 ∼60M Medium 768 12 12 3072 ∼153M Large 1024 16 24 4096 ∼350M 
+
+Model configurations. All models use: RMSNorm (pre-norm), SwiGLU FFN, tied in-put/output embeddings, learned positional embeddings. 
+
+> †
+
+Parameter counts depend on vocabulary size. Tiny is used only for MQAR (vocab=64, 
+
+∼6M params). Small and medium counts are for WikiText-103 (vocab=50,257). 
+
+Training hyperparameters. MQAR experiments. AdamW ( β1=0.9, β2=0.95), lr =3×10 −4,weight decay 0.01, gradient clipping 1.0, cosine schedule with 500-step warmup, 10K–20K total steps, batch size 64. 
+
+WikiText-103 (small, 60M). AdamW ( β1=0.9, β2=0.95), lr =6×10 −4, weight decay 0.1, gradi-ent clipping 1.0, cosine schedule with 2K-step warmup, 30K total steps, effective batch size 32 (micro-batch 8, gradient accumulation 4), mixed precision (fp16), seq len 512. 
+
+WikiText-103 (medium, 150M). Same as small except: lr =3×10 −4, 30K total steps, gradient checkpointing enabled, effective batch size 32 (micro-batch 8, accum 4; coupled QK: micro-batch 4, accum 8). 
+
+WikiText-103 (large, 350M). Same as medium except: lr =2×10 −4, effective batch size 32 (micro-batch 4, accum 8; coupled QK: micro-batch 2, accum 16). 
+
+Variant-specific hyperparameters. 
+
+11 Preprint. Under review. Table 9: Variant-specific hyperparameters. 
+
+Variant Hyperparameter Value 
+
+Coupled QK (Hamiltonian) Integration steps n 3Initial ∆t 0.1 Coupling network 2-layer MLP ( dk → dk, SiLU) Coupled QK (Euler) Integration steps n 3Initial ∆t 0.1 Coupling network 2-layer MLP ( dk → dk, SiLU) GQA KV head ratio 1/4 of query heads Group size 4 queries per KV head Differential Attention Sub-head dimension ds dk/2 
+
+λ init 0.8 − 0.6 exp (−0.3 ℓ) (layer ℓ)
+
+Software and hardware. All experiments were conducted on servers with NVIDIA RTX 2080 Ti GPUs (11 GB each). We use PyTorch 2.10 with mixed-precision (fp16) training. The codebase implements all attention variants as drop-in replacements sharing a common 
+
+forward(x, causal mask, rope) -> (output, aux loss) interface, enabling fair comparison with identical training infrastructure. All models use learned positional embeddings by default; the RoPE ablation (§3.2) replaces these with Rotary Position Embeddings (Su et al., 2024). 
+
+C Overhead Benchmarks 
+
+Table 10: Throughput and memory comparison on a single RTX 2080 Ti (60M model, batch=8, seq len=512). “Rel” is relative to standard attention. 
+
+Attention Fwd tok/s Rel Fwd+Bwd tok/s Rel Peak MB 
+
+Standard 61,070 1.00 × 22,803 1.00 × 4,127 Coupled QK (Hamil.) 50,225 0.82 × 18,650 0.82 × 5,855 Coupled QK (Euler) 51,102 0.84 × 19,014 0.83 × 5,712 GQA 62,277 1.02 × 23,368 1.02 × 4,115 Diff Attention 50,164 0.82 × 18,667 0.82 × 5,151 Table 11: Parameter comparison at 60M scale. 
+
+Attention Total Params Variant-Specific Overhead 
+
+Standard 60,343,296 0 -Coupled QK (Hamil.) 60,408,896 65,600 +0.11% Coupled QK (Euler) 60,408,896 65,600 +0.11% GQA 57,197,568 0 −5.21% Diff Attention 60,343,360 64 +0.00% Euler is marginally faster than Hamiltonian (0.84 × vs. 0.82 ×) because forward Euler requires one force evaluation per step versus two for leapfrog. Both have identical parameter counts since they share the same coupling network architecture. 
+
+D Additional Analysis 
+
+Entropy profiles. Attention entropy S = − ∑j aj log aj measures distributional spread. Entropy collapse - where heads degenerate to near-deterministic distributions - wastes 12 Preprint. Under review. representational capacity (Zhai et al., 2023). Figure 3 compares per-layer entropy across variants. 0 1 2 3 4 5 6 7
+
+> Layer
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 3.5
+> 4.0
+> 4.5
+> 5.0
+> Shannon Entropy (nats)
+> Attention Entropy per Layer
+> Diff Attn
+> GQA
+> Hamiltonian
+> Standard
+
+(a) 60M model 0 2 4 6 8 10  
+
+> Layer
+> 2.0
+> 2.5
+> 3.0
+> 3.5
+> 4.0
+> 4.5
+> 5.0
+> Shannon Entropy (nats)
+> Attention Entropy per Layer
+> Diff Attn
+> GQA
+> Hamiltonian
+> Standard
+
+(b) 150M model 
+
+Figure 3: Per-layer attention entropy at end of training. Left (60M): A sharp entropy dip at Layer 2 reveals the attention sink. GQA collapses furthest ( ≈1.65 nats), followed by Standard ( ≈1.95). Coupled QK dynamics ( ≈2.5) mitigates the collapse. Right (150M): The Layer 2 collapse persists at scale, confirming it is a structural phenomenon. 
+
+Attention pattern visualizations. Figures 4–5 show attention heatmaps from trained 60M models (layers 0, 4, 7; heads 0–3). Each L × L matrix shows the attention weight from query 
+
+i (row) to key j (column), with causal masking zeroing the upper triangle. 0 20 40 60                                  
+
+> 0
+> 20
+> 40
+> 60
+> Query pos
+> L0 H0
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L0 H1
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L0 H2
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L0 H3
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> Query pos
+> L4 H0
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L4 H1
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L4 H2
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L4 H3
+> 020 40 60
+> Key pos
+> 0
+> 20
+> 40
+> 60
+> Query pos
+> L7 H0
+> 020 40 60
+> Key pos
+> 0
+> 20
+> 40
+> 60
+> L7 H1
+> 020 40 60
+> Key pos
+> 0
+> 20
+> 40
+> 60
+> L7 H2
+> 020 40 60
+> Key pos
+> 0
+> 20
+> 40
+> 60
+> L7 H3
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Attention weight
+
+Attention Patterns Standard 
+
+Figure 4: Standard Attention (60M). Layer 0: Clean causal gradients. Layer 4: Attention sink at position 0 dominates all heads. Layer 7: Sink persists with partial content-based recovery. 
+
+Attention matrix rank. To directly test whether coupled dynamics mitigates rank collapse in the attention matrix A = softmax (QK ⊤/√dk), we compute the effective rank of A across 13 Preprint. Under review. 0 20 40 60                                   
+
+> 0
+> 20
+> 40
+> 60
+> Query pos
+> L0 H0
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L0 H1
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L0 H2
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L0 H3
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> Query pos
+> L4 H0
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L4 H1
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L4 H2
+> 020 40 60
+> 0
+> 20
+> 40
+> 60
+> L4 H3
+> 020 40 60
+> Key pos
+> 0
+> 20
+> 40
+> 60
+> Query pos
+> L7 H0
+> 020 40 60
+> Key pos
+> 0
+> 20
+> 40
+> 60
+> L7 H1
+> 020 40 60
+> Key pos
+> 0
+> 20
+> 40
+> 60
+> L7 H2
+> 020 40 60
+> Key pos
+> 0
+> 20
+> 40
+> 60
+> L7 H3
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Attention weight
+> Attention Patterns Hamiltonian
+
+Figure 5: Coupled QK dynamics (60M). Layer 0: H0 shows off-diagonal patterns absent in Standard, indicating the coupled dynamics has diversified QK interactions. Layer 4: The attention sink is present but less extreme - H0 distributes attention more broadly. Layer 7: 
+
+H0 exhibits the most diverse pattern across all heads, with scattered attention to multiple specific positions. layers (Table 12). Coupled QK dynamics achieves higher attention matrix rank in 6 of 8 layers, with the largest gains at the network boundaries: +15% at Layer 0 and +23% at Layer 7. Notably, Layer 2 (the entropy collapse layer) shows lower rank for coupled dynamics, suggesting that the coupling does not prevent the attention sink but compensates by enriching rank in surrounding layers. The mean effective rank is modestly higher (116.2 vs. 113.7, +2.2%), and the top-1 singular value ratio is lower (0.050 vs. 0.056), indicating less concentration in the leading singular direction. Table 12: Attention matrix effective rank (∑i σi)2/ ∑i σ2
+
+i per layer (60M, WikiText-103, aver-aged over 25 validation batches × 8 heads). 
+
+L0 L1 L2 L3 L4 L5 L6 L7 Mean Standard 28.6 179.5 200.0 176.8 104.1 100.1 80.1 40.4 113.7 Coupled QK 32.8 185.0 178.0 175.9 109.5 111.1 87.3 49.8 116.2 
+
+RoPE compatibility. Table 13 verifies that coupled QK dynamics composes with Rotary Position Embeddings (RoPE). Both Standard and Coupled QK see higher perplexity with RoPE at 60M scale, but the coupled dynamics advantage is preserved: Coupled QK+RoPE (24.00) still outperforms Standard+learned (24.22). 14 Preprint. Under review. Table 13: RoPE ablation at 60M scale. Mean ± std over 3 seeds. 
+
+Attention Learned Pos. RoPE 
+
+Standard 24.22 ± 0.12 25.84 ± 0.07 
+
+Coupled QK 22.62 ± 0.04 24.00 ± 0.03 
+
+15

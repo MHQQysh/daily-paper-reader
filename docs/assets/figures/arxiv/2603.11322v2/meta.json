@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.11322v2/fig-001.webp",
+      "caption": "FIG. 1. Schematic representation of the Transformer architecture. (a) Transformer layers are depicted as discrete evolution steps along the vertical axis (red), representing ordered layer depth. (b) Detailed view of an individual l-th layer: the Self-attention block introduces non-local, off-diagonal coupling across the lattice sites, while the Feed-Forward Network (FFN) acts as a local, on-site operator. The forward pass through the network corresponds to the successive application of these operators, analogous to an evolution process.",
+      "page": 3,
+      "index": 1,
+      "width": 486,
+      "height": 328
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.17879v1/fig-001.webp",
+      "caption": "Table 1: Per-video temporal mAP on the RARE-VISION test set (3 NaviCam examinations).",
+      "page": 5,
+      "index": 1,
+      "width": 629,
+      "height": 192
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17879v1/fig-002.webp",
+      "caption": "Figure 1: Overview of the proposed Differential BiomedCLIP pipeline. Stage 1: VCE frames are processed through a sqrt-frequency sampler and augmented with mixup (α = 0.3) and geometric/photometric transforms. Stage 2: The differential ViT backbone (Patch16, 12 blocks, 768-d) extracts 512-d image features, which are routed to both an excitation-gated classification head (17 classes) and a contrastive alignment module against PubMedBERTencoded clinical text prompts. EMA (β = 0.999) maintains a smoothed parameter copy. Stage 3: Asymmetric focal loss and contrastive BCE loss are combined as Lcls + 0.4Lcon. Stage 4: Per-class optimized thresholds, temporal median smoothing (w = 7), and gap merging (≤ 5 frames) convert frame-level posteriors into the competition event JSON.",
+      "page": 5,
+      "index": 2,
+      "width": 1008,
+      "height": 527
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17879v1/fig-003.webp",
+      "caption": "Table 2: Per-class validation metrics at the best checkpoint (epoch 4). “Sup” denotes the number of positive frames in the validation set.",
+      "page": 6,
+      "index": 3,
+      "width": 760,
+      "height": 614
+    }
+  ]
+}

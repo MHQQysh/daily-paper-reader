@@ -6,125 +6,211 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-03-09 ~ 2026-04-07
-- 运行时间：2026-04-07 01:33:04 UTC
+- 最新运行日期：ATTN · 2026-03-09 ~ 2026-04-07 · 2026-04-07 01:51:23
+- 运行时间：2026-04-07 02:09:51 UTC
 - 运行状态：成功
-- 本次总论文数：34
-- 精读区：0
-- 速读区：34
+- 本次总论文数：63
+- 精读区：52
+- 速读区：11
 
 ### 今日简报（AI）
-今日高效速览 34 篇前沿成果，深度聚焦多智能体强化学习与博弈论的高质量突破。
-重点推荐去中心化无人机部署的通信感知方案，以及利用反事实信用优化解决多代理协作难题。
-建议关注多智能体系统中的信用分配与零和博弈机制，探索复杂环境下的协同优化新路径。
-- 详情：[/20260309-20260407/README](/20260309-20260407/README)
+本期精选 63 篇论文，深度探讨了注意力机制从理论泛化到多智能体安全控制的跨越式进展。
+重点推荐 Tucker Attention 泛化框架及局部注意力在强化学习中的应用，为提升模型效率与复杂系统安全性提供了新范式。
+建议读者关注跨模态注意力在 Deepfake 检测、地质识别及医疗影像等垂直领域的落地表现。
+- 详情：[/ATTN__20260407-015123-187267/README](/ATTN__20260407-015123-187267/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Partial Attention in Deep Reinforcement Learning for Safe Multi-Agent Control](/ATTN__20260407-015123-187267/2603.21810v1-partial-attention-in-deep-reinforcement-learning-for-safe-multi-agent-control)  
+   标签：评分：10.0/10、query:marl
+   evidence：QMIX框架下的部分注意力机制用于多智能体控制
+2. [Tucker Attention: A generalization of approximate attention mechanisms](/ATTN__20260407-015123-187267/2603.30033v1-tucker-attention-a-generalization-of-approximate-attention-mechanisms)  
+   标签：评分：10.0/10、query:attn
+   evidence：使用低秩分解的多头自注意力机制泛化
+3. [Understanding Transformers and Attention Mechanisms: An Introduction for Applied Mathematicians](/ATTN__20260407-015123-187267/2604.00965v1-understanding-transformers-and-attention-mechanisms-an-introduction-for-applied-mathematicians)  
+   标签：评分：10.0/10、query:attn
+   evidence：Transformer架构及注意力变体的全面介绍
+4. [Attention Mechanisms Through the Lens of Numerical Methods: Approximation Methods and Alternative Formulations](/ATTN__20260407-015123-187267/2604.01757v1-attention-mechanisms-through-the-lens-of-numerical-methods-approximation-methods-and-alternative-formulations)  
+   标签：评分：10.0/10、query:attn
+   evidence：通过数值方法和近似对注意力机制进行的综述
+5. [Solution to the 10th ABAW Expression Recognition Challenge: A Robust Multimodal Framework with Safe Cross-Attention and Modality Dropout](/ATTN__20260407-015123-187267/2603.08034v1-solution-to-the-10th-abaw-expression-recognition-challenge-a-robust-multimodal-framework-with-safe-cross-attention-and-modality-dropout)  
+   标签：评分：9.0/10、query:attn
+   evidence：具有安全跨注意力机制的双分支Transformer
+6. [Rethinking Attention Output Projection: Structured Hadamard Transforms for Efficient Transformers](/ATTN__20260407-015123-187267/2603.08343v1-rethinking-attention-output-projection-structured-hadamard-transforms-for-efficient-transformers)  
+   标签：评分：9.0/10、query:attn
+   evidence：使用哈达玛变换重新设计多头注意力输出投影
+7. [Higher-Order Modular Attention: Fusing Pairwise and Triadic Interactions for Protein Sequences](/ATTN__20260407-015123-187267/2603.11133v1-higher-order-modular-attention-fusing-pairwise-and-triadic-interactions-for-protein-sequences)  
+   标签：评分：9.0/10、query:attn
+   evidence：融合成对和三元交互的高阶模块化注意力
+8. [From Embeddings to Dyson Series: Transformer Mechanics as Non-Hermitian Operator Theory](/ATTN__20260407-015123-187267/2603.11322v2-from-embeddings-to-dyson-series-transformer-mechanics-as-non-hermitian-operator-theory)  
+   标签：评分：9.0/10、query:attn
+   evidence：将自注意力重新表述为非厄米相互作用算子
+9. [Attention Sinks Are Provably Necessary in Softmax Transformers: Evidence from Trigger-Conditional Tasks](/ATTN__20260407-015123-187267/2603.11487v1-attention-sinks-are-provably-necessary-in-softmax-transformers-evidence-from-trigger-conditional-tasks)  
+   标签：评分：9.0/10、query:attn
+   evidence：Softmax Transformer中注意力汇聚必要性的理论证据
+10. [Attention Sinks Are Provably Necessary in Softmax Transformers: Evidence from Trigger-Conditional Tasks](/ATTN__20260407-015123-187267/2603.11487v2-attention-sinks-are-provably-necessary-in-softmax-transformers-evidence-from-trigger-conditional-tasks)  
+   标签：评分：9.0/10、query:attn
+   evidence：证明了Softmax Transformer中注意力汇聚点的功能必要性
+11. [Attention Sinks Are Provably Necessary in Softmax Transformers: Evidence from Trigger-Conditional Tasks](/ATTN__20260407-015123-187267/2603.11487v3-attention-sinks-are-provably-necessary-in-softmax-transformers-evidence-from-trigger-conditional-tasks)  
+   标签：评分：9.0/10、query:attn
+   evidence：Softmax自注意力模型中注意力汇聚的功能必要性
+12. [IndexCache: Accelerating Sparse Attention via Cross-Layer Index Reuse](/ATTN__20260407-015123-187267/2603.12201v1-indexcache-accelerating-sparse-attention-via-cross-layer-index-reuse)  
+   标签：评分：9.0/10、query:attn
+   evidence：通过大模型中的跨层索引重用加速稀疏注意力
+13. [Beyond Linearity in Attention Projections: The Case for Nonlinear Queries](/ATTN__20260407-015123-187267/2603.13381v1-beyond-linearity-in-attention-projections-the-case-for-nonlinear-queries)  
+   标签：评分：9.0/10、query:attn
+   evidence：Transformer 注意力架构中的非线性查询投影
+14. [Bidirectional Cross-Attention Fusion of High-Res RGB and Low-Res HSI for Multimodal Automated Waste Sorting](/ATTN__20260407-015123-187267/2603.13941v1-bidirectional-cross-attention-fusion-of-high-res-rgb-and-low-res-hsi-for-multimodal-automated-waste-sorting)  
+   标签：评分：9.0/10、query:attn
+   evidence：多模态数据的双向交叉注意力融合
+15. [Self-Indexing KVCache: Predicting Sparse Attention from Compressed Keys](/ATTN__20260407-015123-187267/2603.14224v1-self-indexing-kvcache-predicting-sparse-attention-from-compressed-keys)  
+   标签：评分：9.0/10、query:attn
+   evidence：从压缩的KV缓存键中预测稀疏注意力
+16. [On the Nature of Attention Sink that Shapes Decoding Strategy in MLLMs](/ATTN__20260407-015123-187267/2603.14337v1-on-the-nature-of-attention-sink-that-shapes-decoding-strategy-in-mllms)  
+   标签：评分：9.0/10、query:attn
+   evidence：解释 Transformer 解码过程中注意力汇聚点的作用
+17. [ASAP: Attention-Shift-Aware Pruning for Efficient LVLM Inference](/ATTN__20260407-015123-187267/2603.14549v1-asap-attention-shift-aware-pruning-for-efficient-lvlm-inference)  
+   标签：评分：9.0/10、query:llm
+   evidence：针对高效LVLM推理的注意力偏移感知剪枝
+18. [ASAP: Attention-Shift-Aware Pruning for Efficient LVLM Inference](/ATTN__20260407-015123-187267/2603.14549v2-asap-attention-shift-aware-pruning-for-efficient-lvlm-inference)  
+   标签：评分：9.0/10、query:llm
+   evidence：感知注意力偏移的剪枝用于高效推理
+19. [Directional Routing in Transformers](/ATTN__20260407-015123-187267/2603.14923v1-directional-routing-in-transformers)  
+   标签：评分：9.0/10、query:attn
+   evidence：Transformer注意力头的定向路由机制
+20. [Attention Residuals](/ATTN__20260407-015123-187267/2603.15031v1-attention-residuals)  
+   标签：评分：9.0/10、query:attn
+   evidence：提出注意力残差（AttnRes），用Softmax注意力取代固定的残差累加
+21. [How Attention Shapes Emotion: A Comparative Study of Attention Mechanisms for Speech Emotion Recognition](/ATTN__20260407-015123-187267/2603.15120v1-how-attention-shapes-emotion-a-comparative-study-of-attention-mechanisms-for-speech-emotion-recognition)  
+   标签：评分：9.0/10、query:attn
+   evidence：对不同优化注意力机制的系统基准测试和比较
+22. [Residual Stream Duality in Modern Transformer Architectures](/ATTN__20260407-015123-187267/2603.16039v1-residual-stream-duality-in-modern-transformer-architectures)  
+   标签：评分：9.0/10、query:attn
+   evidence：比较了沿序列轴的自注意力和沿深度轴的残差流
+23. [Learning When to Attend: Conditional Memory Access for Long-Context LLMs](/ATTN__20260407-015123-187267/2603.17484v1-learning-when-to-attend-conditional-memory-access-for-long-context-llms)  
+   标签：评分：9.0/10、query:attn
+   evidence：通过决定何时调用全局注意力来实现条件式长程记忆访问
+24. [Attention Sinks Induce Gradient Sinks](/ATTN__20260407-015123-187267/2603.17771v1-attention-sinks-induce-gradient-sinks)  
+   标签：评分：9.0/10、query:attn
+   evidence：注意力汇聚如何诱导Transformer中的梯度集中
+25. [Differential Attention-Augmented BiomedCLIP with Asymmetric Focal Optimization for Imbalanced Multi-Label Video Capsule Endoscopy Classification](/ATTN__20260407-015123-187267/2603.17879v1-differential-attention-augmented-biomedclip-with-asymmetric-focal-optimization-for-imbalanced-multi-label-video-capsule-endoscopy-classification)  
+   标签：评分：9.0/10、query:attn
+   evidence：用差分注意力替换标准多头自注意力
+26. [CARE: Covariance-Aware and Rank-Enhanced Decomposition for Enabling Multi-Head Latent Attention](/ATTN__20260407-015123-187267/2603.17946v1-care-covariance-aware-and-rank-enhanced-decomposition-for-enabling-multi-head-latent-attention)  
+   标签：评分：9.0/10、query:attn
+   evidence：通过秩增强分解实现多头潜变量注意力 (MLA)
+27. [HAViT: Historical Attention Vision Transformer](/ATTN__20260407-015123-187267/2603.18585v1-havit-historical-attention-vision-transformer)  
+   标签：评分：9.0/10、query:attn
+   evidence：视觉Transformer的跨层注意力传播方法
+28. [MANAR: Memory-augmented Attention with Navigational Abstract Conceptual Representation](/ATTN__20260407-015123-187267/2603.18676v1-manar-memory-augmented-attention-with-navigational-abstract-conceptual-representation)  
+   标签：评分：9.0/10、query:attn
+   evidence：通过记忆增强架构泛化了标准多头注意力机制
+29. [NeuroGame Transformer: Gibbs-Inspired Attention Driven by Game Theory and Statistical Physics](/ATTN__20260407-015123-187267/2603.18761v1-neurogame-transformer-gibbs-inspired-attention-driven-by-game-theory-and-statistical-physics)  
+   标签：评分：9.0/10、query:attn
+   evidence：通过博弈论和统计物理学重新构建注意力机制
+30. [MKA: Memory-Keyed Attention for Efficient Long-Context Reasoning](/ATTN__20260407-015123-187267/2603.20586v1-mka-memory-keyed-attention-for-efficient-long-context-reasoning)  
+   标签：评分：9.0/10、query:attn
+   evidence：集成多级KV缓存的分层注意力机制
+31. [MKA: Memory-Keyed Attention for Efficient Long-Context Reasoning](/ATTN__20260407-015123-187267/2603.20586v2-mka-memory-keyed-attention-for-efficient-long-context-reasoning)  
+   标签：评分：9.0/10、query:attn
+   evidence：提出记忆键控注意力（MKA）分层注意力机制
+32. [Attention in Space: Functional Roles of VLM Heads for Spatial Reasoning](/ATTN__20260407-015123-187267/2603.20662v1-attention-in-space-functional-roles-of-vlm-heads-for-spatial-reasoning)  
+   标签：评分：9.0/10、query:attn
+   evidence：通过机械可解释性分析注意力头的核心功能
+33. [HiCI: Hierarchical Construction-Integration for Long-Context Attention](/ATTN__20260407-015123-187267/2603.20843v1-hici-hierarchical-construction-integration-for-long-context-attention)  
+   标签：评分：9.0/10、query:attn
+   evidence：用于长文本建模的分层注意力模块
+34. [When Does Content-Based Routing Work? Representation Requirements for Selective Attention in Hybrid Sequence Models](/ATTN__20260407-015123-187267/2603.20997v1-when-does-content-based-routing-work-representation-requirements-for-selective-attention-in-hybrid-sequence-models)  
+   标签：评分：9.0/10、query:attn
+   evidence：分析Softmax注意力如何为基于内容的路由创建潜在子空间
+35. [Mixture of Chapters: Scaling Learnt Memory in Transformers](/ATTN__20260407-015123-187267/2603.21096v1-mixture-of-chapters-scaling-learnt-memory-in-transformers)  
+   标签：评分：9.0/10、query:attn
+   evidence：Transformer层通过交叉注意力查询稀疏记忆库
+36. [Scaling Attention via Feature Sparsity](/ATTN__20260407-015123-187267/2603.22300v1-scaling-attention-via-feature-sparsity)  
+   标签：评分：9.0/10、query:flattn
+   evidence：FlashSFA扩展了FlashAttention以在稀疏重叠上运行
+37. [From Weights to Concepts: Data-Free Interpretability of CLIP via Singular Vector Decomposition](/ATTN__20260407-015123-187267/2603.24653v1-from-weights-to-concepts-data-free-interpretability-of-clip-via-singular-vector-decomposition)  
+   标签：评分：9.0/10、query:attn
+   evidence：通过权重空间分析实现Transformer头的无数据可解释性
+38. [Finding Distributed Object-Centric Properties in Self-Supervised Transformers](/ATTN__20260407-015123-187267/2603.26127v1-finding-distributed-object-centric-properties-in-self-supervised-transformers)  
+   标签：评分：9.0/10、query:attn
+   evidence：分析补丁级注意力组件（Q, K, V）以进行目标定位
+39. [Switch Attention: Towards Dynamic and Fine-grained Hybrid Transformers](/ATTN__20260407-015123-187267/2603.26380v1-switch-attention-towards-dynamic-and-fine-grained-hybrid-transformers)  
+   标签：评分：9.0/10、query:attn
+   evidence：全注意力与滑动窗口注意力之间的动态路由
+40. [Preconditioned Attention: Enhancing Efficiency in Transformers](/ATTN__20260407-015123-187267/2603.27153v1-preconditioned-attention-enhancing-efficiency-in-transformers)  
+   标签：评分：9.0/10、query:attn
+   evidence：通过预处理注意力架构改善矩阵条件数并优化训练
+41. [Attention Frequency Modulation: Training-Free Spectral Modulation of Diffusion Cross-Attention](/ATTN__20260407-015123-187267/2603.28114v1-attention-frequency-modulation-training-free-spectral-modulation-of-diffusion-cross-attention)  
+   标签：评分：9.0/10、query:attn
+   evidence：扩散模型交叉注意力权重的频谱调制与可视化
+42. [HISA: Efficient Hierarchical Indexing for Fine-Grained Sparse Attention](/ATTN__20260407-015123-187267/2603.28458v1-hisa-efficient-hierarchical-indexing-for-fine-grained-sparse-attention)  
+   标签：评分：9.0/10、query:attn
+   evidence：用于细粒度稀疏注意力的分层索引，解决平方级复杂度瓶颈
+43. [HISA: Efficient Hierarchical Indexing for Fine-Grained Sparse Attention](/ATTN__20260407-015123-187267/2603.28458v2-hisa-efficient-hierarchical-indexing-for-fine-grained-sparse-attention)  
+   标签：评分：9.0/10、query:attn
+   evidence：提出用于细粒度稀疏注意力的分层索引架构
+44. [Hierarchical Pre-Training of Vision Encoders with Large Language Models](/ATTN__20260407-015123-187267/2604.00086v1-hierarchical-pre-training-of-vision-encoders-with-large-language-models)  
+   标签：评分：9.0/10、query:attn
+   evidence：视觉编码器与大语言模型之间的分层交叉注意力
+45. [QUEST: A robust attention formulation using query-modulated spherical attention](/ATTN__20260407-015123-187267/2604.00199v1-quest-a-robust-attention-formulation-using-query-modulated-spherical-attention)  
+   标签：评分：9.0/10、query:attn
+   evidence：使用查询调制球面注意力的全新注意力公式
+46. [Stochastic Attention: Connectome-Inspired Randomized Routing for Expressive Linear-Time Attention](/ATTN__20260407-015123-187267/2604.00754v1-stochastic-attention-connectome-inspired-randomized-routing-for-expressive-linear-time-attention)  
+   标签：评分：9.0/10、query:attn
+   evidence：受连接组学启发的线性时间注意力随机路由
+47. [IWP: Token Pruning as Implicit Weight Pruning in Large Vision Language Models](/ATTN__20260407-015123-187267/2604.00757v1-iwp-token-pruning-as-implicit-weight-pruning-in-large-vision-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：视觉语言模型中作为隐式权重剪枝的Token剪枝
+48. [Screening Is Enough](/ATTN__20260407-015123-187267/2604.01178v1-screening-is-enough)  
+   标签：评分：9.0/10、query:attn
+   evidence：引入Multiscreen架构作为标准softmax注意力的替代方案
+49. [Regularizing Attention Scores with Bootstrapping](/ATTN__20260407-015123-187267/2604.01339v1-regularizing-attention-scores-with-bootstrapping)  
+   标签：评分：9.0/10、query:attn
+   evidence：使用自助法正则化并解释注意力分数
+50. [Coupled Query-Key Dynamics for Attention](/ATTN__20260407-015123-187267/2604.01683v1-coupled-query-key-dynamics-for-attention)  
+   标签：评分：9.0/10、query:attn
+   evidence：注意力架构中的耦合查询-键动力学
+51. [A Multi-head-based architecture for effective morphological tagging in Russian with open dictionary](/ATTN__20260407-015123-187267/2604.02926v1-a-multi-head-based-architecture-for-effective-morphological-tagging-in-russian-with-open-dictionary)  
+   标签：评分：9.0/10、query:attn
+   evidence：基于多头注意力的形态标记架构
+52. [Gradient Boosting within a Single Attention Layer](/ATTN__20260407-015123-187267/2604.03190v1-gradient-boosting-within-a-single-attention-layer)  
+   标签：评分：9.0/10、query:attn
+   evidence：单个注意力层架构内的梯度提升
 
 ### 速读区论文标签
-1. [Communication-Aware Multi-Agent Reinforcement Learning for Decentralized Cooperative UAV Deployment](/20260309-20260407/2603.16141v1-communication-aware-multi-agent-reinforcement-learning-for-decentralized-cooperative-uav-deployment)  
-   标签：评分：10.0/10、query:marl
-   evidence：在中心化训练分布式执行（CTDE）下训练的多智能体强化学习框架
-2. [Bayesian Learning in Episodic Zero-Sum Games](/20260309-20260407/2603.20604v1-bayesian-learning-in-episodic-zero-sum-games)  
-   标签：评分：10.0/10、query:marl
-   evidence：回合制零和马尔可夫博弈中的贝叶斯学习
-3. [Counterfactual Credit Policy Optimization for Multi-Agent Collaboration](/20260309-20260407/2603.21563v1-counterfactual-credit-policy-optimization-for-multi-agent-collaboration)  
-   标签：评分：10.0/10、query:marl
-   evidence：多智能体大语言模型的反事实信用分配
-4. [Agent Q-Mix: Selecting the Right Action for LLM Multi-Agent Systems through Reinforcement Learning](/20260309-20260407/2604.00344v1-agent-q-mix-selecting-the-right-action-for-llm-multi-agent-systems-through-reinforcement-learning)  
-   标签：评分：10.0/10、query:marl
-   evidence：使用QMIX价值分解进行去中心化通信决策
-5. [GRASP: Gradient Realignment via Active Shared Perception for Multi-Agent Collaborative Optimization](/20260309-20260407/2604.00717v1-grasp-gradient-realignment-via-active-shared-perception-for-multi-agent-collaborative-optimization)  
-   标签：评分：10.0/10、query:marl
-   evidence：通过主动共享感知解决CTDE中的非平稳性问题
-6. [LangMARL: Natural Language Multi-Agent Reinforcement Learning](/20260309-20260407/2604.00722v1-langmarl-natural-language-multi-agent-reinforcement-learning)  
-   标签：评分：10.0/10、query:marl
-   evidence：智能体级语言信用分配与策略梯度演化
-7. [A Recipe for Stable Offline Multi-agent Reinforcement Learning](/20260309-20260407/2603.08399v1-a-recipe-for-stable-offline-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：分析了离线多智能体强化学习中的非线性价值分解和VDN
-8. [Strategically Robust Multi-Agent Reinforcement Learning with Linear Function Approximation](/20260309-20260407/2603.09208v1-strategically-robust-multi-agent-reinforcement-learning-with-linear-function-approximation)  
-   标签：评分：9.0/10、query:marl
-   evidence：一般博弈马尔可夫博弈中的均衡计算与纳什均衡
-9. [STAIRS-Former: Spatio-Temporal Attention with Interleaved Recursive Structure Transformer for Offline Multi-task Multi-agent Reinforcement Learning](/20260309-20260407/2603.11691v1-stairs-former-spatio-temporal-attention-with-interleaved-recursive-structure-transformer-for-offline-multi-task-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：用于离线多任务多智能体强化学习的Transformer架构
-10. [A Semi-Decentralized Approach to Multiagent Control](/20260309-20260407/2603.11802v1-a-semi-decentralized-approach-to-multiagent-control)  
-   标签：评分：9.0/10、query:marl
-   evidence：合作智能体半去中心化控制框架
-11. [Interference-Aware K-Step Reachable Communication in Multi-Agent Reinforcement Learning](/20260309-20260407/2603.15054v1-interference-aware-k-step-reachable-communication-in-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：用于通信与合作的MARL框架
-12. [MA-VLCM: A Vision Language Critic Model for Value Estimation of Policies in Multi-Agent Team Settings](/20260309-20260407/2603.15418v1-ma-vlcm-a-vision-language-critic-model-for-value-estimation-of-policies-in-multi-agent-team-settings)  
-   标签：评分：9.0/10、query:marl
-   evidence：多智能体团队设置中用于价值估计的中心化评论员模型
-13. [SQL-ASTRA: Alleviating Sparse Feedback in Agentic SQL via Column-Set Matching and Trajectory Aggregation](/20260309-20260407/2603.16161v1-sql-astra-alleviating-sparse-feedback-in-agentic-sql-via-column-set-matching-and-trajectory-aggregation)  
-   标签：评分：9.0/10、query:marl
-   evidence：通过轨迹奖励解决多轮信用分配问题
-14. [Markov Potential Game and Multi-Agent Reinforcement Learning for Autonomous Driving](/20260309-20260407/2603.19188v1-markov-potential-game-and-multi-agent-reinforcement-learning-for-autonomous-driving)  
-   标签：评分：9.0/10、query:marl
-   evidence：多智能体强化学习中的马尔可夫势博弈与纳什均衡
-15. [Adaptive Robust Estimator for Multi-Agent Reinforcement Learning](/20260309-20260407/2603.21574v1-adaptive-robust-estimator-for-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：大语言模型多智能体协作中的信用分配问题
-16. [Large Language Model Guided Incentive Aware Reward Design for Cooperative Multi-Agent Reinforcement Learning](/20260309-20260407/2603.24324v1-large-language-model-guided-incentive-aware-reward-design-for-cooperative-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：大模型引导的合作式多智能体强化学习奖励设计
-17. [Large Language Model Guided Incentive Aware Reward Design for Cooperative Multi-Agent Reinforcement Learning](/20260309-20260407/2603.24324v2-large-language-model-guided-incentive-aware-reward-design-for-cooperative-multi-agent-reinforcement-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：合作式多智能体强化学习的自动奖励设计框架
-18. [CoordLight: Learning Decentralized Coordination for Network-Wide Traffic Signal Control](/20260309-20260407/2603.24366v1-coordlight-learning-decentralized-coordination-for-network-wide-traffic-signal-control)  
-   标签：评分：9.0/10、query:marl
-   evidence：基于MARL的去中心化协调框架
-19. [COIN: Collaborative Interaction-Aware Multi-Agent Reinforcement Learning for Self-Driving Systems](/20260309-20260407/2603.24931v1-coin-collaborative-interaction-aware-multi-agent-reinforcement-learning-for-self-driving-systems)  
-   标签：评分：9.0/10、query:marl
-   evidence：反事实个体-全局双延迟深度确定性策略梯度
-20. [Decentralized MARL for Coarse Correlated Equilibrium in Aggregative Markov Games](/20260309-20260407/2603.27575v1-decentralized-marl-for-coarse-correlated-equilibrium-in-aggregative-markov-games)  
-   标签：评分：9.0/10、query:marl
-   evidence：马尔可夫博弈中粗相关均衡的去中心化学习
-21. [Learning Partial Action Replacement in Offline MARL](/20260309-20260407/2603.28573v1-learning-partial-action-replacement-in-offline-marl)  
-   标签：评分：9.0/10、query:marl
-   evidence：解决联合动作空间和离分布挑战的离线多智能体强化学习框架
-22. [Internal State-Based Policy Gradient Methods for Partially Observable Markov Potential Games](/20260309-20260407/2604.00433v1-internal-state-based-policy-gradient-methods-for-partially-observable-markov-potential-games)  
-   标签：评分：9.0/10、query:marl
-   evidence：基于内部状态的多智能体自然策略梯度方法
-23. [Fully Byzantine-Resilient Distributed Multi-Agent Q-Learning](/20260309-20260407/2604.02791v1-fully-byzantine-resilient-distributed-multi-agent-q-learning)  
-   标签：评分：9.0/10、query:marl
-   evidence：拜占庭容错分布式多智能体Q学习算法
-24. [Code-Space Response Oracles: Generating Interpretable Multi-Agent Policies with Large Language Models](/20260309-20260407/2603.10098v1-code-space-response-oracles-generating-interpretable-multi-agent-policies-with-large-language-models)  
-   标签：评分：8.0/10、query:marl
-   evidence：策略空间响应先知（PSRO）与博弈论均衡
-25. [Multi-Agent Reinforcement Learning for UAV-Based Chemical Plume Source Localization](/20260309-20260407/2603.11582v1-multi-agent-reinforcement-learning-for-uav-based-chemical-plume-source-localization)  
-   标签：评分：8.0/10、query:marl
-   evidence：用于无人机群协作感知与导航的多智能体强化学习算法
-26. [The price of decentralization in managing engineering systems through multi-agent reinforcement learning](/20260309-20260407/2603.11884v1-the-price-of-decentralization-in-managing-engineering-systems-through-multi-agent-reinforcement-learning)  
-   标签：评分：8.0/10、query:marl
-   evidence：用于分布式决策的多智能体深度强化学习（MADRL）
-27. [A Robust and Efficient Multi-Agent Reinforcement Learning Framework for Traffic Signal Control](/20260309-20260407/2603.12096v1-a-robust-and-efficient-multi-agent-reinforcement-learning-framework-for-traffic-signal-control)  
-   标签：评分：8.0/10、query:marl
-   evidence：用于交通信号控制的MARL框架及随机化策略
-28. [EcoFair-CH-MARL: Scalable Constrained Hierarchical Multi-Agent RL with Real-Time Emission Budgets and Fairness Guarantees](/20260309-20260407/2603.14625v1-ecofair-ch-marl-scalable-constrained-hierarchical-multi-agent-rl-with-real-time-emission-budgets-and-fairness-guarantees)  
-   标签：评分：8.0/10、query:marl
-   evidence：受约束的分层多智能体强化学习框架
-29. [Multi-Agent Reinforcement Learning Counteracts Delayed CSI in Multi-Satellite Systems](/20260309-20260407/2603.16470v1-multi-agent-reinforcement-learning-counteracts-delayed-csi-in-multi-satellite-systems)  
-   标签：评分：8.0/10、query:marl
-   evidence：多卫星系统中用于在延迟信道状态信息下最大化总速率的多智能体强化学习算法
-30. [MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery](/20260309-20260407/2603.20295v1-marlin-multi-agent-reinforcement-learning-for-incremental-dag-discovery)  
-   标签：评分：8.0/10、query:marl
-   evidence：用于增量因果结构发现的多智能体强化学习架构
-31. [Bounded Coupled AI Learning Dynamics in Tri-Hierarchical Drone Swarms](/20260309-20260407/2603.20333v1-bounded-coupled-ai-learning-dynamics-in-tri-hierarchical-drone-swarms)  
-   标签：评分：8.0/10、query:marl
-   evidence：用于无人机群战术协调的多智能体强化学习
-32. [Decentralized End-to-End Multi-AAV Pursuit Using Predictive Spatio-Temporal Observation via Deep Reinforcement Learning](/20260309-20260407/2603.24238v1-decentralized-end-to-end-multi-aav-pursuit-using-predictive-spatio-temporal-observation-via-deep-reinforcement-learning)  
-   标签：评分：8.0/10、query:marl
-   evidence：基于时空观测的去中心化多智能体追逐强化学习框架
-33. [Corruption-robust Offline Multi-agent Reinforcement Learning From Human Feedback](/20260309-20260407/2603.28281v1-corruption-robust-offline-multi-agent-reinforcement-learning-from-human-feedback)  
-   标签：评分：8.0/10、query:marl
-   evidence：多智能体人类反馈强化学习中纳什均衡的鲁棒估计器
-34. [Multi-AUV Cooperative Target Tracking Based on Supervised Diffusion-Aided Multi-Agent Reinforcement Learning](/20260309-20260407/2603.29426v1-multi-auv-cooperative-target-tracking-based-on-supervised-diffusion-aided-multi-agent-reinforcement-learning)  
-   标签：评分：8.0/10、query:marl
-   evidence：MARL驱动的协作追踪中的非平稳性和稀疏奖励
+1. [X-AVDT: Audio-Visual Cross-Attention for Robust Deepfake Detection](/ATTN__20260407-015123-187267/2603.08483v1-x-avdt-audio-visual-cross-attention-for-robust-deepfake-detection)  
+   标签：评分：8.0/10、query:attn
+   evidence：用于深度伪造检测的音视频交叉注意力
+2. [GIAT: A Geologically-Informed Attention Transformer for Lithology Identification](/ATTN__20260407-015123-187267/2603.09165v1-giat-a-geologically-informed-attention-transformer-for-lithology-identification)  
+   标签：评分：8.0/10、query:attn
+   evidence：Transformer中基于地质信息的注意力偏置机制
+3. [DCAU-Net: Differential Cross Attention and Channel-Spatial Feature Fusion for Medical Image Segmentation](/ATTN__20260407-015123-187267/2603.09530v1-dcau-net-differential-cross-attention-and-channel-spatial-feature-fusion-for-medical-image-segmentation)  
+   标签：评分：8.0/10、query:attn
+   evidence：差分交叉注意力变体以降低二次复杂度
+4. [A saccade-inspired approach to image classification using visiontransformer attention maps](/ATTN__20260407-015123-187267/2603.09613v1-a-saccade-inspired-approach-to-image-classification-using-visiontransformer-attention-maps)  
+   标签：评分：8.0/10、query:attn
+   evidence：利用Vision Transformer注意力图将处理重点放在关键区域
+5. [GST-VLA: Structured Gaussian Spatial Tokens for 3D Depth-Aware Vision-Language-Action Models](/ATTN__20260407-015123-187267/2603.09079v1-gst-vla-structured-gaussian-spatial-tokens-for-3d-depth-aware-vision-language-action-models)  
+   标签：评分：7.0/10、query:attn
+   evidence：视觉-语言-动作模型中的空间注意力池化
+6. [S-HPLB: Efficient LLM Attention Serving via Sparsity-Aware Head Parallelism Load Balance](/ATTN__20260407-015123-187267/2603.10353v1-s-hplb-efficient-llm-attention-serving-via-sparsity-aware-head-parallelism-load-balance)  
+   标签：评分：7.0/10、query:flattn
+   evidence：针对高效注意力推理的稀疏感知多头并行负载均衡
+7. [Taking Shortcuts for Categorical VQA Using Super Neurons](/ATTN__20260407-015123-187267/2603.10781v1-taking-shortcuts-for-categorical-vqa-using-super-neurons)  
+   标签：评分：7.0/10、query:attn
+   evidence：讨论稀疏注意力向量（SAVs）作为微调的替代方案
+8. [RAZOR: Ratio-Aware Layer Editing for Targeted Unlearning in Vision Transformers and Diffusion Models](/ATTN__20260407-015123-187267/2603.14819v1-razor-ratio-aware-layer-editing-for-targeted-unlearning-in-vision-transformers-and-diffusion-models)  
+   标签：评分：7.0/10、query:llm
+   evidence：通过 Transformer 中的多层和多头编辑进行定向遗忘
+9. [CMMR-VLN: Vision-and-Language Navigation via Continual Multimodal Memory Retrieval](/ATTN__20260407-015123-187267/2603.07997v1-cmmr-vln-vision-and-language-navigation-via-continual-multimodal-memory-retrieval)  
+   标签：评分：6.0/10、query:attn
+   evidence：视觉语言导航中的多模态记忆检索
+10. [Inference-Time Structural Reasoning for Compositional Vision-Language Understanding](/ATTN__20260407-015123-187267/2603.27349v1-inference-time-structural-reasoning-for-compositional-vision-language-understanding)  
+   标签：评分：6.0/10、query:attn
+   evidence：视觉语言模型在组合推理上的评估
+11. [Improving Generalization of Deep Learning for Brain Metastases Segmentation Across Institutions](/ATTN__20260407-015123-187267/2604.00397v1-improving-generalization-of-deep-learning-for-brain-metastases-segmentation-across-institutions)  
+   标签：评分：6.0/10、query:attn
+   evidence：在医学图像分割中引入自注意力机制
 
 
 <div class="dpr-home-promo-card">

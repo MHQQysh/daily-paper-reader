@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-001.webp",
+      "caption": "Figure 8. Vit-B 16 on Cifar10. Results denoting mean over 5 runs. The attention layer of Vit-B 16 has dimensions dmodel = 768, nH = 12, dH = 64.",
+      "page": 21,
+      "index": 1,
+      "width": 1003,
+      "height": 393
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-002.webp",
+      "caption": "Figure 9. GPT2 validation cross-entropy loss on OpenWebtext without RoPE. Approximate attention methods are MLA with dQc = dKc = 128, GQA with nKV = 2, Tucker Attention with r = [8, 64, 128]. Parameter counts are (in millions) MHA: 28.31, GQA: 16.51, MLA: 13.00, Tucker: 5.32. Tucker Attention converges well, despite having only a fraction of the trainable parameters of the other methods.",
+      "page": 21,
+      "index": 2,
+      "width": 487,
+      "height": 354
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-003.webp",
+      "caption": "Figure 1. Illustration of the pre-softmax attention tensor W under existing factorizations; colored edges denote contraction dimensions. MHA: W is formed by contracting dmodel × dH query and key matrices along dH (orange) for each of the nH heads, yielding tensor rank (nH, dmodel, dmodel). GQA: Queries follow the same parametrization as MHA, but only nKV key matrices are used. During contraction along dH (orange), each key matrix is broadcasted to all queries in its head group, yielding rank (nH, dmodel, nKVdH). MLA: Key and query matrices are replaced by down- and up-projections, with up-projections reshaped to nH × dc × dH. Contractions occur along dQc , d K c (red/blue), and along dH per head, giving rank (nH, d Q c , d K c ). At inference, contractions along dQc and dH are precomputed. The post-softmax tensor W̃ is parametrized analogously for MHA and GQA; for MLA, only the value matrix has low-rank factorization while the output matrix remains full-rank.",
+      "page": 3,
+      "index": 3,
+      "width": 500,
+      "height": 910
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-004.webp",
+      "caption": "Figure 5. Normalized singular spectrum of the transformer layers in GPT2 after training. The singular spectrum was computed via a matricization of the tensor along a single mode; specific information about which mode is given in each subplot. The ribbon plots are calculated as a sample distribution over all twelve transformer layers in GPT2.",
+      "page": 18,
+      "index": 4,
+      "width": 997,
+      "height": 1098
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-005.webp",
+      "caption": "Table 3. Validation performance and per-iteration training timing breakdown for LLaMA3-1B variants on OpenWebText2 with N = 4096. Note LLaMa3 1B default setup is nKV = 8. Training: Timing is reported per training iteration on 2 cluster nodes with 2 H100 GPUs each. Decode: We use query sequence length 1, with cached KV sequence length N = 4096. Timing is reported on 1 H100 GPU. Peak decode GPU memory load is measured in GB with batch size 1. All timings denote the mean over 10 iterations in [ms]. We remark that this implementation is non-optimized research code. Tucker Attention achieves competitive validation loss and perplexity scores at significant parameter and latency reductions in training and decoding mode.",
+      "page": 8,
+      "index": 5,
+      "width": 991,
+      "height": 200
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-006.webp",
+      "caption": "Table 2. Zero-shot results for GPT-2 [dmodel = 768, nH = 12, dH = 64] variants with N = 1024 trained on OpenWebText with identical training hyperparameters, without fine-tuning. For each RoPE setting, we mark the and lowest KV cache and parameter storage (measured in MB and assuming BF16 encoding) of GQA, MLA, and Tucker Attention in bold. Tucker Attention achieves competitive validation accuracy and perplexity scores with a fewer trainable parameters and KV cache than the baseline methods.",
+      "page": 8,
+      "index": 6,
+      "width": 1013,
+      "height": 255
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-007.webp",
+      "caption": "Table 4. Summary of notation.",
+      "page": 12,
+      "index": 7,
+      "width": 654,
+      "height": 1113
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-008.webp",
+      "caption": "Figure 6. Vit-L 32 on Imagenet1k. Results denoting mean over 5 runs. The attention layer of ViT-L.32 has dimensions dmodel = 1024, nH = 16, dH = 64.",
+      "page": 20,
+      "index": 8,
+      "width": 1003,
+      "height": 393
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-009.webp",
+      "caption": "Figure 7. Vit-B 16 on Cifar100. Results denoting mean over 5 runs. The attention layer of Vit-B 16 has dimensions dmodel = 768, nH = 12, dH = 64.",
+      "page": 20,
+      "index": 9,
+      "width": 1003,
+      "height": 393
+    },
+    {
+      "url": "assets/figures/arxiv/2603.30033v1/fig-010.webp",
+      "caption": "Table 5. Model and training hyperparameters",
+      "page": 16,
+      "index": 10,
+      "width": 1056,
+      "height": 608
+    }
+  ]
+}

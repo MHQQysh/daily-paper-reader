@@ -1,0 +1,345 @@
+Title: Higher-Order Modular Attention: Fusing Pairwise and Triadic Interactions for Protein Sequences
+
+URL Source: https://arxiv.org/pdf/2603.11133v1
+
+Published Time: Fri, 13 Mar 2026 00:03:16 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# Higher-Order Modular Attention: Fusing Pairwise and Triadic Interactions for Protein Sequences 
+
+Shirin Amiraslani 
+
+Department of Mathematics and Statistics York University Toronto, ON M3J 1P3, Canada 
+
+shirinamiraslani@gmail.com 
+
+Xin Gao 
+
+Department of Mathematics and Statistics York University Toronto, ON M3J 1P3, Canada 
+
+xingao@yorku.ca 
+
+# Abstract 
+
+Transformer self-attention computes pairwise token interactions, yet protein se-quence to phenotype relationships often involve cooperative dependencies among three or more residues that dot product attention does not capture explicitly. We introduce Higher-Order Modular Attention, HOMA, a unified attention operator that fuses pairwise attention with an explicit triadic interaction pathway. To make triadic attention practical on long sequences, HOMA employs block-structured, windowed triadic attention. We evaluate on three TAPE benchmarks for Secondary Structure, Fluorescence, and Stability. Our attention mechanism yields consistent improvements across all tasks compared with standard self-attention and efficient variants including block-wise attention and Linformer. These results suggest that explicit triadic terms provide complementary representational capacity for protein sequence prediction at controllable additional computational cost. 
+
+# 1 Introduction 
+
+Understanding how protein sequence determines structure and function remains a fundamental challenge in molecular biology and evolutionary genetics [ 1, 2]. Epistasis, the context dependence of mutational effects, lies at the heart of this challenge: the phenotypic consequence of an amino acid substitution depends on the genetic background in which it occurs [ 1, 2 ]. Classical approaches model protein function with additive effects plus pairwise interaction terms [ 3 , 4], yet mounting evidence shows that this pairwise framework is often insufficient [ 1, 5]. Proteins are globally coupled physical systems, and folding, biochemical function, and evolvability emerge from cooperative energetic networks among residues that can induce genuine higher-order interactions [ 5, 6, 7]. Empirical studies across diverse genotype phenotype maps report substantial higher-order components such as three way and beyond, and demonstrate that removing higher-order terms reshapes fitness landscape topology and evolutionary trajectories [ 1, 5, 8 , 9]. These observations motivate sequence models that can represent triadic dependencies explicitly rather than relying on depth and nonlinearities to reconstruct higher-order structure indirectly from pairwise operations [10, 11]. Transformer architectures have become a standard backbone across many sequence learning domains and learn contextual representations through self-attention [ 12 ]. However, standard self-attention is fundamentally bilinear: each layer forms a weighted sum of values using pairwise query key affinities [ 12 ]. Recent theory formalizes that such pairwise attention can be inefficient for capturing polyadic dependencies, and that tensorized higher-order attention can resolve tasks that single layer pairwise attention cannot efficiently compute [ 10 , 11 ]. Motivated by this, several works have introduced explicit higher-order attention mechanisms [ 13 , 11 , 14 , 15 ]. The 2-simplicial Transformer incorporates 2-simplices triangles relating three entities through a scalar triple product attention [13 ]. Tensor attention formalizes third order attention and shows it can solve polyadic tasks that are not efficiently represented by standard self-attention [ 11 ]. To reduce the cubic cost of naive tensor 
+
+Preprint. 
+
+> arXiv:2603.11133v1 [cs.LG] 11 Mar 2026
+
+attention, Strassen attention proposes a structured approximation that attains subcubic complexity by decomposing a triadic interaction into sums of pairwise products [ 14 ]. Most recently, poly attention provides a unifying framework that contains prior higher-order mechanisms as special cases and characterizes expressivity complexity trade offs via polynomial degree and graphical structure [ 15 ]. In parallel, hypergraph attention captures non pairwise relationships through hyperedges but typically assumes a predefined relational structure rather than learning interaction patterns directly over sequences [16]. On the other hand, long biological sequences make full attention expensive, motivating a large literature on efficient pairwise attention approximations [ 17 , 18 , 19 ]. Linformer achieves linear complexity via low rank projections of keys and values [ 17 ]. The Longformer and Big Bird impose structured sparsity through local windows with global and/or random connections [ 18 , 19 ]. And block-wise attention partitions sequences into segments, applying intra-block self-attention for local context and inter-block mechanisms for long-range dependencies, reducing the quadratic memory burden while preserving expressive representations [ 20 , 21 ]; more recent work further incorporates dynamic hierarchical sparsity through coarse-grained token compression and fine-grained block selection to achieve hardware-aligned speedups across training and inference [ 22 ]. These methods primarily change connectivity or computation but preserve the pairwise interaction structure. This creates a practical gap: higher-order attention is biologically motivated for proteins, yet naive tensor attention is computationally prohibitive, and efficient attention mechanisms have largely remained pairwise [11, 15, 17]. We address this gap with HOMA, a higher-order Modular Attention mechanism for Transform-ers that augments standard pairwise attention with explicit triadic interaction terms. HOMA is plug-compatible with common Transformer backbones, supports training with or without pairwise attention pretraining, and enables controlled comparisons among attention operators under a shared architecture and evaluation protocol. 1 To enable efficient attention computation over long protein sequences, HOMA uses block-structured computation with overlapping blocks. Triadic interactions are computed using local windowing within each block. Block size, overlap, and window size are tunable hyperparameters that control the accuracy efficiency trade off under different task and resource constraints. We evaluate on the TAPE benchmarks [ 23 ], reporting accuracy for Secondary Structure dataset and Spearman’s correlation for the Fluorescence and Stability datasets, together with efficiency metrics including token processing speed and peak memory. Across tasks, this design provides a configurable accuracy efficiency trade off while exposing richer relational structure than pairwise attention alone and yielding consistent performance improvements. 
+
+# 2 Method 
+
+HOMA augments a standard pairwise attention backbone with a triadic interaction pathway that cap-tures local higher-order dependencies. Let X ∈ RL×dmodel denote a length-L sequence of embeddings. We form the standard projections 
+
+Q = XW (Q), K = XW (K), V = XW (V ),
+
+and an additional projection for the triadic pathway, 
+
+U = XW (U ),
+
+where W (Q), W (K), W (V ), W (U ) ∈ Rdmodel ×dmodel are learned parameters. We use H attention heads with dhead = dmodel /H and present the following computations for a single head. Superscripts (2) 
+
+and (3) denote pairwise and triadic quantities computed, respectively. 
+
+Pairwise 2D attention. Let Q, K, V ∈ RL×dhead , where Qi denotes the i-th row and Qic its c-th component. Let i, j ∈ { 1, . . . , L }, the scaled dot-product scores are 
+
+S(2)  
+
+> ij
+
+= QiK⊤
+
+> j
+
+√dhead 
+
+, S(2) ∈ RL×L.        
+
+> 1Source code and experiment scripts are available at https://github.com/samiraslani/ HOMA-Higher-Order-Modular-Attention .
+
+2Figure 1: Transformer Layer with higher-order Modular Attention. HOMA replaces the self-attention sublayer and computes pairwise and triadic multi-head attention in parallel from shared projections 
+
+Q, K, V , and U . Their outputs are concatenated, fused, and mapped through the standard output projection. Normalizing across j yields 
+
+A(2)  
+
+> ij
+
+= exp( S(2)  
+
+> ij
+
+)
+
+PLj′=1 exp( S(2)  
+
+> ij ′
+
+) , A(2) ∈ RL×L,
+
+and the pairwise output is 
+
+O(2)  
+
+> i
+
+=
+
+> L
+
+X
+
+> j=1
+
+A(2)  
+
+> ij
+
+Vj , O(2) ∈ RL×dhead .
+
+Triadic 3D attention. Let U ∈ RL×dhead and k ∈ { 1, . . . , L }, the triadic pathway assigns weights to ordered pairs (j, k ) based on query position i via 
+
+S(3)  
+
+> ijk
+
+= 1
+
+√dhead 
+
+> dhead
+
+X
+
+> c=1
+
+Qic Kjc Ukc , S(3) ∈ RL×L×L.
+
+Normalizing across (j, k ) yields 
+
+A(3)  
+
+> ijk
+
+= exp( S(3) 
+
+> ijk
+
+)
+
+PLj′=1 
+
+PLk′=1 exp( S(3)  
+
+> ij ′k′
+
+) , A(3) ∈ RL×L×L.
+
+For each pair (j, k ) we form a quadratic value interaction 
+
+˜Vjk = Vj ⊙ Vk ∈ Rdhead , ˜V ∈ RL×L×dhead ,
+
+where ⊙ denotes elementwise multiplication. The triadic output is 
+
+O(3)  
+
+> i
+
+=
+
+> L
+
+X
+
+> j=1
+> L
+
+X
+
+> k=1
+
+A(3)  
+
+> ijk
+
+˜Vjk , O(3) ∈ RL×dhead .
+
+Fusion of pairwise and triadic pathways. For each position i, we concatenate the pairwise and triadic outputs and apply a fusion network 
+
+Ocat  
+
+> i
+
+= O(2)  
+
+> i
+
+∥ O(3) 
+
+> i
+
+ ∈ R2dhead , Ofuse  
+
+> i
+
+= g Ocat 
+
+> i
+
+ ∈ Rdhead ,
+
+3where g(·) is a two-layer MLP with ReLU activation function. Before softmax normalization, we apply masks to the 2D and 3D attention weights. After concatenating the H head outputs, we apply the standard output projection W (O) ∈ Rdmodel ×dmodel . In our implementation, we first train the pairwise 2D model, warm-start HOMA by transferring the trained pairwise attention weights, and then continue training to fit the triadic attention parameters. 
+
+Efficient Implementation 
+
+The triadic pathway is the primary computational challenge. Naïve evaluation of S(3)  
+
+> ijk
+
+over all triplets scales as O(L3dhead ) compute and requires O(L3) storage for the unnormalized score tensor, which is infeasible for typical protein lengths. We therefore combine three optimizations: overlapping block decomposition to localize computation, windowed triadic attention to reduce cubic scaling within each block, and a low-rank U projection to control parameter growth. 
+
+Overlapping block decomposition. We partition the sequence into overlapping blocks of length ℓ
+
+with stride s. The number of blocks is 
+
+T =
+
+ L − ℓs
+
+
+
++ 1 .
+
+Both pairwise and triadic attention are computed independently within each block. Block outputs are merged back to the full sequence by overlap-averaging, summing contributions at each position and dividing by the number of blocks covering that position. 
+
+Windowed triadic attention within blocks. Within each block, we apply windowed triadic atten-tion with window size w ≪ ℓ, restricting (j, k ) to a local neighborhood around each query position. This reduces the per-block triadic compute from O(ℓ3dhead ) to O(ℓw 2dhead ) while preserving local higher-order interactions. 
+
+Low-rank U projection. To limit parameter growth in the triadic pathway, we parameterize W (U )
+
+with a rank-r factorization 
+
+W (U ) = W (Uu)W (Uv ), W (Uu) ∈ Rdmodel ×r , W (Uv ) ∈ Rr×dmodel , r ≪ dmodel .
+
+This retains the expressivity of an additional projection while substantially reducing parameters compared to a full dmodel × dmodel map. The rank effect will be analyzed further in Section 5. With T overlapping blocks of length ℓ, pairwise attention costs O(T ℓ 2dhead ). The windowed triadic pathway costs O(T ℓ w 2dhead ).
+
+# 3 Experimental Setup and Datasets 
+
+We use a unified Transformer pipeline in which the attention module is the only varying component, enabling controlled comparisons between HOMA and attention baselines. We consider global multi-head self-attention (Pairwise-2D), overlapping block-wise attention (Blockwise-2D), and Linformer-style low-rank attention (Linear-2D), and evaluate HOMA with triadic window sizes w ∈ { 3, 5, 7}.Model scale is matched as closely as possible across variants; any remaining differences are attention-specific (Table 3). Experiments run on a single NVIDIA A100-SXM4-80GB GPU. To separate model compute from data-pipeline overhead, we report compute-only throughput (token-positions/second) using CUDA synchronization around each optimization step, and provide end-to-end throughput in the supplementary material. We also report peak GPU memory allocation and use fixed seeds with early stopping based on validation performance. 
+
+Datasets, Tasks, and Metrics 
+
+We evaluate on three supervised datasets from the TAPE benchmark, spanning residue-level clas-sification, sequence-level regression under combinatorial mutation, and local sensitivity to single mutations [23]. The three tasks are illustrated in Figure 2. 4Figure 2: Illustration of the three TAPE benchmark tasks. (a) Secondary Structure prediction. Aper residue classification task in which each amino acid is assigned one of three structural labels: helix (H), strand (S), or coil (C). The panel shows an example protein segment with predicted per residue labels indicated below the sequence. (b) Fluorescence prediction. A sequence-level regression task over green fluorescent protein variants. Concentric regions represent increasing Hamming distance, 
+
+Hd, from the parent sequence, where the inner disk contains variants with Hd ≤ 3 and the outer ring contains variants with Hd ≥ 4. Color encodes measured Fluorescence intensity, ranging from dark to bright. (c) Stability prediction. A sequence-level regression task over designed protein variants, where the target is a continuous thermodynamic Stability score. High performing sequences from the training rounds serve as reference points, and test sequences are constructed as single point mutants at Hamming distance one from these top designs. Color encodes the measured Stability score, with darker shades indicating lower Stability. 
+
+Secondary Structure. Secondary Structure prediction is a residue-level token classification task. Given an input sequence x = (x1, x 2, . . . , x L), the model predicts a structural label 
+
+yi ∈ { helix , strand , coil } for each residue xi. Training and validation data are sourced from Klausen et al. [ 24 ], and we evaluate on three held out test sets: CB513 [ 25 ], CASP12 [ 26 ], and TS115 [ 27 ]. We report Q3 accuracy, defined as per residue three class accuracy, and macro F1 over non-padded residues. Models are trained with token level cross entropy loss, masking padded positions with an ignore index of −100 . The dataset contains 8,678 training sequences and 2,170 
+
+validation sequences. 
+
+Fluorescence. Fluorescence is a sequence-level regression task over mutated variants of green fluorescent protein [ 28 ]. The model predicts y ∈ R corresponding to the log Fluorescence intensity of each variant. The dataset is partitioned by Hamming distance from the parent sequence: training sequences lie within Hamming distance three, while test sequences carry at least four mutations [ 23 ]. This split is designed to assess generalization beyond the immediate mutational neighborhood of the parent, requiring the model to extrapolate Fluorescence predictions to more heavily mutated and unseen regions of sequence space. The dataset contains 21 ,446 training sequences, 5,362 validation sequences, and 27 ,217 test sequences. 
+
+Stability. Stability is a sequence level regression task over designed protein variants [ 29 ]. The model predicts y ∈ R as a proxy for thermodynamic Stability derived from high throughput protease resistance measurements. The training split aggregates sequences from multiple rounds of experimen-tal design, while the test split consists of sequences at Hamming distance one from the top performing designs. This partition probes whether the model can accurately predict Stability in the immediate vicinity of high fitness sequences, a regime that is particularly relevant for guiding iterative protein design. The dataset contains 53 ,614 training sequences, 2,512 validation sequences, and 12 ,851 test sequences. For all regression tasks, models are trained with mean squared error loss and evaluated using Spearman rank correlation ρ on the test set [23]. 
+
+Preprocessing and sequence handling. All datasets use residue-level tokenization with the TAPE IUPAC tokenizer. The tokenizer defines a 30-token vocabulary consisting of five control symbols and a 25-character residue alphabet, where the residue alphabet comprises 20 standard amino acids, two non-standard amino acids selenocysteine and pyrrolysine, two ambiguity codes, and one unknown-residue symbol [ 30 , 31 ]. To support a unified pipeline, sequences are padded or truncated to a 5maximum length of 512 using the <pad> token, and padded positions are excluded from attention and evaluation via masking.                                     
+
+> Model Attention Key hyperparameters Params (SS) Params (F&S) (A) Baselines
+> Pairwise-2D Global MHSA –≈25.5M ≈20.9M Blockwise-2D Overlapping block MHSA ℓ=30 , s =15 ≈25.5M ≈21.3M Linear-2D Linformer-style attention k=50 ≈26.1M ≈22.1M
+> (B) Proposed
+> HOMA Pairwise + windowed Triadic ℓ=30 , s =15 , r =8 ≈25.9M ≈21.5M
+> (C) Shared settings
+> dmodel 512 256 Layers 12 12 Heads 88FFN dim 1024 128 Dropout 0.4 0.4 Optimizer Adam Adam LR 10 −45×10 −5
+
+Table 1: Model variants and shared configurations for controlled comparison. All models use the same backbone and training setup and differ only in the attention mechanism. Section (A) lists the three pairwise baseline attention mechanisms. Section (B) describes the proposed HOMA module. Section (C) reports the shared architectural and optimization hyperparameters applied uniformly across all variants. For attention specific hyperparameters, ℓ denotes the block length, s the stride, 
+
+k the low rank projection dimension in Linformer, and r the rank of the triadic U projection in HOMA. Parameter counts are reported separately for the Secondary Structure dataset (SS) and the Fluorescence and Stability datasets (F&S). 
+
+# 4 Results 
+
+Table 2 summarizes performance across all five benchmarks. Secondary structure prediction is evaluated on CASP12, CB513, and TS115 using accuracy, with macro F1 reported for completeness. Fluorescence and Stability are evaluated using Spearman correlation ρ.Among the baseline attention modules, Blockwise-2D is consistently the strongest. On CASP12, it improves accuracy from 0.5582 to 0.6368 , a 14 .08% relative gain over Pairwise-2D. Comparable improvements are observed on CB513, where accuracy rises from 0.5577 to 0.6308 , and on TS115, where it increases from 0.5999 to 0.6648 . For the sequence-level tasks, Blockwise-2D achieves 
+
+ρ = 0 .6998 on Fluorescence and ρ = 0 .6509 on Stability, representing relative improvements of 
+
+5.28% and 4.63% over Pairwise-2D, respectively. These results confirm that restricting attention to overlapping local blocks yields consistent gains for both residue-level and sequence-level prediction. Linear-2D is less effective on tasks requiring local structural detail. It attains the lowest accuracy among the three baselines on all secondary structure benchmarks: 0.5458 on CASP12, 0.5162 on CB513, and 0.5529 on TS115. It also yields the weakest Stability correlation at ρ = 0 .5439 . Its Fluorescence performance is more competitive at ρ = 0 .6821 , slightly surpassing Pairwise-2D but still falling short of Blockwise-2D. HOMA augments the Blockwise-2D backbone with a triadic interaction pathway. The optimal window size varies by task: w = 5 performs best on CASP12 and Stability, while w = 7 is preferred on CB513, TS115 and Fluorescence. On CASP12, HOMA with w = 5 reaches accuracy 0.6588 ,a 3.45% relative gain over Blockwise-2D. On TS115, HOMA with w = 7 achieves the highest accuracy at 0.6789 , with a similar improvement on CB513 where accuracy rises from 0.6308 to 
+
+0.6504 . The most pronounced improvement appears on Stability, where HOMA with w = 5 attains 
+
+ρ = 0 .7152 , a substantial 9.88% gain over Blockwise-2D. On Fluorescence, HOMA with w = 7 
+
+obtains ρ = 0 .7388 , a 5.57% relative improvement over Blockwise-2D and an 8.6% margin over the Transformer performance on the official TAPE leaderboard 2, which reports ρ = 0 .68 [23 ]. This 
+
+> 2https://github.com/songlab-cal/tape#leaderboard
+
+6gain is achieved with 21.5M parameters, roughly half the parameter count of the TAPE Transformer baseline at approximately 38M parameters. These results demonstrate that enriching local pairwise attention with triadic interactions can yield systematic and parameter-efficient improvements across all benchmarks. Performance is sensitive to the triadic window size. Relative to Blockwise-2D, w = 3 provides modest accuracy gains, with the largest improvement on Stability at 2.10% . Increasing to w = 5 
+
+yields further improvements across all benchmarks: CASP12 accuracy rises by 2.58% over w = 3 ,and Stability improves by 7.61% . Increasing the window size to w = 7 improves Fluorescence by 
+
+3.82% , TS115 accuracy by 1.88% , and CB513 accuracy by 1.12% relative to w = 5 , while slightly decreasing CASP12 accuracy by 1.12% and Stability by 0.64% . This trade-off can be partially attributed to triadic score dilution: as the window grows, the normalization in A(3)  
+
+> ijk
+
+is computed over 
+
+w2 pairs (j, k ), spreading probability mass across a larger interaction set and reducing the selectivity of each individual triadic weight. This dilution of attention scores may account for the performance decreases observed on CASP12 and Stability at w = 7 , suggesting that tasks sensitive to sharp local interactions benefit from a narrower triadic context window. 
+
+Efficiency and resource trade-offs. 
+
+Figure 3a shows the validation loss over the first six epochs on the Secondary Structure dataset, comparing the convergence behaviour of the baseline models to the HOMA variants. The losses for Pairwise-2D and Linear-2D quickly plateau and remain the highest curves in the plot, whereas the localized attention mechanisms (Blockwise-2D and HOMA with w ∈ { 3, 5, 7}) continue to decrease throughout training and achieve lower validation loss. This pattern suggests that explicitly modeling local structure improves both optimization dynamics and the model’s ability to extract useful information from the sequence. Figures 3b and 3c report compute-only throughput and peak GPU memory allocation, respectively, for HOMA and the baseline attention mechanisms on Secondary Structure and Fluorescence. Baseline variants follow expected efficiency trends: block-wise and linear attention improve throughput and reduce peak memory relative to full pairwise attention, with linear attention achieving the highest throughput and lowest memory footprint across both tasks; these serve primarily as reference points to contextualize the cost of higher-order modeling. In contrast, HOMA exhibits a clear efficiency–expressivity trade-off. Compute throughput decreases monotonically as the local attention window size increases: on Secondary Structure, throughput falls from roughly 3.1 × 10 4 token-positions/s at w=3 to 1.5 × 10 4 at w=7 , with a similar pattern on Fluorescence. This reduction reflects the additional cost of constructing and processing higher-order local interaction tensors as the neighborhood expands. Peak GPU memory shows a complementary trend, rising from 14.6 GB to 38.9 GB on Secondary Structure and from 8.3 GB to 20.8 GB on Fluorescence as w grows. This increase is driven by the explicit materialization of intermediate higher-order representations in the triadic attention pathway. Overall, these results demonstrate that HOMA introduces a controllable computational overhead in exchange for increased representational capacity over structured local interactions. The attention window size is a hyperparameter that allows practitioners to balance compute and memory budgets against modeling expressivity under fixed hardware constraints. 
+
+# 5 Ablations and Analysis 
+
+We perform targeted ablation studies to isolate the contribution of three design and training choices in HOMA: (i) the low-rank factorization used to parameterize the U -matrix, (ii) initialization and optimization strategies for the pairwise (2D) attention backbone via pretraining and freezing, and (iii) the maximum sequence length used during training. All ablations are conducted on the TAPE Secondary Structure task, and we report accuracy@3 on the CASP12, TS115, and CB513 test sets. Figure 4 summarizes the resulting trends across datasets. 
+
+Rank ablation (Fig. 4a). We vary the rank used to factorize the U -matrix and observe a consistent advantage for the full-rank parameterization. Training from scratch with full U attains 66.6% on CASP12, 68.2% on TS115, and 65.5% on CB513, while the best low-rank setting in each case 7Model CASP12 CB513 TS115 Fluorescence Stability F1 Acc F1 Acc F1 Acc ρ ρ                                                   
+
+> Baseline attention
+> Pairwise-2D 0.5257 0.5582 0.5321 0.5577 0.5650 0.5999 0.6647 0.6221
+> Blockwise-2D 0.6228 0.6368 0.6202 0.6308 0.6472 0.6648 0.6998 0.6509
+> Linear-2D 0.5466 0.5458 0.4910 0.5162 0.5175 0.5529 0.6821 0.5439
+> Augmented attention (HOMA)
+> HOMA ( w= 3 )0.6226 0.6422 0.6261 0.6397 0.6500 0.6676 0.7016 0.6646
+> HOMA ( w= 5 )0.6338 0.6588 0.6263 0.6432 0.6450 0.6664 0.7116 0.7152
+> HOMA ( w= 7 )0.6289 0.6514 0.6336 0.6504 0.6565 0.6789 0.7388 0.7106
+
+Table 2: Performance of all model variants on the three TAPE benchmark tasks. Section (A) lists results for the three pairwise baseline attention mechanisms: global multi-head self-attention, overlapping block-wise attention, and Linformer style low rank attention. Section (B) reports results for HOMA across three triadic window sizes w ∈ { 3, 5, 7}.
+
+Figure 3: Efficiency and convergence analysis of HOMA and baseline attention mechanisms. (a) 
+
+Validation loss over the first six training epochs on the Secondary Structure task, comparing all baseline and HOMA variants across window sizes w ∈ { 3, 5, 7}. (b) Compute only throughput in token positions per second, measured on Secondary Structure and Fluorescence for all model variants across the three HOMA window sizes and the three pairwise baselines. (c) Peak GPU memory allocation in gigabytes on the same two tasks and the same set of model variants as panel (b). reaches 65.1% (rank-8) on CASP12, 67.9% (rank-8) on TS115, and 65.0% (rank-8) on CB513. On CASP12, accuracy decreases monotonically as rank is reduced from 128 to 8 (65.6%, 65.4%, 65.1%), yielding a 1.5-point drop relative to full-rank. In contrast, TS115 and CB513 are less sensitive to aggressive factorization: rank-8 remains within 0.3 and 0.5 points of full-rank, respectively, and slightly exceeds rank-32 and rank-128 (TS115: 67.9% vs. 67.7%/67.7%; CB513: 65.0% vs. 64.8%/64.4%). This pattern suggests that while CASP12 benefits from higher-rank capacity, a compact rank-8 approximation can capture most of the useful structure on TS115 and CB513. 
+
+Pretraining and freezing of pairwise attention (Fig. 4b). We next ablate the training procedure by varying how attention parameters are initialized and optimized. In the first setting, both pairwise and triadic attention parameters are randomly initialized and trained end-to-end within HOMA (2D from scratch). In the second setting, we first train a model with pairwise (2D) attention, then transfer the learned pairwise attention parameters into HOMA as initialization; we either continue updating these transferred parameters during HOMA training (pretrained, no freeze) or keep them fixed to reduce compute and memory overhead (pretrained, frozen). Figure 3B shows that freezing the transferred pairwise weights consistently underperforms the other strategies, yielding 64.5% on CASP12, 65.5% on TS115, and 62.6% on CB513. Allowing the transferred weights to continue training largely closes the gap to training from scratch: on CASP12, HOMA with 2D from scratch achieves 65.9% compared to 65.1% for pretrained, no freeze (a 0.8–0.9 point advantage for scratch), while on TS115 the two are nearly identical (68.0% vs. 67.9%). On CB513, however, pretrained initialization with continued training for pairwise attention weights provides a clear benefit, reaching 68.0% versus 65.0% for 8training from scratch (a 3.0-point improvement). Overall, these results indicate that transferred pairwise attention can serve as an effective initialization for HOMA when it is allowed to adapt during training, whereas freezing the transferred parameters limits adaptation to the triadic pathway and leads to systematic accuracy drops despite potential efficiency gains. 
+
+Effect of maximum sequence length (Fig. 4c). Our third ablation study examines how the maxi-mum sequence length used during training affects secondary-structure accuracy. We compare training with sequences truncated/padded to lengths 256, 512, and 1024. Across all three test sets, using length 256 yields the lowest performance, consistent with information loss from aggressive truncation (63.5% on CASP12, 66.3% on TS115, and 63.6% on CB513). Increasing the limit to length 512 provides the best overall results, reaching 65.1% on CASP12, 67.9% on TS115, and 68.0% on CB513. Extending to length 1024 improves over length 256 but does not match length 512, with accuracies of 62.9% on CASP12, 67.2% on TS115, and 64.7% on CB513. These trends suggest a trade-off: allowing moderately longer contexts reduces truncation-induced information loss, but very long sequences can introduce additional irrelevant context or noise during optimization, which may partially offset the benefits of retaining more residues. 
+
+Figure 4: Ablation studies for HOMA on Secondary Structure prediction across CASP12, TS115, and CB513. All bars report three-class accuracy (Q3). (a) Rank ablation at window size w=7 . The rank of the triadic U -projection is varied across full rank, rank 128, rank 32, and rank 8 to evaluate the effect of low-rank factorization on predictive accuracy. (b) Pretraining and freezing of pairwise attention at window size w=7 . Three training configurations are compared: HOMA trained from scratch, HOMA initialized from a pretrained pairwise backbone with continued joint optimization, and HOMA initialized from a pretrained pairwise backbone with transferred weights frozen during triadic training. (c) Effect of maximum sequence length at window size w=5 . Training runs are compared under maximum sequence lengths of 256, 512, and 1024 to evaluate the sensitivity of Q3 accuracy to the sequence-length budget. 
+
+# 6 Conclusion 
+
+We introduced Higher-Order Modular Attention (HOMA), an augmented attention module for Transformer architectures that complements standard pairwise self-attention with an explicit triadic interaction pathway over local sequence neighborhoods. HOMA achieved gains of up to 3.45% in CASP12 accuracy, 5.57% in Fluorescence Spearman correlation, and 9.88% in Stability Spearman correlation, consistently outperforming pairwise baselines. Ablation studies revealed that performance is sensitive to triadic window size, pairwise initialization strategy, and sequence length, and that joint optimization of the pairwise and triadic pathways is essential for realizing the full benefit of the module. Despite these improvements, the additional compute and memory overhead associated with triadic interactions remain important practical considerations. Addressing these costs through systems level optimizations, such as IO aware implementations inspired by FlashAttention [ 32 ] and custom CUDA kernels for fused pairwise triadic computation, constitutes a promising direction for future work. More broadly, HOMA is a general purpose attention mechanism not limited to protein modeling. Its capacity to capture structured multi-entity dependencies suggests applicability to other domains 9in which higher-order interactions provide complementary signal to standard pairwise attention, including natural language understanding, computer vision, and structured prediction tasks. 
+
+# Acknowledgements 
+
+This work was supported by the Natural Sciences and Engineering Research Council of Canada (NSERC) held by Gao. 
+
+# References 
+
+[1] Daniel M. Weinreich, Y. Lan, Christopher S. Wylie, and Robert B. Heckendorn. Should evolutionary geneticists worry about higher-order epistasis? Current Opinion in Genetics & Development , 23(6):700–707, 2013. [2] Frank J. Poelwijk, Vijay Krishna, and Rama Ranganathan. The context-dependence of mutations: A linkage of formalisms. PLOS Computational Biology , 12(6):e1004771, 2016. [3] Amnon Horovitz and Alan R. Fersht. Strategy for analysing the co-operativity of intramolecular interactions in peptides and proteins. Journal of Molecular Biology , 214(3):613–617, 1990. [4] James A. Wells. Additivity of mutational effects in proteins. Biochemistry , 29(37):8509–8517, 1990. [5] Frank J. Poelwijk, Michael Socolich, and Rama Ranganathan. Learning the pattern of epistasis linking genotype and phenotype in a protein. Nature Communications , 10:4213, 2019. [6] Stuart A. Kauffman. The Origins of Order . Oxford University Press, Oxford, New York, 1993. [7] Stuart A. Kauffman. At Home in the Universe . Oxford University Press, Oxford, New York, 1995. [8] Zachary R. Sailer and Michael J. Harms. High-order epistasis shapes evolutionary trajectories. 
+
+PLOS Computational Biology , 13(5):e1005541, 2017. [9] Nicholas C. Wu, Liang Dai, Catherine A. Olson, James O. Lloyd-Smith, and Ren Sun. Adapta-tion in protein fitness landscapes is facilitated by indirect paths. eLife , 5:e16965, 2016. [10] Clayton Sanford, Daniel Hsu, and Matus Telgarsky. Representational strengths and limitations of transformers. arXiv preprint arXiv:2306.02896 , 2023. [11] Clayton Sanford, Daniel Hsu, and Matus Telgarsky. Representational strengths and limitations of transformers. In Advances in Neural Information Processing Systems , 2024. [12] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Informa-tion Processing Systems , 2017. [13] James Clift and Daniel Murfet. Logic and the 2-simplicial transformer. In International Conference on Learning Representations , 2020. [14] Alexander Kozachinskiy et al. Strassen attention: A faster alternative to standard attention. 
+
+arXiv preprint , 2025. [15] Sayak Chakrabarti, Toniann Pitassi, and Josh Alman. Poly-attention: A general scheme for higher-order self-attention. arXiv preprint arXiv:2602.02422 , 2026. [16] Song Bai, Feihu Zhang, and Philip H. S. Torr. Hypergraph convolution and hypergraph attention. 
+
+Pattern Recognition , 110:107637, 2021. [17] Sinong Wang, Belinda Z. Li, Madian Khabsa, Han Fang, and Hao Ma. Linformer: Self-attention with linear complexity. arXiv preprint arXiv:2006.04768 , 2020. [18] Iz Beltagy, Matthew E. Peters, and Arman Cohan. Longformer: The long-document transformer. 
+
+arXiv preprint arXiv:2004.05150 , 2020. 10 [19] Manzil Zaheer, Guru Guruganesh, Kumar Avinava Dubey, Joshua Ainslie, Chris Alberti, Santiago Ontanon, Philip Pham, Anirudh Ravula, Qifan Wang, Li Yang, et al. Big bird: Transformers for longer sequences. In Advances in Neural Information Processing Systems ,2020. [20] Tao Shen, Tianyi Zhou, Guodong Long, Jing Jiang, and Chengqi Zhang. Bi-directional block self-attention for fast and memory-efficient sequence modeling. In International Conference on Learning Representations (ICLR) , 2018. [21] Jiezhong Qiu, Hao Ma, Omer Levy, Wen-tau Yih, Sinong Wang, and Jie Tang. Blockwise self-attention for long document understanding. In Findings of the Association for Computational Linguistics , 2020. [22] Jingyang Yuan, Huazuo Gao, Damai Dai, Junyu Luo, Liang Zhao, Zhengyan Zhang, Zhenda Xie, Y. X. Wei, Lean Wang, Zhiping Xiao, Yuqing Wang, Chong Ruan, Ming Zhang, Wenfeng Liang, and Wangding Zeng. Native sparse attention: Hardware-aligned and natively trainable sparse attention. arXiv preprint arXiv:2502.11089 , 2025. [23] Roshan Rao, Nicholas Bhattacharya, Neil Thomas, Yan Duan, Xi Chen, John Canny, Pieter Abbeel, and Yun S. Song. Evaluating protein transfer learning with tape. In Advances in Neural Information Processing Systems , 2019. [24] Michael Schantz Klausen, Martin Closter Jespersen, Henrik Nielsen, Kamilla Kjaergaard Jensen, Vanessa Isabell Jurtz, Casper Kaae Soenderby, Morten Otto Alexander Sommer, Ole Winther, Morten Nielsen, Bent Petersen, et al. Netsurfp-2.0: Improved prediction of protein structural features by integrated deep learning. Proteins: Structure, Function, and Bioinformatics , 2019. [25] James A. Cuff and Geoffrey J. Barton. Evaluation and improvement of multiple sequence methods for protein secondary structure prediction. Proteins: Structure, Function, and Bioinfor-matics , 34(4):508–519, 1999. [26] John Moult, Krzysztof Fidelis, Andriy Kryshtafovych, Torsten Schwede, and Anna Tramontano. Critical assessment of methods of protein structure prediction (casp)-round xii. Proteins: Structure, Function, and Bioinformatics , 86:7–15, 2018. [27] Yuedong Yang, Jianzhao Gao, Jihua Wang, Rhys Heffernan, Jack Hanson, Kuldip Paliwal, and Yaoqi Zhou. Sixty-five years of the long march in protein secondary structure prediction: the final stretch? Briefings in Bioinformatics , 19(3):482–494, 2018. [28] Karen S. Sarkisyan, Dmitry A. Bolotin, Margarita V. Meer, Dinara R. Usmanova, Alexander S. Mishin, George V. Sharonov, Dmitry N. Ivankov, Nina G. Bozhanova, Mikhail S. Baranov, Onuralp Soylemez, et al. Local fitness landscape of the green fluorescent protein. Nature ,533(7603):397, 2016. [29] Gabriel J. Rocklin, Tamuka M. Chidyausiku, Inna Goreshnik, Alex Ford, Scott Houliston, Alexander Lemak, Lauren Carter, Rashmi Ravichandran, Vikram K. Mulligan, Aaron Chevalier, et al. Global analysis of protein folding using massively parallel design, synthesis, and testing. 
+
+Science , 357(6347):168–175, 2017. [30] IUPAC-IUB Joint Commission on Biochemical Nomenclature. Nomenclature and symbolism for amino acids and peptides (recommendations 1983). Pure and Applied Chemistry , 56(5):595– 624, 1984. [31] The UniProt Consortium. Uniprot: a worldwide hub of protein knowledge. Nucleic Acids Research , 47(D1):D506–D515, 2019. [32] Tri Dao, Dan Fu, Stefano Ermon, Atri Rudra, and Christopher Ré. Flashattention: Fast and memory-efficient exact attention with io-awareness. In Advances in Neural Information Processing Systems , volume 35, pages 16344–16359, 2022. 11

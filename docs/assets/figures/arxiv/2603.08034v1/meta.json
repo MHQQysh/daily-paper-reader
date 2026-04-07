@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.08034v1/fig-001.webp",
+      "caption": "Figure 1. The proposed multimodal emotion recognition framework processes video and audio inputs through BEiT-Large and WavLMLarge, aligns them in a unified embedding space, and dynamically fuses the representations via a multimodal attention network for MLP classification.",
+      "page": 4,
+      "index": 1,
+      "width": 1036,
+      "height": 254
+    }
+  ]
+}

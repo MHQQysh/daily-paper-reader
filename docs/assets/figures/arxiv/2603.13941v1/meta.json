@@ -1,0 +1,126 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-001.webp",
+      "caption": "Figure 1: BCAF architecture. Left: RGB backbone (blue). Middle: shared decoder/segmentation head (grey). Right: HSI backbone (red) with bidirectional spectral cross-attention and gated modality fusion modules (green).",
+      "page": 6,
+      "index": 1,
+      "width": 946,
+      "height": 685
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-002.webp",
+      "caption": "Figure 6: Effect of input resolution (left, RGB) and spectral slice count K (right, HSI) on segmentation performance across SpectralWaste and K3I-Material/Plastic. Curves summarize the trends of Sections 5.1 and 5.2. Higher mIoU is better.",
+      "page": 15,
+      "index": 2,
+      "width": 877,
+      "height": 561
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-003.webp",
+      "caption": "Figure 8: Mean normalized spectra per class for (a) SpectralWaste, (b) K3I-Material, and (c) K3I-Plastic.",
+      "page": 21,
+      "index": 3,
+      "width": 639,
+      "height": 868
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-004.webp",
+      "caption": "Figure 2: Module details. Left (red): position-wise spectral self-attention. Middle/left (light-green): gated modality fusion. Middle/right (orange): spectral SE Pooling module. Right (dark-green): bidirectional cross-attention modules.",
+      "page": 7,
+      "index": 4,
+      "width": 940,
+      "height": 408
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-005.webp",
+      "caption": "Figure 9: K3I-Material qualitative results. Shown are Swin-T RGB at 1024 and 2048, adapted Swin-T HSI-3, and BCAF (RGB 1024 + HSI-3).",
+      "page": 22,
+      "index": 5,
+      "width": 950,
+      "height": 633
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-006.webp",
+      "caption": "Table 4: K3I-Plastic (segmentation): quantitative comparison of Swin-T (RGB), adapted Swin-T (HSI-K), and BCAF across RGB resolutions and HSI slice counts.",
+      "page": 14,
+      "index": 6,
+      "width": 933,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-007.webp",
+      "caption": "Table 7: Absolute mIoU (%) under HSI-only spatial shifts (pixels on the HSI grid). RGB and labels remain fixed, while HSI is shifted by (dx, dy) with zero padding. All models are trained on aligned data.",
+      "page": 18,
+      "index": 7,
+      "width": 883,
+      "height": 187
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-008.webp",
+      "caption": "Figure 10: Swin-T feature activations across stages for input resolutions 256 vs 1024. Activations are mean over channels, normalized to [0,1].",
+      "page": 23,
+      "index": 8,
+      "width": 426,
+      "height": 908
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-009.webp",
+      "caption": "Table 3: K3I-Material (segmentation): quantitative comparison of Swin-T (RGB), adapted Swin-T (HSI-K), and BCAF across RGB resolutions and HSI slice counts.",
+      "page": 13,
+      "index": 9,
+      "width": 791,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-010.webp",
+      "caption": "Figure 5: Qualitative results on K3I-Plastic (segmentation). Shown are Swin-T RGB at 1024 and 2048, adapted Swin-T HSI with K=7 slices, and our best BCAF (RGB 1024 + HSI-7).",
+      "page": 13,
+      "index": 10,
+      "width": 950,
+      "height": 636
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-011.webp",
+      "caption": "Table 5: HSI (unimodal) ablations on SpectralWaste: embedding variants, spectral modeling, and spectral reducer. All use K=5 unless noted. ∆ is measured against the baseline row within each block.",
+      "page": 17,
+      "index": 11,
+      "width": 793,
+      "height": 242
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-012.webp",
+      "caption": "Figure 4: Qualitative results on SpectralWaste. Shown are Swin-T RGB at 256/1024/2048, adapted Swin-T HSI with K=5 slices, and our best BCAF (RGB 1024 + HSI-5).",
+      "page": 12,
+      "index": 12,
+      "width": 943,
+      "height": 681
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-013.webp",
+      "caption": "Table 2: SpectralWaste: quantitative comparison of SegFormer (MiT-B0/B2), Swin-T (RGB), adapted Swin-T (HSI-K), BCAF, and Logit fusion across RGB resolutions and HSI slice counts.",
+      "page": 12,
+      "index": 13,
+      "width": 910,
+      "height": 442
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-014.webp",
+      "caption": "Figure 3: Samples from the K3I-Cycling dataset. Rows (top to bottom): RGB image, labelled K3I-Material masks, labelled K3I-Plastic masks.",
+      "page": 9,
+      "index": 14,
+      "width": 964,
+      "height": 652
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13941v1/fig-015.webp",
+      "caption": "Figure 7: SpectralWaste: comparison of HSI-1 (K=1, spectral collapse) and HSI-5 (K=5, multi-slice). Oracle fusion (per-pixel best-of-modality using ground truth) shows a larger lift over RGB-1024 for HSI-5, evidencing stronger complementarity to RGB.",
+      "page": 16,
+      "index": 15,
+      "width": 810,
+      "height": 852
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.07997v1/fig-001.webp",
+      "caption": "Fig. 3: Case study 1.",
+      "page": 5,
+      "index": 1,
+      "width": 508,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07997v1/fig-002.webp",
+      "caption": "Fig. 2: Details of the Reflection Module in Fig 1.",
+      "page": 4,
+      "index": 2,
+      "width": 958,
+      "height": 552
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07997v1/fig-003.webp",
+      "caption": "Fig. 4: Case study 2.",
+      "page": 6,
+      "index": 3,
+      "width": 508,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2603.07997v1/fig-004.webp",
+      "caption": "Fig. 1: The overall CMMR-VLN framework consists of three modules from left to right. The Multimodal Experience Memory (MEM) performs memory building before navigation. The Retrieval-Augmented Generation Pipeline (RAGP) carries out corresponding prompting and action execution at each navigation step. The Reflection Module conducts reflection and updates the experience in memory after navigation.",
+      "page": 2,
+      "index": 4,
+      "width": 1046,
+      "height": 545
+    }
+  ]
+}

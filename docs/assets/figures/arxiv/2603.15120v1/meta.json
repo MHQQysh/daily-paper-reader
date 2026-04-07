@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.15120v1/fig-001.webp",
+      "caption": "Table 1: Macro F-score (%) for different attention mechanisms on MSP-Podcast. Dev results use MSP-Podcast v1.0 [5], while T1 (Test1) and T2 (Test2) use MSP-Podcast v2.0 [4]. Mean averages across SSL backbones.",
+      "page": 3,
+      "index": 1,
+      "width": 971,
+      "height": 200
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15120v1/fig-002.webp",
+      "caption": "Figure 2: Inference time and peak GPU memory usage of the seq2seq module as a function of sequence length on the MSPPodcast dev set [5]. Panels (a–b) report results for all models. Panels (c–d) provide a zoomed view excluding SA to make the relative growth trends of the remaining alternatives easier to distinguish.",
+      "page": 4,
+      "index": 2,
+      "width": 461,
+      "height": 422
+    }
+  ]
+}

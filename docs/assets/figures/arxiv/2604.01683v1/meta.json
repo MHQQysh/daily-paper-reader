@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.01683v1/fig-001.webp",
+      "caption": "Figure 2: Training and validation perplexity vs. step (150M model, WikiText-103). Coupled QK dynamics separates early and maintains its lead throughout training. Final ranking: Coupled QK (20.12), Diff Attn (21.11), Standard (21.57), GQA (21.87).",
+      "page": 6,
+      "index": 1,
+      "width": 810,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01683v1/fig-002.webp",
+      "caption": "Figure 5: Coupled QK dynamics (60M). Layer 0: H0 shows off-diagonal patterns absent in Standard, indicating the coupled dynamics has diversified QK interactions. Layer 4: The attention sink is present but less extreme - H0 distributes attention more broadly. Layer 7: H0 exhibits the most diverse pattern across all heads, with scattered attention to multiple specific positions.",
+      "page": 14,
+      "index": 2,
+      "width": 826,
+      "height": 706
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01683v1/fig-003.webp",
+      "caption": "Figure 4: Standard Attention (60M). Layer 0: Clean causal gradients. Layer 4: Attention sink at position 0 dominates all heads. Layer 7: Sink persists with partial content-based recovery.",
+      "page": 13,
+      "index": 3,
+      "width": 810,
+      "height": 605
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01683v1/fig-004.webp",
+      "caption": "Figure 3: Per-layer attention entropy at end of training. Left (60M): A sharp entropy dip at Layer 2 reveals the attention sink. GQA collapses furthest (≈1.65 nats), followed by Standard (≈1.95). Coupled QK dynamics (≈2.5) mitigates the collapse. Right (150M): The Layer 2 collapse persists at scale, confirming it is a structural phenomenon.",
+      "page": 13,
+      "index": 4,
+      "width": 816,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01683v1/fig-005.webp",
+      "caption": "Table 1: Structural ablation (60M, WikiText-103, 30K steps). “Coupling” means Q and K are evolved through shared dynamics before scoring. “Symplectic” means the integrator preserves phase-space volume. The key finding: coupling is the active ingredient; symplecticity is irrelevant.",
+      "page": 4,
+      "index": 5,
+      "width": 776,
+      "height": 197
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01683v1/fig-006.webp",
+      "caption": "Table 9: Variant-specific hyperparameters.",
+      "page": 12,
+      "index": 6,
+      "width": 806,
+      "height": 309
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01683v1/fig-007.webp",
+      "caption": "Figure 1: Training and validation perplexity vs. step (60M model, WikiText-103). Three convergence tiers emerge: (1) Coupled QK separates below the pack from ∼step 10K, (2) Standard and Diff Attn cluster tightly (23.92–24.22), (3) GQA trails. Training curves are cropped to step 5K+ and PPL ≤200 to show the informative region.",
+      "page": 5,
+      "index": 7,
+      "width": 814,
+      "height": 293
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.17771v1/fig-001.webp",
+      "caption": "Figure 3: Scatter plots relating gradient reshaping to input activation norms of Attention block. Top row: 0.1B model; bottom row: 0.3B model. From left to right: log10 Bloat attn vs. log10 ∥hin∥, log10 Compressattn vs. log10 ∥hin∥, and log10 Change attn vs. log10 ∥hin∥. Each point is colored by token group (token 0, token 1, tokens 2–3, tokens 4–7, and the rest early tokens 8–15). Largeactivation points of token 0 occupy the high-bloat regime. Compression exhibits an approximately linear inverse relationship with activation scale. The net residual-level change remains concentrated near log10 1 = 0 except for a small set of first-layer points.",
+      "page": 5,
+      "index": 1,
+      "width": 804,
+      "height": 498
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17771v1/fig-002.webp",
+      "caption": "Figure 1: Forward phenomena in baseline models. Top row: 0.1B model; bottom row: 0.3B model. From left to right: attention sink mass, thresholded sink rate, residual-stream output norm, and MLP output norm. We compare the first token (token 0) with the mean and maximum over the rest early tokens (positions 1–15). The results confirm the co-occurrence of AS and MA.",
+      "page": 4,
+      "index": 2,
+      "width": 818,
+      "height": 381
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17771v1/fig-003.webp",
+      "caption": "Figure 2: Token-wise gradient norms of QKV across training checkpoints. Top row: 0.1B model; bottom row: 0.3B model. From left to right: gradient norms of query, key, and value as functions of token position, averaged over layers. In both scales, key and especially value gradients exhibit a pronounced spike at token 0.",
+      "page": 4,
+      "index": 3,
+      "width": 803,
+      "height": 371
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17771v1/fig-004.webp",
+      "caption": "Figure 5: Forward phenomena in baseline and V-scale models. Top row: 0.1B models; bottom row: 0.3B models. From left to right: thresholded sink rate, residual-stream output norm, MLP output norm, and Attention output norm. We compare the first token with the mean over the rest early tokens (positions 1–15). Across both scales, V-scale largely preserves sink behavior while reducing the activation norms of token 0, with the larger reduction appearing in MLP outputs.",
+      "page": 7,
+      "index": 4,
+      "width": 802,
+      "height": 398
+    }
+  ]
+}

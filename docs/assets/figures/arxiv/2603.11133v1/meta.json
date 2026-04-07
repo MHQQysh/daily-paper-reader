@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.11133v1/fig-001.webp",
+      "caption": "Table 1: Model variants and shared configurations for controlled comparison. All models use the same backbone and training setup and differ only in the attention mechanism. Section (A) lists the three pairwise baseline attention mechanisms. Section (B) describes the proposed HOMA module. Section (C) reports the shared architectural and optimization hyperparameters applied uniformly across all variants. For attention specific hyperparameters, ℓ denotes the block length, s the stride, k the low rank projection dimension in Linformer, and r the rank of the triadic U projection in HOMA. Parameter counts are reported separately for the Secondary Structure dataset (SS) and the Fluorescence and Stability datasets (F&S).",
+      "page": 6,
+      "index": 1,
+      "width": 844,
+      "height": 361
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11133v1/fig-002.webp",
+      "caption": "Figure 1: Transformer Layer with higher-order Modular Attention. HOMA replaces the self-attention sublayer and computes pairwise and triadic multi-head attention in parallel from shared projections Q, K, V , and U . Their outputs are concatenated, fused, and mapped through the standard output projection.",
+      "page": 3,
+      "index": 2,
+      "width": 829,
+      "height": 444
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11133v1/fig-003.webp",
+      "caption": "Table 2: Performance of all model variants on the three TAPE benchmark tasks. Section (A) lists results for the three pairwise baseline attention mechanisms: global multi-head self-attention, overlapping block-wise attention, and Linformer style low rank attention. Section (B) reports results for HOMA across three triadic window sizes w ∈ {3, 5, 7}.",
+      "page": 8,
+      "index": 3,
+      "width": 806,
+      "height": 311
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11133v1/fig-004.webp",
+      "caption": "Figure 3: Efficiency and convergence analysis of HOMA and baseline attention mechanisms. (a) Validation loss over the first six training epochs on the Secondary Structure task, comparing all baseline and HOMA variants across window sizes w ∈ {3, 5, 7}. (b) Compute only throughput in token positions per second, measured on Secondary Structure and Fluorescence for all model variants across the three HOMA window sizes and the three pairwise baselines. (c) Peak GPU memory allocation in gigabytes on the same two tasks and the same set of model variants as panel (b).",
+      "page": 8,
+      "index": 4,
+      "width": 829,
+      "height": 222
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11133v1/fig-005.webp",
+      "caption": "Figure 4: Ablation studies for HOMA on Secondary Structure prediction across CASP12, TS115, and CB513. All bars report three-class accuracy (Q3). (a) Rank ablation at window size w=7. The rank of the triadic U -projection is varied across full rank, rank 128, rank 32, and rank 8 to evaluate the effect of low-rank factorization on predictive accuracy. (b) Pretraining and freezing of pairwise attention at window size w=7. Three training configurations are compared: HOMA trained from scratch, HOMA initialized from a pretrained pairwise backbone with continued joint optimization, and HOMA initialized from a pretrained pairwise backbone with transferred weights frozen during triadic training. (c) Effect of maximum sequence length at window size w=5. Training runs are compared under maximum sequence lengths of 256, 512, and 1024 to evaluate the sensitivity of Q3 accuracy to the sequence-length budget.",
+      "page": 9,
+      "index": 5,
+      "width": 826,
+      "height": 264
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11133v1/fig-006.webp",
+      "caption": "Figure 2: Illustration of the three TAPE benchmark tasks. (a) Secondary Structure prediction. A per residue classification task in which each amino acid is assigned one of three structural labels: helix (H), strand (S), or coil (C). The panel shows an example protein segment with predicted per residue labels indicated below the sequence. (b) Fluorescence prediction. A sequence-level regression task over green fluorescent protein variants. Concentric regions represent increasing Hamming distance, Hd, from the parent sequence, where the inner disk contains variants with Hd ≤ 3 and the outer ring contains variants with Hd ≥ 4. Color encodes measured Fluorescence intensity, ranging from dark to bright. (c) Stability prediction. A sequence-level regression task over designed protein variants, where the target is a continuous thermodynamic Stability score. High performing sequences from the training rounds serve as reference points, and test sequences are constructed as single point mutants at Hamming distance one from these top designs. Color encodes the measured Stability score, with darker shades indicating lower Stability.",
+      "page": 5,
+      "index": 6,
+      "width": 826,
+      "height": 219
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.11487v2/fig-001.webp",
+      "caption": "Figure 5: ReLU attention: 2-layer 2-head model. Attention patterns on a single test input (trigger at position 8). No sink formation occurs in any head; attention on BOS remains near zero throughout.",
+      "page": 6,
+      "index": 1,
+      "width": 950,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11487v2/fig-002.webp",
+      "caption": "Figure 8: ReLU attention: 4-layer 4-head model. Representative attention patterns on a single test input showing absence of sink behavior across all layers.",
+      "page": 21,
+      "index": 2,
+      "width": 950,
+      "height": 948
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11487v2/fig-003.webp",
+      "caption": "Figure 2: Reproduced from Guo et al. (2024)5: an active– dormant attention head in Llama 2–7B. On code-like inputs (GitHub, top), the head exhibits diverse attention patterns; on text-like inputs (Wikipedia, bottom), it collapses to an attention sink on position 0.",
+      "page": 3,
+      "index": 3,
+      "width": 461,
+      "height": 294
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11487v2/fig-004.webp",
+      "caption": "Figure 3: Validation of theorem 1 and theorem 3. (a) Mean attention weights for softmax attention across 1000 test examples with trigger at position 8. Dark regions indicate high attention mass concentrated on BOS (position 1) at non-trigger positions. (b) Standard deviation of softmax attention weights shows negligible variance, confirming stable sink behavior. (c) Mean attention weights for ReLU attention show no sink formation—attention on BOS remains near zero. (d) Standard deviation for ReLU attention confirms consistent behavior across examples.",
+      "page": 4,
+      "index": 4,
+      "width": 950,
+      "height": 208
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11487v2/fig-005.webp",
+      "caption": "Figure 7: Softmax attention: 4-layer 4-head model. Representative attention patterns on a single test input showing strong sink at least in one head across all layers.",
+      "page": 20,
+      "index": 5,
+      "width": 950,
+      "height": 948
+    },
+    {
+      "url": "assets/figures/arxiv/2603.11487v2/fig-006.webp",
+      "caption": "Figure 4: Multi-layer multi-head validation. Attention patterns for a 2-layer 2-head softmax model on a random input (with trigger at position 8). All heads exhibit strong sink behavior.",
+      "page": 5,
+      "index": 6,
+      "width": 921,
+      "height": 210
+    }
+  ]
+}

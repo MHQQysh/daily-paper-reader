@@ -1,0 +1,2456 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-07T01:57:38.602743+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 114,
+    "deep_cap": 6,
+    "deep_selected": 52,
+    "quick_candidates": 92,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2603.21810v1",
+      "source": "arxiv",
+      "title": "Partial Attention in Deep Reinforcement Learning for Safe Multi-Agent Control",
+      "abstract": "Attention mechanisms excel at learning sequential patterns by discriminating data based on relevance and importance. This provides state-of-the-art performance in advanced generative artificial intelligence models. This paper applies this concept of an attention mechanism for multi-agent safe control. We specifically consider the design of a neural network to control autonomous vehicles in a highway merging scenario. The environment is modeled as a Decentralized Partially Observable Markov Decision Process (Dec-POMDP). Within a QMIX framework, we include partial attention for each autonomous vehicle, thus allowing each ego vehicle to focus on the most relevant neighboring vehicles. Moreover, we propose a comprehensive reward signal that considers the global objectives of the environment (e.g., safety and vehicle flow) and the individual interests of each agent. Simulations are conducted in the Simulation of Urban Mobility (SUMO). The results show better performance compared to other driving algorithms in terms of safety, driving speed, and reward.",
+      "authors": [
+        "Turki Bin Mohaya",
+        "Peter Seiler"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY",
+        "cs.MA",
+        "cs.RO"
+      ],
+      "published": "2026-03-23T10:53:34+00:00",
+      "link": "https://arxiv.org/pdf/2603.21810v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "partial attention within a QMIX framework for multi-agent control",
+      "llm_evidence_cn": "QMIX框架下的部分注意力机制用于多智能体控制",
+      "llm_evidence": "QMIX框架下的部分注意力机制用于多智能体控制",
+      "canonical_evidence": "QMIX框架下的部分注意力机制用于多智能体控制",
+      "llm_tldr_en": "Applies partial attention in a QMIX framework to improve safety and focus in multi-agent reinforcement learning.",
+      "llm_tldr_cn": "在QMIX框架中应用部分注意力机制，提高多智能体强化学习的安全性和关注度。",
+      "llm_tldr": "在QMIX框架中应用部分注意力机制，提高多智能体强化学习的安全性和关注度。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.30033v1",
+      "source": "arxiv",
+      "title": "Tucker Attention: A generalization of approximate attention mechanisms",
+      "abstract": "The pursuit of reducing the memory footprint of the self-attention mechanism in multi-headed self attention (MHA) spawned a rich portfolio of methods, e.g., group-query attention (GQA) and multi-head latent attention (MLA). The methods leverage specialized low-rank factorizations across embedding dimensions or attention heads. From the point of view of classical low-rank approximation, these methods are unconventional and raise questions of which objects they really approximate and how to interpret the low-rank behavior of the resulting representations. To answer these questions, this work proposes a generalized view on the weight objects in the self-attention layer and a factorization strategy, which allows us to construct a parameter efficient scheme, called Tucker Attention. Tucker Attention requires an order of magnitude fewer parameters for comparable validation metrics, compared to GQA and MLA, as evaluated in LLM and ViT test cases. Additionally, Tucker Attention~encompasses GQA, MLA, MHA as special cases and is fully compatible with flash-attention and rotary position embeddings (RoPE). This generalization strategy yields insights of the actual ranks achieved by MHA, GQA, and MLA, and further enables simplifications for MLA.",
+      "authors": [
+        "Timon Klein",
+        "Jonas Kusch",
+        "Sebastian Sager",
+        "Stefan Schnake",
+        "Steffen Schotthöfer"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-31T17:30:51+00:00",
+      "link": "https://arxiv.org/pdf/2603.30033v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "generalization of multi-headed self attention using low-rank factorizations",
+      "llm_evidence_cn": "使用低秩分解的多头自注意力机制泛化",
+      "llm_evidence": "使用低秩分解的多头自注意力机制泛化",
+      "canonical_evidence": "使用低秩分解的多头自注意力机制泛化",
+      "llm_tldr_en": "Introduces Tucker Attention as a generalized framework for parameter-efficient multi-head attention variants.",
+      "llm_tldr_cn": "引入 Tucker Attention 作为参数高效多头注意力变体的通用框架。",
+      "llm_tldr": "引入 Tucker Attention 作为参数高效多头注意力变体的通用框架。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "multi-head attention mechanism implementation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00965v1",
+      "source": "arxiv",
+      "title": "Understanding Transformers and Attention Mechanisms: An Introduction for Applied Mathematicians",
+      "abstract": "This document provides a brief introduction to the attention mechanism used in modern language models based on the Transformer architecture. We first illustrate how text is encoded as vectors and how the attention mechanism processes these vectors to encode semantic information. We then describe Multi-Headed Attention, examine how the Transformer architecture is built and look at some of its variants. Finally, we provide a glimpse at modern methods to reduce the computational and memory cost of attention, namely KV caching, Grouped Query attention and Latent Attention. This material is aimed at the applied mathematics community and was written as introductory presentation in the context of the IPAM Research Collaboration Workshop entitled \"Randomized Numerical Linear Algebra\" (RNLA), for the project: \"Randomization in Transformer models\".",
+      "authors": [
+        "Michel Fabrice Serret"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-04-01T14:39:28+00:00",
+      "link": "https://arxiv.org/pdf/2604.00965v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "comprehensive introduction to Transformer architecture and attention variants",
+      "llm_evidence_cn": "Transformer架构及注意力变体的全面介绍",
+      "llm_evidence": "Transformer架构及注意力变体的全面介绍",
+      "canonical_evidence": "Transformer架构及注意力变体的全面介绍",
+      "llm_tldr_en": "Provides a mathematical introduction to attention mechanisms, multi-head attention, and Transformer variants.",
+      "llm_tldr_cn": "为应用数学界提供了注意力机制、多头注意力及Transformer变体的入门介绍。",
+      "llm_tldr": "为应用数学界提供了注意力机制、多头注意力及Transformer变体的入门介绍。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.01757v1",
+      "source": "arxiv",
+      "title": "Attention Mechanisms Through the Lens of Numerical Methods: Approximation Methods and Alternative Formulations",
+      "abstract": "The attention mechanism is the computational core of modern Transformer architectures, but its quadratic complexity in the input sequence length is the bottleneck for large-scale inference. This has motivated a rapidly growing body of work aimed at accelerating attention through approximation and reformulation. In this survey, we revisit attention mechanisms through the lens of numerical analysis, with a particular emphasis on tools and perspectives from numerical linear algebra. Our goal is twofold: first, we aim to systematically review and classify fast approximation methods according to the numerical principles they exploit. These include sparsity and clustering approaches, low-rank and subspace projection techniques, randomized sketching methods, and tensor-based decompositions. We also discuss kernel-inspired reformulations of attention and recent architectural variants, such as Latent Attention, that modify the standard softmax formulation to improve efficiency. Second, by presenting these developments within a unified mathematical framework, we aim to bridge the gap between disciplines and highlight opportunities for further contributions from computational mathematics, particularly numerical linear algebra, to the design of scalable attention mechanisms.",
+      "authors": [
+        "Michel Fabrice Serret",
+        "Alice Cortinovis",
+        "Yijun Dong",
+        "Diana Halikias",
+        "Anna Ma",
+        "Fabio Matti",
+        "Deanna Needell",
+        "Katherine J. Pearce",
+        "Elizaveta Rebrova",
+        "Disha Shur",
+        "Rudi Smith",
+        "Hai-Xiao Wang",
+        "Laura Grigori"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-04-02T08:24:49+00:00",
+      "link": "https://arxiv.org/pdf/2604.01757v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "survey of attention mechanisms through numerical methods and approximation",
+      "llm_evidence_cn": "通过数值方法和近似对注意力机制进行的综述",
+      "llm_evidence": "通过数值方法和近似对注意力机制进行的综述",
+      "canonical_evidence": "通过数值方法和近似对注意力机制进行的综述",
+      "llm_tldr_en": "Systematically reviews fast attention approximation methods through the lens of numerical linear algebra.",
+      "llm_tldr_cn": "从数值线性代数的角度系统地回顾了快速注意力近似方法。",
+      "llm_tldr": "从数值线性代数的角度系统地回顾了快速注意力近似方法。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.08034v1",
+      "source": "arxiv",
+      "title": "Solution to the 10th ABAW Expression Recognition Challenge: A Robust Multimodal Framework with Safe Cross-Attention and Modality Dropout",
+      "abstract": "Emotion recognition in real-world environments is hindered by partial occlusions, missing modalities, and severe class imbalance. To address these issues, particularly for the Affective Behavior Analysis in-the-wild (ABAW) Expression challenge, we propose a multimodal framework that dynamically fuses visual and audio representations. Our approach uses a dual-branch Transformer architecture featuring a safe cross-attention mechanism and a modality dropout strategy. This design allows the network to rely on audio-based predictions when visual cues are absent. To mitigate the long-tail distribution of the Aff-Wild2 dataset, we apply focal loss optimization, combined with a sliding-window soft voting strategy to capture dynamic emotional transitions and reduce frame-level classification jitter. Experiments demonstrate that our framework effectively handles missing modalities and complex spatiotemporal dependencies, achieving an accuracy of 60.79% and an F1-score of 0.5029 on the Aff-Wild2 validation set.",
+      "authors": [
+        "Jun Yu",
+        "Naixiang Zheng",
+        "Guoyuan Wang",
+        "Yunxiang Zhang",
+        "Lingsi Zhu",
+        "Jiaen Liang",
+        "Wei Huang",
+        "Shengping Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-03-09T07:13:20+00:00",
+      "link": "https://arxiv.org/pdf/2603.08034v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "dual-branch Transformer featuring a safe cross-attention mechanism",
+      "llm_evidence_cn": "具有安全跨注意力机制的双分支Transformer",
+      "llm_evidence": "具有安全跨注意力机制的双分支Transformer",
+      "canonical_evidence": "具有安全跨注意力机制的双分支Transformer",
+      "llm_tldr_en": "Proposes a multimodal framework using safe cross-attention for robust emotion recognition.",
+      "llm_tldr_cn": "提出一种使用安全跨注意力机制的多模态框架，用于鲁棒的情感识别。",
+      "llm_tldr": "提出一种使用安全跨注意力机制的多模态框架，用于鲁棒的情感识别。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "encoder-decoder cross-attention mechanism",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.08343v1",
+      "source": "arxiv",
+      "title": "Rethinking Attention Output Projection: Structured Hadamard Transforms for Efficient Transformers",
+      "abstract": "The dense output projection in multi-head attention scales quadratically with model dimension, contributing significantly to parameter count, memory footprint, and inference cost. We propose replacing this projection with a fixed, parameter-free Walsh Hadamard Transform followed by a lightweight learnable affine rescaling, eliminating approximately 25 percent of attention parameters per block while preserving global cross head interaction through an orthogonal, norm-preserving transformation. Across different model sizes, we demonstrate that this structured substitution maintains comparable or slightly superior downstream task performance on standard benchmarks, while achieving up to 7 percent aggregate parameter reduction, 8.9 percent peak memory savings, and 6.6 percent throughput improvement at scale, with efficiency gains growing monotonically with model size, batch size, and sequence length. Interestingly, we observe that structured Hadamard-based models exhibit a steeper validation loss curve relative to training FLOPs compared to their dense counterparts, suggesting more favorable compute utilization during training.",
+      "authors": [
+        "Shubham Aggarwal",
+        "Lokendra Kumar"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-03-09T13:05:08+00:00",
+      "link": "https://arxiv.org/pdf/2603.08343v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "rethinking multi-head attention output projection with Hadamard transforms",
+      "llm_evidence_cn": "使用哈达玛变换重新设计多头注意力输出投影",
+      "llm_evidence": "使用哈达玛变换重新设计多头注意力输出投影",
+      "canonical_evidence": "使用哈达玛变换重新设计多头注意力输出投影",
+      "llm_tldr_en": "Replaces dense output projections in multi-head attention with structured transforms to reduce parameters.",
+      "llm_tldr_cn": "通过结构化哈达玛变换替换多头注意力中的稠密输出投影，显著减少模型参数量。",
+      "llm_tldr": "通过结构化哈达玛变换替换多头注意力中的稠密输出投影，显著减少模型参数量。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "multi-head attention mechanism implementation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11133v1",
+      "source": "arxiv",
+      "title": "Higher-Order Modular Attention: Fusing Pairwise and Triadic Interactions for Protein Sequences",
+      "abstract": "Transformer self-attention computes pairwise token interactions, yet protein sequence to phenotype relationships often involve cooperative dependencies among three or more residues that dot product attention does not capture explicitly. We introduce Higher-Order Modular Attention, HOMA, a unified attention operator that fuses pairwise attention with an explicit triadic interaction pathway. To make triadic attention practical on long sequences, HOMA employs block-structured, windowed triadic attention. We evaluate on three TAPE benchmarks for Secondary Structure, Fluorescence, and Stability. Our attention mechanism yields consistent improvements across all tasks compared with standard self-attention and efficient variants including block-wise attention and Linformer. These results suggest that explicit triadic terms provide complementary representational capacity for protein sequence prediction at controllable additional computational cost.",
+      "authors": [
+        "Shirin Amiraslani",
+        "Xin Gao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-11T16:07:56+00:00",
+      "link": "https://arxiv.org/pdf/2603.11133v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "higher-order modular attention fusing pairwise and triadic interactions",
+      "llm_evidence_cn": "融合成对和三元交互的高阶模块化注意力",
+      "llm_evidence": "融合成对和三元交互的高阶模块化注意力",
+      "canonical_evidence": "融合成对和三元交互的高阶模块化注意力",
+      "llm_tldr_en": "Introduces HOMA, a unified attention operator that captures higher-order dependencies in protein sequences.",
+      "llm_tldr_cn": "引入HOMA，一种捕获蛋白质序列中高阶依赖关系的统一注意力算子。",
+      "llm_tldr": "引入HOMA，一种捕获蛋白质序列中高阶依赖关系的统一注意力算子。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11322v2",
+      "source": "arxiv",
+      "title": "From Embeddings to Dyson Series: Transformer Mechanics as Non-Hermitian Operator Theory",
+      "abstract": "Transformer architectures are typically described in algorithmic and statistical terms, leaving their internal mechanics without a familiar structural language for researchers trained in physical theories. To bridge this gap, we develop a complementary operator-theoretic framework that recasts their mechanics in a language familiar to many-body physics. Beginning from the token as a discrete index without intrinsic geometry, we show that embedding corresponds to a basis transformation into a continuous representation space. Once such a reference basis is established, self-attention naturally assumes the role of a non-Hermitian interaction operator, and network depth implements an ordered composition of these interactions. Within this formulation, several empirical properties of deep Transformers -- including stability at large depth, representational saturation, and the effectiveness of multi-head decomposition -- find natural structural interpretations as consequences of regulated operator composition. Together, channel factorization and normalization emerge as organizing structural logic rather than isolated architectural choices. This perspective does not rely on post-hoc analogy, but follows a constructive path where each parallel arises from the preceding structural step. By recasting Transformer mechanics in operator language, the framework lowers the conceptual barrier between deep learning and many-body physics through shared mathematical structure, making tools and intuitions from each domain more readily legible to the other.",
+      "authors": [
+        "Po-Hao Chang"
+      ],
+      "primary_category": "cond-mat.dis-nn",
+      "categories": [
+        "cond-mat.dis-nn"
+      ],
+      "published": "2026-03-11T21:33:57+00:00",
+      "link": "https://arxiv.org/pdf/2603.11322v2",
+      "tags": [
+        "keyword:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "recasts self-attention as a non-Hermitian interaction operator",
+      "llm_evidence_cn": "将自注意力重新表述为非厄米相互作用算子",
+      "llm_evidence": "将自注意力重新表述为非厄米相互作用算子",
+      "canonical_evidence": "将自注意力重新表述为非厄米相互作用算子",
+      "llm_tldr_en": "Develops an operator-theoretic framework to explain the internal mechanics of self-attention in Transformers.",
+      "llm_tldr_cn": "开发了一个算子理论框架，用多体物理语言解释Transformer自注意力的内部机制。",
+      "llm_tldr": "开发了一个算子理论框架，用多体物理语言解释Transformer自注意力的内部机制。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "how does the attention mechanism work in deep learning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11487v1",
+      "source": "arxiv",
+      "title": "Attention Sinks Are Provably Necessary in Softmax Transformers: Evidence from Trigger-Conditional Tasks",
+      "abstract": "Transformers often display an attention sink: probability mass concentrates on a fixed, content-agnostic position. We prove that computing a simple trigger-conditional behavior necessarily induces a sink in softmax self-attention models. Our results formalize a familiar intuition: normalization over a probability simplex must force attention to collapse onto a stable anchor to realize a default state (e.g., when the model needs to ignore the input). We instantiate this with a concrete task: when a designated trigger token appears, the model must return the average of all preceding token representations, and otherwise output zero, a task which mirrors the functionality of attention heads in the wild (Barbero et al., 2025; Guo et al., 2024). We also prove that non-normalized ReLU attention can solve the same task without any sink, confirming that the normalization constraint is the fundamental driver of sink behavior. Experiments validate our predictions and demonstrate they extend beyond the theoretically analyzed setting: softmax models develop strong sinks while ReLU attention eliminates them in both single-head and multi-head variants.",
+      "authors": [
+        "Yuval Ran-Milo"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-12T03:13:28+00:00",
+      "link": "https://arxiv.org/pdf/2603.11487v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "theoretical evidence for the necessity of attention sinks in softmax transformers",
+      "llm_evidence_cn": "Softmax Transformer中注意力汇聚必要性的理论证据",
+      "llm_evidence": "Softmax Transformer中注意力汇聚必要性的理论证据",
+      "canonical_evidence": "Softmax Transformer中注意力汇聚必要性的理论证据",
+      "llm_tldr_en": "Provides mathematical proof that attention sinks are necessary for realizing default states in softmax transformers.",
+      "llm_tldr_cn": "提供数学证明，说明注意力汇聚对于在Softmax Transformer中实现默认状态是必要的。",
+      "llm_tldr": "提供数学证明，说明注意力汇聚对于在Softmax Transformer中实现默认状态是必要的。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "how does the attention mechanism work in deep learning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11487v2",
+      "source": "arxiv",
+      "title": "Attention Sinks Are Provably Necessary in Softmax Transformers: Evidence from Trigger-Conditional Tasks",
+      "abstract": "Transformers often display an attention sink: probability mass concentrates on a fixed, content-agnostic position. Are sinks a byproduct of the optimization/training regime? Or are they sometimes functionally necessary in softmax Transformers? Are sinks a byproduct of the optimization/training regime? Or are they sometimes functionally necessary in softmax Transformers? We prove that, in some settings, it is the latter: computing a simple trigger-conditional behavior necessarily induces a sink in softmax self-attention models. Our results formalize a familiar intuition: normalization over a probability simplex must force attention to collapse onto a stable anchor to realize a default state (e.g., when the model needs to ignore the input). We instantiate this with a concrete task: when a designated trigger token appears, the model must return the average of all preceding token representations, and otherwise output zero, a task which mirrors the functionality of attention heads in the wild (Barbero et al., 2025; Guo et al., 2024). We also prove that non-normalized ReLU attention can solve the same task without any sink, confirming that the normalization constraint is the fundamental driver of sink behavior. Experiments validate our predictions and demonstrate they extend beyond the theoretically analyzed setting: softmax models develop strong sinks while ReLU attention eliminates them in both single-head and multi-head variants.",
+      "authors": [
+        "Yuval Ran-Milo"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-12T03:13:28+00:00",
+      "link": "https://arxiv.org/pdf/2603.11487v2",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proves functional necessity of attention sinks in softmax self-attention models",
+      "llm_evidence_cn": "证明了Softmax Transformer中注意力汇聚点的功能必要性",
+      "llm_evidence": "证明了Softmax Transformer中注意力汇聚点的功能必要性",
+      "canonical_evidence": "证明了Softmax Transformer中注意力汇聚点的功能必要性",
+      "llm_tldr_en": "Provides theoretical proof that attention sinks are functionally necessary for trigger-conditional behaviors.",
+      "llm_tldr_cn": "从理论上证明了注意力汇聚点（Attention Sinks）在实现触发条件行为时是功能性必需的。",
+      "llm_tldr": "从理论上证明了注意力汇聚点（Attention Sinks）在实现触发条件行为时是功能性必需的。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "how does the attention mechanism work in deep learning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11487v3",
+      "source": "arxiv",
+      "title": "Attention Sinks Are Provably Necessary in Softmax Transformers: Evidence from Trigger-Conditional Tasks",
+      "abstract": "Transformers often display an attention sink: probability mass concentrates on a fixed, content-agnostic position. Are sinks a byproduct of the optimization/training regime? Or are they sometimes functionally necessary in softmax Transformers? Are sinks a byproduct of the optimization/training regime? Or are they sometimes functionally necessary in softmax Transformers? We prove that, in some settings, it is the latter: computing a simple trigger-conditional behavior necessarily induces a sink in softmax self-attention models. Our results formalize a familiar intuition: normalization over a probability simplex must force attention to collapse onto a stable anchor to realize a default state (e.g., when the model needs to ignore the input). We instantiate this with a concrete task: when a designated trigger token appears, the model must return the average of all preceding token representations, and otherwise output zero, a task which mirrors the functionality of attention heads in the wild (Barbero et al., 2025; Guo et al., 2024). We also prove that non-normalized ReLU attention can solve the same task without any sink, confirming that the normalization constraint is the fundamental driver of sink behavior. Experiments validate our predictions and demonstrate they extend beyond the theoretically analyzed setting: softmax models develop strong sinks while ReLU attention eliminates them in both single-head and multi-head variants.",
+      "authors": [
+        "Yuval Ran-Milo"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-12T03:13:28+00:00",
+      "link": "https://arxiv.org/pdf/2603.11487v3",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "functional necessity of attention sinks in softmax self-attention models",
+      "llm_evidence_cn": "Softmax自注意力模型中注意力汇聚的功能必要性",
+      "llm_evidence": "Softmax自注意力模型中注意力汇聚的功能必要性",
+      "canonical_evidence": "Softmax自注意力模型中注意力汇聚的功能必要性",
+      "llm_tldr_en": "Proves that attention sinks are functionally necessary for certain behaviors in softmax Transformers.",
+      "llm_tldr_cn": "证明了注意力汇聚在Softmax Transformer实现特定行为时具有功能必要性。",
+      "llm_tldr": "证明了注意力汇聚在Softmax Transformer实现特定行为时具有功能必要性。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "how does the attention mechanism work in deep learning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.12201v1",
+      "source": "arxiv",
+      "title": "IndexCache: Accelerating Sparse Attention via Cross-Layer Index Reuse",
+      "abstract": "Long-context agentic workflows have emerged as a defining use case for large language models, making attention efficiency critical for both inference speed and serving cost. Sparse attention addresses this challenge effectively, and DeepSeek Sparse Attention (DSA) is a representative production-grade solution: a lightweight lightning indexer selects the top-k most relevant tokens per query, reducing core attention from $O(L^2)$ to $O(Lk)$. However, the indexer itself retains $O(L^2)$ complexity and must run independently at every layer, despite the fact that the resulting top-k selections are highly similar across consecutive layers. We present IndexCache, which exploits this cross-layer redundancy by partitioning layers into a small set of Full layers that run their own indexers and a majority of Shared layers that simply reuse the nearest Full layer's top-k indices. We propose two complementary approaches to determine and optimize this configuration. Training-free IndexCache applies a greedy search algorithm that selects which layers to retain indexers by directly minimizing language modeling loss on a calibration set, requiring no weight updates. Training-aware IndexCache introduces a multi-layer distillation loss that trains each retained indexer against the averaged attention distributions of all layers it serves, enabling even simple interleaved patterns to match full-indexer accuracy. Experimental results on a 30B DSA model show that IndexCache can remove 75% of indexer computations with negligible quality degradation, achieving up to 1.82$\\times$ prefill speedup and 1.48$\\times$ decode speedup compared to standard DSA. These positive results are further confirmed by our preliminary experiments on the production-scale GLM-5 model (Figure 1).",
+      "authors": [
+        "Yushi Bai",
+        "Qian Dong",
+        "Ting Jiang",
+        "Xin Lv",
+        "Zhengxiao Du",
+        "Aohan Zeng",
+        "Jie Tang",
+        "Juanzi Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-03-12T17:27:21+00:00",
+      "link": "https://arxiv.org/pdf/2603.12201v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Accelerates sparse attention via cross-layer index reuse in large models",
+      "llm_evidence_cn": "通过大模型中的跨层索引重用加速稀疏注意力",
+      "llm_evidence": "通过大模型中的跨层索引重用加速稀疏注意力",
+      "canonical_evidence": "通过大模型中的跨层索引重用加速稀疏注意力",
+      "llm_tldr_en": "IndexCache improves sparse attention efficiency by reusing indexing results across consecutive transformer layers.",
+      "llm_tldr_cn": "IndexCache 通过在连续 Transformer 层间重用索引结果，提高了稀疏注意力的效率。",
+      "llm_tldr": "IndexCache 通过在连续 Transformer 层间重用索引结果，提高了稀疏注意力的效率。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.13381v1",
+      "source": "arxiv",
+      "title": "Beyond Linearity in Attention Projections: The Case for Nonlinear Queries",
+      "abstract": "Recent algebraic analysis shows that in decoder-only and encoder-only transformers, the Query projection $W_Q$ may be set to identity without noticeable performance deterioration. This is possible because attention depends on $X$ only through the products $XW_Q, XW_K, XW_V$, allowing basis transformations to be absorbed by adjacent layers and propagated through the network. We replace $W_Q \\in \\mathbb{R}^{d \\times d}$ with a nonlinear residual of the form $Q(X) = X + f_θ(X)$, where $f_θ$ is a bottleneck MLP with $d^2 + O(d)$ parameters. The identity term anchors the nonlinearity to a known-good prior. Experiments on GPT-3 small style models show consistent improvement over the baseline, comfortably outperforming a model with 12.5% more non-embedding parameters. These results motivate investigation at larger scales and across modalities.",
+      "authors": [
+        "Marko Karbevski"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-11T03:13:10+00:00",
+      "link": "https://arxiv.org/pdf/2603.13381v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "nonlinear query projections in transformer attention architecture",
+      "llm_evidence_cn": "Transformer 注意力架构中的非线性查询投影",
+      "llm_evidence": "Transformer 注意力架构中的非线性查询投影",
+      "canonical_evidence": "Transformer 注意力架构中的非线性查询投影",
+      "llm_tldr_en": "Replaces linear query projections with nonlinear residuals to improve transformer performance.",
+      "llm_tldr_cn": "将线性查询投影替换为非线性残差结构，以提升 Transformer 的性能。",
+      "llm_tldr": "将线性查询投影替换为非线性残差结构，以提升 Transformer 的性能。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.13941v1",
+      "source": "arxiv",
+      "title": "Bidirectional Cross-Attention Fusion of High-Res RGB and Low-Res HSI for Multimodal Automated Waste Sorting",
+      "abstract": "Growing waste streams and the transition to a circular economy require efficient automated waste sorting. In industrial settings, materials move on fast conveyor belts, where reliable identification and ejection demand pixel-accurate segmentation. RGB imaging delivers high-resolution spatial detail, which is essential for accurate segmentation, but it confuses materials that look similar in the visible spectrum. Hyperspectral imaging (HSI) provides spectral signatures that separate such materials, yet its lower spatial resolution limits detail. Effective waste sorting therefore needs methods that fuse both modalities to exploit their complementary strengths. We present Bidirectional Cross-Attention Fusion (BCAF), which aligns high-resolution RGB with low-resolution HSI at their native grids via localized, bidirectional cross-attention, avoiding pre-upsampling or early spectral collapse. BCAF uses two independent backbones: a standard Swin Transformer for RGB and an HSI-adapted Swin backbone that preserves spectral structure through 3D tokenization with spectral self-attention. We also analyze trade-offs between RGB input resolution and the number of HSI spectral slices. Although our evaluation targets RGB-HSI fusion, BCAF is modality-agnostic and applies to co-registered RGB with lower-resolution, high-channel auxiliary sensors. On the benchmark SpectralWaste dataset, BCAF achieves state-of-the-art performance of 76.4% mIoU at 31 images/s and 75.4% mIoU at 55 images/s. We further evaluate a novel industrial dataset: K3I-Cycling (first RGB subset already released on Fordatis). On this dataset, BCAF reaches 62.3% mIoU for material segmentation (paper, metal, plastic, etc.) and 66.2% mIoU for plastic-type segmentation (PET, PP, HDPE, LDPE, PS, etc.).",
+      "authors": [
+        "Jonas V. Funk",
+        "Lukas Roming",
+        "Andreas Michel",
+        "Paul Bäcker",
+        "Georg Maier",
+        "Thomas Längle",
+        "Markus Klute"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-14T13:21:36+00:00",
+      "link": "https://arxiv.org/pdf/2603.13941v1",
+      "tags": [
+        "keyword:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "bidirectional cross-attention fusion for multimodal data",
+      "llm_evidence_cn": "多模态数据的双向交叉注意力融合",
+      "llm_evidence": "多模态数据的双向交叉注意力融合",
+      "canonical_evidence": "多模态数据的双向交叉注意力融合",
+      "llm_tldr_en": "Introduces BCAF to fuse RGB and hyperspectral imaging for automated waste sorting using cross-attention.",
+      "llm_tldr_cn": "提出双向交叉注意力融合机制，结合RGB和高光谱图像进行自动化垃圾分类。",
+      "llm_tldr": "提出双向交叉注意力融合机制，结合RGB和高光谱图像进行自动化垃圾分类。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "encoder-decoder cross-attention mechanism",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.14224v1",
+      "source": "arxiv",
+      "title": "Self-Indexing KVCache: Predicting Sparse Attention from Compressed Keys",
+      "abstract": "The KV cache in self-attention has emerged as a major bottleneck in long-context and large-batch inference for LLMs. Existing approaches often treat sparsity prediction and compression as separate modules, relying on auxiliary index structures to select relevant tokens, and on complex quantization schemes to reduce memory usage. This fragmented design introduces redundant overhead and limits scalability.   In this paper, we propose a novel paradigm: treating the compressed key representation not merely as storage, but as a self-indexing structure that directly enables efficient sparse attention. By designing a sign-based 1-bit vector quantization (VQ) scheme, our method unifies compression and retrieval in a single, hardware-friendly format. This approach eliminates the need for external indices or learning-based predictors, offering a lightweight yet robust solution for memory-constrained inference. All components are designed to be hardware-efficient and easy to implement. By implementing custom CUDA kernels, our method integrates seamlessly with FlashAttention, minimizing additional runtime and memory overhead. Experimental results demonstrate that our approach delivers both effectiveness and efficiency.",
+      "authors": [
+        "Xu Yang",
+        "Jiapeng Zhang",
+        "Dongyang Zhao",
+        "Guo Chen",
+        "Zhuo Tang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-15T05:02:17+00:00",
+      "link": "https://arxiv.org/pdf/2603.14224v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Predicting sparse attention from compressed KV cache keys",
+      "llm_evidence_cn": "从压缩的KV缓存键中预测稀疏注意力",
+      "llm_evidence": "从压缩的KV缓存键中预测稀疏注意力",
+      "canonical_evidence": "从压缩的KV缓存键中预测稀疏注意力",
+      "llm_tldr_en": "Unifies KV cache compression and sparse attention retrieval using a self-indexing 1-bit quantization scheme.",
+      "llm_tldr_cn": "利用自索引1比特量化方案统一了KV缓存压缩和稀疏注意力检索。",
+      "llm_tldr": "利用自索引1比特量化方案统一了KV缓存压缩和稀疏注意力检索。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.14337v1",
+      "source": "arxiv",
+      "title": "On the Nature of Attention Sink that Shapes Decoding Strategy in MLLMs",
+      "abstract": "Large language models and their multimodal extensions have achieved remarkable success across diverse tasks, yet the internal mechanisms that govern their reasoning behaviour remain partially understood. In particular, the attention sink, a token that attracts disproportionate attention mass, has been observed in transformer architectures, but its role is still unclear. Our goal is to understand what attention sinks represent and how they shape model behaviour during inference, rather than considering them as incidental artifacts. Through our analysis, we find that attention sink representations encode structured global information that influences the decoding process. Building on our findings, we introduce OutRo, a lightweight inference-time strategy that leverages the sink token to enhance contextual representations: (i) non-sink token representations are aligned with the sink representation in the feature space; and (ii) the sink token is allowed to attend beyond the causal constraint, facilitating information exchange with non-sink tokens. This design enhances the reasoning process without requiring additional forward passes or access to attention maps. Based on extensive experiments, OutRo consistently improves performance across representative MLLMs on seven video QA benchmarks and demonstrates strong generalisation, while incurring only a 1.1x decoding overhead.",
+      "authors": [
+        "Suho Yoo",
+        "Youngjoon Jang",
+        "Joon Son Chung"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-15T12:05:35+00:00",
+      "link": "https://arxiv.org/pdf/2603.14337v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "interpreting the role of attention sinks in transformer decoding",
+      "llm_evidence_cn": "解释 Transformer 解码过程中注意力汇聚点的作用",
+      "llm_evidence": "解释 Transformer 解码过程中注意力汇聚点的作用",
+      "canonical_evidence": "解释 Transformer 解码过程中注意力汇聚点的作用",
+      "llm_tldr_en": "Analyzes how attention sinks encode global information and influence decoding in MLLMs.",
+      "llm_tldr_cn": "分析了注意力汇聚点如何编码全局信息并影响多模态大模型的解码过程。",
+      "llm_tldr": "分析了注意力汇聚点如何编码全局信息并影响多模态大模型的解码过程。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.14549v1",
+      "source": "arxiv",
+      "title": "ASAP: Attention-Shift-Aware Pruning for Efficient LVLM Inference",
+      "abstract": "While Large Vision-Language Models (LVLMs) demonstrate exceptional multi-modal capabilities, the quadratic computational cost of processing high-resolution visual tokens remains a critical bottleneck. Though recent token reduction strategies attempt to accelerate inference, such methods inadequately exploit attention values and fail to address token redundancy. More critically, they overlook the ``attention shift'' phenomenon inherent in LVLMs, which skews token attention scores. In this work, we propose ASAP, a novel training-free, KV-Cache-compatible pruning recipe that comprehensively addresses these limitations. First, we mitigate the attention shift by utilizing a dynamic bidirectional soft attention mask, ensuring the selection of genuinely informative tokens rather than naive attention-based selection. Second, we posit that high semantic redundancy within the token set degrades performance. We therefore introduce a weighted soft merging component that merges semantically similar tokens, preserving only the most feature-dense visual patches for subsequent layers. ASAP achieves virtually lossless compression of visual context, retaining 99.02% of the original LLaVA-NeXT-7B performance while aggressively slashing computational FLOPs by ~80%.",
+      "authors": [
+        "Surendra Pathak",
+        "Bo Han"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-03-15T18:51:31+00:00",
+      "link": "https://arxiv.org/pdf/2603.14549v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "attention-shift-aware pruning for efficient LVLM inference",
+      "llm_evidence_cn": "针对高效LVLM推理的注意力偏移感知剪枝",
+      "llm_evidence": "针对高效LVLM推理的注意力偏移感知剪枝",
+      "canonical_evidence": "针对高效LVLM推理的注意力偏移感知剪枝",
+      "llm_tldr_en": "Proposes ASAP, a training-free pruning recipe that addresses attention shift and redundancy in vision-language models.",
+      "llm_tldr_cn": "提出ASAP，一种解决视觉语言模型中注意力偏移和冗余问题的免训练剪枝方案。",
+      "llm_tldr": "提出ASAP，一种解决视觉语言模型中注意力偏移和冗余问题的免训练剪枝方案。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.14549v2",
+      "source": "arxiv",
+      "title": "ASAP: Attention-Shift-Aware Pruning for Efficient LVLM Inference",
+      "abstract": "While Large Vision-Language Models (LVLMs) demonstrate exceptional multi-modal capabilities, the quadratic computational cost of processing high-resolution visual tokens remains a critical bottleneck. Though recent token reduction strategies attempt to accelerate inference, such methods inadequately exploit attention values and fail to address token redundancy. More critically, they overlook the ``attention shift'' phenomenon inherent in LVLMs, which skews token attention scores. In this work, we propose ASAP, a novel training-free, KV-Cache-compatible pruning recipe that comprehensively addresses these limitations. First, we mitigate the attention shift by utilizing a dynamic bidirectional soft attention mask, ensuring the selection of genuinely informative tokens rather than naive attention-based selection. Second, we posit that high semantic redundancy within the token set degrades performance. We therefore introduce a weighted soft merging component that merges semantically similar tokens, preserving only the most feature-dense visual patches for subsequent layers. ASAP achieves virtually lossless compression of visual context, retaining 99.02% of the original LLaVA-NeXT-7B performance while aggressively slashing computational FLOPs by ~80%.",
+      "authors": [
+        "Surendra Pathak",
+        "Bo Han"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-03-15T18:51:31+00:00",
+      "link": "https://arxiv.org/pdf/2603.14549v2",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "attention-shift-aware pruning for efficient inference",
+      "llm_evidence_cn": "感知注意力偏移的剪枝用于高效推理",
+      "llm_evidence": "感知注意力偏移的剪枝用于高效推理",
+      "canonical_evidence": "感知注意力偏移的剪枝用于高效推理",
+      "llm_tldr_en": "Proposes ASAP, a pruning recipe that addresses attention shift and redundancy for efficient LVLM inference.",
+      "llm_tldr_cn": "提出ASAP剪枝方案，解决注意力偏移和冗余问题以实现高效的LVLM推理。",
+      "llm_tldr": "提出ASAP剪枝方案，解决注意力偏移和冗余问题以实现高效的LVLM推理。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.14923v1",
+      "source": "arxiv",
+      "title": "Directional Routing in Transformers",
+      "abstract": "We introduce directional routing, a lightweight mechanism that gives each transformer attention head learned suppression directions controlled by a shared router, at 3.9% parameter cost. We train a 433M-parameter model alongside an identical baseline in a single run, then trace the resulting circuits through mechanistic interpretability.   Routing becomes the model's dominant computational pathway. Disabling it collapses factual recall to near-zero probability across all 8 test prompts and drops induction accuracy from 93.4% to 0.0%. Knocking out individual attention heads has negligible effect: the primary mover head's removal actually increases target probability, and induction heads retain 98.6% accuracy without their strongest member. The coordination mechanism is irreplaceable; the components it coordinates are not. The model also self-organizes, without explicit pressure, into two regimes: domain-adaptive routing in early layers and fixed syntactic pruning in late layers, where the least-varying layer is the most critical (+42.6 PPL when disabled). Routing reduces perplexity 31-56% relative to the baseline, though downstream multiple-choice benchmarks do not yet reflect these gains.",
+      "authors": [
+        "Kevin Taylor"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-16T07:28:22+00:00",
+      "link": "https://arxiv.org/pdf/2603.14923v1",
+      "tags": [
+        "keyword:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directional routing mechanism for transformer attention heads",
+      "llm_evidence_cn": "Transformer注意力头的定向路由机制",
+      "llm_evidence": "Transformer注意力头的定向路由机制",
+      "canonical_evidence": "Transformer注意力头的定向路由机制",
+      "llm_tldr_en": "Introduces directional routing to control attention heads, significantly impacting factual recall and induction.",
+      "llm_tldr_cn": "引入定向路由机制来控制注意力头，显著提升了事实召回和归纳推理能力。",
+      "llm_tldr": "引入定向路由机制来控制注意力头，显著提升了事实召回和归纳推理能力。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.15031v1",
+      "source": "arxiv",
+      "title": "Attention Residuals",
+      "abstract": "Residual connections with PreNorm are standard in modern LLMs, yet they accumulate all layer outputs with fixed unit weights. This uniform aggregation causes uncontrolled hidden-state growth with depth, progressively diluting each layer's contribution. We propose Attention Residuals (AttnRes), which replaces this fixed accumulation with softmax attention over preceding layer outputs, allowing each layer to selectively aggregate earlier representations with learned, input-dependent weights. To address the memory and communication overhead of attending over all preceding layer outputs for large-scale model training, we introduce Block AttnRes, which partitions layers into blocks and attends over block-level representations, reducing the memory footprint while preserving most of the gains of full AttnRes. Combined with cache-based pipeline communication and a two-phase computation strategy, Block AttnRes becomes a practical drop-in replacement for standard residual connections with minimal overhead.   Scaling law experiments confirm that the improvement is consistent across model sizes, and ablations validate the benefit of content-dependent depth-wise selection. We further integrate AttnRes into the Kimi Linear architecture (48B total / 3B activated parameters) and pre-train on 1.4T tokens, where AttnRes mitigates PreNorm dilution, yielding more uniform output magnitudes and gradient distribution across depth, and improves downstream performance across all evaluated tasks.",
+      "authors": [
+        "Kimi Team",
+        "Guangyu Chen",
+        "Yu Zhang",
+        "Jianlin Su",
+        "Weixin Xu",
+        "Siyuan Pan",
+        "Yaoyu Wang",
+        "Yucheng Wang",
+        "Guanduo Chen",
+        "Bohong Yin",
+        "Yutian Chen",
+        "Junjie Yan",
+        "Ming Wei",
+        "Y. Zhang",
+        "Fanqing Meng",
+        "Chao Hong",
+        "Xiaotong Xie",
+        "Shaowei Liu",
+        "Enzhe Lu",
+        "Yunpeng Tai",
+        "Yanru Chen",
+        "Xin Men",
+        "Haiqing Guo",
+        "Y. Charles",
+        "Haoyu Lu",
+        "Lin Sui",
+        "Jinguo Zhu",
+        "Zaida Zhou",
+        "Weiran He",
+        "Weixiao Huang",
+        "Xinran Xu",
+        "Yuzhi Wang",
+        "Guokun Lai",
+        "Yulun Du",
+        "Yuxin Wu",
+        "Zhilin Yang",
+        "Xinyu Zhou"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-03-16T09:32:21+00:00",
+      "link": "https://arxiv.org/pdf/2603.15031v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes Attention Residuals to replace fixed accumulation with softmax attention over preceding layers",
+      "llm_evidence_cn": "提出注意力残差（AttnRes），用Softmax注意力取代固定的残差累加",
+      "llm_evidence": "提出注意力残差（AttnRes），用Softmax注意力取代固定的残差累加",
+      "canonical_evidence": "提出注意力残差（AttnRes），用Softmax注意力取代固定的残差累加",
+      "llm_tldr_en": "Introduces Attention Residuals to selectively aggregate layer outputs using learned, input-dependent weights.",
+      "llm_tldr_cn": "引入注意力残差机制，通过学习到的输入相关权重选择性地聚合层输出。",
+      "llm_tldr": "引入注意力残差机制，通过学习到的输入相关权重选择性地聚合层输出。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.15120v1",
+      "source": "arxiv",
+      "title": "How Attention Shapes Emotion: A Comparative Study of Attention Mechanisms for Speech Emotion Recognition",
+      "abstract": "Speech Emotion Recognition (SER) plays a key role in advancing human-computer interaction. Attention mechanisms have become the dominant approach for modeling emotional speech due to their ability to capture long-range dependencies and emphasize salient information. However, standard self-attention suffers from quadratic computational and memory complexity, limiting its scalability. In this work, we present a systematic benchmark of optimized attention mechanisms for SER, including RetNet, LightNet, GSA, FoX, and KDA. Experiments on both MSP-Podcast benchmark versions show that while standard self-attention achieves the strongest recognition performance across test sets, efficient attention variants dramatically improve scalability, reducing inference latency and memory usage by up to an order of magnitude. These results highlight a critical trade-off between accuracy and efficiency, providing practical insights for designing scalable SER systems.",
+      "authors": [
+        "Marc Casals-Salvador",
+        "Federico Costa",
+        "Rodolfo Zevallos",
+        "Javier Hernando"
+      ],
+      "primary_category": "eess.AS",
+      "categories": [
+        "eess.AS"
+      ],
+      "published": "2026-03-16T11:16:27+00:00",
+      "link": "https://arxiv.org/pdf/2603.15120v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Systematic benchmark and comparison of different optimized attention mechanisms",
+      "llm_evidence_cn": "对不同优化注意力机制的系统基准测试和比较",
+      "llm_evidence": "对不同优化注意力机制的系统基准测试和比较",
+      "canonical_evidence": "对不同优化注意力机制的系统基准测试和比较",
+      "llm_tldr_en": "This study benchmarks various efficient attention variants against standard self-attention for emotion recognition.",
+      "llm_tldr_cn": "该研究针对语音情感识别任务，对多种高效注意力变体与标准自注意力进行了基准测试对比。",
+      "llm_tldr": "该研究针对语音情感识别任务，对多种高效注意力变体与标准自注意力进行了基准测试对比。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "comparison of different types of attention mechanisms",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.16039v1",
+      "source": "arxiv",
+      "title": "Residual Stream Duality in Modern Transformer Architectures",
+      "abstract": "Recent work has made clear that the residual pathway is not mere optimization plumbing; it is part of the model's representational machinery. We agree, but argue that the cleanest way to organize this design space is through a two-axis view of the Transformer. A decoder evolves information along two ordered dimensions: sequence position and layer depth. Self-attention already provides adaptive mixing along the sequence axis, whereas the residual stream usually performs fixed addition along the depth axis. If we fix a token position and treat layer index as the ordered variable, then a causal depth-wise residual attention read is exactly the same local operator as causal short sliding-window attention (ShortSWA), except written over depth rather than over sequence. This is the core residual stream duality behind Transformer$^2$. This perspective also clarifies the recent literature. ELC-BERT and DenseFormer already show that learned aggregation over depth can outperform uniform residual accumulation, while Vertical Attention, DeepCrossAttention (DCA), MUDDFormer, and Attention Residuals move further toward explicit attention-based routing over earlier layers. The key point, however, is that operator-level duality does not imply systems-level symmetry. For large-scale autoregressive models, sequence-axis ShortSWA is usually the more hardware-friendly placement because it reuses token-side sliding-window kernels, KV-cache layouts, and chunked execution. If the goal is instead to change the shortcut itself, Deep Delta Learning (DDL) is the cleaner intervention because it modifies the residual operator directly rather than adding a separate cross-layer retrieval path. Our recommendation is therefore simple: use DDL when the shortcut is the object of interest, and use sequence-axis ShortSWA when the goal is local adaptive mixing.",
+      "authors": [
+        "Yifan Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-03-17T00:56:29+00:00",
+      "link": "https://arxiv.org/pdf/2603.16039v1",
+      "tags": [
+        "keyword:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "compares self-attention along sequence axis with residual stream along depth axis",
+      "llm_evidence_cn": "比较了沿序列轴的自注意力和沿深度轴的残差流",
+      "llm_evidence": "比较了沿序列轴的自注意力和沿深度轴的残差流",
+      "canonical_evidence": "比较了沿序列轴的自注意力和沿深度轴的残差流",
+      "llm_tldr_en": "Proposes a two-axis view of Transformers, equating residual streams with depth-wise sliding-window attention.",
+      "llm_tldr_cn": "提出Transformer的双轴视角，将残差流视为深度维度的滑动窗口注意力机制。",
+      "llm_tldr": "提出Transformer的双轴视角，将残差流视为深度维度的滑动窗口注意力机制。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "self-attention layers in transformer models",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.17484v1",
+      "source": "arxiv",
+      "title": "Learning When to Attend: Conditional Memory Access for Long-Context LLMs",
+      "abstract": "Language models struggle to generalize beyond pretraining context lengths, limiting long-horizon reasoning and retrieval. Continued pretraining on long-context data can help but is expensive due to the quadratic scaling of Attention. We observe that most tokens do not require (Global) Attention over the entire sequence and can rely on local context. Based on this, we propose L2A (Learning To Attend), a layer that enables conditional (token-wise) long-range memory access by deciding when to invoke global attention. We evaluate L2A on Qwen 2.5 and Qwen 3 models, extending their effective context length from 32K to 128K tokens. L2A matches the performance of standard long-context training to within 3% while skipping Global Attention for $\\sim$80% of tokens, outperforming prior baselines. We also design custom Triton kernels to efficiently implement this token-wise conditional Attention on GPUs, achieving up to $\\sim$2x improvements in training throughput and time-to-first-token over FlashAttention. Moreover, L2A enables post-training pruning of highly sparse Global Attention layers, reducing KV cache memory by up to 50% with negligible performance loss.",
+      "authors": [
+        "Sakshi Choudhary",
+        "Aditya Chattopadhyay",
+        "Luca Zancato",
+        "Elvis Nunez",
+        "Matthew Trager",
+        "Wei Xia",
+        "Stefano Soatto"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-03-18T08:48:18+00:00",
+      "link": "https://arxiv.org/pdf/2603.17484v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "conditional long-range memory access by deciding when to invoke global attention",
+      "llm_evidence_cn": "通过决定何时调用全局注意力来实现条件式长程记忆访问",
+      "llm_evidence": "通过决定何时调用全局注意力来实现条件式长程记忆访问",
+      "canonical_evidence": "通过决定何时调用全局注意力来实现条件式长程记忆访问",
+      "llm_tldr_en": "Proposes L2A to enable efficient long-context LLMs by conditionally skipping global attention for local tokens.",
+      "llm_tldr_cn": "提出L2A层，通过为局部标记有条件地跳过全局注意力，实现高效的长文本大模型推理。",
+      "llm_tldr": "提出L2A层，通过为局部标记有条件地跳过全局注意力，实现高效的长文本大模型推理。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.17771v1",
+      "source": "arxiv",
+      "title": "Attention Sinks Induce Gradient Sinks",
+      "abstract": "Attention sinks and massive activations are recurring and closely related phenomena in Transformer models. Existing studies have largely focused on the forward pass, making it unclear whether their connection is direct or mediated by a training-time mechanism. We study this question from the perspective of backpropagation. Empirically and theoretically, we show that under causal mask, attention sinks can induce pronounced gradient concentration, which we term gradient sinks. Furthermore, in pre-norm architectures with RMSNorm, massive activations can be understood as an adaptive response to this localized gradient pressure during training. To test this hypothesis, we introduce V-scale, a modification that adjusts value-path backpropagated gradients. In pretrained V-scale models, attention sinks are preserved whereas massive activations are suppressed. These results support the interpretation that gradient sink is a key training-time mediator linking attention sinks and massive activations.",
+      "authors": [
+        "Yihong Chen",
+        "Quanming Yao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-18T14:31:21+00:00",
+      "link": "https://arxiv.org/pdf/2603.17771v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "how attention sinks induce gradient concentration in Transformers",
+      "llm_evidence_cn": "注意力汇聚如何诱导Transformer中的梯度集中",
+      "llm_evidence": "注意力汇聚如何诱导Transformer中的梯度集中",
+      "canonical_evidence": "注意力汇聚如何诱导Transformer中的梯度集中",
+      "llm_tldr_en": "Investigates the relationship between attention sinks and gradient concentration during Transformer training.",
+      "llm_tldr_cn": "研究了Transformer训练过程中注意力汇聚与梯度集中之间的关系。",
+      "llm_tldr": "研究了Transformer训练过程中注意力汇聚与梯度集中之间的关系。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "how does the attention mechanism work in deep learning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.17879v1",
+      "source": "arxiv",
+      "title": "Differential Attention-Augmented BiomedCLIP with Asymmetric Focal Optimization for Imbalanced Multi-Label Video Capsule Endoscopy Classification",
+      "abstract": "This work presents a multi-label classification framework for video capsule endoscopy (VCE) that addresses the extreme class imbalance inherent in the Galar dataset through a combination of architectural and optimization-level strategies. Our approach modifies BiomedCLIP, a biomedical vision-language foundation model, by replacing its standard multi-head self-attention with a differential attention mechanism that computes the difference between two softmax attention maps to suppress attention noise. To counteract the skewed label distribution, where pathological findings constitute less than 0.1% of all annotated frames, a sqrt-frequency weighted sampler, asymmetric focal loss, mixup regularization, and per-class threshold optimization are employed. Temporal coherence is enforced through median-filter smoothing and gap merging prior to event-level JSON generation. On the held-out RARE-VISION test set comprising three NaviCam examinations (161,025 frames), the pipeline achieves an overall temporal mAP@0.5 of 0.2456 and mAP@0.95 of 0.2353, with total inference completed in approximately 8.6 minutes on a single GPU.",
+      "authors": [
+        "Podakanti Satyajith Chary",
+        "Nagarajan Ganapathy"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-03-18T16:04:50+00:00",
+      "link": "https://arxiv.org/pdf/2603.17879v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "replacing standard multi-head self-attention with differential attention",
+      "llm_evidence_cn": "用差分注意力替换标准多头自注意力",
+      "llm_evidence": "用差分注意力替换标准多头自注意力",
+      "canonical_evidence": "用差分注意力替换标准多头自注意力",
+      "llm_tldr_en": "Introduces a differential attention mechanism to suppress noise in medical video classification.",
+      "llm_tldr_cn": "引入差分注意力机制以抑制医学视频分类中的注意力噪声。",
+      "llm_tldr": "引入差分注意力机制以抑制医学视频分类中的注意力噪声。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "comparison of different types of attention mechanisms",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.17946v1",
+      "source": "arxiv",
+      "title": "CARE: Covariance-Aware and Rank-Enhanced Decomposition for Enabling Multi-Head Latent Attention",
+      "abstract": "Converting pretrained attention modules such as grouped-query attention (GQA) into multi-head latent attention (MLA) can improve expressivity without increasing KV-cache cost, making it attractive for efficient inference. However, many practical conversion baselines rely on weight-only low-rank approximations (e.g., SVD-style initializations) and uniform rank allocation. They focus on minimizing the difference between weight matrices rather than on how those weights affect input activations, ignore the covariance structure of activations, and enforce uniform rank across layers, causing activation drift and degraded attention fidelity. To address these issues, we propose CARE, a Covariance-Aware, Rank-Enhanced MLA conversion pipeline under a fixed KV width. CARE introduces three key steps: (i) activation-preserving factorization, which aligns the approximation with the actual input activations rather than just the weights; (ii) adjusted-rank allocation, which spreads a fixed KV budget across layers by giving more capacity to layers that need it most; and (iii) KV-parity mapping, which reparameterizes the converted K and V to fit the MLA format while keeping the KV-cache size unchanged. Our method outperforms a uniform-rank SVD baseline on Qwen3-4B/30B-A3B-Instruct-2507 and Llama-3.1-8B/70B-Instruct, reducing one-shot perplexity by up to 215x and improving mean accuracy by up to 1.70x at matched KV budgets. With a brief post-SVD healing fine-tune, we fully recover the original model's accuracy.",
+      "authors": [
+        "Zhongzhu Zhou",
+        "Fengxiang Bie",
+        "Ziyan Chen",
+        "Zhenyu Zhang",
+        "Yibo Yang",
+        "Junxiong Wang",
+        "Ben Athiwaratkun",
+        "Xiaoxia Wu",
+        "Shuaiwen Leon Song"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-18T17:18:35+00:00",
+      "link": "https://arxiv.org/pdf/2603.17946v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Enabling Multi-Head Latent Attention (MLA) through rank-enhanced decomposition",
+      "llm_evidence_cn": "通过秩增强分解实现多头潜变量注意力 (MLA)",
+      "llm_evidence": "通过秩增强分解实现多头潜变量注意力 (MLA)",
+      "canonical_evidence": "通过秩增强分解实现多头潜变量注意力 (MLA)",
+      "llm_tldr_en": "CARE enables efficient conversion of attention modules into Multi-Head Latent Attention for faster inference.",
+      "llm_tldr_cn": "CARE 实现了将注意力模块高效转换为多头潜变量注意力，以实现更快的推理。",
+      "llm_tldr": "CARE 实现了将注意力模块高效转换为多头潜变量注意力，以实现更快的推理。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "multi-head attention mechanism implementation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.18585v1",
+      "source": "arxiv",
+      "title": "HAViT: Historical Attention Vision Transformer",
+      "abstract": "Vision Transformers have excelled in computer vision but their attention mechanisms operate independently across layers, limiting information flow and feature learning. We propose an effective cross-layer attention propagation method that preserves and integrates historical attention matrices across encoder layers, offering a principled refinement of inter-layer information flow in Vision Transformers. This approach enables progressive refinement of attention patterns throughout the transformer hierarchy, enhancing feature acquisition and optimization dynamics. The method requires minimal architectural changes, adding only attention matrix storage and blending operations. Comprehensive experiments on CIFAR-100 and TinyImageNet demonstrate consistent accuracy improvements, with ViT performance increasing from 75.74% to 77.07% on CIFAR-100 (+1.33%) and from 57.82% to 59.07% on TinyImageNet (+1.25%). Cross-architecture validation shows similar gains across transformer variants, with CaiT showing 1.01% enhancement. Systematic analysis identifies the blending hyperparameter of historical attention (alpha = 0.45) as optimal across all configurations, providing the ideal balance between current and historical attention information. Random initialization consistently outperforms zero initialization, indicating that diverse initial attention patterns accelerate convergence and improve final performance. Our code is publicly available at https://github.com/banik-s/HAViT.",
+      "authors": [
+        "Swarnendu Banik",
+        "Manish Das",
+        "Shiv Ram Dubey",
+        "Satish Kumar Singh"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-19T07:46:47+00:00",
+      "link": "https://arxiv.org/pdf/2603.18585v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "cross-layer attention propagation method for Vision Transformers",
+      "llm_evidence_cn": "视觉Transformer的跨层注意力传播方法",
+      "llm_evidence": "视觉Transformer的跨层注意力传播方法",
+      "canonical_evidence": "视觉Transformer的跨层注意力传播方法",
+      "llm_tldr_en": "Introduces HAViT to integrate historical attention matrices across layers in Vision Transformers.",
+      "llm_tldr_cn": "引入HAViT，通过在视觉Transformer中整合跨层历史注意力矩阵来优化特征学习。",
+      "llm_tldr": "引入HAViT，通过在视觉Transformer中整合跨层历史注意力矩阵来优化特征学习。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "applications of attention in natural language processing and vision",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.18676v1",
+      "source": "arxiv",
+      "title": "MANAR: Memory-augmented Attention with Navigational Abstract Conceptual Representation",
+      "abstract": "MANAR (Memory-augmented Attention with Navigational Abstract Conceptual Representation), contextualization layer generalizes standard multi-head attention (MHA) by instantiating the principles of Global Workspace Theory (GWT). While MHA enables unconstrained all-to-all communication, it lacks the functional bottleneck and global integration mechanisms hypothesized in cognitive models of consciousness. MANAR addresses this by implementing a central workspace through a trainable memory of abstract concepts and an Abstract Conceptual Representation (ACR). The architecture follows a two-stage logic that maps directly to GWT mechanics: (i) an integration phase, where retrieved memory concepts converge to form a collective \"mental image\" (the ACR) based on input stimuli; and (ii) a broadcasting phase, where this global state navigates and informs the contextualization of individual local tokens. We demonstrate that efficient linear-time scaling is a fundamental architectural byproduct of instantiating GWT functional bottleneck, as routing global information through a constant-sized ACR resolves the quadratic complexity inherent in standard attention. MANAR is a compatible re-parameterization of MHA with identical semantic roles for its projections, enabling knowledge transfer from pretrained transformers via weight-copy and thus overcoming the adoption barriers of structurally incompatible linear-time alternatives. MANAR enables non-convex contextualization, synthesizing representations that provably lie outside the convex hull of input tokens - a mathematical reflection of the creative synthesis described in GWT. Empirical evaluations confirm that MANAR matches or exceeds strong baselines across language (GLUE score of 85.1), vision (83.9% ImageNet-1K), and speech (2.7% WER on LibriSpeech), positioning it as an efficient and expressive alternative to quadratic attention.",
+      "authors": [
+        "Zuher Jahshan",
+        "Ben Ben Ishay",
+        "Leonid Yavits"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-19T09:37:18+00:00",
+      "link": "https://arxiv.org/pdf/2603.18676v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "generalizes standard multi-head attention (MHA) with memory-augmented architecture",
+      "llm_evidence_cn": "通过记忆增强架构泛化了标准多头注意力机制",
+      "llm_evidence": "通过记忆增强架构泛化了标准多头注意力机制",
+      "canonical_evidence": "通过记忆增强架构泛化了标准多头注意力机制",
+      "llm_tldr_en": "Proposes MANAR, a memory-augmented attention layer that implements a central workspace for better integration.",
+      "llm_tldr_cn": "提出MANAR，一种通过记忆增强实现中央工作区的注意力层，以改进信息整合。",
+      "llm_tldr": "提出MANAR，一种通过记忆增强实现中央工作区的注意力层，以改进信息整合。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.18761v1",
+      "source": "arxiv",
+      "title": "NeuroGame Transformer: Gibbs-Inspired Attention Driven by Game Theory and Statistical Physics",
+      "abstract": "Standard attention mechanisms in transformers are limited by their pairwise formulation, which hinders the modeling of higher-order dependencies among tokens. We introduce the NeuroGame Transformer (NGT) to overcome this by reconceptualizing attention through a dual perspective: tokens are treated simultaneously as players in a cooperative game and as interacting spins in a statistical physics system. Token importance is quantified using two complementary game-theoretic concepts -- Shapley values for global, permutation-based attribution and Banzhaf indices for local, coalition-level influence. These are combined via a learnable gating parameter to form an external magnetic field, while pairwise interaction potentials capture synergistic relationships. The system's energy follows an Ising Hamiltonian, with attention weights emerging as marginal probabilities under the Gibbs distribution, efficiently computed via mean-field equations. To ensure scalability despite the exponential coalition space, we develop importance-weighted Monte Carlo estimators with Gibbs-distributed weights. This approach avoids explicit exponential factors, ensuring numerical stability for long sequences. We provide theoretical convergence guarantees and characterize the fairness-sensitivity trade-off governed by the interpolation parameter. Experimental results demonstrate that the NeuroGame Transformer achieves strong performance across SNLI, and MNLI-matched, outperforming some major efficient transformer baselines. On SNLI, it attains a test accuracy of 86.4\\% (with a peak validation accuracy of 86.6\\%), surpassing ALBERT-Base and remaining highly competitive with RoBERTa-Base. Code is available at https://github.com/dbouchaffra/NeuroGame-Transformer.",
+      "authors": [
+        "Djamel Bouchaffra",
+        "Faycal Ykhlef",
+        "Hanene Azzag",
+        "Mustapha Lebbah",
+        "Bilal Faye"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-19T11:14:30+00:00",
+      "link": "https://arxiv.org/pdf/2603.18761v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reconceptualizing attention through game theory and statistical physics",
+      "llm_evidence_cn": "通过博弈论和统计物理学重新构建注意力机制",
+      "llm_evidence": "通过博弈论和统计物理学重新构建注意力机制",
+      "canonical_evidence": "通过博弈论和统计物理学重新构建注意力机制",
+      "llm_tldr_en": "Introduces NeuroGame Transformer using game-theoretic concepts to model higher-order token dependencies.",
+      "llm_tldr_cn": "引入NeuroGame Transformer，利用博弈论概念建模Token之间的高阶依赖关系。",
+      "llm_tldr": "引入NeuroGame Transformer，利用博弈论概念建模Token之间的高阶依赖关系。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.20586v1",
+      "source": "arxiv",
+      "title": "MKA: Memory-Keyed Attention for Efficient Long-Context Reasoning",
+      "abstract": "As long-context language modeling becomes increasingly important, the cost of maintaining and attending to large Key/Value (KV) caches grows rapidly, becoming a major bottleneck in both training and inference. While prior works such as Multi-Query Attention (MQA) and Multi-Latent Attention (MLA) reduce memory by sharing or compressing KV features, they often trade off representation quality or incur runtime overhead. We propose Memory-Keyed Attention (MKA), a hierarchical attention mechanism that integrates multi-level KV caches (local, session, and long-term) and learns to route attention across them dynamically. We further introduce Route-Fused MKA (FastMKA), a broadcast-routed variant that fuses memory sources before attention computation for improved efficiency. Experiments on different sequence lengths show that FastMKA achieves a favorable accuracy-efficiency trade-off: comparable perplexity to MLA while achieving up to 5x faster training throughput and 1.8x lower evaluation latency. These results highlight MKA as a practical and extensible framework for efficient long-context attention.",
+      "authors": [
+        "Dong Liu",
+        "Yanxuan Yu",
+        "Ben Lengerich",
+        "Ying Nian Wu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-21T01:04:03+00:00",
+      "link": "https://arxiv.org/pdf/2603.20586v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Hierarchical attention mechanism integrating multi-level KV caches",
+      "llm_evidence_cn": "集成多级KV缓存的分层注意力机制",
+      "llm_evidence": "集成多级KV缓存的分层注意力机制",
+      "canonical_evidence": "集成多级KV缓存的分层注意力机制",
+      "llm_tldr_en": "Proposes Memory-Keyed Attention (MKA) to optimize long-context reasoning by dynamically routing across KV caches.",
+      "llm_tldr_cn": "提出内存键控注意力（MKA），通过动态路由KV缓存优化长文本推理。",
+      "llm_tldr": "提出内存键控注意力（MKA），通过动态路由KV缓存优化长文本推理。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.20586v2",
+      "source": "arxiv",
+      "title": "MKA: Memory-Keyed Attention for Efficient Long-Context Reasoning",
+      "abstract": "As long-context language modeling becomes increasingly important, the cost of maintaining and attending to large Key/Value (KV) caches grows rapidly, becoming a major bottleneck in both training and inference. While prior works such as Multi-Query Attention (MQA) and Multi-Latent Attention (MLA) reduce memory by sharing or compressing KV features, they often trade off representation quality or incur runtime overhead. We propose Memory-Keyed Attention (MKA), a hierarchical attention mechanism that integrates multi-level KV caches (local, session, and long-term) and learns to route attention across them dynamically. We further introduce Route-Fused MKA (FastMKA), a broadcast-routed variant that fuses memory sources before attention computation for improved efficiency. Experiments on different sequence lengths show that FastMKA achieves a favorable accuracy-efficiency trade-off: comparable perplexity to MLA while achieving up to 5x faster training throughput and 1.8x lower evaluation latency. These results highlight MKA as a practical and extensible framework for efficient long-context attention.",
+      "authors": [
+        "Dong Liu",
+        "Yanxuan Yu",
+        "Ben Lengerich",
+        "Ying Nian Wu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-21T01:04:03+00:00",
+      "link": "https://arxiv.org/pdf/2603.20586v2",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proposes Memory-Keyed Attention (MKA) hierarchical attention mechanism",
+      "llm_evidence_cn": "提出记忆键控注意力（MKA）分层注意力机制",
+      "llm_evidence": "提出记忆键控注意力（MKA）分层注意力机制",
+      "canonical_evidence": "提出记忆键控注意力（MKA）分层注意力机制",
+      "llm_tldr_en": "Introduces a hierarchical attention mechanism to optimize KV cache and long-context reasoning.",
+      "llm_tldr_cn": "引入一种分层注意力机制，以优化KV缓存和长上下文推理。",
+      "llm_tldr": "引入一种分层注意力机制，以优化KV缓存和长上下文推理。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.20662v1",
+      "source": "arxiv",
+      "title": "Attention in Space: Functional Roles of VLM Heads for Spatial Reasoning",
+      "abstract": "Despite remarkable advances in large Vision-Language Models (VLMs), spatial reasoning remains a persistent challenge. In this work, we investigate how attention heads within VLMs contribute to spatial reasoning by analyzing their functional roles through a mechanistic interpretability lens. We introduce CogVSR, a dataset that decomposes complex spatial reasoning questions into step-by-step subquestions designed to simulate human-like reasoning via a chain-of-thought paradigm, with each subquestion linked to specific cognitive functions such as spatial perception or relational reasoning. Building on CogVSR, we develop a probing framework to identify and characterize attention heads specialized for these functions. Our analysis across diverse VLM families reveals that these functional heads are universally sparse, vary in number and distribution across functions. Notably, spatially specialized heads are fewer than those for other cognitive functions, highlighting their scarcity. We propose methods to activate latent spatial heads, improving spatial understanding. Intervention experiments further demonstrate their critical role in spatial reasoning: removing functional heads leads to performance degradation, while emphasizing them enhances accuracy. This study provides new interpretability driven insights into how VLMs attend to space and paves the way for enhancing complex spatial reasoning in multimodal models.",
+      "authors": [
+        "Xueqi Ma",
+        "Shuo Yang",
+        "Yanbei Jiang",
+        "Shu Liu",
+        "Zhenzhen Liu",
+        "Jiayang Ao",
+        "Xingjun Ma",
+        "Sarah Monazam Erfani",
+        "James Bailey"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-03-21T05:36:12+00:00",
+      "link": "https://arxiv.org/pdf/2603.20662v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "analyzing functional roles of attention heads through mechanistic interpretability",
+      "llm_evidence_cn": "通过机械可解释性分析注意力头的核心功能",
+      "llm_evidence": "通过机械可解释性分析注意力头的核心功能",
+      "canonical_evidence": "通过机械可解释性分析注意力头的核心功能",
+      "llm_tldr_en": "Investigates the functional roles of VLM attention heads in spatial reasoning using a probing framework.",
+      "llm_tldr_cn": "利用探测框架研究视觉语言模型中注意力头在空间推理中的功能角色。",
+      "llm_tldr": "利用探测框架研究视觉语言模型中注意力头在空间推理中的功能角色。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.20843v1",
+      "source": "arxiv",
+      "title": "HiCI: Hierarchical Construction-Integration for Long-Context Attention",
+      "abstract": "Long-context language modeling is commonly framed as a scalability challenge of token-level attention, yet local-to-global information structuring remains largely implicit in existing approaches. Drawing on cognitive theories of discourse comprehension, we propose HiCI (Hierarchical Construction--Integration), a hierarchical attention module that constructs segment-level representations, integrates them into a shared global context, and broadcasts both to condition segment-level attention. We validate HiCI through parameter-efficient adaptation of LLaMA-2 with only <5.5% additional parameters, extending context from 4K to 100K tokens (7B) and 64K tokens (13B). Across language modeling, retrieval, and instruction-following benchmarks, HiCI yields consistent improvements over strong baselines, including matching proprietary models on topic retrieval and surpassing GPT-3.5-Turbo-16K on code comprehension. These results demonstrate the effectiveness of explicit hierarchical structuring as an inductive bias for long-context modeling.",
+      "authors": [
+        "Xiangyu Zeng",
+        "Qi Xu",
+        "Yunke Wang",
+        "Chang Xu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-03-21T14:59:45+00:00",
+      "link": "https://arxiv.org/pdf/2603.20843v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hierarchical attention module for long-context modeling",
+      "llm_evidence_cn": "用于长文本建模的分层注意力模块",
+      "llm_evidence": "用于长文本建模的分层注意力模块",
+      "canonical_evidence": "用于长文本建模的分层注意力模块",
+      "llm_tldr_en": "Proposes HiCI, a hierarchical attention mechanism to extend Transformer context length efficiently.",
+      "llm_tldr_cn": "提出 HiCI 分层注意力机制，以高效扩展 Transformer 的上下文长度。",
+      "llm_tldr": "提出 HiCI 分层注意力机制，以高效扩展 Transformer 的上下文长度。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.20997v1",
+      "source": "arxiv",
+      "title": "When Does Content-Based Routing Work? Representation Requirements for Selective Attention in Hybrid Sequence Models",
+      "abstract": "We identify a routing paradox in hybrid recurrent-attention architectures: content-based routing - deciding which tokens deserve expensive attention - requires exactly the pairwise computation that routing is designed to avoid. Through 20+ controlled experiments across three tasks (a synthetic diagnostic, the Zoology MQAR benchmark, and HotpotQA), we map the routing landscape exhaustively. One layer of softmax attention creates a latent ~34-dimensional subspace enabling 98.4% routing precision; zero layers yield 1.2%. This subspace is invisible to cosine similarity, destroyed by random projections (98.4% to 2.6%), and cannot be created by contrastive pretraining - proving attention's role is writing pairwise match results into representations, not merely computing them. Twelve alternative mechanisms all cluster at 15-29%. Non-learned indices (Bloom filter: 90.9%; BM25 on HotpotQA: 82.7%) bypass the bottleneck entirely. The result is a sharp two-regime hierarchy with an empty middle ground. These findings provide the mechanistic explanation for the empirical observation that recurrent models fail at associative recall, and reframe attention as a representation constructor rather than merely a computation mechanism.",
+      "authors": [
+        "Abhinaba Basu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-22T01:04:57+00:00",
+      "link": "https://arxiv.org/pdf/2603.20997v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Analyzes how softmax attention creates a latent subspace for content-based routing",
+      "llm_evidence_cn": "分析Softmax注意力如何为基于内容的路由创建潜在子空间",
+      "llm_evidence": "分析Softmax注意力如何为基于内容的路由创建潜在子空间",
+      "canonical_evidence": "分析Softmax注意力如何为基于内容的路由创建潜在子空间",
+      "llm_tldr_en": "Investigates the representation requirements and mechanisms of selective attention in hybrid sequence models.",
+      "llm_tldr_cn": "研究混合序列模型中选择性注意力的表示需求和作用机制。",
+      "llm_tldr": "研究混合序列模型中选择性注意力的表示需求和作用机制。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "how does the attention mechanism work in deep learning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.21096v1",
+      "source": "arxiv",
+      "title": "Mixture of Chapters: Scaling Learnt Memory in Transformers",
+      "abstract": "Transformers lack an explicit architectural mechanism for storing and organizing knowledge acquired during training. We introduce learnable sparse memory banks: a set of latent tokens, randomly initialized and trained end-to-end, that transformer layers query via cross-attention to retrieve stored knowledge. To scale memory capacity without prohibitive attention costs, we propose chapter-based routing inspired by Mixture-of-Experts architectures, partitioning the memory bank into chapters and training a router to select relevant subsets per input. This enables scaling to 262K memory tokens while maintaining tractable computation. We evaluate our approach against standard transformers (in iso-FLOP settings) on pre-training and instruction fine-tuning across relevant benchmarks. Our models surpass iso-FLOP baselines suggesting scope for a new axis of scaling, demonstrating that explicit associative memory provides complementary capacity to what is captured implicitly in model parameters. Additionally, we observe improved knowledge retention under continued training, with robustness to forgetting when transitioning between training phases (e.g., pretraining to instruction fine-tuning).",
+      "authors": [
+        "Tasmay Pankaj Tibrewal",
+        "Pritish Saha",
+        "Ankit Meda",
+        "Kunal Singh",
+        "Pradeep Moturi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-03-22T07:16:58+00:00",
+      "link": "https://arxiv.org/pdf/2603.21096v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "transformer layers query sparse memory banks via cross-attention",
+      "llm_evidence_cn": "Transformer层通过交叉注意力查询稀疏记忆库",
+      "llm_evidence": "Transformer层通过交叉注意力查询稀疏记忆库",
+      "canonical_evidence": "Transformer层通过交叉注意力查询稀疏记忆库",
+      "llm_tldr_en": "Introduces Mixture of Chapters to scale Transformer memory using sparse cross-attention routing.",
+      "llm_tldr_cn": "引入Mixture of Chapters，通过稀疏交叉注意力路由扩展Transformer的记忆容量。",
+      "llm_tldr": "引入Mixture of Chapters，通过稀疏交叉注意力路由扩展Transformer的记忆容量。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "encoder-decoder cross-attention mechanism",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.22300v1",
+      "source": "arxiv",
+      "title": "Scaling Attention via Feature Sparsity",
+      "abstract": "Scaling Transformers to ultra-long contexts is bottlenecked by the $O(n^2 d)$ cost of self-attention. Existing methods reduce this cost along the sequence axis through local windows, kernel approximations, or token-level sparsity, but these approaches consistently degrade accuracy. In this paper, we instead explore an orthogonal axis: feature sparsity. We propose Sparse Feature Attention (SFA), where queries and keys are represented as $k$-sparse codes that preserve high-dimensional expressivity while reducing the cost of attention from $Θ(n^2 d)$ to $Θ(n^2 k^2/d)$. To make this efficient at scale, we introduce FlashSFA, an IO-aware kernel that extends FlashAttention to operate directly on sparse overlaps without materializing dense score matrices. Across GPT-2 and Qwen3 pretraining, SFA matches dense baselines while improving speed by up to $2.5\\times$ and reducing FLOPs and KV-cache by nearly 50\\%. On synthetic and downstream benchmarks, SFA preserves retrieval accuracy and robustness at long contexts, outperforming short-embedding baselines that collapse feature diversity. These results establish feature-level sparsity as a complementary and underexplored axis for efficient attention, enabling Transformers to scale to orders-of-magnitude longer contexts with minimal quality loss. Code is available at https://github.com/YannX1e/Sparse-Feature-Attention.",
+      "authors": [
+        "Yan Xie",
+        "Tiansheng Wen",
+        "Tangda Huang",
+        "Bo Chen",
+        "Chenyu You",
+        "Stefanie Jegelka",
+        "Yifei Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-17T08:41:50+00:00",
+      "link": "https://arxiv.org/pdf/2603.22300v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "FlashSFA extends FlashAttention to operate on sparse overlaps",
+      "llm_evidence_cn": "FlashSFA扩展了FlashAttention以在稀疏重叠上运行",
+      "llm_evidence": "FlashSFA扩展了FlashAttention以在稀疏重叠上运行",
+      "canonical_evidence": "FlashSFA扩展了FlashAttention以在稀疏重叠上运行",
+      "llm_tldr_en": "Introduces Sparse Feature Attention and FlashSFA to scale Transformers via feature sparsity.",
+      "llm_tldr_cn": "引入稀疏特征注意力（SFA）和FlashSFA，通过特征稀疏性扩展Transformer的上下文能力。",
+      "llm_tldr": "引入稀疏特征注意力（SFA）和FlashSFA，通过特征稀疏性扩展Transformer的上下文能力。",
+      "llm_tags": [
+        "query:flattn:composite"
+      ],
+      "matched_query_tag": "query:flattn:composite",
+      "matched_query_text": "Papers central to Flash Attention 算法及其优化机制, especially work that connects or combines: FlashAttention algorithm mechanism and implementation; memory tiling for attention computation optimization; FlashAttention-2 improvements in parallelism and work partitioning; How does FlashAttention optimize memory access and speed up training?; Comparison between FlashAttention and standard self attention mechanisms.; Technical details of tiling and recomputation in FlashAttention..",
+      "matched_requirement_id": "req-composite-flattn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.24653v1",
+      "source": "arxiv",
+      "title": "From Weights to Concepts: Data-Free Interpretability of CLIP via Singular Vector Decomposition",
+      "abstract": "As vision-language models are deployed at scale, understanding their internal mechanisms becomes increasingly critical. Existing interpretability methods predominantly rely on activations, making them dataset-dependent, vulnerable to data bias, and often restricted to coarse head-level explanations. We introduce SITH (Semantic Inspection of Transformer Heads), a fully data-free, training-free framework that directly analyzes CLIP's vision transformer in weight space. For each attention head, we decompose its value-output matrix into singular vectors and interpret each one via COMP (Coherent Orthogonal Matching Pursuit), a new algorithm that explains them as sparse, semantically coherent combinations of human-interpretable concepts. We show that SITH yields coherent, faithful intra-head explanations, validated through reconstruction fidelity and interpretability experiments. This allows us to use SITH for precise, interpretable weight-space model edits that amplify or suppress specific concepts, improving downstream performance without retraining. Furthermore, we use SITH to study model adaptation, showing how fine-tuning primarily reweights a stable semantic basis rather than learning entirely new features.",
+      "authors": [
+        "Francesco Gentile",
+        "Nicola Dall'Asen",
+        "Francesco Tonini",
+        "Massimiliano Mancini",
+        "Lorenzo Vaquero",
+        "Elisa Ricci"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-25T17:59:57+00:00",
+      "link": "https://arxiv.org/pdf/2603.24653v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "data-free interpretability of transformer heads via weight space analysis",
+      "llm_evidence_cn": "通过权重空间分析实现Transformer头的无数据可解释性",
+      "llm_evidence": "通过权重空间分析实现Transformer头的无数据可解释性",
+      "canonical_evidence": "通过权重空间分析实现Transformer头的无数据可解释性",
+      "llm_tldr_en": "Introduces SITH to interpret CLIP attention heads by decomposing weight matrices into concepts.",
+      "llm_tldr_cn": "引入SITH，通过将权重矩阵分解为概念来解释CLIP的注意力头。",
+      "llm_tldr": "引入SITH，通过将权重矩阵分解为概念来解释CLIP的注意力头。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.26127v1",
+      "source": "arxiv",
+      "title": "Finding Distributed Object-Centric Properties in Self-Supervised Transformers",
+      "abstract": "Self-supervised Vision Transformers (ViTs) like DINO show an emergent ability to discover objects, typically observed in [CLS] token attention maps of the final layer. However, these maps often contain spurious activations resulting in poor localization of objects. This is because the [CLS] token, trained on an image-level objective, summarizes the entire image instead of focusing on objects. This aggregation dilutes the object-centric information existing in the local, patch-level interactions. We analyze this by computing inter-patch similarity using patch-level attention components (query, key, and value) across all layers. We find that: (1) Object-centric properties are encoded in the similarity maps derived from all three components ($q, k, v$), unlike prior work that uses only key features or the [CLS] token. (2) This object-centric information is distributed across the network, not just confined to the final layer. Based on these insights, we introduce Object-DINO, a training-free method that extracts this distributed object-centric information. Object-DINO clusters attention heads across all layers based on the similarities of their patches and automatically identifies the object-centric cluster corresponding to all objects. We demonstrate Object-DINO's effectiveness on two applications: enhancing unsupervised object discovery (+3.6 to +12.4 CorLoc gains) and mitigating object hallucination in Multimodal Large Language Models by providing visual grounding. Our results demonstrate that using this distributed object-centric information improves downstream tasks without additional training.",
+      "authors": [
+        "Samyak Rawlekar",
+        "Amitabh Swain",
+        "Yujun Cai",
+        "Yiwei Wang",
+        "Ming-Hsuan Yang",
+        "Narendra Ahuja"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL",
+        "cs.LG",
+        "cs.MM"
+      ],
+      "published": "2026-03-27T07:22:04+00:00",
+      "link": "https://arxiv.org/pdf/2603.26127v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Analyzing patch-level attention components (Q, K, V) for object localization",
+      "llm_evidence_cn": "分析补丁级注意力组件（Q, K, V）以进行目标定位",
+      "llm_evidence": "分析补丁级注意力组件（Q, K, V）以进行目标定位",
+      "canonical_evidence": "分析补丁级注意力组件（Q, K, V）以进行目标定位",
+      "llm_tldr_en": "Analyzes internal attention components in ViTs to improve object-centric property discovery and localization.",
+      "llm_tldr_cn": "分析ViT内部的注意力组件，以改进以对象为中心的属性发现和定位。",
+      "llm_tldr": "分析ViT内部的注意力组件，以改进以对象为中心的属性发现和定位。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.26380v1",
+      "source": "arxiv",
+      "title": "Switch Attention: Towards Dynamic and Fine-grained Hybrid Transformers",
+      "abstract": "The attention mechanism has been the core component in modern transformer architectures. However, the computation of standard full attention scales quadratically with the sequence length, serving as a major bottleneck in long-context language modeling. Sliding window attention restricts the context length for better efficiency at the cost of narrower receptive fields. While existing efforts attempt to take the benefits from both sides by building hybrid models, they often resort to static, heuristically designed alternating patterns that limit efficient allocation of computation in various scenarios. In this paper, we propose Switch Attention (SwiAttn), a novel hybrid transformer that enables dynamic and fine-grained routing between full attention and sliding window attention. For each token at each transformer layer, SwiAttn dynamically routes the computation to either a full-attention branch for global information aggregation or a sliding-window branch for efficient local pattern matching. An adaptive regularization objective is designed to encourage the model towards efficiency. Moreover, we adopt continual pretraining to optimize the model, transferring the full attention architecture to the hybrid one. Extensive experiments are conducted on twenty-three benchmark datasets across both regular (4K) and long (32K) context lengths, demonstrating the effectiveness of the proposed method.",
+      "authors": [
+        "Yusheng Zhao",
+        "Hourun Li",
+        "Bohan Wu",
+        "Jingyang Yuan",
+        "Meng Zhang",
+        "Yichun Yin",
+        "Lifeng Shang",
+        "Ming Zhang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-03-27T13:04:29+00:00",
+      "link": "https://arxiv.org/pdf/2603.26380v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "dynamic routing between full and sliding window attention",
+      "llm_evidence_cn": "全注意力与滑动窗口注意力之间的动态路由",
+      "llm_evidence": "全注意力与滑动窗口注意力之间的动态路由",
+      "canonical_evidence": "全注意力与滑动窗口注意力之间的动态路由",
+      "llm_tldr_en": "Proposes Switch Attention for dynamic, fine-grained routing to balance efficiency and receptive field.",
+      "llm_tldr_cn": "提出 Switch Attention，通过动态细粒度路由平衡计算效率与感受野。",
+      "llm_tldr": "提出 Switch Attention，通过动态细粒度路由平衡计算效率与感受野。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.27153v1",
+      "source": "arxiv",
+      "title": "Preconditioned Attention: Enhancing Efficiency in Transformers",
+      "abstract": "Central to the success of Transformers is the attention block, which effectively models global dependencies among input tokens associated to a dataset. However, we theoretically demonstrate that standard attention mechanisms in transformers often produce ill-conditioned matrices with large condition numbers. This ill-conditioning is a well-known obstacle for gradient-based optimizers, leading to inefficient training. To address this issue, we introduce preconditioned attention, a novel approach that incorporates a conditioning matrix into each attention head. Our theoretical analysis shows that this method significantly reduces the condition number of attention matrices, resulting in better-conditioned matrices that improve optimization. Conditioned attention serves as a simple drop-in replacement for a wide variety of attention mechanisms in the literature. We validate the effectiveness of preconditioned attention across a diverse set of transformer applications, including image classification, object detection, instance segmentation, long sequence modeling and language modeling.",
+      "authors": [
+        "Hemanth Saratchandran"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-28T06:30:45+00:00",
+      "link": "https://arxiv.org/pdf/2603.27153v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Preconditioned attention architecture to improve matrix conditioning and optimization",
+      "llm_evidence_cn": "通过预处理注意力架构改善矩阵条件数并优化训练",
+      "llm_evidence": "通过预处理注意力架构改善矩阵条件数并优化训练",
+      "canonical_evidence": "通过预处理注意力架构改善矩阵条件数并优化训练",
+      "llm_tldr_en": "Introduces preconditioned attention to solve ill-conditioning in standard attention, enhancing training efficiency.",
+      "llm_tldr_cn": "引入预处理注意力机制解决标准注意力的病态矩阵问题，提升训练效率。",
+      "llm_tldr": "引入预处理注意力机制解决标准注意力的病态矩阵问题，提升训练效率。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28114v1",
+      "source": "arxiv",
+      "title": "Attention Frequency Modulation: Training-Free Spectral Modulation of Diffusion Cross-Attention",
+      "abstract": "Cross-attention is the primary interface through which text conditions latent diffusion models, yet its step-wise multi-resolution dynamics remain under-characterized, limiting principled training-free control. We cast diffusion cross-attention as a spatiotemporal signal on the latent grid by summarizing token-softmax weights into token-agnostic concentration maps and tracking their radially binned Fourier power over denoising. Across prompts and seeds, encoder cross-attention exhibits a consistent coarse-to-fine spectral progression, yielding a stable time-frequency fingerprint of token competition. Building on this structure, we introduce Attention Frequency Modulation (AFM), a plug-and-play inference-time intervention that edits token-wise pre-softmax cross-attention logits in the Fourier domain: low- and high-frequency bands are reweighted with a progress-aligned schedule and can be adaptively gated by token-allocation entropy, before the token softmax. AFM provides a continuous handle to bias the spatial scale of token-competition patterns without retraining, prompt editing, or parameter updates. Experiments on Stable Diffusion show that AFM reliably redistributes attention spectra and produces substantial visual edits while largely preserving semantic alignment. Finally, we find that entropy mainly acts as an adaptive gain on the same frequency-based edit rather than an independent control axis.",
+      "authors": [
+        "Seunghun Oh",
+        "Unsang Park"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-03-30T07:24:41+00:00",
+      "link": "https://arxiv.org/pdf/2603.28114v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "spectral modulation and visualization of diffusion cross-attention weights",
+      "llm_evidence_cn": "扩散模型交叉注意力权重的频谱调制与可视化",
+      "llm_evidence": "扩散模型交叉注意力权重的频谱调制与可视化",
+      "canonical_evidence": "扩散模型交叉注意力权重的频谱调制与可视化",
+      "llm_tldr_en": "Introduces AFM to control diffusion models by analyzing and modulating cross-attention spectral dynamics.",
+      "llm_tldr_cn": "通过分析和调制交叉注意力的频谱动态，引入 AFM 以实现对扩散模型的推理时控制。",
+      "llm_tldr": "通过分析和调制交叉注意力的频谱动态，引入 AFM 以实现对扩散模型的推理时控制。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28458v1",
+      "source": "arxiv",
+      "title": "HISA: Efficient Hierarchical Indexing for Fine-Grained Sparse Attention",
+      "abstract": "Token-level sparse attention mechanisms, exemplified by DeepSeek Sparse Attention (DSA), achieve fine-grained key selection by scoring every historical token for each query using a lightweight indexer, and then computing attention only over the selected subset. While the downstream sparse attention scales efficiently, the indexer still scans the entire prefix for every query, introducing an O($L^2$) per-layer bottleneck that becomes prohibitive as context length grows. We propose HISA (Hierarchical Indexed Sparse Attention), a drop-in replacement for the indexer that transforms the search process from a flat token scan into a two-stage hierarchical procedure. First, a block-level coarse filter scores pooled block representatives to prune irrelevant regions. Then, a token-level refinement applies the original indexer only within the remaining candidate blocks. HISA preserves the exact token-level top-k sparsity pattern required by the downstream Sparse MLA operator and requires no additional training. On kernel-level benchmarks, HISA achieves a 2$\\times$ speedup at 32K context length and 4$\\times$ at 128K. On Needle-in-a-Haystack and LongBench, we directly replace the indexer in DeepSeek-V3.2 with HISA, without any fine-tuning. HISA closely matches the original DSA in quality while significantly outperforming block-sparse baselines. Moreover, the token selection sets produced by HISA and the original DSA exhibit a mean IoU greater than 99%, indicating that the efficiency gains come with virtually no impact on selection fidelity.",
+      "authors": [
+        "Yufei Xu",
+        "Fanxu Meng",
+        "Fan Jiang",
+        "Yuxuan Wang",
+        "Ruijie Zhou",
+        "Jiexi Wu",
+        "Zhixin Pan",
+        "Zhaohui Wang",
+        "Xiaojuan Tang",
+        "Wenjie Pei",
+        "Tongxuan Liu",
+        "Di yin",
+        "Xing Sun",
+        "Muhan Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-30T13:59:51+00:00",
+      "link": "https://arxiv.org/pdf/2603.28458v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hierarchical indexing for fine-grained sparse attention to solve O(L^2) bottleneck",
+      "llm_evidence_cn": "用于细粒度稀疏注意力的分层索引，解决平方级复杂度瓶颈",
+      "llm_evidence": "用于细粒度稀疏注意力的分层索引，解决平方级复杂度瓶颈",
+      "canonical_evidence": "用于细粒度稀疏注意力的分层索引，解决平方级复杂度瓶颈",
+      "llm_tldr_en": "Introduces HISA, a hierarchical indexer that optimizes sparse attention efficiency for long-context models.",
+      "llm_tldr_cn": "引入HISA分层索引器，优化了长文本模型中细粒度稀疏注意力的计算效率。",
+      "llm_tldr": "引入HISA分层索引器，优化了长文本模型中细粒度稀疏注意力的计算效率。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28458v2",
+      "source": "arxiv",
+      "title": "HISA: Efficient Hierarchical Indexing for Fine-Grained Sparse Attention",
+      "abstract": "Token-level sparse attention mechanisms, exemplified by DeepSeek Sparse Attention (DSA), achieve fine-grained key selection by scoring every historical key for each query through a lightweight indexer, then computing attention only on the selected subset. While the downstream sparse attention itself scales favorably, the indexer must still scan the entire prefix for every query, introducing an per-layer bottleneck that grows prohibitively with context length. We propose HISA (Hierarchical Indexed Sparse Attention), a plug-and-play replacement for the indexer that rewrites the search path from a flat token scan into a two-stage hierarchical procedure: (1) a block-level coarse filtering stage that scores pooled block representations to discard irrelevant regions, followed by (2) a token-level refinement stage that applies the original indexer exclusively within the retained candidate blocks. HISA preserves the identical token-level top-sparse pattern consumed by the downstream Sparse MLA operator and requires no additional training. On kernel-level benchmarks, HISA achieves up to speedup at 64K context. On Needle-in-a-Haystack and LongBench, we directly replace the indexer in DeepSeek-V3.2 and GLM-5 with our HISA indexer, without any finetuning. HISA closely matches the original DSA in quality, while substantially outperforming block-sparse baselines.",
+      "authors": [
+        "Yufei Xu",
+        "Fanxu Meng",
+        "Fan Jiang",
+        "Yuxuan Wang",
+        "Ruijie Zhou",
+        "Zhaohui Wang",
+        "Jiexi Wu",
+        "Zhixin Pan",
+        "Xiaojuan Tang",
+        "Wenjie Pei",
+        "Tongxuan Liu",
+        "Di yin",
+        "Xing Sun",
+        "Muhan Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-30T13:59:51+00:00",
+      "link": "https://arxiv.org/pdf/2603.28458v2",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes hierarchical indexing for fine-grained sparse attention architecture",
+      "llm_evidence_cn": "提出用于细粒度稀疏注意力的分层索引架构",
+      "llm_evidence": "提出用于细粒度稀疏注意力的分层索引架构",
+      "canonical_evidence": "提出用于细粒度稀疏注意力的分层索引架构",
+      "llm_tldr_en": "HISA introduces a hierarchical indexing method to eliminate the per-layer bottleneck in sparse attention models.",
+      "llm_tldr_cn": "HISA 提出了一种分层索引方法，消除了稀疏注意力模型中的逐层瓶颈。",
+      "llm_tldr": "HISA 提出了一种分层索引方法，消除了稀疏注意力模型中的逐层瓶颈。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00086v1",
+      "source": "arxiv",
+      "title": "Hierarchical Pre-Training of Vision Encoders with Large Language Models",
+      "abstract": "The field of computer vision has experienced significant advancements through scalable vision encoders and multimodal pre-training frameworks. However, existing approaches often treat vision encoders and large language models (LLMs) as independent modules, limiting the integration of hierarchical visual features. In this work, we propose HIVE (Hierarchical Pre-Training of Vision Encoders), a novel framework that enhances vision-language alignment by introducing hierarchical cross-attention between the vision encoder and LLM. Unlike conventional methods that flatten image embeddings, HIVE enables structured feature fusion across multiple layers, improving gradient flow and representation learning. To optimize this interaction, we introduce a three-stage training strategy that progressively aligns the vision encoder with the LLM, ensuring stable optimization and effective multimodal fusion. Empirical evaluations demonstrate that HIVE achieves superior performance not only in image classification but also on various vision-language tasks, outperforming self-attention-based methods in benchmarks such as MME, GQA, OK-VQA, and ScienceQA. Our results highlight the benefits of hierarchical feature integration, paving the way for more efficient and expressive vision-language models.",
+      "authors": [
+        "Eugene Lee",
+        "Ting-Yu Chang",
+        "Jui-Huang Tsai",
+        "Jiajie Diao",
+        "Chen-Yi Lee"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-03-31T18:00:39+00:00",
+      "link": "https://arxiv.org/pdf/2604.00086v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Hierarchical cross-attention between vision encoder and LLM",
+      "llm_evidence_cn": "视觉编码器与大语言模型之间的分层交叉注意力",
+      "llm_evidence": "视觉编码器与大语言模型之间的分层交叉注意力",
+      "canonical_evidence": "视觉编码器与大语言模型之间的分层交叉注意力",
+      "llm_tldr_en": "Proposes HIVE to improve vision-language alignment using hierarchical cross-attention mechanisms.",
+      "llm_tldr_cn": "提出HIVE框架，通过分层交叉注意力机制增强视觉与语言的对齐。",
+      "llm_tldr": "提出HIVE框架，通过分层交叉注意力机制增强视觉与语言的对齐。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "encoder-decoder cross-attention mechanism",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00199v1",
+      "source": "arxiv",
+      "title": "QUEST: A robust attention formulation using query-modulated spherical attention",
+      "abstract": "The Transformer model architecture has become one of the most widely used in deep learning and the attention mechanism is at its core. The standard attention formulation uses a softmax operation applied to a scaled dot product between query and key vectors. We explore the role played by norms of the queries and keys, which can cause training instabilities when they arbitrarily increase. We demonstrate how this can happen even in simple Transformer models, in the presence of easy-to-learn spurious patterns in the data. We propose a new attention formulation, QUEry-modulated Spherical aTtention (QUEST), that constrains the keys to a hyperspherical latent space, while still allowing individual tokens to flexibly control the sharpness of the attention distribution. QUEST can be easily used as a drop-in replacement for standard attention. We focus on vision applications while also exploring other domains to highlight the method's generality. We show that (1) QUEST trains without instabilities and (2) produces models with improved performance (3) that are robust to data corruptions and adversarial attacks.",
+      "authors": [
+        "Hariprasath Govindarajan",
+        "Per Sidén",
+        "Jacob Roll",
+        "Fredrik Lindsten"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-03-31T20:04:17+00:00",
+      "link": "https://arxiv.org/pdf/2604.00199v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "new attention formulation using query-modulated spherical attention",
+      "llm_evidence_cn": "使用查询调制球面注意力的全新注意力公式",
+      "llm_evidence": "使用查询调制球面注意力的全新注意力公式",
+      "canonical_evidence": "使用查询调制球面注意力的全新注意力公式",
+      "llm_tldr_en": "Proposes QUEST, a spherical attention mechanism that improves training stability by constraining keys to a hypersphere.",
+      "llm_tldr_cn": "提出QUEST球面注意力机制，通过将键约束在超球面上来提高训练稳定性。",
+      "llm_tldr": "提出QUEST球面注意力机制，通过将键约束在超球面上来提高训练稳定性。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00754v1",
+      "source": "arxiv",
+      "title": "Stochastic Attention: Connectome-Inspired Randomized Routing for Expressive Linear-Time Attention",
+      "abstract": "The whole-brain connectome of a fruit fly comprises over 130K neurons connected with a probability of merely 0.02%, yet achieves an average shortest path of only 4.4 hops. Despite being highly structured at the circuit level, the network's long-range connections are broadly distributed across brain regions, functioning as stochastic shortcuts that enable efficient global communication. Inspired by this observation, we propose Stochastic Attention (SA), a drop-in enhancement for sliding-window attention (SWA) that applies a random permutation to the token sequence before windowed attention and restores the original order afterward. This transforms the fixed local window into a stochastic global one within the same $O(nw)$ per-layer budget. Through depth, independently sampled permutations yield exponentially growing receptive fields, achieving full sequence coverage in $O(\\log_w n)$ layers versus $O(n/w)$ for SWA. We validate SA in two settings: pre-training language models from scratch, where a gated SA + SWA combination achieves the best average zero-shot accuracy, and training-free inference on Qwen3-8B and Qwen3-30B-A3B, where SA consistently outperforms SWA and matches or exceeds Mixture of Block Attention at comparable compute budgets. These results suggest that connectome-inspired stochastic routing is a practical primitive for improving the expressivity of efficient attention, complementary to existing linear and sparse approaches.",
+      "authors": [
+        "Zehao Jin",
+        "Yanan Sui"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-04-01T11:18:40+00:00",
+      "link": "https://arxiv.org/pdf/2604.00754v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "connectome-inspired randomized routing for linear-time attention",
+      "llm_evidence_cn": "受连接组学启发的线性时间注意力随机路由",
+      "llm_evidence": "受连接组学启发的线性时间注意力随机路由",
+      "canonical_evidence": "受连接组学启发的线性时间注意力随机路由",
+      "llm_tldr_en": "Proposes Stochastic Attention using random permutations to enable global communication in linear time.",
+      "llm_tldr_cn": "提出随机注意力机制，利用随机排列在线性时间内实现全局通信。",
+      "llm_tldr": "提出随机注意力机制，利用随机排列在线性时间内实现全局通信。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.00757v1",
+      "source": "arxiv",
+      "title": "IWP: Token Pruning as Implicit Weight Pruning in Large Vision Language Models",
+      "abstract": "Large Vision Language Models show impressive performance across image and video understanding tasks, yet their computational cost grows rapidly with the number of visual tokens. Existing token pruning methods mitigate this issue through empirical approaches while overlooking the internal mechanism of attention. In this paper, we propose a novel training free token pruning framework grounded in the dual form perspective of attention. We reformulate attention as an implicit linear layer whose weight matrix is the sum of rank 1 outer products, each generated by a single token's key value pair. Token pruning thus reduces to selecting an optimal subset of these rank 1 updates that best approximates the original dual weight matrix. Extending this perspective to standard softmax attention in LVLMs, we derive a novel metric quantifying both a token's information magnitude and information duplication. To efficiently select the subset with the proposed metric, we introduce Progressive Chunked Maximal Marginal Relevance. Extensive experiments demonstrate that our method achieves a better trade off between performance and efficiency, while providing another perspective on existing pruning approaches.",
+      "authors": [
+        "Dong-Jae Lee",
+        "Sunghyun Baek",
+        "Junmo Kim"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-01T11:23:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.00757v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "token pruning as implicit weight pruning in vision language models",
+      "llm_evidence_cn": "视觉语言模型中作为隐式权重剪枝的Token剪枝",
+      "llm_evidence": "视觉语言模型中作为隐式权重剪枝的Token剪枝",
+      "canonical_evidence": "视觉语言模型中作为隐式权重剪枝的Token剪枝",
+      "llm_tldr_en": "Formulates token pruning as implicit weight pruning to reduce computational costs in LVLMs.",
+      "llm_tldr_cn": "将Token剪枝公式化为隐式权重剪枝，以降低大型视觉语言模型的计算开销。",
+      "llm_tldr": "将Token剪枝公式化为隐式权重剪枝，以降低大型视觉语言模型的计算开销。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.01178v1",
+      "source": "arxiv",
+      "title": "Screening Is Enough",
+      "abstract": "A core limitation of standard softmax attention is that it does not define a notion of absolute query--key relevance: attention weights are obtained by redistributing a fixed unit mass across all keys according to their relative scores. As a result, relevance is defined only relative to competing keys, and irrelevant keys cannot be explicitly rejected. We introduce Multiscreen, a language-model architecture built around a mechanism we call screening, which enables absolute query--key relevance. Instead of redistributing attention across all keys, screening evaluates each key against an explicit threshold, discarding irrelevant keys and aggregating the remaining keys, thereby removing global competition among keys. Across experiments, Multiscreen achieves comparable validation loss with approximately 40% fewer parameters than a Transformer baseline, enables stable optimization at substantially larger learning rates, maintains strong performance in long-context perplexity, shows little to no degradation in retrieval performance even far beyond the training context length, and reduces inference latency by up to 3.2$\\times$ at 100K context length.",
+      "authors": [
+        "Ken M. Nakanishi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-01T17:29:08+00:00",
+      "link": "https://arxiv.org/pdf/2604.01178v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "introduces Multiscreen architecture as an alternative to standard softmax attention",
+      "llm_evidence_cn": "引入Multiscreen架构作为标准softmax注意力的替代方案",
+      "llm_evidence": "引入Multiscreen架构作为标准softmax注意力的替代方案",
+      "canonical_evidence": "引入Multiscreen架构作为标准softmax注意力的替代方案",
+      "llm_tldr_en": "Proposes a screening mechanism to replace softmax attention with absolute query-key relevance.",
+      "llm_tldr_cn": "提出一种筛选机制，用绝对查询-键相关性取代传统的softmax注意力。",
+      "llm_tldr": "提出一种筛选机制，用绝对查询-键相关性取代传统的softmax注意力。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.01339v1",
+      "source": "arxiv",
+      "title": "Regularizing Attention Scores with Bootstrapping",
+      "abstract": "Vision transformers (ViT) rely on attention mechanism to weigh input features, and therefore attention scores have naturally been considered as explanations for its decision-making process. However, attention scores are almost always non-zero, resulting in noisy and diffused attention maps and limiting interpretability. Can we quantify uncertainty measures of attention scores and obtain regularized attention scores? To this end, we consider attention scores of ViT in a statistical framework where independent noise would lead to insignificant yet non-zero scores. Leveraging statistical learning techniques, we introduce the bootstrapping for attention scores which generates a baseline distribution of attention scores by resampling input features. Such a bootstrap distribution is then used to estimate significances and posterior probabilities of attention scores. In natural and medical images, the proposed \\emph{Attention Regularization} approach demonstrates a straightforward removal of spurious attention arising from noise, drastically improving shrinkage and sparsity. Quantitative evaluations are conducted using both simulation and real-world datasets. Our study highlights bootstrapping as a practical regularization tool when using attention scores as explanations for ViT.   Code available: https://github.com/ncchung/AttentionRegularization",
+      "authors": [
+        "Neo Christopher Chung",
+        "Maxim Laletin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG",
+        "stat.ME",
+        "stat.ML"
+      ],
+      "published": "2026-04-01T19:48:32+00:00",
+      "link": "https://arxiv.org/pdf/2604.01339v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "regularizing and interpreting attention scores with bootstrapping",
+      "llm_evidence_cn": "使用自助法正则化并解释注意力分数",
+      "llm_evidence": "使用自助法正则化并解释注意力分数",
+      "canonical_evidence": "使用自助法正则化并解释注意力分数",
+      "llm_tldr_en": "Uses bootstrapping to quantify uncertainty and regularize attention scores for better interpretability in ViTs.",
+      "llm_tldr_cn": "利用自助法量化不确定性并正则化注意力分数，提高视觉Transformer的可解释性。",
+      "llm_tldr": "利用自助法量化不确定性并正则化注意力分数，提高视觉Transformer的可解释性。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.01683v1",
+      "source": "arxiv",
+      "title": "Coupled Query-Key Dynamics for Attention",
+      "abstract": "Standard scaled dot-product attention computes scores from static, independent projections of the input. We show that evolving queries and keys \\emph{jointly} through shared learned dynamics before scoring - which we call \\textbf{coupled QK dynamics} - improves language modeling perplexity and training stability. On WikiText-103 at 60M parameters, coupled dynamics achieves 22.55--22.62 perplexity vs.\\ 24.22 for standard attention ($-$6.6--6.9\\%), with only 0.11\\% additional parameters (shared across both instantiations). A structural ablation isolates coupling as the active ingredient: a symplectic (Hamiltonian) and a non-symplectic (Euler) integrator perform identically when both couple Q and K, while an uncoupled MLP baseline of matched capacity reaches only 23.81 with 8$\\times$ higher seed variance. The integration step count (1--7) is similarly irrelevant - a single coupled step suffices. A compute-matched comparison reveals that coupling is a \\emph{sample-efficiency} mechanism: standard attention trained for 2.4$\\times$ longer (matching wall-clock) reaches the same perplexity, but requires 2.4$\\times$ more tokens. The advantage scales to 150M ($-$6.7\\%) but narrows at 350M ($-$1.0\\%), where Differential Attention (18.93) overtakes coupled dynamics (19.35). The benefit is corpus-dependent: coupling helps on domain-coherent text (WikiText-103 $-$6.6\\%, PubMed $-$4.5\\%) but degrades on heterogeneous web text ($+$10.3\\%) and shows no benefit on GLUE. We characterize when coupling helps and when it does not, providing practical guidelines.",
+      "authors": [
+        "Barak Gahtan",
+        "Alex M. Bronstein"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-04-02T06:37:05+00:00",
+      "link": "https://arxiv.org/pdf/2604.01683v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Coupled Query-Key dynamics for attention architecture",
+      "llm_evidence_cn": "注意力架构中的耦合查询-键动力学",
+      "llm_evidence": "注意力架构中的耦合查询-键动力学",
+      "canonical_evidence": "注意力架构中的耦合查询-键动力学",
+      "llm_tldr_en": "Proposes evolving queries and keys jointly through shared dynamics to improve attention stability and performance.",
+      "llm_tldr_cn": "提出通过共享动力学共同演化查询和键，以提高注意力机制的稳定性和性能。",
+      "llm_tldr": "提出通过共享动力学共同演化查询和键，以提高注意力机制的稳定性和性能。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.02926v1",
+      "source": "arxiv",
+      "title": "A Multi-head-based architecture for effective morphological tagging in Russian with open dictionary",
+      "abstract": "The article proposes a new architecture based on Multi-head attention to solve the problem of morphological tagging for the Russian language. The preprocessing of the word vectors includes splitting the words into subtokens, followed by a trained procedure for aggregating the vectors of the subtokens into vectors for tokens. This allows to support an open dictionary and analyze morphological features taking into account parts of words (prefixes, endings, etc.). The open dictionary allows in future to analyze words that are absent in the training dataset. The performed computational experiment on the SinTagRus and Taiga datasets shows that for some grammatical categories the proposed architecture gives accuracy 98-99% and above, which outperforms previously known results. For nine out of ten words, the architecture precisely predicts all grammatical categories and indicates when the categories must not be analyzed for the word. At the same time, the model based on the proposed architecture can be trained on consumer-level graphics accelerators, retains all the advantages of Multi-head attention over RNNs (RNNs are not used in the proposed approach), does not require pretraining on large collections of unlabeled texts (like BERT), and shows higher processing speed than previous results.",
+      "authors": [
+        "K. Skibin",
+        "M. Pozhidaev",
+        "S. Suschenko"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-03T09:46:52+00:00",
+      "link": "https://arxiv.org/pdf/2604.02926v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "architecture based on Multi-head attention for morphological tagging",
+      "llm_evidence_cn": "基于多头注意力的形态标记架构",
+      "llm_evidence": "基于多头注意力的形态标记架构",
+      "canonical_evidence": "基于多头注意力的形态标记架构",
+      "llm_tldr_en": "Develops a Multi-head attention architecture for effective morphological tagging in Russian.",
+      "llm_tldr_cn": "开发了一种基于多头注意力的架构，用于俄语的有效形态标记。",
+      "llm_tldr": "开发了一种基于多头注意力的架构，用于俄语的有效形态标记。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "multi-head attention mechanism implementation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.03190v1",
+      "source": "arxiv",
+      "title": "Gradient Boosting within a Single Attention Layer",
+      "abstract": "Transformer attention computes a single softmax-weighted average over values -- a one-pass estimate that cannot correct its own errors. We introduce \\emph{gradient-boosted attention}, which applies the principle of gradient boosting \\emph{within} a single attention layer: a second attention pass, with its own learned projections, attends to the prediction error of the first and applies a gated correction. Under a squared reconstruction objective, the construction maps onto Friedman's gradient boosting machine, with each attention pass as a base learner and the per-dimension gate as the shrinkage parameter. We show that a single Hopfield-style update erases all query information orthogonal to the stored-pattern subspace, and that further iteration under local contraction can collapse distinct queries in the same region to the same fixed point. We also show that separate projections for the correction pass can recover residual information inaccessible to the shared-projection approach of Tukey's twicing. On a 10M-token subset of WikiText-103, gradient-boosted attention achieves a test perplexity of $67.9$ compared to $72.2$ for standard attention, $69.6$ for Twicing Attention, and $69.0$ for a parameter-matched wider baseline, with two rounds capturing most of the benefit.",
+      "authors": [
+        "Saleh Sargolzaei"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-03T17:06:08+00:00",
+      "link": "https://arxiv.org/pdf/2604.03190v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "gradient boosting within a single attention layer architecture",
+      "llm_evidence_cn": "单个注意力层架构内的梯度提升",
+      "llm_evidence": "单个注意力层架构内的梯度提升",
+      "canonical_evidence": "单个注意力层架构内的梯度提升",
+      "llm_tldr_en": "Introduces gradient-boosted attention to correct errors within a single layer using a second attention pass.",
+      "llm_tldr_cn": "引入梯度提升注意力，通过第二次注意力传递纠正单层内的预测误差。",
+      "llm_tldr": "引入梯度提升注意力，通过第二次注意力传递纠正单层内的预测误差。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "neural network attention mechanism architecture",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2603.08483v1",
+      "source": "arxiv",
+      "title": "X-AVDT: Audio-Visual Cross-Attention for Robust Deepfake Detection",
+      "abstract": "The surge of highly realistic synthetic videos produced by contemporary generative systems has significantly increased the risk of malicious use, challenging both humans and existing detectors. Against this backdrop, we take a generator-side view and observe that internal cross-attention mechanisms in these models encode fine-grained speech-motion alignment, offering useful correspondence cues for forgery detection. Building on this insight, we propose X-AVDT, a robust and generalizable deepfake detector that probes generator-internal audio-visual signals accessed via DDIM inversion to expose these cues. X-AVDT extracts two complementary signals: (i) a video composite capturing inversion-induced discrepancies, and (ii) an audio-visual cross-attention feature reflecting modality alignment enforced during generation. To enable faithful cross-generator evaluation, we further introduce MMDF, a new multimodal deepfake dataset spanning diverse manipulation types and rapidly evolving synthesis paradigms, including GANs, diffusion, and flow-matching. Extensive experiments demonstrate that X-AVDT achieves leading performance on MMDF and generalizes strongly to external benchmarks and unseen generators, outperforming existing methods with accuracy improved by 13.1%. Our findings highlight the importance of leveraging internal audio-visual consistency cues for robustness to future generators in deepfake detection.",
+      "authors": [
+        "Youngseo Kim",
+        "Kwan Yun",
+        "Seokhyeon Hong",
+        "Sihun Cha",
+        "Colette Suhjung Koo",
+        "Junyong Noh"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-03-09T15:18:42+00:00",
+      "link": "https://arxiv.org/pdf/2603.08483v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "audio-visual cross-attention for deepfake detection",
+      "llm_evidence_cn": "用于深度伪造检测的音视频交叉注意力",
+      "llm_evidence": "用于深度伪造检测的音视频交叉注意力",
+      "canonical_evidence": "用于深度伪造检测的音视频交叉注意力",
+      "llm_tldr_en": "Leverages internal cross-attention signals from generative models to detect synthetic video forgeries.",
+      "llm_tldr_cn": "利用生成模型内部的交叉注意力信号来检测合成视频伪造。",
+      "llm_tldr": "利用生成模型内部的交叉注意力信号来检测合成视频伪造。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "encoder-decoder cross-attention mechanism",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2603.09079v1",
+      "source": "arxiv",
+      "title": "GST-VLA: Structured Gaussian Spatial Tokens for 3D Depth-Aware Vision-Language-Action Models",
+      "abstract": "VLA models encode visual observations as 2D patch tokens with no intrinsic geometric structure. We introduce GST-VLA with two contributions. First, the Gaussian Spatial Tokenizer (GST) converts frozen dense depth and frozen semantic patch features into $N_g{=}128$ anisotropic 3D Gaussian primitives, each parameterized by a metric residual mean $μ\\in \\mathbb{R}^3$, log-scale covariance $\\log σ\\in \\mathbb{R}^3$, and learned opacity $α\\in (0,1)$. The covariance eigenstructure encodes local surface orientation, and opacity provides per-primitive geometric confidence, both inaccessible from scalar depth. Spatial attention pooling with learned queries concentrates the fixed token budget on geometrically salient regions rather than distributing uniformly. Second, 3D Depth-Aware Chain-of-Thought (DA-CoT) reasoning supervises four structured intermediate spatial thoughts, covering 3D object grounding, grasp affordance contact geometry, pairwise metric distances, and coarse SE(3) waypoints, as explicit generation targets in the training loss. A cross-attention sublayer at every VLM transformer block provides direct access to the raw 256-primitive Gaussian field during DA-CoT generation. A 300M-parameter flow-matching action expert with mixture-of-experts feedforward sublayers decodes 7-DoF delta action chunks via conditional ODE integration, conditioned on both VLM hidden states and DA-CoT outputs through dual cross-attention. Trained with composite $\\mathcal{L}_\\mathrm{flow} + \\mathcal{L}_\\mathrm{CoT} + \\mathcal{L}_\\mathrm{depth}$ across three progressive stages, GST-VLA achieves 96.4% on LIBERO (+2.0%), and 80.2% on SimplerEnv (+5.4%). Ablations isolate the contribution of each GST component, each DA-CoT thought, and each training stage, confirming independent and synergistic gains concentrated on precision demanding tasks.",
+      "authors": [
+        "Md Selim Sarowar",
+        "Omer Tariq",
+        "Sungho Kim"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.RO"
+      ],
+      "published": "2026-03-10T01:39:38+00:00",
+      "link": "https://arxiv.org/pdf/2603.09079v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Spatial attention pooling for vision-language-action models",
+      "llm_evidence_cn": "视觉-语言-动作模型中的空间注意力池化",
+      "llm_evidence": "视觉-语言-动作模型中的空间注意力池化",
+      "canonical_evidence": "视觉-语言-动作模型中的空间注意力池化",
+      "llm_tldr_en": "Introduces a Gaussian Spatial Tokenizer and spatial attention pooling to improve 3D geometric awareness in VLA models.",
+      "llm_tldr_cn": "引入高斯空间分词器和空间注意力池化，增强视觉-语言-动作模型对3D几何结构的感知能力。",
+      "llm_tldr": "引入高斯空间分词器和空间注意力池化，增强视觉-语言-动作模型对3D几何结构的感知能力。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "applications of attention in natural language processing and vision",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.07997v1",
+      "source": "arxiv",
+      "title": "CMMR-VLN: Vision-and-Language Navigation via Continual Multimodal Memory Retrieval",
+      "abstract": "Although large language models (LLMs) are introduced into vision-and-language navigation (VLN) to improve instruction comprehension and generalization, existing LLM- based VLN lacks the ability to selectively recall and use relevant priori experiences to help navigation tasks, limiting their performance in long-horizon and unfamiliar scenarios. In this work, we propose CMMR-VLN (Continual Multimodal Memory Retrieval based VLN), a VLN framework that endows LLM agents with structured memory and reflection capabilities. Specifically, the CMMR-VLN constructs a multimodal experi- ence memory indexed by panoramic visual images and salient landmarks to retrieve relevant experiences during navigation, introduces a retrieved-augmented generation pipeline to mimick how experienced human navigators leverage priori knowledge, and incorporates a reflection-based memory update strategy that selectively stores complete successful paths and the key initial mistake in failure cases. Comprehensive tests illustrate average success rate improvements of 52.9%, 20.9% and 20.9%, and 200%, 50% and 50% over the NavGPT, the MapGPT, and the DiscussNav in simulation and real tests, respectively eluci- dating the great potential of the CMMR-VLN as a backbone VLN framework.",
+      "authors": [
+        "Haozhou Li",
+        "Xiangyu Dong",
+        "Huiyan Jiang",
+        "Yaoming Zhou",
+        "Xiaoguang Ma"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-03-09T06:02:50+00:00",
+      "link": "https://arxiv.org/pdf/2603.07997v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multimodal memory retrieval for vision-and-language navigation",
+      "llm_evidence_cn": "视觉语言导航中的多模态记忆检索",
+      "llm_evidence": "视觉语言导航中的多模态记忆检索",
+      "canonical_evidence": "视觉语言导航中的多模态记忆检索",
+      "llm_tldr_en": "Enhances LLM agents with structured multimodal memory for improved vision-and-language navigation.",
+      "llm_tldr_cn": "为LLM智能体赋予结构化多模态记忆，以提升其在视觉语言导航任务中的表现。",
+      "llm_tldr": "为LLM智能体赋予结构化多模态记忆，以提升其在视觉语言导航任务中的表现。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "applications of attention in natural language processing and vision",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.09165v1",
+      "source": "arxiv",
+      "title": "GIAT: A Geologically-Informed Attention Transformer for Lithology Identification",
+      "abstract": "Accurate lithology identification from well logs is crucial for subsurface resource evaluation. Although Transformer-based models excel at sequence modeling, their \"black-box\" nature and lack of geological guidance limit their performance and trustworthiness. To overcome these limitations, this letter proposes the Geologically-Informed Attention Transformer (GIAT), a novel framework that deeply fuses data-driven geological priors with the Transformer's attention mechanism. The core of GIAT is a new attention-biasing mechanism. We repurpose Category-Wise Sequence Correlation (CSC) filters to generate a geologically-informed relational matrix, which is injected into the self-attention calculation to explicitly guide the model toward geologically coherent patterns. On two challenging datasets, GIAT achieves state-of-the-art performance with an accuracy of up to 95.4%, significantly outperforming existing models. More importantly, GIAT demonstrates exceptional interpretation faithfulness under input perturbations and generates geologically coherent predictions. Our work presents a new paradigm for building more accurate, reliable, and interpretable deep learning models for geoscience applications.",
+      "authors": [
+        "Jie Li",
+        "Qishun Yang",
+        "Nuo Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-03-10T04:02:57+00:00",
+      "link": "https://arxiv.org/pdf/2603.09165v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Geologically-informed attention-biasing mechanism in Transformers",
+      "llm_evidence_cn": "Transformer中基于地质信息的注意力偏置机制",
+      "llm_evidence": "Transformer中基于地质信息的注意力偏置机制",
+      "canonical_evidence": "Transformer中基于地质信息的注意力偏置机制",
+      "llm_tldr_en": "Proposes a Transformer framework that integrates geological priors into the attention mechanism for lithology ID.",
+      "llm_tldr_cn": "提出一种将地质先验知识融入注意力机制的Transformer框架，用于岩性识别。",
+      "llm_tldr": "提出一种将地质先验知识融入注意力机制的Transformer框架，用于岩性识别。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2603.10353v1",
+      "source": "arxiv",
+      "title": "S-HPLB: Efficient LLM Attention Serving via Sparsity-Aware Head Parallelism Load Balance",
+      "abstract": "With the increasing volumes of Large Language Models (LLMs) and the expanding context lengths, attention computation has become a key performance bottleneck in LLM serving. For fast attention computation, recent practices often parallelize the attention heads on multiple GPUs, and also widely adopt attention sparsification to reduce the computation amount -- which selectively computes a subset of attention pairs under a preset sparsity budget. In this paper, we notice that attention heads of an LLM model often exhibit heterogeneous-yet-stable sparsity elasticities, which motivates us to enforce head-adaptive sparsity budgets to attain better efficiency while preserving high inference quality. Yet, from the system aspect, with heterogeneous sparsity levels, attention computation time on different heads would be inconsistent, yielding cross-GPU resource bubbles under head-parallel deployment. To further minimize such bubbles, we propose a novel attention deployment strategy called Sparsity-aware Head-Parallel Load Balance (S-HPLB). Experiments on long-context benchmark show that, S-HPLB can achieve a $2.88\\times$ improvement in average attention computation latency without quality degradation.",
+      "authors": [
+        "Di Liu",
+        "Yifei Liu",
+        "Chen Chen",
+        "Zhibin Yu",
+        "Xiaoyi Fan",
+        "Quan Chen",
+        "Minyi Guo"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC"
+      ],
+      "published": "2026-03-11T03:03:58+00:00",
+      "link": "https://arxiv.org/pdf/2603.10353v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "sparsity-aware head parallelism for efficient attention serving",
+      "llm_evidence_cn": "针对高效注意力推理的稀疏感知多头并行负载均衡",
+      "llm_evidence": "针对高效注意力推理的稀疏感知多头并行负载均衡",
+      "canonical_evidence": "针对高效注意力推理的稀疏感知多头并行负载均衡",
+      "llm_tldr_en": "Optimizes attention computation efficiency through sparsity-aware head parallelism and load balancing.",
+      "llm_tldr_cn": "通过稀疏感知的多头并行和负载均衡技术，优化了大模型注意力计算的推理效率。",
+      "llm_tldr": "通过稀疏感知的多头并行和负载均衡技术，优化了大模型注意力计算的推理效率。",
+      "llm_tags": [
+        "query:flattn:composite"
+      ],
+      "matched_query_tag": "query:flattn:composite",
+      "matched_query_text": "Papers central to Flash Attention 算法及其优化机制, especially work that connects or combines: FlashAttention algorithm mechanism and implementation; memory tiling for attention computation optimization; FlashAttention-2 improvements in parallelism and work partitioning; How does FlashAttention optimize memory access and speed up training?; Comparison between FlashAttention and standard self attention mechanisms.; Technical details of tiling and recomputation in FlashAttention..",
+      "matched_requirement_id": "req-composite-flattn",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.27349v1",
+      "source": "arxiv",
+      "title": "Inference-Time Structural Reasoning for Compositional Vision-Language Understanding",
+      "abstract": "Vision-language models (VLMs) excel at image-text retrieval yet persistently fail at compositional reasoning, distinguishing captions that share the same words but differ in relational structure. We present, a unified evaluation and augmentation framework benchmarking four architecturally diverse VLMs,CLIP, BLIP, LLaVA, and Qwen3-VL-8B-Thinking,on the Winoground benchmark under plain and scene-graph-augmented regimes. We introduce a dependency-based TextSceneGraphParser (spaCy) extracting subject-relation-object triples, and a Graph Asymmetry Scorer using optimal bipartite matching to inject structural relational priors. Caption ablation experiments (subject-object masking and swapping) reveal that Qwen3-VL-8B-Thinking achieves a group score of 62.75, far above all encoder-based models, while a proposed multi-turn SG filtering strategy further lifts it to 66.0, surpassing prior open-source state-of-the-art. We analyze the capability augmentation tradeoff and find that SG augmentation benefits already capable models while providing negligible or negative gains for weaker baselines. Code: https://github.com/amartyacodes/Inference-Time-Structural-Reasoning-for-Compositional-Vision-Language-Understanding",
+      "authors": [
+        "Amartya Bhattacharya"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-03-28T17:41:35+00:00",
+      "link": "https://arxiv.org/pdf/2603.27349v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "evaluation of vision-language models on compositional reasoning",
+      "llm_evidence_cn": "视觉语言模型在组合推理上的评估",
+      "llm_evidence": "视觉语言模型在组合推理上的评估",
+      "canonical_evidence": "视觉语言模型在组合推理上的评估",
+      "llm_tldr_en": "Benchmarks diverse VLMs on compositional reasoning using structural relational priors.",
+      "llm_tldr_cn": "利用结构化关系先验，对多种视觉语言模型在组合推理任务上进行基准测试。",
+      "llm_tldr": "利用结构化关系先验，对多种视觉语言模型在组合推理任务上进行基准测试。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "applications of attention in natural language processing and vision",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.09530v1",
+      "source": "arxiv",
+      "title": "DCAU-Net: Differential Cross Attention and Channel-Spatial Feature Fusion for Medical Image Segmentation",
+      "abstract": "Accurate medical image segmentation requires effective modeling of both long-range dependencies and fine-grained boundary details. While transformers mitigate the issue of insufficient semantic information arising from the limited receptive field inherent in convolutional neural networks, they introduce new challenges: standard self-attention incurs quadratic computational complexity and often assigns non-negligible attention weights to irrelevant regions, diluting focus on discriminative structures and ultimately compromising segmentation accuracy. Existing attention variants, although effective in reducing computational complexity, fail to suppress redundant computation and inadvertently impair global context modeling. Furthermore, conventional fusion strategies in encoder-decoder architectures, typically based on simple concatenation or summation, can not adaptively integrate high-level semantic information with low-level spatial details. To address these limitations, we propose DCAU-Net, a novel yet efficient segmentation framework with two key ideas. First, a new Differential Cross Attention (DCA) is designed to compute the difference between two independent softmax attention maps to adaptively highlight discriminative structures. By replacing pixel-wise key and value tokens with window-level summary tokens, DCA dramatically reduces computational complexity without sacrificing precision. Second, a Channel-Spatial Feature Fusion (CSFF) strategy is introduced to adaptively recalibrate features from skip connections and up-sampling paths through using sequential channel and spatial attention, effectively suppressing redundant information and amplifying salient cues. Experiments on two public benchmarks demonstrate that DCAU-Net achieves competitive performance with enhanced segmentation accuracy and robustness.",
+      "authors": [
+        "Yanxin Li",
+        "Hui Wan",
+        "Libin Lan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-10T11:37:10+00:00",
+      "link": "https://arxiv.org/pdf/2603.09530v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Differential cross attention variant to reduce quadratic complexity",
+      "llm_evidence_cn": "差分交叉注意力变体以降低二次复杂度",
+      "llm_evidence": "差分交叉注意力变体以降低二次复杂度",
+      "canonical_evidence": "差分交叉注意力变体以降低二次复杂度",
+      "llm_tldr_en": "Introduces a differential cross-attention mechanism to improve medical image segmentation and reduce redundancy.",
+      "llm_tldr_cn": "引入差分交叉注意力机制，以改进医学图像分割并减少冗余计算。",
+      "llm_tldr": "引入差分交叉注意力机制，以改进医学图像分割并减少冗余计算。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "comparison of different types of attention mechanisms",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2603.10781v1",
+      "source": "arxiv",
+      "title": "Taking Shortcuts for Categorical VQA Using Super Neurons",
+      "abstract": "Sparse Attention Vectors (SAVs) have emerged as an excellent training-free alternative to supervised finetuning or low-rank adaptation to improve the performance of Vision Language Models (VLMs). At their heart, SAVs select a few accurate attention heads for a task of interest and use them as classifiers, rather than relying on the model's prediction. In a similar spirit, we find that directly probing the raw activations of the VLM, in the form of scalar values, is sufficient to yield accurate classifiers on diverse visually grounded downstream tasks. Shifting focus from attention vectors to scalar activations dramatically increases the search space for accurate parameters, allowing us to find more discriminative neurons immediately from the first generated token. We call such activations Super Neurons (SNs). In this probing setting, we discover that enough SNs appear in the shallower layers of the large language model to allow for extreme early exiting from the first layer of the model at the first generated token. Compared to the original network, SNs robustly improve the classification performance while achieving a speedup of up to 5.10x.",
+      "authors": [
+        "Pierre Musacchio",
+        "Jaeyi Jeong",
+        "Dahun Kim",
+        "Jaesik Park"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-03-11T13:54:45+00:00",
+      "link": "https://arxiv.org/pdf/2603.10781v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Discusses Sparse Attention Vectors (SAVs) as an alternative to finetuning",
+      "llm_evidence_cn": "讨论稀疏注意力向量（SAVs）作为微调的替代方案",
+      "llm_evidence": "讨论稀疏注意力向量（SAVs）作为微调的替代方案",
+      "canonical_evidence": "讨论稀疏注意力向量（SAVs）作为微调的替代方案",
+      "llm_tldr_en": "Explores Sparse Attention Vectors and raw activations to improve Vision Language Model performance.",
+      "llm_tldr_cn": "探索稀疏注意力向量和原始激活值，以提高视觉语言模型的性能。",
+      "llm_tldr": "探索稀疏注意力向量和原始激活值，以提高视觉语言模型的性能。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.00397v1",
+      "source": "arxiv",
+      "title": "Improving Generalization of Deep Learning for Brain Metastases Segmentation Across Institutions",
+      "abstract": "Background: Deep learning has demonstrated significant potential for automated brain metastases (BM) segmentation; however, models trained at a singular institution often exhibit suboptimal performance at various sites due to disparities in scanner hardware, imaging protocols, and patient demographics. The goal of this work is to create a domain adaptation framework that will allow for BM segmentation to be used across multiple institutions.   Methods: We propose a VAE-MMD preprocessing pipeline that combines variational autoencoders (VAE) with maximum mean discrepancy (MMD) loss, incorporating skip connections and self-attention mechanisms alongside nnU-Net segmentation. The method was tested on 740 patients from four public databases: Stanford, UCSF, UCLM, and PKG, evaluated by domain classifier's accuracy, sensitivity, precision, F1/F2 scores, surface Dice (sDice), and 95th percentile Hausdorff distance (HD95).   Results: VAE-MMD reduced domain classifier accuracy from 0.91 to 0.50, indicating successful feature alignment across institutions. Reconstructed volumes attained a PSNR greater than 36 dB, maintaining anatomical accuracy. The combined method raised the mean F1 by 11.1% (0.700 to 0.778), the mean sDice by 7.93% (0.7121 to 0.7686), and reduced the mean HD95 by 65.5% (11.33 to 3.91 mm) across all four centers compared to the baseline nnU-Net.   Conclusions: VAE-MMD effectively diminishes cross-institutional data heterogeneity and enhances BM segmentation generalization across volumetric, detection, and boundary-level metrics without necessitating target-domain labels, thereby overcoming a significant obstacle to the clinical implementation of AI-assisted segmentation.",
+      "authors": [
+        "Yuchen Yang",
+        "Shuangyang Zhong",
+        "Haijun Yu",
+        "Langcuomu Suo",
+        "Hongbin Han",
+        "Florian Putz",
+        "Yixing Huang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-01T02:25:25+00:00",
+      "link": "https://arxiv.org/pdf/2604.00397v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Incorporating self-attention mechanisms for medical image segmentation",
+      "llm_evidence_cn": "在医学图像分割中引入自注意力机制",
+      "llm_evidence": "在医学图像分割中引入自注意力机制",
+      "canonical_evidence": "在医学图像分割中引入自注意力机制",
+      "llm_tldr_en": "Uses self-attention within a VAE-MMD pipeline to improve brain metastases segmentation across institutions.",
+      "llm_tldr_cn": "在VAE-MMD流程中使用自注意力机制，以提高跨机构脑转移瘤分割的泛化能力。",
+      "llm_tldr": "在VAE-MMD流程中使用自注意力机制，以提高跨机构脑转移瘤分割的泛化能力。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "self-attention layers in transformer models",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.09613v1",
+      "source": "arxiv",
+      "title": "A saccade-inspired approach to image classification using visiontransformer attention maps",
+      "abstract": "Human vision achieves remarkable perceptual performance while operating under strict metabolic constraints. A key ingredient is the selective attention mechanism, driven by rapid saccadic eye movements that constantly reposition the high-resolution fovea onto task-relevant locations, unlike conventional AI systems that process entire images with equal emphasis. Our work aims to draw inspiration from the human visual system to create smarter, more efficient image processing models. Using DINO, a self-supervised Vision Transformer that produces attention maps strikingly similar to human gaze patterns, we explore a saccade inspired method to focus the processing of information on key regions in visual space. To do so, we use the ImageNet dataset in a standard classification task and measure how each successive saccade affects the model's class scores. This selective-processing strategy preserves most of the full-image classification performance and can even outperform it in certain cases. By benchmarking against established saliency models built for human gaze prediction, we demonstrate that DINO provides superior fixation guidance for selecting informative regions. These findings highlight Vision Transformer attention as a promising basis for biologically inspired active vision and open new directions for efficient, neuromorphic visual processing.",
+      "authors": [
+        "Matthis Dallain",
+        "Laurent Rodriguez",
+        "Laurent Udo Perrinet",
+        "Benoît Miramond"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-10T12:54:55+00:00",
+      "link": "https://arxiv.org/pdf/2603.09613v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "using Vision Transformer attention maps to focus processing on key regions",
+      "llm_evidence_cn": "利用Vision Transformer注意力图将处理重点放在关键区域",
+      "llm_evidence": "利用Vision Transformer注意力图将处理重点放在关键区域",
+      "canonical_evidence": "利用Vision Transformer注意力图将处理重点放在关键区域",
+      "llm_tldr_en": "Explores a saccade-inspired method using ViT attention maps for efficient image classification.",
+      "llm_tldr_cn": "探索一种受眼跳启发的、利用ViT注意力图进行高效图像分类的方法。",
+      "llm_tldr": "探索一种受眼跳启发的、利用ViT注意力图进行高效图像分类的方法。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2603.14819v1",
+      "source": "arxiv",
+      "title": "RAZOR: Ratio-Aware Layer Editing for Targeted Unlearning in Vision Transformers and Diffusion Models",
+      "abstract": "Transformer based diffusion and vision-language models have achieved remarkable success; yet, efficiently removing undesirable or sensitive information without retraining remains a central challenge for model safety and compliance. We introduce Ratio-Aware Zero/One-step Optimized Retentive unlearning (RAZOR), a lightweight, model-agnostic unlearning framework that generalizes forgetting updates to coordinated multi-layer and multi-head edits within transformer backbones. RAZOR identifies the most important layers and attention heads by measuring how much they contribute to forgetting the target data while preserving useful knowledge. Then, it updates these parts of the model using a carefully regularized rule to avoid harming overall performance. The set of edited components grows gradually, ensuring precise unlearning without over-editing or damaging unrelated capabilities. We evaluate RAZOR on CLIP, Stable Diffusion, and vision-language models (VLMs) using widely adopted unlearning benchmarks covering identity, style, and object erasure tasks. Our results show that RAZOR achieves highly accurate and stable forgetting, even under quantization. This approach offers stronger retention and better efficiency than prior methods. Notably, it also operates significant faster than conventional techniques. These results demonstrate that RAZOR is a practical and scalable solution for safe, adaptive unlearning in transformer-based vision models.",
+      "authors": [
+        "Ravi Ranjan",
+        "Utkarsh Grover",
+        "Xiaomin Lin",
+        "Agoritsa Polyzou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-03-16T04:47:37+00:00",
+      "link": "https://arxiv.org/pdf/2603.14819v1",
+      "tags": [
+        "keyword:ATTN",
+        "query:ATTN"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Targeted unlearning via multi-layer and multi-head edits in transformers",
+      "llm_evidence_cn": "通过 Transformer 中的多层和多头编辑进行定向遗忘",
+      "llm_evidence": "通过 Transformer 中的多层和多头编辑进行定向遗忘",
+      "canonical_evidence": "通过 Transformer 中的多层和多头编辑进行定向遗忘",
+      "llm_tldr_en": "RAZOR performs targeted unlearning by editing specific attention heads and layers in transformer backbones.",
+      "llm_tldr_cn": "RAZOR 通过编辑 Transformer 骨干网络中的特定注意力头和层来实现定向遗忘。",
+      "llm_tldr": "RAZOR 通过编辑 Transformer 骨干网络中的特定注意力头和层来实现定向遗忘。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

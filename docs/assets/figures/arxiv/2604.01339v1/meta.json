@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.01339v1/fig-001.webp",
+      "caption": "Figure 4: The suppression factor D for different categories of the Imagenette validation subset and different shrinkage methods. Lower D corresponds to better regularization.",
+      "page": 7,
+      "index": 1,
+      "width": 500,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01339v1/fig-002.webp",
+      "caption": "Figure 3: Regularization efficiency in ROI for various images from all the categories of the Imagenette validation subset expressed in terms of: a) mean percentile of scores in ROI w.r.t. the whole image; b) percentage of nonzero attention scores in ROI. Each dot denotes the results of using a method for a perturbed image. Thresholding values pth = 0.3 and lth = 0.3. The blue dashed line indicates no regularization.",
+      "page": 7,
+      "index": 2,
+      "width": 1002,
+      "height": 400
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01339v1/fig-003.webp",
+      "caption": "Figure 2: Example of a perturbed image (n02102040 821.JPEG) with the attention map before and after regularization via different shrinkage methods: p-thresholding and l-thresholding with thresholds set at the 10-th percentile for p-values and LFDR respectively.",
+      "page": 6,
+      "index": 3,
+      "width": 1014,
+      "height": 504
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01339v1/fig-004.webp",
+      "caption": "Figure 5: Sensitivity vs. specificity curves for 5 random images from each of the categories of the Imagenette validation subset (denoted with different colors) regularized via p-thresholding (left) and l-thresholding (right) for 50 values of the corresponding threshold spanning logarithmically from 0 to 1. The dots correspond to the π0-threshold value for each curve. The black solid line shows the median of all the curves.",
+      "page": 8,
+      "index": 4,
+      "width": 1002,
+      "height": 396
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01339v1/fig-005.webp",
+      "caption": "Figure 6: Results of the proposed attention regularization on the lung cancer medical images (malignant case 21). The top row shows the histograms of LFDRs, p-values, and z-scores. In the bottom row, regularized attention maps with various p-thresholds are shown alongside the CT scan and the original attention map. In the rightmost, a π0 threshold is automatically estimated.",
+      "page": 8,
+      "index": 5,
+      "width": 1014,
+      "height": 443
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01339v1/fig-006.webp",
+      "caption": "Figure 1: Histogram of z-statistics from the observed attention score sample corresponding to one of the images we use in our analysis and from the derived bootstrap sample.",
+      "page": 4,
+      "index": 6,
+      "width": 443,
+      "height": 325
+    }
+  ]
+}

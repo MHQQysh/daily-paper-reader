@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-001.webp",
+      "caption": "Figure 1. Temporally averaged cross-attention maps. For each video, we extract audio–visual cross-attention during DDIM inversion and average the maps over all frames to obtain a single heatmap. Real vs. fake samples exhibit consistent disparities.",
+      "page": 1,
+      "index": 1,
+      "width": 496,
+      "height": 261
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-002.webp",
+      "caption": "Table 4. Quantitative comparison on the MMDF dataset. Detectors are evaluated using the official pretrained checkpoint (first panel) and after retrained on the MMDF training set (Hallo2 [19], LivePortrait [30], and FaceAdapter [33]) (second panel). Best in bold; secondbest underlined. *Note: FACTOR is a zero-shot method, while AVAD and AVH-Align are unsupervised methods.",
+      "page": 6,
+      "index": 2,
+      "width": 1031,
+      "height": 321
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-003.webp",
+      "caption": "Figure D.2.1. Qualitative visualization of the input representations ϕ and ψ.",
+      "page": 21,
+      "index": 3,
+      "width": 829,
+      "height": 413
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-004.webp",
+      "caption": "Figure 4. Comparison of attention features across diffusion timesteps. Red box denote the configuration used in our method.",
+      "page": 7,
+      "index": 4,
+      "width": 496,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-005.webp",
+      "caption": "Figure 2. Input representations with complementary features. (a) video composite ϕ is obtained from video x and audio c by running DDIM inversion and reconstruction, decoding both the noisy and clean latents, and computing the residual. We then concatenate four components channel-wise: x, D(ẑT ), D(ẑ0), and |x−D(ẑ0)|. (b) AV cross-attention feature ψ is extracted during DDIM inversion from the diffusion U-Net and summarized as a frame-aligned tensor. These complementary cues (a) and (b) capture appearance information and modality alignment, respectively. For clarity, all visual elements shown (D(ẑT ), D(ẑ0), and |x−D(ẑ0)|) are decoded images.",
+      "page": 3,
+      "index": 5,
+      "width": 1036,
+      "height": 319
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-006.webp",
+      "caption": "Figure C.3. Visualization of attention features across diffusion timesteps.",
+      "page": 18,
+      "index": 6,
+      "width": 932,
+      "height": 637
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-007.webp",
+      "caption": "Figure 6. Grad-CAM visualizations. Red activation indicates regions where our model focuses most (i.e., pixels that make a strong positive contribution to the predicted class), while cooler colors denote weak or no contribution.",
+      "page": 8,
+      "index": 7,
+      "width": 496,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-008.webp",
+      "caption": "Figure 3. The overall framework of X-AVDT. From each audio-visual pair, we form two inputs ϕ and ψ. Two 3D encoders map them to features that are concatenated and passed through the Feature Fusion Decoder to produce a fused feature. A classification head outputs the real/fake score, while an embedding head is trained with a triplet objective to improve robustness.",
+      "page": 4,
+      "index": 8,
+      "width": 829,
+      "height": 404
+    },
+    {
+      "url": "assets/figures/arxiv/2603.08483v1/fig-009.webp",
+      "caption": "Figure C.2.1. Robustness to unseen corruptions. AP (%) is shown in the first row and Acc@EER (%) is shown in the second row across five severity levels. Per corruption scales are shown on the x–axes. Average denotes the mean AP in the top row and Acc@EER in the bottom row, respectively, across all corruptions at each severity level.",
+      "page": 16,
+      "index": 9,
+      "width": 932,
+      "height": 325
+    }
+  ]
+}

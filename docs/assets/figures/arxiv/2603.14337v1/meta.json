@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-001.webp",
+      "caption": "Fig. 1: VLM criterion ΦVLM incorrectly identifies many semantic tokens as sinks. (a) Number of sink tokens across layers under ΦVLM and ΦLLM. ΦVLM rapidly over-identifies sink tokens in deeper layers, unlike the sparse behaviour of ΦLLM. (b) Qualitative visualisation for the queries “Is the helicopter visible in the video?”. Although the queried object tokens receive high attention, indicating that the model appropriately focuses on them, they are nevertheless identified as sinks under ΦVLM.",
+      "page": 6,
+      "index": 1,
+      "width": 721,
+      "height": 186
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-002.webp",
+      "caption": "Fig. 8: Overall OutRo pipeline. (a) Gated head output rotation. Non-sink outputs are rotated toward the sink value direction via adaptive gating. (b) Sink enhancement. The causal mask is removed for sink positions, amplifying global information.",
+      "page": 11,
+      "index": 2,
+      "width": 723,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-003.webp",
+      "caption": "Table A.2: Effect of removing sink dimensions under ΦLLM and ΦVLM on AVHBench. Removing the ΦLLM sink token collapses performance, while removing tokens identified by ΦVLM has little effect.",
+      "page": 21,
+      "index": 3,
+      "width": 723,
+      "height": 504
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-004.webp",
+      "caption": "Fig. 3: High sink attention does not imply head redundancy. (a) Performance change after removing individual heads, distinguishing improvement and decrease heads. (b) High sink scores are observed in both improvement and decrease heads, indicating that sink-heavy heads are not always redundant.",
+      "page": 7,
+      "index": 4,
+      "width": 723,
+      "height": 214
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-005.webp",
+      "caption": "Fig. B.1: Token pruning results using sink queries from different layers. Sink queries from an appropriate layer improve performance even when only a small subset of modality tokens is retained, suggesting they attend to informative modality tokens.",
+      "page": 22,
+      "index": 5,
+      "width": 577,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-006.webp",
+      "caption": "Fig. B.2: Sink score vs. cosine similarity. Attention to sink tokens is strongly correlated with the cosine similarity between head outputs and the sink value direction.",
+      "page": 23,
+      "index": 6,
+      "width": 579,
+      "height": 224
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-007.webp",
+      "caption": "Fig. 4: Geometric analysis of sink token representations. (a) Sink keys and values exhibit substantially smaller norms than other tokens. (b) Their activations are not uniformly small across dimensions. (c) In t-SNE, sink keys form a coherent cluster near the query distribution. (d) Despite their small norms, the cosine similarity between queries and sink keys remains high, resulting in large attention scores",
+      "page": 8,
+      "index": 7,
+      "width": 704,
+      "height": 465
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-008.webp",
+      "caption": "Table 6: Performance comparison of OutRo on AV-LLMs. OutRo consistently improves performance across models and benchmarks, demonstrating its generality",
+      "page": 12,
+      "index": 8,
+      "width": 718,
+      "height": 200
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-009.webp",
+      "caption": "Fig. B.3: Effect of different γ values. Optimal γ values vary across models: 3.0 for Qwen2.5, 0.5 for Qwen3-VL and video-SALMONN2+, and 1.5 for VideoLLaMA3.",
+      "page": 24,
+      "index": 9,
+      "width": 723,
+      "height": 473
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-010.webp",
+      "caption": "Fig. 6: Zeroing the top-1 sink key dimension (Zero-K). Attention maps show that this intervention effectively suppresses attention on sink tokens.",
+      "page": 9,
+      "index": 10,
+      "width": 721,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14337v1/fig-011.webp",
+      "caption": "Table A.1: Dimensions identified as outliers or sinks. Under the ΦVLM criterion, sink dimensions (i.e., 458 and 2570) cause many tokens to be classified as sinks.",
+      "page": 20,
+      "index": 11,
+      "width": 622,
+      "height": 568
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.13381v1/fig-001.webp",
+      "caption": "Table 1: Configurations and results at step 59k. MLPw denotes baseline with MLP hidden dimension w·d. Relative improvement is computed as (Lbase − L)/Lbase.",
+      "page": 4,
+      "index": 1,
+      "width": 844,
+      "height": 240
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13381v1/fig-002.webp",
+      "caption": "Figure 1: Training dynamics (steps 1k–59k). Solid: validation, dashed: training. Top: Loss curves. Bottom: Relative improvement over baseline.",
+      "page": 4,
+      "index": 2,
+      "width": 622,
+      "height": 645
+    },
+    {
+      "url": "assets/figures/arxiv/2603.13381v1/fig-003.webp",
+      "caption": "Figure 2: Relative improvement over baseline (steps 1k to 59k). Nonlinear configurations: 84.97M parameters; MLP-widened controls: 89.6 to 95.6M.",
+      "page": 8,
+      "index": 3,
+      "width": 870,
+      "height": 480
+    }
+  ]
+}

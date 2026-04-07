@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.14923v1/fig-001.webp",
+      "caption": "Figure 2: Per-layer routing weight distributions. Layer 0 shows the widest spread (σ=0.272), consistent with domain-adaptive specialist routing. Layer 7 is bimodal (σ=0.290, 14.8% near-zero). Layer 9 never produces weights above 0.9 despite being the most critical layer. All layer means exceed 0.5 (range 0.508–0.674); the model prefers suppression over preservation on average.",
+      "page": 11,
+      "index": 1,
+      "width": 706,
+      "height": 439
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14923v1/fig-002.webp",
+      "caption": "Table 6: Multiple-choice benchmark accuracy [Gao et al., 2021], n=500 examples each. BoolQ is the only benchmark where the 95% CI on the difference excludes zero.",
+      "page": 10,
+      "index": 2,
+      "width": 744,
+      "height": 242
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14923v1/fig-003.webp",
+      "caption": "Figure 1: Standard transformer block (left) vs. routed transformer block (right). The routing mechanism (dashed box) adds three components: a shared router MLP that produces per-input weights rh,k ∈ [0, 1] from the mean-pooled sequence, learned direction vectors dh,k, and a directional suppression step that removes selected components from each head’s output. All other components are identical.",
+      "page": 3,
+      "index": 3,
+      "width": 787,
+      "height": 437
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14923v1/fig-004.webp",
+      "caption": "Table 3: Induction circuit analysis. Routing is essential; individual induction heads are not.",
+      "page": 4,
+      "index": 4,
+      "width": 697,
+      "height": 206
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14923v1/fig-005.webp",
+      "caption": "Figure 4: Direction geometry. Mean within-head angle: 75.9° (vs. 89.4° random in 128D). Effective rank: 112.9/128 (88% capacity usage). Mild superposition, no dimensional collapse.",
+      "page": 12,
+      "index": 5,
+      "width": 830,
+      "height": 190
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14923v1/fig-006.webp",
+      "caption": "Figure 5: Preliminary cross-scale results at 26M and 400M parameters. Parameter overhead is 3.9% at both scales. Two data points; not a scaling law.",
+      "page": 12,
+      "index": 6,
+      "width": 706,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2603.14923v1/fig-007.webp",
+      "caption": "Figure 3: Routing benefit (∆ log-prob) by token position. Decays from +1.35 at positions 0–9 to +0.19 at 100+, a direct consequence of the mean-pooling bottleneck.",
+      "page": 12,
+      "index": 7,
+      "width": 706,
+      "height": 249
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-001.webp",
+      "caption": "Table 2. Topic retrieval accuracy on LongChat (Li et al., 2023). We compare HiCI against both proprietary models and open-source long-context LLMs across 3K–16K context lengths. HiCI-13B16K matches proprietary model performance up to 13K and outperforms all open-source baselines at 16K.",
+      "page": 7,
+      "index": 1,
+      "width": 492,
+      "height": 250
+    },
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-002.webp",
+      "caption": "Table 10. Parameter overhead of HiCI on LLaMA-2-7B. We use d=4096, bottleneck dimension db=512, shared compression dimension ds=128, M=8 local slots, and K=4 global slots across 32 layers.",
+      "page": 18,
+      "index": 2,
+      "width": 667,
+      "height": 316
+    },
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-003.webp",
+      "caption": "Figure 5. Layer-wise attention allocated to global slots during evaluation on PG-19. Background shading denotes depth groups: early (L0–7, blue), middle (L8–23, white), and deep (L24–31, red). (a) Comparison of segment sizes S=1024 and S=2048 under matched conditions (8K evaluation, 2K steps): finer segmentation yields substantially higher attention to global slots, with the final layer (L31) reaching 40.4% versus 12.7%. (b) Robustness at S=2048: varying evaluation length (8K vs. 4K) and training steps (2K vs. 1K) yields nearly identical layer-wise allocation patterns, with per-layer deviations within 1 percentage point. In both panels, attention to global slots increases toward deeper layers.",
+      "page": 18,
+      "index": 3,
+      "width": 604,
+      "height": 260
+    },
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-004.webp",
+      "caption": "Table 5. Segment granularity ablation for HiCI and S2-Attn finetuned on LLaMA-2-7B for 2,000 steps and evaluated on the PG-19 test set. -F: full attention; -M: training-consistent. Std: standard deviation across evaluation lengths.",
+      "page": 8,
+      "index": 4,
+      "width": 488,
+      "height": 354
+    },
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-005.webp",
+      "caption": "Table 3. Results (%) on LongBench (Bai et al., 2024b) benchmark. Best in bold, second underlined. ↑ indicates improvement over LongLoRA-7B-16K (direct baseline) and ↑ highlights top-2 gains for each HiCI variant.",
+      "page": 8,
+      "index": 5,
+      "width": 1013,
+      "height": 270
+    },
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-006.webp",
+      "caption": "Figure 1. Overview of HiCI. Left: HiCI integrated into a Transformer block; trainable components are highlighted. Right: HiCI constructs hierarchical context through three stages. (1) Local Construction: the input sequence is partitioned into N segments, and cross-attention with M learnable query slots extracts a local representation Li from each segment. (2) Global Integration: local representations {Li}Ni=1 are aggregated into a shared global context G via multi-view statistical pooling and attention-based weighting. (3) Top-down Broadcast: G and Li are prepended to each segment’s key–value sequence, conditioning attention on hierarchical context while preserving parallelism across segments. At inference, HiCI is optionally applied during prefill, while autoregressive decoding uses standard attention.",
+      "page": 4,
+      "index": 6,
+      "width": 759,
+      "height": 477
+    },
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-007.webp",
+      "caption": "Figure 4. Training loss comparison between HiCI and LongLoRA on LLaMA-2-7B continual pre-training (RedPajama, 2,000 steps). Both methods are trained at 8K and 16K context with S ∈ {1024, 2048}. HiCI with S=1024 sustains optimization throughout, while HiCI with S=2048 and all LongLoRA variants plateau beyond step 1,000.",
+      "page": 17,
+      "index": 7,
+      "width": 985,
+      "height": 375
+    },
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-008.webp",
+      "caption": "Figure 3. Peak GPU memory (left) and wall-clock training time (right) for HiCI and LongLoRA (LLaMA-2-7B, 8×H100-80GB, 1,000 steps; Stage-2 for 8K–64K, Stage-3 for 100K). The three-stage HiCI pipeline raises memory by 3.5–9.9%, which necessitates finer partitioning at long contexts (N=10 at 100K vs. LongLoRA’s N=4); the resulting quadratic reduction in per-segment attention cost yields a 19.3% wall-clock speedup.",
+      "page": 17,
+      "index": 8,
+      "width": 782,
+      "height": 269
+    },
+    {
+      "url": "assets/figures/arxiv/2603.20843v1/fig-009.webp",
+      "caption": "Table 9. Hyperparameters for HiCI training. PT: continued pretraining on RedPajama; SFT: supervised fine-tuning on LongAlpaca-12k.",
+      "page": 16,
+      "index": 9,
+      "width": 741,
+      "height": 785
+    }
+  ]
+}

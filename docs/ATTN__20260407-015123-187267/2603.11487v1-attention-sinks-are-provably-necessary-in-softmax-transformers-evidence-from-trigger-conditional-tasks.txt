@@ -1,0 +1,1352 @@
+Title: Attention Sinks Are Provably Necessary in Softmax Transformers: Evidence from Trigger-Conditional Tasks
+
+URL Source: https://arxiv.org/pdf/2603.11487v1
+
+Published Time: Fri, 13 Mar 2026 00:30:10 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# Attention Sinks Are Provably Necessary in Softmax Transformers: Evidence from Trigger-Conditional Tasks 
+
+Yuval Ran-Milo 
+
+Tel Aviv University 
+
+yuvalmilo@mail.tau.ac.il 
+
+Abstract 
+
+Transformers often display an attention sink :probability mass concentrates on a fixed, content-agnostic position. We prove that com-puting a simple trigger-conditional behavior 
+
+necessarily induces a sink in softmax self-attention models. Our results formalize a fa-miliar intuition: normalization over a proba-bility simplex must force attention to collapse onto a stable anchor to realize a default state (e.g., when the model needs to ignore the in-put). We instantiate this with a concrete task: when a designated trigger token appears, the model must return the average of all preced-ing token representations , and otherwise out-put zero, a task which mirrors the functionality of attention heads in the wild (Barbero et al., 2025; Guo et al., 2024). We also prove that non-normalized ReLU attention can solve the same task without any sink, confirming that the normalization constraint is the fundamental driver of sink behavior. Experiments validate our predictions and demonstrate they extend beyond the theoretically analyzed setting: soft-max models develop strong sinks while ReLU attention eliminates them in both single-head and multi-head variants. 
+
+1 Introduction 
+
+Transformers (Vaswani et al., 2017) frequently con-centrate attention on an early position in a way that is largely insensitive to content. This atten-tion sink has been reported for small and large models alike (Xiao et al., 2024; Gu et al., 2024; Guo et al., 2024). It occurs under a variety of positional schemes—absolute/learned embeddings, ALiBi, RoPE, and even without explicit positional encodings (Press et al., 2021; Su et al., 2021; Gu et al., 2024)—and similar behavior shows up in multimodal and vision settings, as well as in dif-fusion language models (Kang et al., 2025; Wang et al., 2025; Feng and Sun, 2025; Rulli et al., 2025). The breadth of contexts points to a pervasive pat-tern, not a peculiarity of any single model or train-ing regime. This pattern has significant practical conse-quences. When probability mass concentrates on a fixed position, attention can be diverted away from other tokens and downstream accuracy can be affected (Yu et al., 2024). Sinks can also worsen numerical issues relevant to compression and quan-tization (Sun et al., 2024; Lin et al., 2024; Bon-darenko et al., 2023; Son et al., 2024), distort attention-based interpretability analyses (Guo et al., 2024), and complicate streaming and long-context inference (Xiao et al., 2024). Analogous sink ef-fects have also been documented in vision and mul-timodal settings, where they waste representational capacity on irrelevant visual tokens (Kang et al., 2025; Wang et al., 2025; Feng and Sun, 2025). (See Appendix B for an extended discussion on the prac-tical motivations for mitigating attention sinks.) Why is sink behavior so common? One plausible account is an inductive bias —a phenomenon docu-mented in other settings (Soudry et al., 2024; Arora et al., 2019; Ran-Milo et al., 2026)— whereby the learning setup (model class and optimization pro-cedure) steers solutions toward models that exhibit attention sinks, even when sink-free alternatives exist. In this work we argue that, in certain settings, this isn’t the case, and sink behavior is functionally essential : all models that successfully compute a natural class of functions must exhibit sinks. 1
+
+We investigate this claim theoretically by intro-ducing a trigger-conditional task : a model must output the mean of past tokens at a designated trig-ger position, and output zero (a no-op) everywhere else. This formulation captures the core mecha-nism of empirically observed attention heads “in the wild” (Barbero et al., 2025; Guo et al., 2024) 
+
+> 1We do not claim sinks are unavoidable in all architectures (e.g., sinks do not appear in gated attention or Mamba-based models (Qiu et al., 2025; Endy et al., 2025)). Rather, we prove they are a necessary consequence of softmax attention.
+
+1
+
+> arXiv:2603.11487v1 [cs.LG] 12 Mar 2026
+
+which aggregate context when triggered and use a sink to remain dormant otherwise (see section 2 for more details). We prove that attention sinks are necessary for softmax attention to solve this task. Specifically, we consider a synthetic, trigger-conditional task on sequences in which each to-ken representation consists of: (i) a BOS indicator 
+
+equal to one only for the first token; (ii) a trigger indicator equal to one only at the trigger position; (iii) a non-trigger non-BOS indicator equal to one for all remaining tokens; and (iv) i.i.d. samples from a continuous distribution in the content coor-dinates. The target is intuitive: the model writes nothing to the residual stream at every position (i.e., outputs the zero vector), except at the unique trig-ger position where it should write the mean of all preceding non-BOS 2 token vectors .Our main results are necessity theorems for soft-max self-attention: for single-layer models (theo-rem 1), any model that achieves vanishing error on this task must place attention arbitrarily close to 1 (the maximal possible value) on a fixed sink token (the BOS token) at all non-trigger positions; for multi-layer models (theorem 2), we show that at least one layer must exhibit sink behavior at some non-trigger position 3. At a high level, we formalize a widely held intuition: normalization of attention scores forces the model to concentrate probability mass on a stable anchor whenever it needs to produce a default output, independent of the variable input content. We complement these necessity theorems with a constructive result (the-orem 3): ReLU attention can solve the same task with zero attention on the BOS token, demonstrat-ing that the normalization constraint is the primary driver of sink formation. Experiments on both single-layer and multi-layer models provide supporting evidence (section 4). Single-layer softmax Transformers trained on the task develop attention sinks with near-unit mass on 
+
+BOS when no trigger is present, aligning with our theoretical analysis. Swapping softmax for ReLU attention eliminates sink formation while preserv-ing task accuracy, confirming that the softmax nor-malization constraint—rather than the task struc-ture or optimization dynamics—is the fundamen-tal driver of the sink behavior. We observe these patterns across both single-layer and deeper multi-   
+
+> 2We exclude BOS from the average because it contains no input-dependent content.
+> 3Indeed, we empirically see in section 4 that sinks do form, but not in all positions and layers (see fig. 6).
+> Figure 1: Reproduced from Barbero et al. (2025) 4: an attention head that fires on an apostrophe trigger and otherwise attends to BOS .
+
+head multi-layer architectures, demonstrating that our theoretical insights capture fundamental proper-ties of normalization-based attention mechanisms. Overall, our contributions are as follows: 1. We introduce a trigger-conditional task that models the mechanism of attention heads ob-served “in the wild” (Barbero et al., 2025; Guo et al., 2024) (section 3.2). 2. We prove that any single-layer softmax atten-tion model achieving vanishing error on this task must place nearly all attention on a fixed sink token (the BOS token) at every non-trigger position (theorem 1). 3. We extend this to multi-layer models, showing that at least one layer must place nearly all attention on the BOS token at some non-trigger position 3 (theorem 2). 4. We show that the softmax normalization is the driver of sink formation by showing the existence of a ReLU attention model that per-fectly solves the same task without any sink formation (theorem 3). 
+
+2 Sinks Empirically Enable No-Op Behaviors in Real Models 
+
+In realistic empirical settings, attention sinks fre-quently appear in attention heads implementing a no-op behavior in the absence of specific trig-gers. Barbero et al. (2025) demonstrate this di-rectly: their case study of an “apostrophe head” in Gemma 7B shows two operating modes—firing on apostrophe triggers and otherwise attending   
+
+> 4Licensed under Creative Commons Attribution 4.0 (CC BY 4.0). Minor cropping for layout; no other changes. License: https://creativecommons.org/licenses/by/4. 0/ .
+
+2Figure 2: Reproduced from Guo et al. (2024) 5: an active– dormant attention head in Llama 2–7B. On code-like inputs (GitHub, top), the head exhibits diverse attention patterns; on text-like inputs (Wikipedia, bottom), it col-lapses to an attention sink on position 0. 
+
+to BOS as a default no-operation (no-op) (fig. 1) 4.Similarly, Guo et al. (2024) document an ac-tive–dormant head in Llama 2–7B that switches be-tween active computation on code-like inputs and dormant sink behavior on text-like inputs (fig. 2) 5.Notably, Guo et al. (2024) report that sink behavior diminishes under certain non-softmax/activation variants; in particular, replacing softmax with ReLU attention eliminates sinks, consistent with our theoretical result (theorem 3). These works complement our theoretical per-spective. Barbero et al. (2025) argue that sinks enable controlled information mixing, with BOS 
+
+serving as a stable anchor. Guo et al. (2024) an-alyze the training dynamics behind sink forma-tion—how these patterns emerge during optimiza-tion. In contrast, our work establishes a theoretical necessity of sink behavior in softmax attention and its absence in ReLU attention via expressiveness analyses regardless of optimization and training schemes . We include illustrative figures from Bar-bero et al. (2025) (fig. 1) 4 and Guo et al. (2024) (fig. 2) 5 to highlight that our synthetic task captures key aspects of real sink behavior—sinks emerge to implement a no-op when no trigger fires. See Appendix H for more related works. 
+
+3 Theory and Results 
+
+We now set up our analysis. We introduce the task in section 3.2, explain why this task is meaningful and how its assumptions match realistic modeling in section 3.3, introduce the model architectures in         
+
+> 5Reproduced with written permission of the au-thors from https://github.com/GuoTianYu2000/ Active-Dormant-Attention .
+
+section 3.4, and state our main necessity claims in section 3.5. 
+
+3.1 Notation and Setup 
+
+We write R>0 for the positive reals and N≥k for the natural numbers at least k. We use 1{·} for the indicator function and denote [k] = {1, . . . , k }.Let n ∈ N≥5 be the input dimension and L ∈ N≥4
+
+denote the sequence length. We write sequences as x = ( x(1) , . . . , x(L))⊤ ∈ RL×n with tokens vectors x(i) ∈ Rn×1.
+
+3.2 Task Definition 
+
+We define a synthetic task designed to capture the mechanism of attention sinks “in the wild”. Em-pirical studies show that attention heads in LLMs frequently implement trigger-conditional behavior: they aggregate context upon detecting a specific trigger, and attend to a sink token to effectively “switch off” otherwise (Barbero et al., 2025; Guo et al., 2024) (see section 2 for more details). Our task isolates this structure: the model must detect a trigger token and, only at the trigger position , write to the residual stream the mean of prior content, and write the zero vector at all other positions. 
+
+3.2.1 Input Distribution 
+
+Input tokens lie in Rn (for some n ∈ N≥5) and consist of four coordinate types: (i) a BOS indica-tor (coordinate 1), equal to one only for the first token; (ii) a trigger indicator (coordinate 2), equal to one only for the trigger token; (iii) a non-trigger non-BOS indicator (coordinate 3), equal to one for all remaining tokens; and (iv) content coordinates 
+
+(4 ≤ k ≤ n), drawn i.i.d. from some continuous distribution (except for the BOS token, for which the content coordinates are fixed to zero, as this token contains no input-dependent content). Formally, we construct our input distribution D
+
+as follows. We sample a trigger position j uni-formly from {2, . . . , L }, and construct a sequence as follows: • Position 1 ( BOS ): Coordinate 1 is one; all other coordinates are zero. • Position j (Trigger token): Coordinate 2 is one; coordinates 4 ≤ k ≤ n are i.i.d. from some continuous distribution. All other coordinates are zero. • Positions i̸ = 1 , j : Coordinate 3 is one; coordi-nates 4 ≤ k ≤ n are i.i.d. from some continuous distribution. All other coordinates are zero. 3Figure 3: Experimental validation: Theoretically analyzed model. (a) Mean attention weights for softmax attention across 1000 test examples with trigger at position 8. Dark regions indicate high attention mass concentrated on BOS (position 1) before the trigger. (b) Standard deviation of softmax attention weights shows negligible variance, confirming stable sink behavior. (c) Mean attention weights for ReLU attention show no sink formation—attention on BOS remains near zero. (d) Standard deviation for ReLU attention confirms consistent behavior across examples. 
+
+3.2.2 Target Output 
+
+The target output y(i) is the zero vector 0 at all positions except the trigger position i = j, where it equals (j−1) −1 Pjk=2 x(k), the mean of all preced-ing non-BOS tokens (including the trigger itself). 
+
+3.2.3 Loss Function 
+
+We evaluate hypotheses using the ℓ∞ loss: L(f ) = sup (x,y)∈support (D) max i∈[L] y(i) − f (x)(i)
+
+> 2
+
+.
+
+3.3 Task Motivation and Justification 
+
+This setup captures a basic and pervasive pattern in sequence modeling: aggregate context upon a trigger, otherwise perform a no-op (Barbero et al., 2025; Guo et al., 2024) (see section 2 for more details). Our task distills this to its minimal form: detect a trigger and compute the mean of prior content, or, otherwise, output zero. 6
+
+The design choices we make are less arbitrary than they may appear. Many aspects are without loss of generality: the BOS indicator, the trigger indicator, and the non-trigger non-BOS indicator channels can be any three mutually orthogonal vec-tors via a change of basis; we fix them to coordi-nates 1, 2, and 3 for simplicity. While having such fixed indicator channels feels somewhat arbitrary, it is a natural way to model position-type information that an MLP layer can easily learn to inject into the residual stream in practice (e.g., by writing a constant vector). 
+
+> 6Our analysis applies almost as-is to a broader class of trigger-conditional problems, such as key-query retrieval where a query must extract a specific previous token (e.g., marked by a feature bit) while ignoring others, resembling the apostrophe head in fig. 1 4. We analyze the averaging task for clarity, leaving the formal characterization of the full class of tasks necessitating sinks to future work.
+
+3.4 Model Architecture 
+
+We study self-attention models with two variants of attention mechanisms. We denote the learn-able parameter of a single-layer attention model by 
+
+WQ, WK , WV , WO ∈ Rn×n for queries, keys, values, and output projection respectively. For in-put sequence x = ( x(1) , . . . , x(L))⊤ ∈ RL×n, we calculate the attention weights αi,j as defined be-low for each attention variant (softmax or ReLU). The model output is then computed as f (x)(i) =
+
+WO
+
+Pij=1 αi,j WV x(j).
+
+Softmax Attention. The attention weight from position i to position j ≤ i is given by: 
+
+αi,j = exp( x(i)WQW⊤ 
+
+> K
+
+(x(j))⊤)
+
+Pik=1 exp( x(i)WQW⊤ 
+
+> K
+
+(x(k))⊤)
+
+ReLU Attention. For ReLU attention, we re-place the softmax normalization with element-wise ReLU. We divide the scores by the num-ber of positions up to the current position i, ex-cluding the BOS token 7. Namely, if we de-fine ni = max {i − 1, 1}, then we have αi,j =ReLU( x(i)WQW⊤ 
+
+> K
+
+(x(j))⊤)/n i.
+
+Multi-Layer Attention. A D-layer soft-max/ReLU model is the composition 
+
+f = f (D) ◦ · · · ◦ f (1) , where each f (d) is a single-layer softmax/ReLU attention model. We denote by α(d) 
+
+> i,j
+
+the attention weight at position i
+
+attending to position j in layer d.    
+
+> 7This scaling is necessary because ReLU attention cannot naturally compute averages: concatenating the input sequence to itself would double the output at the final position while keeping the average the same. Alternatively, we could have defined the task to sum over past tokens for the ReLU model instead of averaging , which would yield an analogous theorem without requiring scaling. Moreover, a similar scaling would not work for softmax attention , as our analysis would hold for any such variant.
+
+4Figure 4: Multi-layer multi-head validation. Attention patterns for a 2-layer 2-head softmax model on a random input (with trigger at position 8). All heads exhibit strong sink behavior. 
+
+3.5 Main Result 
+
+We are now ready to state our theoretical results. Our central contribution is threefold: (i) we estab-lish that an attention sink is necessary at every non-trigger position for single-layer softmax attention to solve the trigger-conditional task (theorem 1); (ii) we prove that in multi-layer softmax attention, at least one position must exhibit sink behavior (theorem 2); 8 and (iii) we prove constructively that ReLU attention can solve the same task without 
+
+any sink behavior (theorem 3). This contrast di-rectly demonstrates that the softmax normalization constraint—not the task structure or optimization dynamics—is the fundamental driver of attention sinks. 
+
+Theorem 1 (Single-Layer Attention Sink Neces-sity) . For any ε, δ ∈ R>0, L ∈ N≥4, n ∈ N≥5, and a bounded probability density function P, there ex-ists a constant η ∈ R>0 such that the following holds. Consider any single-layer softmax atten-tion 9 model f with loss L(f ) ≤ η on sequences with length L and dimension n where content coor-dinates are drawn from P.10 Then with probability at least 1 − δ, for all non-trigger positions i̸ = j,we have αi, 1 ≥ 1 − ε.Proof sketch (full proof in section D). Suppose for contradiction that αi, 1 ≤ 1 − ε at some non-trigger position i with probability at least δ > 0, even as 
+
+η := L(f ) → 0. On this event a constant amount of attention mass falls on non-BOS tokens; by pi-geonhole there exist indices i0, h 0 and a constant 
+
+γ > 0 such that αi0,h 0 ≥ γ on a positive-measure set.                     
+
+> 8Indeed, we empirically see in section 4.2 (e.g., fig. 6) that sinks do form, but not in all positions and layers.
+> 9Our analysis immediately extends to any attention mechanism whose weights αi,j satisfy: (i) normalization —P
+> j≤iαi,j ≥cfor some constant c > 0; and (ii) monotonic-ity —inserting an additional key into positions 1, . . . , i does not increase αi,j for any existing key j.
+> 10 It is easy to show that such an fexists for any η∈R>0.
+
+Since every non-trigger position must output 0
+
+with error at most η, and adding more keys can only decrease any fixed softmax weight, one can reduce to short prefixes and show that whenever h ≤ i
+
+are both non-trigger positions, ∥αi,h Vx (h)∥2 ≤
+
+O(η). On the positive-measure set where αi,h ≥ γ,this gives ∥Vx (h)∥2 = O(η/γ ): the value map must crush a positive-probability set of non-trigger tokens. By bounded density and independence of the content coordinates, for every content coordinate 
+
+m ≥ 4 this crushed set contains two tokens z, z′
+
+that agree on all coordinates except m, where they differ by at least a constant. Transplant them into two sequences with trigger at position 3: (BOS , z, t)
+
+and (BOS , z′, t). The targets at the trigger posi-tion differ by 12 (z − z′), which has a Ω(1) com-ponent along em. The prediction at position 3
+
+is ˆy(3) (z) = α3,1Ve1 + α3,2Vz + α3,3Vt ; the first two terms are O(η) by the crushing bound, and the third lies in the span of the fixed vector 
+
+v := Vt . Projecting onto v⊥ removes the trigger contribution entirely, so the two projected predic-tions are O(η)-close, while the projected targets re-main Ω(1) -apart (choosing m so em has a nontriv-ial component in v⊥). This contradicts η → 0.
+
+Theorem 2 (Multi-Layer Attention Sink Neces-sity) . For any ε, δ ∈ R>0, L ∈ N≥4, n ∈ N≥5 and a bounded probability density function P, there exists a constant η ∈ R>0 such that the following holds. Consider any D-layer softmax attention 9
+
+model f with loss L(f ) ≤ η on sequences with length L and dimension n where content coor-dinates are drawn from P.11 Then over all in-puts with trigger position j ≥ 3, with probabil-ity at least 1 − δ, there exists at least one layer 
+
+d ∈ { 1, . . . , D } and a non-BOS non-trigger posi-tion i̸ = j such that α(d) 
+
+> i, 1
+
+≥ 1 − ε.     
+
+> 11 It is easy to show that such an fexists for any η∈R>0.
+
+5Figure 5: ReLU attention: 2-layer 2-head model. Attention patterns on a single test input (trigger at position 8). No sink formation occurs in any head; attention on BOS remains near zero throughout. 
+
+Proof sketch (full proof in section E). We unroll the multi-layer network and apply similar rea-soning as in theorem 1: if no layer exhibits sink behavior, the effective attention weights on content tokens remain large, forcing the value map to crush them to zero, which again contradicts the sensitivity required at the trigger position. 
+
+Theorem 3 (ReLU Attention Without Sinks) . For any L ∈ N≥4 and n ∈ N≥3, there exists a one-layer ReLU attention model f with loss L(f ) = 0 
+
+such that for any input sequence x with trigger position j, and any non-trigger position i̸ = j we have αi, 1 = 0 .Proof sketch (full proof in section F). We provide a simple explicit construction. By choosing query and key weights to align with the trigger indicator coordinate and non-trigger non-BOS indicator co-ordinate, we ensure that attention scores are equal to some positive constant at the trigger position (where they compute the average) and zero other-wise. Since ReLU does not enforce normalization, the model can output the zero vector by simply having zero attention weights, without needing a sink. 
+
+4 Experiments 
+
+We validate our theoretical predictions on the syn-thetic trigger-conditional task. In section 4.1, we train single-layer single-head models to validate theorem 1 and theorem 3. In section 4.2, we vali-date our multi-layer findings (theorem 2) in more realistic settings by training multi-layer multi-head models with residual connections. All experiments use sequences of length L = 16 ; training details are in Appendix A. Code for reproducing our ex-periments is available at https://github.com/ YuvMilo/sinks-are-provably-necessary .
+
+4.1 Single-Layer Models 
+
+We first validate theorem 1 and theorem 3 on single-layer single-head models. 
+
+Experiment 1: Softmax Attention Forms Sinks. 
+
+Theorem 1 predicts that softmax attention models achieving low loss must have a strong attention sink at all pre-trigger positions. To test this, we visualize the mean and standard deviation of atten-tion weights across 1000 test examples with trigger position j = 8 (fig. 3, panels a and b). The model places near-unit attention mass on position 1 at ev-ery non-trigger position, with negligible variance across examples. 
+
+Experiment 2: ReLU Attention Avoids Sinks. 
+
+Theorem 3 establishes that ReLU attention can solve the same task with zero attention on BOS . We replace softmax with ReLU attention while keep-ing all other parameters identical (fig. 3, panels c and d). The ReLU model achieves comparable task accuracy without developing sink behavior: attention weights on position 1 remain near zero throughout the sequence. This observation rein-forces that sinks are not a byproduct of the task or training dynamics, but a direct consequence of the normalization geometry. 
+
+4.2 Multi-Layer Multi-Head Models 
+
+Figure 4 shows attention patterns for a 2-layer 2-head softmax model: all heads exhibit strong sink behavior before the trigger. In deeper models, sinks appear in some but not all heads, consistent with theorem 2, which guarantees existence rather than ubiquity. Figure 6 shows an example: in a 4-layer 4-head softmax model that achieves low loss, head 3 in layer 4 places near-zero attention on BOS , while other heads in the same network develop clear sinks (fig. 7 in Appendix C). Finally, replacing softmax with ReLU attention eliminates sink formation en-tirely in multi-layer models as well: fig. 5 shows 6that no head of a 2-layer 2-head ReLU model devel-ops a sink, and the same holds for a 4-layer 4-head ReLU model (see fig. 8 in Appendix C). 
+
+5 Conclusions and Practical Implications 
+
+Our results show that for trigger-conditional behav-iors, attention sinks are not an optimization artifact but a structural necessity: when a model must main-tain a stable default (no-op) output on typical inputs while performing a content-dependent computation upon a recognizable trigger, softmax normalization forces sink formation. This has direct practical consequences: it can help practitioners distinguish between mitigation strategies that are fundamen-tally limited and those that address the root cause. Specifically, sink-removal interventions operat-ing within the softmax mechanism may be inher-ently limited for such computations. Penalizing BOS attention, spreading attention mass, or post-hoc reweighting may degrade the no-op guarantee, or cause the model to recreate an equivalent anchor elsewhere (a different position, head, or layer). In this sense, our results provide a principled reason to expect that simply “fighting” sinks without relax-ing the simplex constraint can be counterproductive for trigger-conditional circuits: the sink may be the very mechanism that makes the circuit possible. At the same time, the contrast with ReLU at-tention (theorem 3) clarifies a more promising di-rection. If sinks are undesirable for a downstream goal—e.g., they waste representational capacity (Yu et al., 2024), confound attention-based anal-yses (Guo et al., 2024), or create quantization-unfriendly outliers (Sun et al., 2024)—the right lever is to change how “off” states are represented, via non-normalized attention, explicit gating, or other mechanisms that can output zero without al-locating probability mass. More broadly, we hope our results can help guide future work on designing sink-free attention mech-anisms that directly support no-op operations. 
+
+6 Limitations 
+
+The synthetic trigger-conditional task, while em-pirically grounded in real sink behavior (Barbero et al., 2025; Guo et al., 2024), represents a specific computational pattern within a broader class of trigger-conditional problems. Our analysis likely extends to related tasks such as key-query retrieval where a query must extract a specific previous to-ken (e.g., marked by a feature bit) while ignoring      
+
+> Figure 6: A softmax head without a sink in multilayer Transformer. Attention pattern of head 3, layer 4 in a 4-layer 4-head softmax model that achieves low loss. This head places near-zero attention on BOS at all non-BOS
+> positions, while other heads in the same network exhibit strong sinks (see fig. 7 for all heads). This confirms the existential nature of theorem 2: a sink must exist
+> somewhere in the network, but not in every head.
+
+others—resembling the apostrophe head in fig. 1. We leave the formal characterization of the full class of tasks necessitating sinks to future work. For multi-layer models, our necessity result (the-orem 2) guarantees that at least one layer must exhibit sink behavior at some non-trigger position, but does not characterize which specific layer this must be. Our experiments extend this to multi-head architectures and confirm that sinks indeed do not form in all heads or layers (section C), consistent with the existential nature of the theorem; under-standing exactly where sinks emerge would likely require a dynamical analysis of how optimization selects among valid solutions, which we leave to future work. Finally, it would be interesting to investigate whether other special tokens that are stable and always present in the input (e.g., <|think|> in reasoning models) exhibit similar sink behavior, and to investigate the relatively newly discovered phenomenon of “secondary attention sinks” (Wong et al., 2026). We leave this direction for future work as well. 
+
+Acknowledgments 
+
+I thank Yotam Alexander, Daniela Gottesman, Eden Lumbroso and Yoni Slutsky for illuminat-ing discussions. Special thanks to my advisor Na-dav Cohen for his guidance and mentorship. We used AI assistance for writing and code develop-ment. This work was supported by the European Research Council (ERC) grant NN4C 101164614, 7a Google Research Scholar Award, a Google Re-search Gift, Meta, the Yandex Initiative in Machine Learning, the Israel Science Foundation (ISF) grant 1780/21, the Tel Aviv University Center for AI and Data Science, the Adelis Research Fund for Artifi-cial Intelligence, Len Blavatnik and the Blavatnik Family Foundation, and Amnon and Anat Shashua. 
+
+References 
+
+Anand, Umberto Cappellazzo, Stavros Petridis, and Maja Pantic. 2026. Mitigating attention sinks and massive activations in audio-visual speech recogni-tion with llms. Preprint , arXiv:2510.22603. Sanjeev Arora, Nadav Cohen, Wei Hu, and Yuping Luo. 2019. Implicit regularization in deep matrix factor-ization. Preprint , arXiv:1905.13655. Federico Barbero, Álvaro Arroyo, Xiangming Gu, Christos Perivolaropoulos, Michael Bronstein, Petar Veliˇ ckovi´ c, and Razvan Pascanu. 2025. Why do llms attend to the first token? Preprint ,arXiv:2504.02732. Yelysei Bondarenko, Markus Nagel, and Tijmen Blankevoort. 2023. Quantizable transformers: Re-moving outliers by helping attention heads do noth-ing. Preprint , arXiv:2306.12929. Nicola Cancedda. 2024. Spectral filters, dark signals, and attention sinks. Preprint , arXiv:2402.09221. Enrique Queipo de Llano, Álvaro Arroyo, Federico Bar-bero, Xiaowen Dong, Michael Bronstein, Yann Le-Cun, and Ravid Shwartz-Ziv. 2026. Attention sinks and compression valleys in llms are two sides of the same coin. Preprint , arXiv:2510.06477. Nir Endy, Idan Daniel Grosbard, Yuval Ran-Milo, Yonatan Slutzky, Itay Tshuva, and Raja Giryes. 2025. Mamba knockout for unraveling factual information flow. Preprint , arXiv:2505.24244. Wenfeng Feng and Guoying Sun. 2025. Edit: Enhanc-ing vision transformers by mitigating attention sink through an encoder-decoder architecture. Preprint ,arXiv:2504.06738. Zichuan Fu, Wentao Song, Yejing Wang, Xian Wu, Yefeng Zheng, Yingying Zhang, Derong Xu, Xue-tao Wei, Tong Xu, and Xiangyu Zhao. 2025. Sliding window attention training for efficient large language models. Preprint , arXiv:2502.18845. Zizhuo Fu, Wenxuan Zeng, Runsheng Wang, and Meng Li. 2026. Attention sink forges native moe in at-tention layers: Sink-aware training to address head collapse. Preprint , arXiv:2602.01203. Xiangming Gu, Tianyu Pang, Chao Du, Qian Liu, Fengzhuo Zhang, Cunxiao Du, Ye Wang, and Min Lin. 2024. When attention sink emerges in language models: An empirical view. Preprint ,arXiv:2410.10781. Tianyu Guo, Druv Pai, Yu Bai, Jiantao Jiao, Michael I. Jordan, and Song Mei. 2024. Active-dormant attention heads: Mechanistically demystifying extreme-token phenomena in llms. Preprint ,arXiv:2410.13835. Victoria Hankemeier and Malte Schilling. 2026. Stochastic parroting in temporal attention – regulat-ing the diagonal sink. Preprint , arXiv:2602.10956. Jonghyun Hong and Sungyoon Lee. 2025. Variance sensitivity induces attention entropy collapse and in-stability in transformers. In Proceedings of the 2025 Conference on Empirical Methods in Natural Lan-guage Processing , pages 8360–8378, Suzhou, China. Association for Computational Linguistics. Sayed Mohammadreza Tayaranian Hosseini, Amir Ardakani, and Warren J. Gross. 2026. In-nerq: Hardware-aware tuning-free quantization of kv cache for large language models. Preprint ,arXiv:2602.23200. Xingyue Huang, Xueying Ding, Mingxuan Ju, Yozen Liu, Neil Shah, and Tong Zhao. 2026. Thresh-old differential attention for sink-free, ultra-sparse, and non-dispersive language modeling. Preprint ,arXiv:2601.12145. Mingyu Jin, Kai Mei, Wujiang Xu, Mingjie Sun, Ruix-iang Tang, Mengnan Du, Zirui Liu, and Yongfeng Zhang. 2025. Massive values in self-attention mod-ules are the key to contextual knowledge understand-ing. Preprint , arXiv:2502.01563. Seil Kang, Jinyeong Kim, Junhyeok Kim, and Seong Jae Hwang. 2025. See what you are told: Visual at-tention sink in large multimodal models. ArXiv ,abs/2503.03321. Haokun Lin, Haobo Xu, Yichen Wu, Jingzhi Cui, Ying-tao Zhang, Linzhan Mou, Linqi Song, Zhenan Sun, and Ying Wei. 2024. Duquant: Distributing outliers via dual transformation makes stronger quantized llms. Preprint , arXiv:2406.01721. Ziyong Lin, Haoyi Wu, Shu Wang, Kewei Tu, Zilong Zheng, and Zixia Jia. 2025. Look both ways and no sink: Converting LLMs into text encoders without training. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Vol-ume 1: Long Papers) , pages 22839–22853, Vienna, Austria. Association for Computational Linguistics. Guozhi Liu, Weiwei Lin, Tiansheng Huang, Ruichao Mo, Qi Mu, Xiumin Wang, and Li Shen. 2026. Surgery: Mitigating harmful fine-tuning for large language models via attention sink. Preprint ,arXiv:2602.05228. Andrew Lu, Wentinn Liao, Liuhui Wang, Huzheng Yang, and Jianbo Shi. 2025. Artifacts and attention sinks: Structured approximations for efficient vision transformers. Preprint , arXiv:2507.16018. 
+
+8Jiayun Luo, Wan-Cyuan Fan, Lyuyang Wang, Xi-angteng He, Tanzila Rahman, Purang Abolmaesumi, and Leonid Sigal. 2025. To sink or not to sink: Vi-sual information pathways in large vision-language models. Preprint , arXiv:2510.08510. Aidar Myrzakhan, Tianyi Li, Bowei Guo, Shengkun Tang, and Zhiqiang Shen. 2026. Sink-aware pruning for diffusion language models. Preprint ,arXiv:2602.17664. Ofir Press, Noah A. Smith, and Mike Lewis. 2021. Train short, test long: Attention with linear bi-ases enables input length extrapolation. Preprint ,arXiv:2108.12409. Zihan Qiu, Zeyu Huang, Kaiyue Wen, Peng Jin, Bo Zheng, Yuxin Zhou, Haofeng Huang, Zekun Wang, Xiao Li, Huaqing Zhang, Yang Xu, Haoran Lian, Siqi Zhang, Rui Men, Jianwei Zhang, Ivan Titov, Dayiheng Liu, Jingren Zhou, and Junyang Lin. 2026. A unified view of attention and residual sinks: Outlier-driven rescaling is essential for transformer training. Preprint , arXiv:2601.22966. Zihan Qiu, Zekun Wang, Bo Zheng, Zeyu Huang, Kaiyue Wen, Songlin Yang, Rui Men, Le Yu, Fei Huang, Suozhi Huang, Dayiheng Liu, Jingren Zhou, and Junyang Lin. 2025. Gated attention for large lan-guage models: Non-linearity, sparsity, and attention-sink-free. Preprint , arXiv:2505.06708. Yuval Ran-Milo, Yotam Alexander, Shahar Mendel, and Nadav Cohen. 2026. Outcome-based rl provably leads transformers to reason, but only with the right data. Preprint , arXiv:2601.15158. Oliver Richter and Roger Wattenhofer. 2020. Normal-ized attention without probability cage. Preprint ,arXiv:2005.09561. Maximo Eduardo Rulli, Simone Petruzzi, Edoardo Michielon, Fabrizio Silvestri, Simone Scardapane, and Alessio Devoto. 2025. Attention sinks in diffu-sion language models. Preprint , arXiv:2510.15731. Valeria Ruscio, Umberto Nanni, and Fabrizio Silvestri. 2025. What are you sinking? a geometric approach on attention sink. Preprint , arXiv:2508.02546. Pedro Sandoval-Segura, Xijun Wang, Ashwinee Panda, Micah Goldblum, Ronen Basri, Tom Goldstein, and David Jacobs. 2025. Using attention sinks to identify and evaluate dormant heads in pretrained llms. arXiv preprint arXiv:2504.03889 .Bingqi Shang, Yiwei Chen, Yihua Zhang, Bingquan Shen, and Sijia Liu. 2025. Forgetting to forget: At-tention sink as a gateway for backdooring llm un-learning. Preprint , arXiv:2510.17021. Jaewon Sok, Jewon Yeom, Seonghyeon Park, Jeongjae Park, and Taesup Kim. 2026. Garbage attention in large language models: Bos sink heads and sink-aware pruning. Preprint , arXiv:2601.06787. Seungwoo Son, Wonpyo Park, Woohyun Han, Kyuyeun Kim, and Jaeho Lee. 2024. Prefixing attention sinks can mitigate activation outliers for large language model quantization. In Proceedings of the 2024 Con-ference on Empirical Methods in Natural Language Processing , pages 2242–2252, Miami, Florida, USA. Association for Computational Linguistics. Daniel Soudry, Elad Hoffer, Mor Shpigel Nacson, Suriya Gunasekar, and Nathan Srebro. 2024. The implicit bias of gradient descent on separable data. 
+
+Preprint , arXiv:1710.10345. Jianlin Su, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2021. Roformer: En-hanced transformer with rotary position embedding. 
+
+Preprint , arXiv:2104.09864. Zunhai Su and Kehong Yuan. 2025. Kvsink: Under-standing and enhancing the preservation of attention sinks in kv cache quantization for llms. Preprint ,arXiv:2508.04257. Mingjie Sun, Xinlei Chen, J. Zico Kolter, and Zhuang Liu. 2024. Massive activations in large language models. Preprint , arXiv:2402.17762. Shangwen Sun, Alfredo Canziani, Yann LeCun, and Jiachen Zhu. 2026. The spike, the sparse and the sink: Anatomy of massive activations and attention sinks. Preprint , arXiv:2603.05498. Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. Preprint , arXiv:1706.03762. Petar Veliˇ ckovi´ c, Christos Perivolaropoulos, Federico Barbero, and Razvan Pascanu. 2025. Softmax is not enough (for sharp size generalisation). Preprint ,arXiv:2410.01104. Yining Wang, Mi Zhang, Junjie Sun, Chenyue Wang, Min Yang, Hui Xue, Jialing Tao, Ranjie Duan, and Jiexi Liu. 2025. Mirage in the eyes: Hallucination attack on multi-modal large language models with only attention sink. Preprint , arXiv:2501.15269. Jeffrey T. H. Wong, Cheng Zhang, Louis Mahon, Wayne Luk, Anton Isopoussu, and Yiren Zhao. 2026. On the existence and behavior of secondary attention sinks. 
+
+Preprint , arXiv:2512.22213. Guangxuan Xiao, Yuandong Tian, Beidi Chen, Song Han, and Mike Lewis. 2024. Efficient streaming language models with attention sinks. Preprint ,arXiv:2309.17453. Jing Xiong, Liyang Fan, Hui Shen, Zunhai Su, Min Yang, Lingpeng Kong, and Ngai Wong. 2026. Dope: Denoising rotary position embedding. Preprint ,arXiv:2511.09146. Itay Yona, Ilia Shumailov, Jamie Hayes, Federico Bar-bero, and Yossi Gandelsman. 2025. Interpreting the repeated token phenomenon in large language mod-els. Preprint , arXiv:2503.08908. 
+
+9Zhongzhi Yu, Zheng Wang, Yonggan Fu, Huihong Shi, Khalid Shaikh, and Yingyan Celine Lin. 2024. Unveiling and harnessing hidden attention sinks: Enhancing large language models without training through attention calibration. Preprint ,arXiv:2406.15765. Stephen Zhang, Mustafa Khan, and Vardan Papyan. 2025. Attention sinks: A ’catch, tag, release’ mecha-nism for embeddings. Preprint , arXiv:2502.00919. Xiaofeng Zhang, Yihao Quan, Chaochen Gu, Chen Shen, Xiaosong Yuan, Shaotian Yan, Hao Cheng, Kaijie Wu, and Jieping Ye. 2024. Seeing clearly by layer two: Enhancing attention heads to alleviate hallucination in lvlms. Preprint , arXiv:2411.09968. Zihou Zhang, Zheyong Xie, Li Zhong, Haifeng Liu, Yao Hu, and Shaosheng Cao. 2026. One token is enough: Improving diffusion language models with a sink token. Preprint , arXiv:2601.19657. Zayd M. K. Zuhri, Erland Hilman Fuadi, and Al-ham Fikri Aji. 2026. Softpick: No attention sink, no massive activations with rectified softmax. Preprint ,arXiv:2504.20966. 
+
+A Training Details 
+
+All models are trained using the Adam optimizer (β1=0 .9, β 2=0 .95 ) with batch size 128 over the ℓ2
+
+loss until the ℓ∞ loss is less than 10 −2 for the entire batch. Single-layer models use learning rate 10 −3;multi-layer models use learning rate 10 −4. We use input dimension n = 16 and sample content coordinates i.i.d. from U(−1, 1) .
+
+B Practical Impact of Attention Sinks 
+
+The goal of this section is to detail the empirical mo-tivation for our theoretical study. Attention sinks have been shown to affect several aspects of model performance and deployment. We briefly survey the evidence here to motivate the practical impor-tance of understanding their origin. 
+
+Accuracy and context utilization. When prob-ability mass concentrates on a fixed position, at-tention can be diverted away from other tokens and downstream accuracy can be affected (Yu et al., 2024). Guo et al. (2024) document “active– dormant” heads in which dormant sink behavior effectively wastes representational capacity. 
+
+Compression and quantization. Attention sinks are correlated with outlier activations that compli-cate model compression. Sun et al. (2024) identify massive activations tied to sink tokens, and Lin et al. (2024) show that these outliers are a key challenge for quantization. 
+
+Streaming and long-context inference. At-tention sinks complicate streaming and rolling-window KV-cache strategies: Xiao et al. (2024) show that evicting sink tokens from the cache causes catastrophic performance degradation, and that explicitly retaining them is necessary for sta-ble generation on sequences far beyond the training length. 
+
+Vision and multimodal models. Analogous sink effects appear in vision Transformers and multi-modal models. Kang et al. (2025) show that visual attention sinks allocate high attention weights to irrelevant visual tokens, wasting representational capacity. Wang et al. (2025) demonstrate that atten-tion sinks in multimodal models can be exploited to induce hallucinations, and Feng and Sun (2025) propose architectural modifications to mitigate sink behavior in vision Transformers. 
+
+Interpretability. Sinks distort attention-based analyses by concentrating probability mass on to-kens that carry no content-relevant information, complicating efforts to use attention patterns for model interpretation (Guo et al., 2024). 
+
+C Additional Experimental Results 
+
+To further validate our findings at larger scale, we train 4-layer 4-head models with both softmax and ReLU attention. All models use the same training configuration described in Appendix A. Figures 7 and 8 show representative attention patterns. The softmax variant exhibits strong sink behavior in at least one head per layer in the no-trigger regime, while the ReLU variant maintains near-zero atten-tion on BOS throughout. These results provide addi-tional evidence that the necessity of attention sinks in softmax models persists in deeper, wider archi-tectures. 
+
+D Proof of theorem 1 
+
+We prove theorem 1 by establishing two separate necessity results: one for pre-trigger positions (the-orem 4) and one for post-trigger positions (theo-rem 5). Combining these two results directly yields the statement of theorem 1, which asserts necessity at all non-trigger positions i̸ = j.
+
+Theorem 4 (Pre-Trigger Necessity) . For any ε, δ ∈
+
+R>0, L ∈ N≥4, n ∈ N≥5, and a bounded proba-bility density function P, there exists a constant 
+
+η ∈ R>0 such that the following holds. Con-sider any single-layer softmax attention model f
+
+10 with loss L(f ) ≤ η on sequences with length L
+
+and dimension n where non-trigger coordinates are drawn from P. Then with probability at least 
+
+1 − δ over the choice of x with trigger position j,for all pre-trigger positions 1 < i < j , we have 
+
+αi, 1 ≥ 1 − ε.Proof. Step 1: We can assume that WK = I and 
+
+WO = I. Let 
+
+B := WQW⊤ 
+
+> K
+
+, V := WOWV .
+
+For any input, the scores and outputs are 
+
+si,k = x(i)B(x(k))⊤, ˆy(i) = X
+
+> k≤i
+
+αi,k V x (k),
+
+with 
+
+αi,k = exp( si,k )
+
+P 
+
+> ℓ≤i
+
+exp( si,ℓ ) .
+
+Thus the attention depends on (WQ, WK ) only through B, and the output depends on (WO, WV )
+
+only through V. Reparameterizing by setting 
+
+WK := I, WQ := B,
+
+WO := I, WV := V
+
+leaves αi,k and ˆy(i) unchanged, hence the loss is unchanged. Therefore, we will assume without loss of generality that WK = I and WO = I, write Q
+
+for the query map, and V for the (combined) value map. 
+
+Step 2: Setup and pigeonhole principle. Fix 
+
+ε0, δ 0 ∈ R>0 and suppose by contradiction that there exists a sequence of one-layer softmax mod-els {ft}∞ 
+
+> t=1
+
+with ηt := L(ft) → 0 such that, for each t, with probability at least δ0 over (x, j ) ∼ P 
+
+there is a pre-trigger position i < j violating the sink condition: 
+
+αi, 1 ≤ 1 − ε0. (1) Since P 
+
+> k≤i
+
+αi,k = 1 , (1) implies that the total mass on non-BOS keys is at least ε0. There are only finitely many position triples (i, h, j ) with 
+
+2 ≤ h ≤ i < j ≤ L. By a pigeonhole principle, there exist infinitely many times ta1 , t a2 , . . . and fixed indices 2 ≤ i⋆ < j ⋆ ≤ L and 2 ≤ h⋆ ≤ i⋆,and a constant γ ∈ R>0 (e.g., γ = ε0/L 2), such that 
+
+P
+
+
+
+αi⋆,1 ≤ 1 − ε0 and αi⋆,h ⋆ ≥ γ
+
+
+
+≥ δ (2) for some δ ∈ R>0 independent of t. By relabel-ing this subsequence, we assume without loss of generality that (2) holds for all t.
+
+Step 3: Constructing tokens via Lemma 7. 
+
+Since the event in (2) has positive probability at least δ, by Lemma 7 (applied to content coordi-nates) there exists ε′ ∈ R>0 (independent of t) such that for every content coordinate m ∈ { 4, . . . , n }
+
+there exist tokens x(m), y (m) with the following properties: (i) x(m) 
+
+> k
+
+= y(m) 
+
+> k
+
+for all k̸ = m, and 
+
+x(m) 
+
+> m
+
+− y(m) 
+
+> m
+
+≥ ε′; and (ii) there exist sequences with either x(m) or y(m) at position h⋆ and with trigger position j satisfying i⋆ < j , such that 
+
+αi⋆,h ⋆ ≥ γ. (3) 
+
+Step 4: Positive weight implies small values. By Lemma 5 (applied with the pair (h⋆, i ⋆) in the case where h⋆̸ = i⋆) and Lemma 4 (applied with h⋆
+
+whenever h⋆ = i⋆), for every choice of token at position h⋆ we have 
+
+αi⋆,h ⋆ Vx (h⋆) 
+
+> 2
+
+≤ 4ηt.
+
+Combining with (3) yields that for any content co-ordinate m and any z ∈ { x(m), y (m)},
+
+Vz 2 ≤ 4 
+
+> γ
+
+ηt. (4) That is, the lower bound on αi⋆,h ⋆ directly forces the value projections to be small for all tokens con-structed in Step 2. 
+
+Step 5: Transplanting to j = 3 and deriving a contradiction. Fix t and abbreviate η := ηt. Pick a content coordinate m ∈ { 4, . . . , n } and let xt := 
+
+x(m) and yt := y(m) be the two tokens from Step 2 satisfying |x(m) 
+
+> t
+
+− y(m) 
+
+> t
+
+| ≥ ε′. Instantiate two sequences by setting the trigger at j = 3 , taking 
+
+x(2) ∈ { xt, yt}, and fixing the trigger token x(3) 
+
+to any arbitrary value t such that the sequence is in the support of D. At position i = 3 the target is 
+
+y(3) = 12 (x(2) + t). (5) For any z ∈ { xt, yt}, let βt(z) be the atten-tion weight α3,3 computed on the sequence where 
+
+x(2) = z and x(3) = t. Define the fixed value vector 
+
+vt := Vt t. (6) 11 By Lemma 1 and (4) , at position 3 we can decom-pose 
+
+ˆy(3) (z) = α3,1 Ve1 + α3,2 Vz 
+
+| {z } 
+
+> =: rt(z)
+
++βt(z) vt, (7) 
+
+∥rt(z)∥2 ≤ C0 η, (8) with C0 := 1 + 4 
+
+> γ
+
+independent of t. Consider coordinate 3 (the non-trigger non-BOS indicator). Since (y(3) )3 = 12 (( x(2) )3 + ( t)3) = 12 (1 + 0) = 0.5 and 0 < β t(z) ≤ 1, from (7) and the uniform loss bound we obtain 
+
+βt(z) ( vt)3 − 0.5
+
+≤ ˆy(3) 3 (z) − 0.5 + (rt(z)) 3
+
+≤ η + C0η
+
+= C1η, (9) where C1 := 1 + C0. Hence, for all sufficiently large t,
+
+(vt)3 ≥ 0.5 − C1ηβt(z) ≥ 0.5 − C1η > 0, (10) so vt̸ = 0.Let Pt denote the orthogonal projection onto 
+
+v⊥ 
+
+> t
+
+. Since Pt is an orthogonal projection onto an 
+
+(n−1) -dimensional subspace, there must be at least one coordinate m0 ∈ { 4, 5} such that ∥Ptem0 ∥2 ≥
+
+1/√2; fix m to be that coordinate. Now, applying 
+
+Pt to (7) kills the vt component: 
+
+Pt ˆy(3) (z) = Ptrt(z), (11) 
+
+∥Pt ˆy(3) (z)∥2 ≤ ∥ rt(z)∥2 ≤ C0η. (12) Therefore, for the two choices z = xt, yt,
+
+Pt ˆy(3) (xt) − Pt ˆy(3) (yt) 2
+
+≤ ∥ Ptrt(xt)∥2 + ∥Ptrt(yt)∥2
+
+≤ 2C0η. (13) On the other hand, we have y(3) (z) = 12 (z + t),so Pty(3) (z) = 12 Ptz + 12 Ptt. Since the t term is constant in z, it cancels in the difference: 
+
+Pty(3) (xt) − Pty(3) (yt) 2
+
+= 12 ∥Pt(xt − yt)∥2
+
+= 12 ∥Pt(( xt,m − yt,m )em)∥2
+
+= 12 |xt,m − yt,m | ∥ Ptem∥2
+
+≥ 12 ε′ ∥Ptem∥2
+
+≥ 12√2 ε′. (14) where the third equality uses the fact that xt and yt
+
+differ only on coordinate m.Finally, by the triangle inequality and the uni-form loss bound, 
+
+Pty(3) (xt) − Pty(3) (yt) 2
+
+≤ Pt ˆy(3) (xt) − Pt ˆy(3) (yt) 2 + 2 η
+
+≤ (2 C0 + 2) η, (15) which contradicts (14) for all sufficiently small η,because ε′∥Ptem∥2 > 0 is independent of t.
+
+Theorem 5 (Post-Trigger Necessity) . For any 
+
+ε, δ ∈ R>0, L ∈ N≥4, n ∈ N≥5, and a bounded probability density function P, there exists a con-stant η ∈ R>0 such that the following holds. Con-sider any single-layer softmax attention model f
+
+with loss L(f ) ≤ η on sequences with length L
+
+and dimension n where non-trigger coordinates are drawn from P. Then with probability at least 
+
+1 − δ over the choice of x with trigger position j,for all post-trigger positions j < i ≤ L, we have 
+
+αi, 1 ≥ 1 − ε.Proof. Step 1: The trigger receives arbitrarily small attention post-trigger. Fix any trigger to-ken t and any non-trigger token z, and consider the length-3 prefix (BOS , t, z) (so the trigger posi-tion is j = 2 and position 3 is post-trigger). Let 
+
+eα3,1, eα3,2, eα3,3 be the attention weights at position 
+
+3.We first bound the self term eα3,3Vz using Lemma 4. Embed the pair (BOS , z) as the first two tokens of any valid sequence from D whose trigger position satisfies j ≥ 3 (so position 2 is pre-trigger and non-trigger). Applying Lemma 4 at i = 2 
+
+gives ∥α2,2Vz ∥2 ≤ 2η for that sequence, and by Lemma 2 (adding the extra key t can only decrease the probability assigned to z) we have eα3,3 ≤ α2,2,hence ∥eα3,3Vz ∥2 ≤ 2η. Also, Lemma 1 gives 
+
+∥eα3,1Ve1∥2 ≤ η. Since the target at position 3 is 
+
+0, we have ∥ˆy(3) ∥2 ≤ η, and therefore 
+
+∥eα3,2Vt ∥2 ≤ ∥ ˆy(3) ∥2 + ∥eα3,1Ve1∥2
+
++ ∥eα3,3Vz ∥2 ≤ 4η. 
+
+Finally, Lemma 6 (applied to any valid sequence with trigger at position 2) gives ∥Vt ∥2 ≥ 1 − 2η,so 
+
+eα3,2 ≤ 4η
+
+1 − 2η . (16) 12 Now fix any valid sequence x with trigger posi-tion j and any i > j . By Lemma 3(2), αi,j ≤ bα3,2
+
+where bα3,2 is the attention weight on the second token in the prefix (BOS , x(j), x(i)), and applying (16) to that prefix yields 
+
+αi,j ≤ 4η
+
+1 − 2η for all i > j. (17) 
+
+Step 2 (contradiction via shifting the trigger). 
+
+Fix ε0, δ 0 ∈ R>0 and suppose, for contradiction, that the theorem is false. Then there exists a se-quence of one-layer softmax models {ft}t≥1 with 
+
+ηt := L(ft) → 0 such that for every t,
+
+P(x,j )∼D 
+
+
+
+∃ i > j : α(t)
+
+> i, 1
+
+(x) ≤ 1 − ε0
+
+
+
+≥ δ0.
+
+(18) By Step 1 (i.e., (17) ), for all x in support( D)
+
+and all i > j ,
+
+α(t) 
+
+> i,j
+
+(x) ≤ 4ηt
+
+1 − 2ηt
+
+.
+
+Fix t large enough so that 4ηt 
+
+> 1−2ηt
+
+≤ ε0/2.Let Et be the event in (18) . For each (x, j ) ∈ Et
+
+there exists i(x) > j with α(t)
+
+> i(x),1
+
+(x) ≤ 1 − ε0. For that i(x) we also have α(t) 
+
+> i(x),j
+
+(x) ≤ ε0/2, hence 
+
+X
+
+> k≤i(x), k / ∈{ 1,j }
+
+α(t)
+
+> i(x),k
+
+(x)= 1 − α(t)
+
+> i(x),1
+
+(x) − α(t) 
+
+> i(x),j
+
+(x)
+
+≥ ε0/2. (19) Now define the shift map Shift that moves the trigger token to the end: x′ = Shift( x, j ), where 
+
+x′(k) = x(k) for 1 ≤ k < j (positions before the trigger are unchanged), x′(k) = x(k+1) for 
+
+j ≤ k ≤ L − 1 (positions after the trigger shift left by one), and x′(L) = x(j) (trigger moves to the end). Then x′ ∈ support( D) with trigger position 
+
+L, and moreover, by the definition of the task (sec-tion 3.2), we have that the probability density of x′
+
+is the same as that of x:
+
+P(x) = P(x′). (20) Fix (x, j ) ∈ Et. Applying Lemma 2 we get that removing the key j can only increase the attention weight of each remaining key (at position i(x) in 
+
+x, the “candidate” key set is {1, . . . , i (x)}; at po-sition i(x) − 1 in x′, the “candidate” key set is 
+
+{1, . . . , i (x)} \ { j}, the same set with the trigger key removed.) Therefore, 
+
+X 
+
+> r≤i(x)−1, r ̸=1
+
+α′(t)
+
+> i(x)−1,r
+
+(x′)
+
+≥ X
+
+> k≤i(x), k / ∈{ 1,j }
+
+α(t)
+
+> i(x),k
+
+(x)
+
+≥ ε0/2,
+
+where the last inequality is (19). Equivalently, 
+
+α′(t)
+
+> i(x)−1,1
+
+(x′) ≤ 1 − ε0/2. (21) Since this holds for every (x, j ) ∈ Et, by the Pigeonhole Principle, there exist fixed indices j∗ ∈{1, . . . , L } and r∗ < L and a constant c1 ∈ R>0
+
+such that for infinitely many t,
+
+P(x,j )∼D 
+
+
+
+α′(t)
+
+> r∗,1
+
+(x′) ≤ 1 − ε0/2 and j = j∗
+
+≥ c1δ0,
+
+(22) where x′ = Shift( x, j ).Finally, consider the bijection x 7 → Shift( x, j ∗)
+
+from the set of sequences with trigger at j∗ to the set of sequences with trigger at L. By eq. (20), this map preserves probability density. Thus, the event in (22) has the exact same probability as the corresponding event for sequences with trigger at 
+
+L:
+
+P(z,j )∼D 
+
+
+
+α(t)
+
+> r∗,1
+
+(z) ≤ 1 − ε0/2 and j = L
+
+
+
+≥ c1δ0.
+
+Conditioning on j = L, this implies that for in-finitely many t,
+
+P
+
+
+
+α(t)
+
+> r∗,1
+
+(z) ≤ 1 − ε0/2 j = L
+
+
+
+≥ c1δ0
+
+P(j = L) .
+
+Since r∗ < L, this contradicts Theorem 4, as needed. 
+
+E Proof of theorem 2 
+
+Step 1: Setup and contradiction assumption. 
+
+Fix ε0, δ 0 ∈ R>0. Suppose for contradiction that there exists a sequence of D-layer softmax models 
+
+{ft}∞ 
+
+> t=1
+
+with 
+
+ηt := L(ft) −→ 0
+
+13 such that, for every t,
+
+P
+
+
+
+∀d ∈ { 1, . . . , D }, ∀ 1 < i < j :
+
+α(d) 
+
+> i, 1
+
+≤ 1 − ε0 j ≥ 3
+
+
+
+≥ δ0.
+
+(23) Let Et denote the event inside the probability in (23) intersected with the event j ≥ 3. For each t,let Vt be the combined value map from Lemma 8, and write β(t) 
+
+> i,k
+
+(·) for the corresponding coefficients. 
+
+Step 2: No sink implies small value projections. 
+
+On the event Et, position 2 is pre-trigger (since 
+
+j ≥ 3) and for every layer d,
+
+α(d)2,2 = 1 − α(d)2,1 ≥ ε0.
+
+Therefore, by Lemma 9 conditioned on Et we have that 
+
+β(t)2,2(x) ≥ εD 
+
+> 0
+
+(24) Moreover, Lemma 11 applied to ft yields 
+
+β(t)2,2(x) Vtx(2)  
+
+> 2
+
+≤ 2ηt.
+
+Combining with (24) gives 
+
+∥Vtx(2) ∥2 ≤ 2
+
+εD
+
+> 0
+
+ηt on Et. (25) Define the measurable set 
+
+St := 
+
+n
+
+z ∈ Rn : ∥Vtz∥2 ≤ 2
+
+> εD
+> 0
+
+ηt
+
+o
+
+.
+
+Since Et ⊆ { x(2) ∈ St} by (25), (23) implies 
+
+P x(2) ∈ St j ≥ 3 ≥ δ0. (26) By Lemma 7 (applied to content coordinates) and (26) , there exists ε′ ∈ R>0 (independent of 
+
+t) such that for every content coordinate m ∈{4, . . . , n } there exist tokens x(m) 
+
+> t
+
+, y(m) 
+
+> t
+
+∈ St sat-isfying 
+
+x(m) 
+
+> t,k
+
+= y(m) 
+
+> t,k
+
+for all k̸ = m, 
+
+x(m) 
+
+> t,m
+
+− y(m) 
+
+> t,m
+
+≥ ε′.
+
+(27) 
+
+Step 3: Transplanting to j = 3 and deriving a contradiction. Fix t and abbreviate η := ηt.Pick a content coordinate m ∈ { 4, . . . , n } and let 
+
+xt := x(m) 
+
+> t
+
+and yt := y(m) 
+
+> t
+
+be the two tokens from Step 2 satisfying |xt,m −yt,m | ≥ ε′. Instantiate two sequences by setting the trigger at j = 3 , taking 
+
+x(2) ∈ { xt, yt}, and fixing the trigger token x(3) 
+
+to an arbitrary value t such that the sequence is in the support of D. At position i = 3 the target is 
+
+y(3) = 12 (x(2) + t). (28) For any z ∈ { xt, yt}, let βt(z) be the coefficient 
+
+β(t)3,3(z) computed on the sequence where x(2) = z
+
+and x(3) = t. Define the fixed value vector 
+
+vt := Vt t. (29) By Lemma 8, for each choice x(2) = z we can decompose 
+
+ˆy(3) (z) = β(t)3,1(z) Vte1 + β(t)3,2(z) Vtz
+
+| {z } 
+
+> =: rt(z)
+
++βt(z) vt.
+
+(30) Since β(t)3,1(z), β (t)3,2(z) ≤ 1, Lemma 10 gives 
+
+∥Vte1∥2 ≤ η, and z ∈ St implies ∥Vtz∥2 ≤ 2
+
+> εD
+> 0
+
+η.Therefore 
+
+∥rt(z)∥2 ≤ C0 η, C0 := 1 + 2
+
+> εD
+> 0
+
+. (31) Consider coordinate 3 (the non-trigger non-BOS indicator). For the j = 3 construction, we have 
+
+(y(3) )3 = 0 .5. Using (30) and the uniform loss bound, 
+
+βt(z) ( vt)3 − 0.5
+
+≤ ˆy(3) 3 (z) − 0.5 + (rt(z)) 3
+
+≤ η + C0η
+
+= C1η, 
+
+where C1 := 1+ C0. Hence (vt)3 ≥ 0.5−C1η > 0
+
+for all sufficiently large t, so vt̸ = 0.Let Pt denote the orthogonal projection onto v⊥ 
+
+> t
+
+.Since dim( v⊥ 
+
+> t
+
+) = n − 1, there exists at least one coordinate m0 ∈ { 4, 5} such that 
+
+∥Ptem0 ∥2 ≥ 1/√2. (32) Fix such an m, and take xt := x(m) 
+
+> t
+
+and yt := 
+
+y(m) 
+
+> t
+
+from (27). Applying Pt to (30) kills the vt component, giv-ing Pt ˆy(3) (z) = Ptrt(z). Therefore, 
+
+Pt ˆy(3) (xt) − Pt ˆy(3) (yt) 2
+
+≤ ∥ Ptrt(xt)∥2 + ∥Ptrt(yt)∥2 ≤ 2C0η, 
+
+(33) 14 using (31) . On the other hand, by (28) we have 
+
+Pty(3) (z) = 12 Pt(z + t), so 
+
+Pty(3) (xt) − Pty(3) (yt) 2
+
+= 12 ∥Pt(xt − yt)∥2
+
+= 12 |xt,m − yt,m | · ∥ Ptem∥2
+
+≥ 12√2 ε′, (34) using (27) and (32). Finally, by the triangle inequality and the uni-form loss bound, 
+
+Pty(3) (xt) − Pty(3) (yt) 2
+
+≤ Pt ˆy(3) (xt) − Pt ˆy(3) (yt) 2 + 2 η
+
+≤ (2 C0 + 2) η, 
+
+which contradicts (34) for all sufficiently small η.This contradiction completes the proof. 
+
+F Proof of theorem 3 
+
+We give an explicit zero-loss construction with 
+
+αi, 1 = 0 for all i.
+
+Parameters. Set WK = I, WV = I, and 
+
+WO = I. Let er denote the r-th standard basis vector. Recall from section 3.2: coordinate 1 is the BOS indicator; coordinate 2 is the trigger indicator; coordinate 3 is the non-trigger non-BOS indicator, with x(1) 3 = x(j)3 = 0 and x(i)3 = 1 for i̸ = 1 , j .Define 
+
+WQ = e2(e2 + e3)⊤.
+
+Computing the attention weights. Using the ReLU attention formula from section 3.4, the un-normalized score from position i to position k is 
+
+x(i)WQW⊤ 
+
+> K
+
+(x(k))⊤ = x(i)2 · (x(k)2 + x(k)3 ).
+
+Fix a trigger position j ∈ { 2, . . . , L }. For any non-trigger position i̸ = j, we have x(i)2 = 0 , so all scores are zero and hence αi,k = ReLU(0) /n i = 0 
+
+for all k ≤ i. In particular, αi, 1 = 0 .For the trigger position i = j, we have x(j)2 = 1 .The score to position k equals x(k)2 + x(k)3 . This is 1 for non-trigger non-BOS tokens (if such exist) 
+
+k ∈ { 2, . . . , j − 1} (where x(k)3 = 1 ) and for the trigger token k = j (where x(k)2 = 1 ). It is 0 for 
+
+k = 1 (BOS ). After applying ReLU and dividing by 
+
+nj = j − 1, we obtain 
+
+αj,k = 1 
+
+> j−1
+
+for 2 ≤ k ≤ j, αj,k = 0 otherwise .
+
+Verifying the output. At non-trigger positions, all attention weights are zero, so f (x)(i) = 0 =
+
+y(i). At the trigger position i = j, using WO =
+
+WV = I:
+
+f (x)(j) = WOjX
+
+> k=1
+
+αj,k WV x(k)
+
+= 1
+
+j − 1
+
+> j
+
+X
+
+> k=2
+
+x(k) = x = y(j).
+
+Thus L(f ) = 0 and αi, 1 = 0 for all i, completing the proof. 
+
+G Lemmas 
+
+Lemma 1. Let f be a single-layer softmax self-attention model as in §3.4 and write V := 
+
+WOWV . If the loss L(f ) (see section 3.2) sat-isfies L(f ) ≤ η, then 
+
+∥Ve1∥2 ≤ η. 
+
+Proof. By causality, at position i = 1 we have 
+
+α1,1 = 1 , hence ˆy(1) = Ve1. Since y(1) = 0 and 
+
+∥ˆy(1) −y(1) ∥2 ≤ L (f ) ≤ η, the claim follows. 
+
+Lemma 2. Assume the attention mechanism is soft-max. Fix any query q ∈ Rn and two candidate sets of keys S ⊆ T ⊂ Rn. For the softmax probabilities 
+
+σS (k) = exp( q⊤k)
+
+P 
+
+> r∈S
+
+exp( q⊤r) ,σT (k) = exp( q⊤k)
+
+P 
+
+> r∈T
+
+exp( q⊤r) ,
+
+we have σT (k) ≤ σS (k) for every k ∈ S.Proof. The denominators satisfy 
+
+X
+
+> r∈T
+
+exp( q⊤r) = X
+
+> r∈S
+
+exp( q⊤r)+ X 
+
+> r∈T\S
+
+exp( q⊤r)
+
+≥ X
+
+> r∈S
+
+exp( q⊤r),
+
+while the numerator for a fixed k ∈ S is the same in both fractions. 15 Lemma 3. Assume the attention mechanism is soft-max. Consider any sequence from D (section 3.2) and any indices 1 < i and 1 < i < h . Then: 1. (Self-reduction) Let eα2,2 denote the attention weight on the second token in the length-2 prefix (BOS , x(i)), computed with the same 
+
+(WQ, WK ). Then αi,i ≤ eα2,2.2. (Pairwise reduction) Let eα3,2 denote the at-tention weight on the second token in the length-3 prefix (BOS , x(i), x(h)), computed with 
+
+(WQ, WK ). Then αh,i ≤ eα3,2.Proof. For (1), at real position i the query equals x(i)WQ. Let S be the two keys 
+
+{WK x(1) , WK x(i)} and T = {WK x(k) : k ≤
+
+i}. Lemma 2 (with this fixed query) gives the claim, noting that eα2,2 = σS (WK x(i)) and αi,i =
+
+σT (WK x(i)).For (2), at real position h the query equals x(h)WQ. Let S =
+
+{WK x(1) , WK x(i), WK x(h)} and T =
+
+{WK x(k) : k ≤ h}; apply Lemma 2 as before. 
+
+Lemma 4. In the setting of lemma 1, assume the attention mechanism is softmax. For every se-quence in support( D) and every non-trigger posi-tion 1 < i ̸ = j,
+
+αi,i Vx (i) 
+
+> 2
+
+≤ 2η. 
+
+Proof. Fix i and consider the length-2 prefix 
+
+(BOS , x(i)). At its position 2 (which is pre-trigger), the output equals 
+
+ˆy(2) = eα2,1Ve1 + eα2,2Vx (i),
+
+with target y(2) = 0. Hence 
+
+eα2,2Vx (i) 
+
+> 2
+
+≤ ∥ ˆy(2) ∥2 + ∥eα2,1Ve1∥2
+
+≤ η + η = 2 η, 
+
+using Lemma 1 for the BOS term. By Lemma 3(1), 
+
+αi,i ≤ eα2,2, and multiplying both sides by the fixed vector Vx (i) yields the result. 
+
+Lemma 5. In the setting of lemma 1, assume the at-tention mechanism is softmax. For every sequence in support( D) and every pair of non-trigger in-dices 1 < i < h with i, h ̸ = j:
+
+αh,i Vx (i) 
+
+> 2
+
+≤ 4η. 
+
+Proof. Consider first the length-3 prefix 
+
+(BOS , x(i), x(h)). At position 3 (pre-trigger), with target y(3) = 0,
+
+ˆy(3) = eα3,1Ve1 + eα3,2Vx (i) + eα3,3Vx (h).
+
+Therefore, 
+
+eα3,2Vx (i) 
+
+> 2
+
+≤ ∥ ˆy(3) ∥2 + ∥eα3,1Ve1∥2
+
++ ∥eα3,3Vx (h)∥2
+
+≤ η + η + 2 η = 4 η, 
+
+using Lemma 1 for the BOS term and Lemma 4 for the self term. By Lemma 3(2), αh,i ≤ eα3,2.Multiplying by Vx (i) gives the result. 
+
+Lemma 6. In the setting of lemma 1, assume the at-tention mechanism is softmax. For every sequence in support( D) with trigger at position j,
+
+∥Vx (j)∥2 ≥ 1 − 2η. 
+
+Proof. Consider a sequence where the trigger is at position j = 2 . The target output at position 2 is 
+
+y(2) = x(2) . The model output is 
+
+ˆy(2) = α2,1Ve1 + α2,2Vx (2) .
+
+We know ∥y(2) − ˆy(2) ∥2 ≤ η and ∥Ve1∥2 ≤
+
+η (lemma 1). By triangle inequality, ∥y(2) −
+
+α2,2Vx (2) ∥2 ≤ 2η. Since (y(2) )2 = 1 (trigger in-dicator), we have |1 − α2,2(Vx (2) )2| ≤ 2η. Since 
+
+α2,2 ≤ 1, this implies (Vx (2) )2 ≥ 1 − 2η, so 
+
+∥Vx (2) ∥2 ≥ 1 − 2η.
+
+Lemma 7. Let n ∈ N≥1 and X =(X1, . . . , X n) ∼ μ⊗n, where μ has a density g
+
+bounded by M := sup x∈R g(x) < ∞. Fix δ ∈
+
+(0 , 1] . Then there exists some ε′ ∈ R>0 such that if a measurable set E ⊂ Rn satisfies P(X ∈ E) ≥ δ,then for every coordinate j ∈ { 1, . . . , n } there exist x, y ∈ E such that 
+
+xk = yk for all k̸ = j, and |xj − yj | ≥ ε′,
+
+Proof. Fix j and, for z ∈ Rn−1, set Ej (z) := {t ∈
+
+R : ( z1, . . . , z j−1, t, z j+1 , . . . ) ∈ E}. By Fubini and independence, 
+
+P(X ∈ E) = 
+
+Z
+
+μ(Ej (z)) dμ ⊗(n−1) (z).
+
+Since μ has density g bounded by M , for any mea-surable A ⊂ R we have μ(A) ≤ M λ (A), where 16 λ is the Lebesgue measure. Hence 
+
+δ ≤
+
+Z
+
+μ(Ej (z)) dμ ⊗(n−1) (z)
+
+≤ M
+
+Z
+
+λ(Ej (z)) dμ ⊗(n−1) (z).
+
+Therefore there exists z with λ(Ej (z)) ≥ δ/M .Any set A ⊂ R with Lebesgue measure λ(A) has diameter at least λ(A) − η for any η ∈ R>0, so we can choose t1, t 2 ∈ Ej (z) with |t1 − t2| ≥ 
+
+δ/M − η with η < δ/ 2M . Setting ε′ = δ/ 2M and taking x, y to match z on all coordinates k̸ = j and have j-th coordinates t1, t 2 respectively gives the claim. 
+
+Lemma 8. Let f = f (D) ◦ · · · ◦ f (1) be a D-layer causal softmax self-attention model as in §3.4 . For each layer d ∈ { 1, . . . , D } write 
+
+V(d) := W(d) 
+
+> O
+
+W(d) 
+
+> V
+
+.
+
+V := V(D)V(D−1) · · · V(1) 
+
+Then for every input sequence x and every position 
+
+i ∈ [L], there exist coefficients βi, 1(x), . . . , β i,i (x)
+
+such that 
+
+f (x)(i) =
+
+> i
+
+X
+
+> k=1
+
+βi,k (x) Vx (k). (35) 
+
+Moreover, for each i we have βi,k (x) ≥ 0 for all 
+
+k ≤ i and iX
+
+> k=1
+
+βi,k (x) = 1 .
+
+Proof. Let z(0) := x and for d ≥ 1 let z(d) := 
+
+f (d)(z(d−1) ). Write α(d) 
+
+> i,k
+
+for the (softmax) attention weight in layer d from position i to key k ≤ i. By definition of a single layer, 
+
+z(d)( i) = X
+
+> k≤i
+
+α(d) 
+
+> i,k
+
+V(d)z(d−1)( k).
+
+Define β(1)  
+
+> i,k
+
+:= α(1)  
+
+> i,k
+
+, and for d ≥ 2 define recur-sively 
+
+β(d) 
+
+> i,k
+
+:= X 
+
+> ℓ:k≤ℓ≤i
+
+α(d) 
+
+> i,ℓ
+
+β(d−1)  
+
+> ℓ,k
+
+.
+
+A direct induction on d gives 
+
+z(d)( i) = X
+
+> k≤i
+
+β(d) 
+
+> i,k
+
+V(d) · · · V(1) x(k).
+
+Nonnegativity and the row-sum identity follow since each α(d) 
+
+> i, ·
+
+is a probability vector. Taking 
+
+d = D and setting βi,k := β(D) 
+
+> i,k
+
+yields (35). 
+
+Lemma 9. In the setting of Lemma 8, for any input sequence x we have 
+
+β2,2(x) = 
+
+> D
+
+Y
+
+> d=1
+
+α(d)2,2(x),
+
+where α(d)2,2(x) is the attention weight at position 2
+
+attending to position 2 in layer d.Proof. In the recursion from the proof of Lemma 8, note that position 1 is causal and thus never de-pends on token 2, directly yielding the product formula. 
+
+Lemma 10. In the setting of Lemma 8, if the loss 
+
+L(f ) (see section 3.2) satisfies L(f ) ≤ η then 
+
+∥Ve1∥2 ≤ η. 
+
+Proof. By causality, at position i = 1 every layer attends only to position 1, hence f (x)(1) =
+
+Vx (1) = Ve1. Since y(1) = 0 and ∥f (x)(1) −
+
+y(1) ∥2 ≤ L (f ) ≤ η, the claim follows. 
+
+Lemma 11. In the setting of Lemma 8, assume softmax attention and that the loss L(f ) (see sec-tion 3.2) satisfies L(f ) ≤ η. Then for every x in 
+
+support( D) with trigger position j ≥ 3 we have that 
+
+β2,2(x) Vx (2)  
+
+> 2
+
+≤ 2η. 
+
+Proof. Since j ≥ 3, position 2 is pre-trigger and the target satisfies y(2) = 0. By Lemma 8 with 
+
+i = 2 ,
+
+f (x)(2) = β2,1(x) Ve1 + β2,2(x) Vx (2) .
+
+Thus 
+
+β2,2(x) Vx (2)  
+
+> 2
+
+≤ ∥ f (x)(2) ∥2
+
++ β2,1(x) ∥Ve1∥2
+
+≤ η + η
+
+= 2 η, 
+
+using ∥f (x)(2) − y(2) ∥2 ≤ η, β2,1(x) ≤ 1, and Lemma 10. 
+
+H Related Work 
+
+Theory and analyses of attention sinks. Several recent works study attention sinks directly, aiming to characterize why they arise and what they cor-relate with. Barbero et al. (2025) argue (theoret-ically and empirically) that first-token sinks can act as a stabilizing mechanism against over-mixing, 17 and analyze how factors like depth, context length, and packing influence sink strength. Cancedda (2024) connect sink behavior to spectral structure in the vocabulary embedding/unembedding oper-ators, attributing sinking to “dark” (tail-spectrum) components. Ruscio et al. (2025) view sinks as learned “reference-frame anchors” in representa-tion space and show that the resulting anchoring pattern depends strongly on architectural choices, especially the positional encoding. de Llano et al. (2026) connect attention sinks to “compression val-leys” (layers where token representations become unusually low-entropy/compressed), showing both tend to emerge when the BOS token develops ex-tremely large residual-stream activations. Qiu et al. (2026) study attention sinks together with “residual sinks” (persistent large activations in a few residual-stream dimensions) and argue these outliers in-teract with normalization (softmax/RMSNorm) to rescale the remaining components, supporting sta-ble training. Sok et al. (2026) treat strong BOS-focused heads—especially in later layers—as a marker of functional redundancy and propose a pruning criterion based on sink scores. Hong and Lee (2025) attribute softmax-driven attention en-tropy collapse (attention concentrating onto a sin-gle token) to variance sensitivity of the logits and propose entropy-stable alternatives. Zhang et al. (2025) link sink tokens to large-norm outlier direc-tions in LLM representations and RoPE-focused analyses similarly tie sink behavior to structured frequency artifacts and Q/K “massive values” (Jin et al., 2025; Xiong et al., 2026). These “massive values” were recently revisited in Sun et al. (2026), which argues that massive activations and atten-tion sinks are largely decoupled: spikes can be suppressed via normalization changes while sinks persist. We complement these with a different an-gle: rather than studying how sinks emerge during training, we ask whether they are structurally nec-essary for certain computations. We prove that any softmax attention model solving a natural trigger-conditional task must develop a sink, regardless of the training procedure or optimization dynamics (theorems 1 and 2). 
+
+Softmax normalization implications. In stan-dard attention, the softmax turns scores into non-negative weights that sum to one. Richter and Wattenhofer (2020) analyze how this simplex con-straint can restrict attention behavior and discuss alternatives that relax or replace softmax normal-ization. Veliˇ ckovi´ c et al. (2025) prove that softmax-based mechanisms can fail to maintain increasingly sharp selection as the problem size grows, leading to degraded behavior under distribution shift when near-argmax behavior is required. We provide a concrete natural task where this constraint is prov-ably the cause of sink formation: a model that must aggregate context on a trigger token and output zero otherwise cannot avoid a sink under softmax normalization (theorem 1), whereas ReLU atten-tion—which lacks the simplex constraint—solves the same task without any sink (theorem 3). 
+
+Mitigating sinks. Alongside analyses, multiple papers propose sink-targeted interventions. This in-cludes modified attention normalizations explicitly designed to avoid sinks (Zuhri et al., 2026; Huang et al., 2026), as well as training procedures tailored to long-context regimes, including sliding-window attention that explicitly addresses attention-sink is-sue(Fu et al., 2025). For inference-time efficiency, Su and Yuan (2025); Hosseini et al. (2026) analyze how KV-cache quantization can disrupt sink be-havior and propose predicting and preserving sink tokens during quantization. Mitigation has also been studied for closely related collapse modes of attention: Hong and Lee (2025) analyze softmax-driven entropy collapse (attention concentrating onto a single token) and propose alternatives aimed at stabilizing attention entropy, while Hankemeier and Schilling (2026) study diagonal/temporal self-attention sinks and introduce regularizers to counter them. In a different setting, Lin et al. (2025) show that attention sinks degrade training-free conver-sion of decoder-only LLMs into text encoders, and reduce this effect by enabling bidirectional atten-tion and masking the first token in attention. In mul-timodal and AV settings, sink patterns have simi-larly motivated mitigation strategies aimed at reduc-ing hallucination and stabilizing activations (Zhang et al., 2024; Anand et al., 2026). Lu et al. (2025) analyze attention sinks as a structured artifact in Vision Transformers and leverage this structure to derive efficient approximation schemes. More-over, in these settings, sinks have been explicitly regularized in the context of harmful fine-tuning (Liu et al., 2026). Sinks have also been studied in alignment and security contexts where Shang et al. (2025) leverage sink behavior as a pathway for backdooring unlearning procedures. Finally, circuit-level interventions have also been explored in regimes where sink-related circuitry correlates 18 with repeated-token failures (Yona et al., 2025). Our necessity results offer a principled lens for eval-uating such interventions: for trigger-conditional circuits, the sink is the mechanism enabling the computation, so strategies that operate within soft-max (penalizing BOS attention, spreading mass, post-hoc reweighting) risk degrading the circuit without addressing the root cause. The contrast with ReLU attention (theorem 3 and section 5) sug-gests that relaxing the normalization constraint is the more fundamental direction. 
+
+Usefulness of sinks. Other work treats sinks as a useful computational primitive rather than an ar-tifact to eliminate. Our work formalizes this intu-ition: for trigger-conditional behaviors—where a model must aggregate context on a trigger while outputting zero elsewhere—the sink is not merely a convenient implementation choice but a provably necessary consequence of softmax normalization (theorems 1 and 2). Zhang et al. (2025) link sink tokens to representation outliers and argue that sim-ple structural conditions (e.g., low-rank attention structure) can be sufficient to induce sinks that sup-port concrete computations such as averaging and retrieval—a viewpoint that is closely aligned with our trigger-conditional setting. Sinks have been argued to induce or support attention-layer special-ization, including MoE-like effects within attention (Fu et al., 2026). Sandoval-Segura et al. (2025) use sink dominance to identify “dormant” heads and validate their redundancy via head ablations. In addition, BOS-sink heads have been treated as a locus of redundancy that can be targeted for model simplification via sink-aware pruning (Sok et al., 2026). In large vision-language models (Luo et al., 2025) show that high-norm ViT sink tokens encode high-level semantic concepts and serve as impor-tant visual information pathways into the LLM, and propose methods to better leverage them. Related ideas appear in diffusion LMs as well, where in-troducing an explicit sink token is used to stabilize sink behavior across steps (Zhang et al., 2026) and where sink locations can be transient across de-noising steps, motivating sink-aware pruning that targets unstable sinks (Myrzakhan et al., 2026). 19 Figure 7: Softmax attention: 4-layer 4-head model. Representative attention patterns on a single test input showing strong sink at least in one head across all layers. 
+
+20 Figure 8: ReLU attention: 4-layer 4-head model. Representative attention patterns on a single test input showing absence of sink behavior across all layers. 
+
+21

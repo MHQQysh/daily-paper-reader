@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-001.webp",
+      "caption": "Figure 3: Cache-based pipeline communication example with 4 physical ranks and 2 virtual stages per rank, where hatched boxes denote end of AttnRes blocks. Numbers indicate micro-batch indices. Each rank caches previously received blocks; stage transitions only transmit incremental blocks (+[b1, b2]) instead of the full history.",
+      "page": 6,
+      "index": 1,
+      "width": 963,
+      "height": 258
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-002.webp",
+      "caption": "Figure 5: Training dynamics of Baseline and Block AttnRes. (a) Validation loss during training. (b) Each transformer block’s output magnitude at the end of training. (c) Each transformer block’s gradient magnitude.",
+      "page": 10,
+      "index": 2,
+      "width": 943,
+      "height": 336
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-003.webp",
+      "caption": "Table 3: Performance comparison of AttnRes with the baseline, both after the same pre-training recipe. Best per-row results are bolded.",
+      "page": 10,
+      "index": 3,
+      "width": 534,
+      "height": 414
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-004.webp",
+      "caption": "Table 5: Comparison of residual update mechanisms. Weight: whether the mixing coefficients are architecture-fixed, learned-static (fixed after training), or input-dependent (dynamic). Source: which earlier representations layer l can access. Normalization is omitted from most formulas for clarity.",
+      "page": 14,
+      "index": 4,
+      "width": 980,
+      "height": 553
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-005.webp",
+      "caption": "Figure 8: Depth-wise attention weight distributions for a 16-head model with full (top) and block (bottom) Attention Residuals, averaged over tokens. The model has 16 attention and 16 MLP layers. Each row shows how the lth attention (left) or MLP (right) layer distributes weight over previous sources. Diagonal dominance indicates locality remains the primary information pathway, while persistent weights on source 0 (embedding) and occasional off-diagonal concentrations reveal learned skip connections. Block attention (N = 8) recovers the essential structure with sharper, more decisive weight distributions.",
+      "page": 13,
+      "index": 5,
+      "width": 968,
+      "height": 556
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-006.webp",
+      "caption": "Table 1: Memory access cost per token per layer incurred by the residual mechanism under each scheme. The internal I/O of the layer function fl is excluded. For AttnRes, both Full and Block variants use the two-phase inference schedule described in Appendix B; amortized costs are averaged over N layers within a block. Typical values: L=128, N=8, S=L/N=16, m=4.",
+      "page": 8,
+      "index": 6,
+      "width": 976,
+      "height": 347
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-007.webp",
+      "caption": "Figure 7: Architecture sweep under fixed compute (≈ 6.5 × 1019 FLOPs, ≈ 2.3 × 108 active parameters). Each cell reports validation loss for a (dmodel/Lb, H/Lb) configuration, where Lb = L/2 is the number of Transformer blocks; the star marks the optimum.",
+      "page": 12,
+      "index": 7,
+      "width": 957,
+      "height": 400
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-008.webp",
+      "caption": "Table 2: Baseline vs Block AttnRes (N = 8) vs Full AttnRes vs mHC(-lite) [64]: Model configurations, Hyperparameters, and Validation Loss.",
+      "page": 9,
+      "index": 8,
+      "width": 980,
+      "height": 241
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-009.webp",
+      "caption": "Figure 4: Scaling law curves for Attention Residuals. Both Full and Block AttnRes consistently outperform the baseline across all scales. Block AttnRes closely tracks Full AttnRes, recovering most of the gain at the largest scale.",
+      "page": 9,
+      "index": 9,
+      "width": 441,
+      "height": 414
+    },
+    {
+      "url": "assets/figures/arxiv/2603.15031v1/fig-010.webp",
+      "caption": "Figure 2: PyTorch-style pseudo code for Block Attention Residuals. block_attn_res computes softmax attention over block representations using a learned pseudo-query wl; forward is a single-layer pass that maintains partial_block (bin, intra-block residual) and blocks ([b0, . . . , bn−1], inter-block history).",
+      "page": 5,
+      "index": 10,
+      "width": 825,
+      "height": 608
+    }
+  ]
+}

@@ -1,0 +1,387 @@
+Title: From Embeddings to Dyson Series: Transformer Mechanics as Non-Hermitian Operator Theory
+
+URL Source: https://arxiv.org/pdf/2603.11322v2
+
+Published Time: Wed, 18 Mar 2026 00:30:03 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# From Embeddings to Dyson Series: Transformer Mechanics as Non-Hermitian Operator Theory 
+
+Po-Hao Chang ∗
+
+Quantum Science and Engineering Center, George Mason University, Fairfax, VA 22030, USA 
+
+Transformer architectures are typically described in algorithmic and statistical terms, leaving their internal mechanics without a familiar structural language for researchers trained in physical theories. To bridge this gap, we develop a complementary operator-theoretic framework that recasts their mechanics in a language familiar to many-body physics. Beginning from the token as a discrete index without intrinsic geometry, we show that embedding corresponds to a basis transformation into a continuous representation space. Once such a reference basis is established, self-attention naturally assumes the role of a non-Hermitian interaction operator, and network depth implements an ordered composition of these interactions. Within this formulation, several empirical proper-ties of deep Transformers—including stability at large depth, representational saturation, and the effectiveness of multi-head decomposition—find natural structural interpretations as consequences of regulated operator composition. Together, channel factorization and normalization emerge as organizing structural logic rather than isolated architectural choices. This perspective does not rely on post-hoc analogy, but follows a constructive path where each parallel arises from the preceding structural step. By recasting Transformer mechanics in operator language, the framework lowers the conceptual barrier between deep learning and many-body physics through shared mathematical structure, making tools and intuitions from each domain more readily legible to the other. 
+
+I. INTRODUCTION: TWO DIFFERENT UNIVERSES 
+
+Transformer architectures [1] have rapidly become the dominant framework for large-scale representation learn-ing. Their empirical success is well documented, and their mechanisms—self-attention, residual connections [2], normalization [3], and multi-head decomposition [1]—are extensively analyzed within algorithmic and sta-tistical paradigms. Recent pioneering work has begun to bridge between physics and AI by applying statistical mechanics and random matrix theory to analyze the weight matrices of trained neural networks and characterize learning qual-ity [4–8]. However, these approaches primarily focus on the statistical or thermodynamic properties of the learned parameters themselves. For researchers trained in operator-based physical theories, the dynamics of the sequence state, namely how the token vector propagates, interacts, and evolves through the Transformer’s depth, still lack a familiar structural language. The challenge is therefore not only one of statistical performance, but also of translating the architecture’s forward pass into a recognizable kinematic and dynamical framework. Modern many-body physics and deep learning orig-inate from fundamentally different intellectual starting points. In quantum mechanics, a system is bounded by its Hamiltonian H constructed from explicit dynamical laws, which defines its allowable states. Machine-learning systems, in contrast, are discovered through optimiza-tion: their structure emerges from data, with parame-ters adjusted to minimize a global loss over a statistical corpus whose generative rules are not explicitly defined.  
+
+> ∗chang.pohao@gmail.com
+
+This difference in origin is not superficial. Physical op-erators inherit constraints, such as Hermiticity, unitarity, and conservation laws, which are non-negotiable conse-quences of physical laws. On the other hand, learned operators inherit no such constraints as properties like stability are enforced through deliberate architectural choices rather than first principles. The degrees of free-dom available to each framework are therefore fundamen-tally different. Despite this difference in origin, the resulting com-putational structures exhibit striking algebraic paral-lels. Both involve high-dimensional vector spaces, struc-tured basis transformations, and repeated application of interaction-like operators that mix degrees of freedom across scales. Furthermore, both frameworks mathemat-ically involve resolving their high-dimensional states into probabilistic outcomes through either the measurement of a wave-function in quantum mechanics or a softmax projection over a vocabulary in language modeling. From this perspective, the apparent conceptual gap between deep learning and many-body theory becomes less fun-damental than it first appears. In this work, we develop an operator-theoretic frame-work that recasts the internal mechanics of Transform-ers into the language of many-body physics. Starting from the token as a discrete, geometry-free index, we show that embedding acts as a basis transformation into a continuous representation space. Once this reference basis is established, self-attention naturally emerges as a non-Hermitian interaction operator, with network depth corresponding to an ordered composition of these inter-actions. Rather than drawing post-hoc analogies between ma-chine learning and physics, we follow a constructive path where each parallel emerges from the mathematical struc-ture of the architecture itself. Within this formulation, 
+
+> arXiv:2603.11322v2 [cond-mat.dis-nn] 17 Mar 2026
+
+2the empirical properties of deep Transformers, includ-ing stability at large depth, representational saturation, and multi-head effectiveness, acquire natural structural interpretations. Residual connections generate an exact algebraic expansion over ordered interaction paths, nor-malization regulates the magnitude of successive updates, and multi-head attention implements a channel factor-ization of the interaction operator. These elements thus emerge as organizing principles of operator composition rather than isolated heuristics. We assume familiarity with the basic Transformer com-ponents [1], specifically self-attention and residual con-nections. We analyze their canonical Post-Norm forms here, as this provides the cleanest structural picture for the operator-theoretic framework, noting that modern architectural variations preserve these essential mecha-nisms despite differences in implementation. When in-voking causal masking and the transfer-matrix-like gen-eration mechanism, we draw on autoregressive vari-ants whose directional interactions strictly enforce non-Hermitian operator structure. Bidirectional variants like BERT [9] permit potentially symmetric attention, yield-ing operators closer to Hermitian, but are not the focus here By expressing Transformer mechanics in operator lan-guage, this framework lowers the conceptual barrier be-tween deep learning and many-body physics. The goal is not to force an analogy or claim exact mapping, but to expose a shared mathematical foundation—rendering the tools and intuitions of each field mutually legible. This perspective is intentionally incomplete. We empha-size only the most immediate structural parallels, and deeper examination will likely surface additional corre-spondences as well as further points of departure.  
+
+> II. THE KINEMATICS: EMBEDDINGS AS BASIS TRANSFORMATION
+
+In many-body physics, the starting point of any calcu-lation is the choice of basis. One typically begins with a discrete representation namely, atomic orbitals [10, 11], plane waves [12], or site indices, and transforms into a basis that captures the dominant low-energy structure of the system. Diagonalization identifies stationary eigen-states, selecting linear combinations that minimize the total energy within the chosen variational subspace. The Transformer begins from a mathematically analo-gous construction. A token enters the model as a one-hot vector: a column vector of dimension V with zeros ev-erywhere except a single entry of one at the index corre-sponding to its vocabulary position, carrying no geome-try beyond that discrete label, analogous to labeling a lat-tice site. The embedding matrix WE performs a learned linear transformation on this index space, projecting the discrete label ei into a continuous latent vector x(0)  
+
+> i
+
+of dimension dmodel [9, 13]: 
+
+x(0) 
+
+> i
+
+|{z} 
+
+> Rdmodel
+
+= WE
+
+|{z} 
+
+> dmodel ×V
+
+ei
+
+|{z} 
+
+> RV
+
+(1) Because dmodel ≪ V , where V is the dimension of the vocabulary space, this projection assigns each dis-crete vocabulary index a vector coordinate in a lower di-mensional representation space —a downfolding in which only the dominant relational structure is retained and distinct discrete identities are mapped into a shared con-tinuous geometry. The procedure is loosely analogous to a variational reduction [14], where the massive discrete space is pro-jected out and only the relevant low-lying active subspace is kept. The objectives differ: electronic structure minimizes the Hamiltonian expectation value, while the embedding matrix is learned through predictive loss over a train-ing corpus. The structural role is nonetheless compara-ble as both identify optimal linear combinations within a constrained basis that best represent the underlying structure of the system. The resulting vectors x(0) there-fore serve as stationary reference states for the vocab-ulary, defining the kinematic manifold prior to contex-tual interaction. Subsequent layers then introduce ef-fective interactions that mix these reference states, gen-erating context-dependent representations analogous to correlated many-body states built upon an unperturbed eigenbasis.  
+
+> III. THE DYNAMICS: PERTURBATION AS A MENTAL PICTURE FOR ATTENTION
+
+To understand how the Transformer evolves the state of a sequence [1], we must first define its core compu-tational block. The architecture operates through the repeated application of a modular structure: as shown in Fig. 1 (a), it consists of a stack of L structurally iden-tical layers, each with distinct learned weights, applied sequentially to (b) a system of N degrees of freedom (to-ken states) within a layer.  
+
+> A. The Transformer modular unit: Non-Local vs. Local Operators
+
+Each layer in the network, as shown in Fig. 1 (b), can be viewed as a discrete evolution step for a “multi-particle system of N tokens”. Every layer is composed of two primary computational components that serve dis-tinct physical roles: 1. The Self-Attention Block (Non-Local Cou-pling): This component depicted as blue rectangle in Fig. 1(b), acts as the interaction engine. It al-lows every token (state) xi in the sequence to com-municate with other tokens xj . In the language of 3Feed-Forward (FFN)  
+
+> Self-Attention
+> Non-local/Interaction potential
+> Local/On-site potential
+> ... ...
+> Layer ( l)
+> ... ...
+> ... ...
+> ... ...
+> Layer ( l+1 )Layer ( l-1 )
+> Layer ( l)
+> Layer Norm
+> Dyson Series
+> (a) (b)
+> ... ...
+> Layer Norm
+
+FIG. 1. Schematic representation of the Transformer archi-tecture. (a) Transformer layers are depicted as discrete evo-lution steps along the vertical axis (red), representing ordered layer depth. (b) Detailed view of an individual l-th layer: the Self-attention block introduces non-local, off-diagonal cou-pling across the lattice sites, while the Feed-Forward Network (FFN) acts as a local, on-site operator. The forward pass through the network corresponds to the successive applica-tion of these operators, analogous to an evolution process. 
+
+operators, this is an off-diagonal process that cou-ples different tokens across the sequence, enabling the exchange of semantic information. 2. The Feed-Forward Network (Local Poten-tial): Following the interaction, each token state passes through a position-wise Feed-Forward (FFN) shown as green rectangle in Fig. 1(b). This is a purely local operator. It does not couple dif-ferent tokens; instead, it acts like a learned on-site potential that encodes integrated statistical struc-ture from training [15, 16], analogous to how pseu-dopotentials fold core electron complexity into an effective valence-space operator [17]. The entire ”forward pass” of the model is simply the it-erative application of these two operators defined in Fig. 1(b) and (a), respectively, supported by intermediate Layer Normalization steps (yellow blocks) that stabilize the state vector. This alternating sequence of non-local mixing and local refinement is what allows the model to build complex, context-dependent representations from initially independent basis states (i.e. static embedding). 
+
+B. The Heart of Attention: Q, K, and V as Coupling Components 
+
+The interaction within the attention block are defined by three learned linear projections [1]: 
+
+Q = WQx, K = WK x, V = WV x
+
+These projections establish a coupling protocol between token sites. The Query ( Qi) acts as a ”receptor” for state i, de-termining what kind of surrounding states it needs to interact with. Conversely, the Key ( Kj ) acts as the ”sig-nature” of state j, defining exactly how it appears to those probing receptors. For a pair of states i and j the interaction amplitude is determined by the overlap 
+
+wij ∝ QTi Kj
+
+which serves as an effective coupling coefficient. This quantity controls how strongly the state component as-sociated with site j contributes to the update of site i.Finally, the value projection Vj specifies which vector components to be transferred under this coupling. The full update maybe schematically expressed as 
+
+xnew  
+
+> i
+
+= xi + X
+
+> j
+
+wij Vj
+
+In operator terms, WQ and WK define the interaction kernel (coupling strengths) while WV defines what state content to be mixed. Together they implement a struc-tured, non-Hermitian interaction that couples otherwise independent sites. 
+
+C. Self-Attention as an Effective Interaction 
+
+Self-attention mechanism introduces coupling between tokens through an effective operator in the layer lV (l)eff ∝ W TQ WK .
+
+Unlike conventional quantum Hamiltonians, V (l)eff is generically non-Hermitian. In standard quantum me-chanics, Hermiticity ensures that the coupling between states i and j satisfies ⟨ψj | ˆV |ψi⟩ = ⟨ψi| ˆV |ψj ⟩∗. This symmetric coupling, combined with an evolution opera-tor containing an explicit imaginary factor ( I − i ˆHdt ), guarantees unitary time evolution, preserves probability amplitude, and drives oscillatory dynamics. Language, however, is intrinsically directional, a prop-erty further enforced in autoregressive models [18, 19] by the causal attention mask. This mask imposes left-to-right dependencies across the 1D sequence token lattice (blue arrow, Fig. 1 (b)). While all N states evolve si-multaneously through the network depth, state i can only be perturbed by spatially preceding states j ≤ i. This spatial constraint renders the N × N effective interac-tion matrix strictly lower-triangular, permanently break-ing reversibility. Furthermore, the Transformer’s residual mechanism strictly lacks the imaginary unit, acting instead as a purely real generator. Consequently, the layer update is non-unitary. Rather than exhibiting oscillatory dy-namics, representations are iteratively reshaped through a non-unitary, irreversible forward pass. 4Input State Space ( d model )Output State Space ( d model  )       
+
+> Input State Space ( dmodel )
+> V1
+> eff
+> V2
+> eff
+> V3
+> eff
+> V4
+> eff
+> (a) (b)
+
+FIG. 2. Schematic view of multi-head attention as oper-ator channel factorization. (a) A dense effective interaction 
+
+Veff operating on the full representation space dmodel to map input states xj to updated states xi. (b) In multi-head atten-tion, the interaction is block-diagonalized into h independent channels ( h = 4 in this example). The state vectors them-selves are partitioned into corresponding reduced subspaces (x(h) 
+
+> j
+
+and x(h) 
+
+> i
+
+). Each block V (h)eff operates exclusively within its own sub-vector. 
+
+This purely real, non-unitary evolution mathemati-cally invites comparison to imaginary-time evolution, where the transformation τ = it absorbs the phase to yield amplitude relaxation. However, the analogy is only precise in architectures with weight tying, such as Univer-sal Transformers [20] or Deep Equilibrium Models [21], where V (l)eff = Veff . Imaginary-time evolution presumes a fixed operator ˆH, whereas in standard Transformers, each layer carries distinct learned parameters, so the ef-fective interaction V (l)eff varies with depth. For standard Transformers with distinct layer weights, the evolution should instead be viewed as a non-autonomous operator flow. The imaginary-time picture remains a useful heuristic for understanding why repre-sentations saturate across depth and why deeper net-works do not generically diverge, but it does not im-ply relaxation toward the ground state of a single fixed Hamiltonian. 
+
+D. Multi-Head Attention as Channel Factorization 
+
+In practical Transformer architectures, the interaction operator is not implemented as a single coupling channel as shown in Fig. 2(a). Instead, multi-head attention de-composes the interaction into several ( h in this case) par-allel components acting on reduced representation sub-spaces as depicted in Fig. 2(b) [1]. Each head performs an independent attention operation with its own projec-tion matrices, producing an update that is later recom-bined through linear projection. From an operator perspective, this architecture factor-izes the effective interaction into multiple channels, 
+
+Veff =
+
+
+
+V (1) eff 0 · · · 00 V (2) eff · · · 0... ... . . . ...0 0 · · · V (h)eff 
+
+
+
+where each component V (k)eff (k = 1 , 2, ... h) acts within a restricted representation subspace before their contri-butions are aggregated. This structure resembles operator decompositions commonly used in many-body physics, where distinct in-teraction channels probe different sectors of the system. Examples include separations between spin and spa-tial operators or decompositions into angular-momentum channels in partial-wave expansions. Although Trans-former heads operate within a shared representation space rather than independent Hilbert spaces, their ar-chitectural role is similar: structured operators extract complementary information from different projections of the state before recombination. In this sense, multi-head attention implements a con-trolled factorization of the interaction operator, allow-ing complex coupling patterns to be constructed from several lower-dimensional channels. Empirical and the-oretical work has shown that self-attention admits low-rank approximations [22], supporting the interpretation of multi-head structure as a factorized representation of the underlying interaction. 
+
+E. The Residual Stream as First-Order Perturbation 
+
+Stripped of engineering stabilizers, the core residual update for an autoregressive token incorporates a causal attention mask that acts as a physical Heaviside step function Θ( i − j), restricting the inter sum strictly to preceding states: 
+
+xnew  
+
+> i
+
+= xi +
+
+> i
+
+X
+
+> j=1
+
+(xTi Veff xj )xj .
+
+This non-reciprocal spatial coupling ensures that each to-ken state is ”dressed” exclusively by the interactions with its leftward lattice neighbors, inherently accommodating the sequential addition of new basis states without alter-ing the computed history of prior tokens. This mecha-nism resolves contextual ambiguity. A token such as ” bank”, initially represented as a superposition of seman-tic possibilities, is driven toward the subspace consistent with its environment through effective interaction with neighboring states as schematically depicted in Fig. 3. This expression mirrors the structure of first-order in-teraction mixing in quantum mechanics, 
+
+ψ(1)  
+
+> i
+
+= ψ(0)  
+
+> i
+
++
+
+> N
+
+X
+
+> j=1
+
+⟨ψ(0)  
+
+> i
+
+| ˆVint |ψ(0)  
+
+> j
+
+⟩ψ(0) 
+
+> j
+
+5" account ""money" " bank "             
+
+> FIG. 3. Geometric mapping between first-order perturbation theory and contextual token mixing. (Left) An unperturbed quantum reference state |ψ(0)
+> i⟩is dressed by surrounding ba-sis states |ψ(0)
+> j⟩to form the perturbed state |ψ(1)
+> i⟩.(Right) Analogously, an ambiguous static token embedding xi(e.g., ”bank” ) is contextually resolved by mixing in representations from preceding tokens (e.g., ”account”, ”money” ) to produce the updated state xnew
+> i
+
+where ˆVint is the interaction operator that induces mix-ing between the unperturbed states. In this sense, the residual update corresponds to the first-order interac-tion step in an operator expansion. Despite sharing a similar algebraic form with the stationary-state correc-tions of Rayleigh–Schr¨ odinger perturbation theory, it is mathematically more analogous to the leading term of a Dyson-type evolution. The residual term xi plays the role of the unperturbed reference state |ψ(0)  
+
+> j
+
+⟩. The surrounding tokens xj form the basis states mixed into the target state, weighted by interaction amplitudes determined by the attention scores.  
+
+> F. From Theory to Engineering Practice
+
+In practice, the interaction amplitudes are not taken directly from the raw overlaps QTi Kj . Instead, the Trans-former defines a normalized interaction kernel that reg-ulates the magnitude of the perturbative mixing. The overlaps are first scaled by 1 /√dk, where dk is the di-mensionality of the key and query vectors. This factor ensures that the variance of the interaction amplitudes remains approximately constant as the representation di-mension grows. The resulting matrix is then passed through a softmax function along the interaction index j, producing a set of normalized coupling weights that sum to unity for each receiving site i. Mathematically this operation resem-bles a Boltzmann distribution, where the scaled overlaps act as interaction “energies” and the factor √dk sets an effective temperature controlling how sharply the inter-action selects among competing states. In this way the raw interaction strengths are converted into a bounded set of mixing coefficients that regulate the perturbative update. The value projection WV further separates the static identity of a token from the information being transferred through the interaction, enabling controlled state mixing across sites. With these definitions, the practical self-attention up-date takes the familiar form 
+
+xnew  
+
+> i
+
+= xi +
+
+> N
+
+X
+
+> j=1
+
+softmax 
+
+ QT K
+
+√dk
+
+
+
+> ij
+
+Vj (2) These normalization steps ensure that the perturbative mixing remains bounded even for large sequence lengths and high-dimensional representations, allowing the inter-action operator to be evaluated stably at scale. Crucially, this practical attention mechanism departs from the strictly linear operators familiar in conventional quantum mechanics, as the softmax function and 1 /√dk
+
+scaling introduce a highly nonlinear dependence of the interaction weights on the state. However, it is worth recalling the fundamentally dis-tinct nature between physical and learned operators that governs all such departures. Unlike a physical system constrained by immutable laws, in a software model, an engineer has the mathematical freedom to impose stabil-ity directly. Consequently, the practical stabilizers intro-duced here are best understood as engineered regulators whose structural function serves as the relevant point of comparison to physical constraints. Despite these modifications, the conceptual paradigm remains intact: self-attention functions as a non-Hermitian operator enabling state mixing, while its nor-malization mechanisms serve as engineering stabilizers. Specifically, 1 /√dk scaling maintains O(1) interaction variance [1], the softmax ensures convex combinations of value vectors, and Layer Normalization, depicted as the yellow block shown in Fig. 1 (b), rescales activa-tions to a controlled variance [3, 23]. Effectively, the bare residual update is structurally modified into a regu-lated sublayer operation. If we denote the entire non-linear attention summation in Eq. 2 as an interac-tion functional A(xi) ≡ PNj=1 softmax  QT K/ √dk
+
+ 
+
+> ij
+
+Vj ,the standard attention sublayer update takes the form 
+
+x′ 
+
+> i
+
+= LayerNorm( xi + A(xi)). When subsequently com-bined with the local FFN potential, the complete forward pass through layer l can be mathematically lumped into a single composite effective state-dependent operator ˆV (l),yielding the stable recurrence 
+
+x(l) 
+
+> i
+
+= x(l−1)  
+
+> i
+
++ ˆV (l)x(l−1)  
+
+> i
+
+(3) Residual connections implement the identity shortcut [2], with normalization further stabilizing the operator com-position throughout training [24], collectively ensuring a well-regulated forward pass. 6 
+
+> IV. THE EVOLUTION OF DEPTH: TIME-ORDERED DYSON SERIES
+
+If a single-layer update mirrors a first-order perturba-tion, then the stacking of distinct operators across depth [25, 26] organizes the forward pass as an ordered com-position equivalent to evaluating successive, higher-order many-body corrections. Consider a deep Transformer where each layer l pos-sesses unique projection matrices, meaning the effective potential ˆV (l)eff is layer-dependent. To a physicist, the depth of the neural network acts as a discrete time axis, where the sequence state propagates through a time-varying interaction Hamiltonian. Let the static token embedding be the initial, unper-turbed state x(0) . The first residual layer computes a standard first-order update: 
+
+x(1) = x(0) + ˆV (1) x(0) = ( I + ˆV (1) )x(0) . (4) The profound structural recurrence emerges in the second layer. The network applies the second potential ˆV (2) not to the base state, but to the already perturbed state x(1) :
+
+x(2) = x(1) + ˆV (2) x(1) = ( I + ˆV (2) )( I + ˆV (1) )x(0) (5) Expanding this algebraic product reveals the exact generation of higher-order interaction terms: 
+
+x(2) =
+
+h
+
+I + ˆV (1) + ˆV (2) + ˆV (2) ˆV (1) i
+
+x(0) . (6) The term ˆV (2) ˆV (1) represents a mathematically second-order correction, where the state is perturbed by Layer 1 and subsequently perturbed again by Layer 2. By induc-tion, the full forward pass through L layers mathemati-cally evaluates the discrete product operator: 
+
+x(L) =
+
+> L
+
+Y
+
+> l=1
+
+(I + ˆV (l))x(0) (7) When expanded, this product generates a sum over all possible ordered compositions of the interaction opera-tors [25]: 
+
+x(L) =
+
+
+
+I +
+
+> L
+
+X
+
+> l=1
+
+ˆV (l) +
+
+> L
+
+X
+
+> l2>l 1
+
+ˆV (l2) ˆV (l1)
+
++
+
+> L
+
+X
+
+> l3>l 2>l 1
+
+ˆV (l3) ˆV (l2) ˆV (l1) + . . . 
+
+
+
+x(0) 
+
+(8) In quantum field theory, this mirrors the discrete for-mulation of the time-ordered Dyson series [27]: 
+
+U (t, t 0) = T exp 
+
+
+
+−i
+
+Z tt0
+
+ˆV (t′)dt ′
+
+
+
+= I − i
+
+Z tt0
+
+ˆV (t′) + ( −i)2
+
+Z Z 
+
+> t2>t 1
+
+ˆV (t2) ˆV (t1)+ ( −i)3
+
+Z Z 
+
+> t3>t 2>t 1
+
+ˆV (t3) ˆV (t2) ˆV (t1) + . . . 
+
+For brevity, we adopt a shorthand notation where the differential time measures dt n and the shared integration limits [ t0, t ] are omitted from the expansion. While this compositional ordering mirrors the struc-ture of the time-ordered Dyson series, it is critical to recognize that the operators ˆV (l) are nonlinear function-als, driven by the softmax and feed-forward activation functions. Consequently, the expanded cross-terms (e.g., ˆV (2) ˆV (1) ) represent a composition of nonlinear mappings rather than standard linear matrix products. This places a formal boundary on the analogy: these composite terms cannot be directly analyzed via standard linear spectral decomposition without employing careful linear approx-imations. It is interesting to note that state-dependent operators of this kind have a natural counterpart in time-dependent density functional theory (TDDFT) [28], where the effec-tive Hamiltonian ˆH[ρ(t)] similarly depends on the evolv-ing state at each time step. The standard Transformer in fact shares both features, state-dependent operators and layer-varying parameters, making TDDFT a potentially richer analogy than the static Dyson series. However, as the goal of this work is to establish a clear structural foundation, we retain the simpler time-ordered operator picture and leave the TDDFT correspondence to future investigation. Through this iterative structure, network depth gen-erates higher-order, ”time-ordered” many-body correla-tions. Linguistically, the architecture scales from cou-pling isolated words to interacting phrases and complex clauses, iteratively building perturbative corrections un-til the state converges.  
+
+> A. Layer Norm as Wavefunction Renormalization
+
+While high-order perturbation expansions in quan-tum systems frequently diverge, The Transformer ar-chitecture helps maintain stability through an itera-tive “re-gauging” mechanism known as Layer Normal-ization [3]. Physically, this plays a role analogous to a renormalization-like rescaling applied at each order of the expansion. Rather than allowing successive opera-tor compositions to drive the state vector’s norm into uncontrolled regimes, LayerNorm continuously rescales the dressed state, keeping the depth expansion within a bounded region of representation space. It effectively acts as a stability regulator for the op-erator composition, empirically observed in by models like GPT-3 [18], where architectures with up to 96 layers maintain coherent representations across depth. The ex-act placement of this renormalization step and its precise form vary across modern architectures, but the structural role as a stability regulator of the operator composition remains unchanged. 7 
+
+> V. CAUSALITY AND MEASUREMENT: THE SPATIAL ARROW AND UNEMBEDDING
+
+Autoregressive generation functions as a transfer-matrix-like procedure on a 1D directed token lattice. At each step, the sequence boundary advances by one site: the ”dressed” edge state is measured, a discrete outcome is then appended, and the boundary state is updated. This process bridges the two primary axes of the archi-tecture depicted in Fig. 1: the computational depth of the forward pass and the spatial growth of the sequence. The forward pass serves to prepare the boundary state 
+
+|ΨN ⟩ for measurement. By the final layer L, the token at position N has evolved into a fully ”dressed” state, encoding the contextual influence of all preceding to-kens through non-local interactions and local renormal-izations. Because of this causal structure, |ΨN ⟩ acts as a sufficient representation for the next-token prediction and no global measurement of the full sequence is re-quired. The unembedding matrix WU operates as the measure-ment operator, projecting the boundary state back onto the discrete vocabulary basis ⟨vk|. This projection yields the transition amplitudes: Logits k = ⟨vk|ΨN ⟩
+
+The structural parallel to quantum measurement is mathematically precise: both involve projecting a high-dimensional state onto a discrete basis and normalizing the resulting magnitudes into a probability distribution. However, this mapping is physically distinct. While quantum probabilities emerge from the geometry of Hilbert space via squared wavefunction amplitudes, This framework emphasizes the shared algebraic sequence, projection followed by normalization, rather than sug-gesting a common physical origin.  
+
+> VI. CONCLUSION AND OUTLOOK
+
+Looking at Transformer mechanics through the lens of basis construction, effective interactions, and ordered state mixing provides more than a metaphor. It offers an effective mental model. For researchers trained in com-putational physics, these architectures need not appear as opaque statistical engines; they can be understood as structured operator systems evolving within a variation-ally optimized subspace. The operator-theoretic bridge proposed here, however, rests on a structural parallel rather than an exact identity mapping. While physical operators follow from first prin-ciples, such as Hermiticity and unitarity, Transformer weights are empirical outcomes of gradient descent and nonlinear in nature. Despite these differing origins, both disciplines confront similar structural bottleneck: the stabilization of large ordered products of non-commuting, non-Hermitian operators against divergence or rank col-lapse — an instability independent of whether the con-stituent operators arise from a Hamiltonian or a learned weight matrix. The transferability of techniques depends on identify-ing which operator properties govern this composition. These are not Hermiticity or unitarity, but the non-Hermitian, dense, and potentially defective character of individual layers. The matrices underlying these trans-formations share structural features with the classes of operators studied in non-Hermitian random matrix the-ory [29, 30] and pseudospectral analysis [31]. While the present work does not establish a direct mapping, these frameworks may provide natural tools for diagnosing sta-bility and sensitivity in deep operator compositions. While the constituent layer operations are nonlinear, the depth expansion in Eq. 8 generates a summation over state vectors within the linear representation space. For architectures that seek fixed points, such as Deep Equilib-rium Models [21], fixed-point acceleration methods such as Anderson mixing, the numerical analog of DIIS [32], are already employed in practice. For standard Trans-formers with depth-varying operators, sequence extrapo-lation methods operating directly on the state trajectory, such as vector Pad´ e and Borel [33] resummation, may of-fer complementary tools for extracting stable representa-tions from this discrete series, though their applicability to nonlinear compositions requires further investigation. The transfer of knowledge between these fields is inher-ently reciprocal. From a physics perspective, the empir-ical stability of large-scale Transformers is remarkable. They maintain coherent state vectors across many se-quential, non-Hermitian layer operations without catas-trophic divergence in practice, despite being shaped by optimization across billions of scalar parameters. Deep learning achieves this not through physical conservation laws, but through structural interventions like residual connections and layer normalization that act as algorith-mic regulators for strongly out-of-equilibrium dynamics. As discussed earlier, deep learning has the mathemat-ical freedom to rescale state vectors through architec-tural choices to enforce stability that is prohibited by the conservation laws governing physical quantum sys-tems. However, this divergence in constraints is what makes cross-disciplinary exchange valuable. Translating AI’s empirically successful stabilization mechanisms into operator language may offer physicists new perspectives on controlling complex non-Hermitian dynamics. Con-versely, the deep learning community can draw upon the analytical frameworks of many-body physics to better characterize the stability and structure of these architec-tures. By identifying operator product control as the shared numerical bottleneck, we move beyond analogy toward systematic translation. The value of this perspective lies not in providing immediate solutions, but in establish-ing that physicists and machine learning researchers con-fronting similar mathematical and structural bottlenecks, and can therefore begin working on them together. 8
+
+[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin, Attention Is All You Need (2017), arXiv:1706.03762 [cs] version: 1. [2] K. He, X. Zhang, S. Ren, and J. Sun, Deep Residual Learning for Image Recognition (2015), arXiv:1512.03385 [cs]. [3] J. L. Ba, J. R. Kiros, and G. E. Hinton, Layer Normal-ization (2016), arXiv:1607.06450 [stat]. [4] N. Tishby and N. Zaslavsky, Deep Learning and the In-formation Bottleneck Principle (2015), arXiv:1503.02406 [cs]. [5] S. S. Schoenholz, J. Gilmer, S. Ganguli, and J. Sohl-Dickstein, Deep Information Propagation (2017), arXiv:1611.01232 [stat]. [6] C. H. Martin and M. W. Mahoney, Implicit Self-Regularization in Deep Neural Networks: Evidence from Random Matrix Theory and Implications for Learning (2018), arXiv:1810.01075 [cs]. [7] C. H. Martin and C. Hinrichs, SETOL: A Semi-Empirical Theory of (Deep) Learning (2025). [8] J. Pennington, S. S. Schoenholz, and S. Ganguli, Resur-recting the sigmoid in deep learning through dynamical isometry: theory and practice (2017), arXiv:1711.04735 [cs]. [9] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (2019), arXiv:1810.04805 [cs]. [10] T. Ozaki, Phys. Rev. B 67 , 155108 (2003). [11] J. M. Soler, E. Artacho, J. D. Gale, A. Garc´ ıa, J. Jun-quera, P. Ordej´ on, and D. S´ anchez-Portal, Journal of Physics: Condensed Matter 14 , 2745 (2002). [12] G. Kresse and J. Furthm¨ uller, Phys. Rev. B 54 , 11169 (1996). [13] T. Mikolov, K. Chen, G. Corrado, and J. Dean, Efficient Estimation of Word Representations in Vector Space (2013), arXiv:1301.3781 [cs]. [14] D. Singh and L. Nordstr¨ om, Planewaves, Pseudopoten-tials and the LAPW Method, Second Edition (2005). [15] M. Geva, R. Schuster, J. Berant, and O. Levy, Trans-former Feed-Forward Layers Are Key-Value Memories (2021), arXiv:2012.14913 [cs]. [16] K. Meng, D. Bau, A. Andonian, and Y. Belinkov, Lo-cating and Editing Factual Associations in GPT (2023), arXiv:2202.05262 [cs]. [17] D. Vanderbilt, Physical Review B 41 , 7892 (1990). [18] T. B. Brown, B. Mann, N. Ryder, M. Subbiah, J. Ka-plan, P. Dhariwal, A. Neelakantan, P. Shyam, G. Sas-try, A. Askell, S. Agarwal, A. Herbert-Voss, G. Krueger, T. Henighan, R. Child, A. Ramesh, D. M. Ziegler, J. Wu, C. Winter, C. Hesse, M. Chen, E. Sigler, M. Litwin, S. Gray, B. Chess, J. Clark, C. Berner, S. McCandlish, A. Radford, I. Sutskever, and D. Amodei, Language Mod-els are Few-Shot Learners (2020), arXiv:2005.14165 [cs]. [19] A. Radford, K. Narasimhan, T. Salimans, and I. Sutskever, Improving language understanding by gen-erative pre-training (2018). [20] M. Dehghani, S. Gouws, O. Vinyals, J. Uszkor-eit, and L. Kaiser, Universal Transformers (2019), arXiv:1807.03819 [cs]. [21] S. Bai, J. Z. Kolter, and V. Koltun, Deep Equilibrium Models (2019), arXiv:1909.01377 [cs]. [22] S. Wang, B. Z. Li, M. Khabsa, H. Fang, and H. Ma, Lin-former: Self-Attention with Linear Complexity (2020), arXiv:2006.04768 [cs]. [23] R. Xiong, Y. Yang, D. He, K. Zheng, S. Zheng, C. Xing, H. Zhang, Y. Lan, L. Wang, and T.-Y. Liu, On Layer Normalization in the Transformer Architecture (2020), arXiv:2002.04745 [cs]. [24] S. De and S. L. Smith, Batch Normalization Biases Resid-ual Blocks Towards the Identity Function in Deep Net-works (2020), arXiv:2002.10444 [cs]. [25] A. Veit, M. Wilber, and S. Belongie, Residual Networks Behave Like Ensembles of Relatively Shallow Networks (2016), arXiv:1605.06431 [cs]. [26] K. Greff, R. K. Srivastava, and J. Schmidhuber, Highway and Residual Networks learn Unrolled Iterative Estima-tion (2017), arXiv:1612.07771 [cs]. [27] J. J. Sakurai, Modern Quantum Mechanics (Revised Edi-tion) , 1st ed. (Addison Wesley, 1993). [28] E. Runge and E. K. U. Gross, Phys. Rev. Lett. 52 , 997 (1984). [29] T. N. Saada, A. Naderi, and J. Tanner, Mind the Gap: a Spectral Analysis of Rank Collapse and Signal Propaga-tion in Attention Layers (2025), arXiv:2410.07799 [cs]. [30] M. Staats, M. Thamm, and B. Rosenow, Small Singular Values Matter: A Random Matrix Analysis of Trans-former Models (2025), arXiv:2410.17770 [cs]. [31] L. Trefethen and M. Embree, Spectra and Pseu-dospectra | Princeton University Press (2005), iSBN: 9780691119465. [32] P. Pulay, Chemical Physics Letters 73 , 393 (1980). [33] ´E. Borel, Annales scientifiques de l’ ´Ecole Normale Sup´ erieure 16 , 9 (1899).

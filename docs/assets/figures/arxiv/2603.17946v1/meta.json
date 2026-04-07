@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.17946v1/fig-001.webp",
+      "caption": "Figure 1: (a) Naive MLA transfer: jointly factorize W (g) K and W (g) V by SVD and truncate to a uniform per-layer rank, optimizing ∥W − Ŵ∥F while ignoring layerwise heterogeneity. (b) CARE:",
+      "page": 2,
+      "index": 1,
+      "width": 826,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17946v1/fig-002.webp",
+      "caption": "Figure 2: (a) Accuracy under 50% rank reduction applied one layer at a time in DeepSeek-V2-Lite, measured on ARC Challenge and MMLU. Sensitivity is strongly layer-dependent. (b) WikiText perplexity under grouped truncation of GQA attention in Llama-3-8B (layers 30–32). Singular-value groups are ordered by magnitude; the resulting non-monotone degradation shows that singular values alone are an imperfect proxy for MLA conversion quality.",
+      "page": 3,
+      "index": 2,
+      "width": 832,
+      "height": 267
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17946v1/fig-003.webp",
+      "caption": "Figure 3: Covariance-aware rank profiles across calibration corpora (Alpaca, WikiText2, PTB, C4) for Llama-3.1-8B-Instruct at target ranks 64, 128, 256, and 512. Across all target budgets, both WK and WV show a depth-dependent increase—small in early layers, rising through mid layers—with stronger late-layer growth for WV . The consistency across corpora suggests a model-intrinsic trend.",
+      "page": 8,
+      "index": 3,
+      "width": 825,
+      "height": 1040
+    }
+  ]
+}

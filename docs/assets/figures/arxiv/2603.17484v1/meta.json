@@ -1,0 +1,110 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-001.webp",
+      "caption": "Figure 3. Task-wise performance comparison of L2A and baseline methods on Qwen 2.5 7B model. L2A remains close to CLP performance while outperforming baselines on the majority of tasks.",
+      "page": 6,
+      "index": 1,
+      "width": 906,
+      "height": 366
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-002.webp",
+      "caption": "Table 4. Task-wise performance comparison of L2A and baseline methods across long-context benchmarks on Qwen 2.5 1.5B model. L2A remains close to CLP performance while outperforming baselines on most tasks.All scores are reported on a 0–100 scale.",
+      "page": 25,
+      "index": 2,
+      "width": 563,
+      "height": 1279
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-003.webp",
+      "caption": "Table 5. Task-wise performance comparison of L2A and baseline methods across long-context benchmarks on Qwen3 8B model. L2A remains close to CLP performance while outperforming baselines on most tasks.All scores are reported on a 0–100 scale.",
+      "page": 26,
+      "index": 3,
+      "width": 713,
+      "height": 1056
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-004.webp",
+      "caption": "Figure 15. Time-to-first-token (TTFT) for Qwen2.5 7B model for various sequence lengths. L2A becomes progressively faster as the context length increases, highlighting the need for conditional Global Attention.",
+      "page": 21,
+      "index": 4,
+      "width": 802,
+      "height": 461
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-005.webp",
+      "caption": "Figure 14. Time-to-first-token (TTFT) for Qwen2.5 1.5B model for various sequence lengths. L2A becomes progressively faster as the context length increases, highlighting the need for conditional Global Attention.",
+      "page": 21,
+      "index": 5,
+      "width": 798,
+      "height": 455
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-006.webp",
+      "caption": "Figure 2. Long-context performance and efficiency of L2A at 128K context length. Left: Performance comparison of L2A against CLP for base model and other baselines on Qwen 2.5 7B, where L2A outperforms existing approaches. Right: Kernel-level speedups achieved by L2A relative to FlashAttention-2, with ∼10× and ∼8× speedups for the forward and backward passes at upto 90% sparsity in practice.",
+      "page": 2,
+      "index": 6,
+      "width": 791,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-007.webp",
+      "caption": "Figure 16. Aggregate long-context performance for L2A variants with varying SWA window sizes. The performance remains similar, while the Router module compensates for smaller SWA windows by reducing sparsity in Global Attention invocations.",
+      "page": 22,
+      "index": 7,
+      "width": 994,
+      "height": 639
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-008.webp",
+      "caption": "Figure 9. Context-free Sparse baselines that independently trigger Global Attention at each token with Bernoulli probability p ∈ {0.1, 0.2, 0.5}, corresponding to 50-90% sparsity levels. L2A outperforms these by a large margin, providing crucial evidence that the Router leverages local context to decide upon the invocation of Global Attention.",
+      "page": 10,
+      "index": 8,
+      "width": 905,
+      "height": 367
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-009.webp",
+      "caption": "Figure 10. L2A kernel speedups over FlashAttention-2 for the forward (left) and backward (right) pass across varying sparsity levels and sequence lengths. Qwen-2.5 7B configuration is used (28 attention heads and a head dimension of 128).",
+      "page": 18,
+      "index": 9,
+      "width": 995,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-010.webp",
+      "caption": "Figure 18. Time-to-first token (TTFT) for L2A variants with varying SWA context window from 0-4K. These results reveal a clear tradeoff: as the short-term local context shrinks, L2A increasingly relies on long-term global memory resulting into higher TTFT as shown.",
+      "page": 23,
+      "index": 10,
+      "width": 802,
+      "height": 461
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-011.webp",
+      "caption": "Figure 17. Sparsity levels for L2A variants with different SWA sizes. As the short-term local context shrinks, L2A increasingly relies on long-term global memory. In the extreme case, the SWA-0 configuration exhibits 0% sparsity during training.",
+      "page": 23,
+      "index": 11,
+      "width": 783,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-012.webp",
+      "caption": "Table 3. Task-wise performance comparison of L2A and baseline methods across long-context benchmarks on Qwen 2.5 7B model. L2A remains close to CLP performance while outperforming baselines on most tasks. All scores are reported on a 0–100 scale.",
+      "page": 24,
+      "index": 12,
+      "width": 563,
+      "height": 1279
+    },
+    {
+      "url": "assets/figures/arxiv/2603.17484v1/fig-013.webp",
+      "caption": "Figure 13. Scaling test time compute for L2A by varying the threshold of the Routing module (Equation (3)). Increasing the threshold leads to higher sparsity and lower time-to-first-token, at the cost of reduced aggregate performance.",
+      "page": 20,
+      "index": 13,
+      "width": 802,
+      "height": 468
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.16039v1/fig-001.webp",
+      "caption": "Figure 1 Overview of Residual Stream Duality. A modern Transformer evolves information along two ordered dimensions: sequence position and layer depth. Computing the target state h (ℓ) t via explicit depth-wise residual attention operates identically to causal short sliding-window attention (ShortSWA) on the sequence axis, effectively bridging the representation mechanisms of the two pathways.",
+      "page": 2,
+      "index": 1,
+      "width": 828,
+      "height": 601
+    }
+  ]
+}

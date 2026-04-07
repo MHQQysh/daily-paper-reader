@@ -1,0 +1,269 @@
+Title: HAViT: Historical Attention Vision Transformer
+
+URL Source: https://arxiv.org/pdf/2603.18585v1
+
+Published Time: Fri, 20 Mar 2026 00:46:50 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+2026 IEEE Conference on Artificial Intelligence (CAI) 
+
+# HAViT: Historical Attention Vision Transformer 
+
+Swarnendu Banik ∗, Manish Das §, Shiv Ram Dubey †, Satish Kumar Singh ‡
+
+Computer Vision and Biometrics Lab, Indian Institute of Information Technology, Allahabad 
+
+{∗mhc2023012, §pmm2023001, †srdubey, ‡sk.singh }@iiita.ac.in 
+
+Abstract — Vision Transformers have excelled in computer vision but their attention mechanisms operate independently across layers, limiting information flow and feature learning. We propose an effective cross-layer attention propagation method that preserves and integrates historical attention matrices across encoder layers, offering a principled refinement of inter-layer information flow in Vision Transformers. This approach enables progressive refinement of attention patterns throughout the transformer hierarchy, enhancing feature acquisition and optimization dynamics. The method requires minimal architec-tural changes, adding only attention matrix storage and blend-ing operations. Comprehensive experiments on CIFAR-100 and TinyImageNet demonstrate consistent accuracy improvements, with ViT performance increasing from 75.74% to 77.07% on CIFAR-100 (+1.33%) and from 57.82% to 59.07% on TinyImageNet (+1.25%). Cross-architecture validation shows similar gains across transformer variants, with CaiT showing 1.01% enhancement. Systematic analysis identifies the blending hyperparameter of historical attention ( α = 0 .45 ) as optimal across all configurations, providing the ideal balance between current and historical attention information. Random initial-ization consistently outperforms zero initialization, indicating that diverse initial attention patterns accelerate convergence and improve final performance. Our code is publicly available at https://github.com/banik-s/HAViT 
+
+I. INTRODUCTION Vision Transformers (ViTs) [1] have fundamentally re-shaped computer vision by showing that transformer ar-chitectures, originally designed for NLP, excel at image recognition and consistently rival or outperform traditional convolutional neural networks across tasks like classification, detection, and segmentation. Their success stems from self-attention [1], which enables modeling of long-range spatial relationships between image patches for rich, contextual representation learning. This innovation has inspired diverse variants, such as Class-Attention Image Transformer (CaiT) [2] with class-attention, broadening the model’s capabilities. Existing Vision Transformer implementations isolate at-tention layers, discarding valuable patterns post-computation and limiting hierarchical refinement. To address this gap, we introduce an innovative historical attention propaga-tion methodology that preserves and integrates self-attention matrices ( Q · KT ) across sequential encoder layers. Our framework establishes an attention memory architecture that accumulates knowledge throughout network depth, offering a novel complement to existing enhancements. We validate this approach across diverse architectures (ViT [1], CaiT [2]), demonstrating consistent gains on established bench-marks. On CIFAR-100, our method elevates baseline ViT accuracy from 75.74% to 77.07% ( ↑1.33%) with optimal 
+
+α = 0 .45 [Table I]. Comparable improvements appear on TinyImageNet, rising from 57.82% to 59.07% (↑1.25%) [Table II]. The approach also enhances CaiT performance from 73.85% to 74.86% (+1.01%) [Table III], confirming broad architectural compatibility. II. RELATED WORK 
+
+Vision Transformers (ViTs) have transformed computer vision by adapting NLP-based attention for visual tasks, with recent research focusing on architectural enhancements. Patro et al. introduced SpectFormer, which uses spectral decomposition to capture global and local features [3], while other works emphasize information flow beyond spatial dimensions, such as Channel Propagation Networks [4] and localization masks in PatchGuard [5]. Further innovations include GrafT [6], a lightweight add-on for multi-scale dependencies, and DeepViT’s [7] Re-attention, which regen-erates attention maps to prevent collapse. Efficiency-focused designs like MicroViT [8] and edge-optimized transformers [9] reduce complexity for constrained devices. Additionally, Cross-Layer Attention (CLA) [10] optimizes KV caching by sharing heads across layers, while HDPNet employs an hour-glass dual-path architecture to refine global and spatial details for camouflaged object detection [11]. The big.LITTLE ViT [12] introduces a dual-transformer architecture employing a dynamic inference mechanism to optimize efficiency. Dang 
+
+et al. utilize cascaded channel- and spatial-split transformers for facial landmark geometry modeling [13]. Yang et al. 
+
+propose focal self-attention [14] to capture both local and global interactions. The TORE framework [15] employs token recycling for active exploration, while SHViT [16] utilizes a larger-stride patchify stem to reduce memory costs and enhance performance. Recent work shows how similarity-guided adaptive trans-formers [17] dynamically disable redundant layers for real-time UAV tracking. Further efficiency is achieved via softmax-free mechanisms [18], focused linear attention [19], and Less Attention ViT (LaViT) [20], which minimizes attention operations. Ehab et al. leverage feature fusion across DaViT, iFormer, and GPViT for deepfake detection [21]. Touvron et al. [22] achieved data-efficient ViT training via knowledge distillation. Hierarchical architectures like Swin Transformer [23] utilize shifted windows for local attention, while FDViT [24] introduces flexible downsam-pling. ResNets [25] established identity skip connections for deep training, a concept foundational to modern backbones. TransNeXt [26] proposes aggregated biomimetic attention. 
+
+This paper is accepted by 2026 IEEE Conference on Artificial Intelligence (CAI). Copyright ©2026 IEEE. Personal use of this material is permitted. However, permission to use this material for any other purposes must be obtained from the IEEE by sending an email to pubs-permissions@ieee.org. 
+
+1
+
+> arXiv:2603.18585v1 [cs.CV] 19 Mar 2026
+
+Pre-training on small datasets is optimized by minimally scaled images [27], [28]. A horizontally scalable vision transformer (HSViT) is introduced in [29] to tackle the collaborative model training and inference. SATA-ViT [30] performs the suppressing of accumulated trivial attention which is computed using attention importance. Compact Convolutional Transformers (CCT) [31] and Patch Attention Excitation (PAE) [32] address small-dataset limitations via convolutional tokenization and channel-wise attention, respectively. Unlike DeepViT [7], which uses ‘Re-attention’ to mix attention heads within the same layer (intra-layer) to boost diversity, HAViT explicitly propagates raw attention logits from the previous layer (inter-layer). DeepViT regenerates local patterns, whereas HAViT creates a direct memory path to preserve and refine historical context across the network depth, whereas HAViT blends historical attention matrices to progressively refine feature represen-tations, serving a representational rather than computational goal. Recent surveys [33], [34] benchmark these ViT ad-vancements against CNNs. Despite recent advances in Vision Transformer architec-tures, a critical gap persists in inter-layer information flow: existing methods isolate layers, discarding valuable attention patterns after each computation. While approaches like chan-nel propagation and token recycling explore connectivity, they fail to systematically preserve self-attention history for refinement. We address this by introducing an inter-layer attention propagation mechanism that enables historical pat-tern refinement throughout network depth. Unlike methods focused on individual layer optimization or architectural changes, our approach builds an attention memory system to accumulate and integrate self-attention knowledge across consecutive layers, offering a novel complement to existing performance enhancements. III. PROPOSED HISTORICAL ATTENTION MECHANISM 
+
+This section details our proposed cross-layer attention propagation framework for Vision Transformers. We com-mence by examining the conventional ViT architecture, subsequently presenting our innovative methodology for preserving and integrating unprocessed attention computa-tions across sequential layers. Our approach resolves the core constraint of isolated attention processing in existing transformer designs by establishing attention memory that develops throughout network depth. 
+
+A. Conventional Vision Transformer Architecture 
+
+Vision Transformers handle images through decomposi-tion into non-overlapping segments, treating individual seg-ments as sequence tokens. For input images with dimensions 
+
+Height ×W idth and segment size P , the total segment count equals: 
+
+N = Height × W idth P 2 (1) Individual segments undergo linear transformation into 
+
+dmodel -dimensional representations, with a trainable classi-fication token added to the sequence, resulting in a total sequence length of n = N + 1 , for the CLS token (Classifi-cation token). The fundamental ViT component is the multi-head self-attention framework. Within each attention layer, the input sequence X ∈ Rn×dmodel generates query ( Q), key (K), and value ( V ) representations: 
+
+Q = XW Q, K = XW K , V = XW V (2) where WQ, W K , W V ∈ Rdmodel ×dk represent trainable transformation matrices, and dk = dmodel  
+
+> h
+
+denotes the per-head dimensionality with h being the number of attention heads. The attention mechanism proceeds as: 
+
+Attention( Q, K, V ) = softmax 
+
+ QK T
+
+√dk
+
+
+
+V (3) This encodes similarity relationships among token pairs prior to softmax normalization. Standard ViT implementa-tions immediately apply softmax to these values and sub-sequently eliminate them, precluding cross-layer attention pattern communication. 
+
+B. Historical Attention Propagation Architecture 
+
+As illustrated in Figure 1, our methodology establishes a framework for maintaining and transmitting historical attention computations across sequential transformer layers. The fundamental principle recognizes that attention patterns from preceding layers encode valuable token relationship information that can enhance subsequent layer attention computations. 
+
+a) Mathematical Framework: For attention layer l, we preserve the self attention matrix 
+
+Al 
+
+> self
+
+= Ql(Kl)T
+
+√dk
+
+(4) and transmit it to layer l + 1 . The attention computation in layer l + 1 transforms to: 
+
+Al+1  
+
+> Current
+
+= α · Al+1  
+
+> Self
+
++ (1 − α) · Hl 
+
+> prev
+
+(5) where Hl denotes the attention history from the preceding layer, i.e., 
+
+Hl 
+
+> prev
+
+= Al 
+
+> Current
+
+(6) and α is a fixed integration hyperparameter that controls the balance between current and historical attention informa-tion. For the first encoder layer, H0 is initialized with random numbers (or zero initialization). The final attention result computes as: 
+
+Attention l+1 = softmax  Al+1 
+
+> Current
+
+ V l+1 (7) This formulation establishes attention continuity dynamics, enabling each layer to build upon previously established attention strategies while adapting to evolving feature rep-resentations. In the given algorithm (see Algorithm 1), it is shown how to compute the encoder output by blending current self-attention with historical attention. Fig. 1: Overview of the modified ViT with historical attention propagation. 
+
+Algorithm 1 Self-Attention with Historical Blending 
+
+Require: Embeddings X ∈ Rn×dmodel 
+
+Ensure: Output and updated historical attention Hcurrent  
+
+> 1:
+
+Initialize blending coefficient 
+
+α ← R ∈ [0 , 1]  
+
+> 2:
+
+if this is the first encoder layer then  
+
+> 3:
+
+H0 ← Initialize (random or zero ) 
+
+> 4:
+
+else  
+
+> 5:
+
+Hprev ← Hprevious layer  
+
+> 6:
+
+end if  
+
+> 7:
+
+X ← LayerNorm( X) 
+
+> 8:
+
+Q ← XW Q, K ← XW K , V ← XW V 
+
+> 9:
+
+Aself ← QK ⊤
+
+√dk 
+
+> 10:
+
+Acurrent ← α · Aself + (1 − α) · Hprev  
+
+> 11:
+
+output ← softmax  ACurrent 
+
+ V 
+
+> 12:
+
+Hcurrent ← Acurrent  
+
+> 13:
+
+return output 
+
+C. Attention History Initialization Approaches 
+
+A fundamental design consideration involves initializing attention history H0 for the initial transformer layer, where no preceding attention information exists. We examine two distinct initialization methodologies, each possessing differ-ent theoretical foundations and practical consequences. 
+
+1) Random Matrix Initialization : We initialize the at-tention history H0 by sampling from a standard normal distribution, ensuring reproducibility via fixed seeds and separate random states for each run. This approach populates 
+
+H0 as: 
+
+H0 ∼ N (0 , I ) ∈ RB×h×n×n
+
+where B is batch size, h is head count, and n denotes the total sequence length (patches + classification token). 
+
+2) Zero Matrix Initialization : We also initialize H0 as a zero matrix, enabling the first layer to operate identically to a standard ViT initially. This strategy allows attention propa-gation effects to emerge gradually during training, helping to isolate the developmental benefits of accumulated attention history across network depth: H0 = 0 ∈ RB×h×n×n.IV. E XPERIMENTAL SETUP 
+
+This section presents the comprehensive experimental framework designed to evaluate our proposed historical at-tention propagation mechanism. The experimental design en-compasses multiple architectural configurations, initialization strategies, and evaluation benchmarks to provide thorough assessment of our method’s effectiveness. 
+
+A. Dataset Configuration and Preprocessing 
+
+Our evaluation employs two complementary benchmarks. CIFAR-100 [35] provides 60,000 32 × 32 color images across 100 classes, split into 50,000 training and 10,000 test samples. TinyImageNet [36] offers 200 classes, containing 100,000 training and 10,000 validation images (500 and 50 per class, respectively), all resized to 64 × 64 .
+
+B. Training Settings 
+
+To ensure a fair comparison, we train both ViT and CaiT backbones using the same setup. Each model is trained for 100 epochs with AdamW (learning rate 0.003, weight decay 
+
+5 × 10 −2, batch size 128), along with a cosine learning rate schedule and a 10-epoch warm-up. We also apply label smoothing with a factor of 0.1. To keep the token count consistent across datasets, we adapt the patch size based on input resolution: 4 ×4 patches for 32 ×32 CIFAR-100 and 8 ×8 patches for 64 ×64 TinyImageNet. All optimization TABLE I: CIFAR-100 Results with α Variation (Baseline ViT accuracy = 75.74) 
+
+α Accuracy Accuracy(%) (Random) (Zero) 
+
+0.10 76.14 ( ↑0.40) 75.83 ( ↑0.09) 0.25 76.29 ( ↑0.55) 76.02 ( ↑0.28) 0.40 76.85 ( ↑1.11) 76.25 ( ↑0.51) 0.45 77.07 ( ↑1.33) 76.50 ( ↑0.76) 0.50 76.43 ( ↑0.69) 76.41 ( ↑0.67) 0.60 76.25 ( ↑0.51) 76.67 ( ↑0.93) 0.75 76.08 ( ↑0.34) 75.91 ( ↑0.17) 0.80 75.76 ( ↑0.02) 76.11 ( ↑0.37) 0.90 75.77 ( ↑0.03) 76.35 ( ↑0.61) 
+
+Fig. 2: (a) Test accuracy comparison over epochs for CIFAR-100 dataset. (b) Training loss comparison over epochs for CIFAR-100 dataset. and regularization settings are kept identical so that any performance differences can be attributed only to architec-tural changes. We further study the effect of the blending parameter α by varying it from 0.1 to 0.9, and evaluate each setting using both random and zero initialization across all models and datasets. V. RESULTS AND ANALYSIS 
+
+This section presents experimental results demonstrating our historical attention propagation mechanism’s effective-ness, analyzed across datasets, architectures, and initializa-tion strategies for understanding performance characteristics and optimal configurations. 
+
+A. CIFAR-100 Performance Analysis 
+
+Table I evaluates HAViT’s performance on CIFAR-100. Baseline ViT attains 75.74% accuracy, while HAViT with random initialization peaks at 77.07% ( ↑1.33%) at α = 0 .45 ,demonstrating effective inter-layer attention blending (see Fig. 4(a)). Zero initialization also yields gains, reaching 76.50% (↑0.76%), though the 0.57% gap highlights the benefit of random initialization. Sensitivity analysis reveals an inverted-U trend where mid-range α values (0.40–0.50) optimize performance, whereas extremes ( <0.25 or >0.75) limit adaptability. Fig. 2 confirms HAViT’s stable conver-gence and consistent improvement over the baseline. 
+
+B. TinyImageNet Performance Evaluation 
+
+Table II confirms HAViT’s scalability on TinyImageNet, achieving 59.07% accuracy compared to the baseline ViT’s TABLE II: TinyImageNet Results with α Variation (Baseline ViT accuracy = 57.82) 
+
+α Accuracy Accuracy (%) (Random) (Zero) 
+
+0.10 57.79 ( ↓0.03) 57.89 ( ↑0.07) 0.25 58.21 ( ↑0.39) 57.90 ( ↑0.08) 0.40 58.93 ( ↑1.11) 58.32 ( ↑0.50) 0.45 59.07 ( ↑1.25) 58.73 ( ↑0.91) 0.50 58.74 ( ↑0.92) 58.47 ( ↑0.65) 0.60 58.44 ( ↑0.62) 57.98 ( ↑0.16) 0.75 57.74 ( ↓0.08) 57.93 ( ↑0.11) 0.80 58.44 ( ↑0.62) 58.38 ( ↑0.56) 0.90 58.01 ( ↑0.19) 58.01 ( ↑0.19) 
+
+Fig. 3: (a) Test accuracy comparison over epochs for Tiny-ImageNet dataset. (b) Training loss comparison over epochs for TinyImageNet dataset. 
+
+Fig. 4: Initialization Strategy Impact Analysis: (a) Accuracy for α on CIFAR-100 (ViT baseline 75.74%), (b) Accuracy for α on TinyImageNet (ViT baseline 57.82%). 57.82%. Performance analysis shows a strong dependency on the blending hyperparameter α, peaking at α = 0 .45 
+
+with 59.07% ( ↑1.25%) for random initialization and 58.73% (↑0.91%) for zero initialization (see Fig. 4(b)). This high-lights that a balanced mix of current and historical atten-tion optimizes feature learning. Furthermore, random initial-ization consistently outperforms zero initialization, notably widening the gap by 0.34% at the optimal α, suggesting that controlled randomness aids the historical attention mecha-nism. Fig. 3 illustrates the stable convergence and superior training dynamics of HAViT over the baseline. 
+
+C. Cross-Architecture Performance Validation 
+
+Table III compares performance across multiple Vision Transformer variants using the optimal setup ( α = 0 .45 ,random initialization). All architectures (ViT [1], CaiT [2]) benefit from historical attention propagation, with improve-ments from 1.01% to 1.33%, confirming the method’s broad applicability. Fig. 5: Attention map comparison between Base ViT and HAViT across CIFAR-100 classes TABLE III: Cross-Architecture Comparison (optimal α =0.45 , random initialization.)                
+
+> Architecture Dataset Baseline (%) Modified (%)
+> ViT CIFAR-100 75.74 77.07 CaiT CIFAR-100 73.85 74.86 ViT TinyImageNet 57.82 59.07 CaiT TinyImageNet 58.01 59.02
+
+TABLE IV: Accuracy Comparison with SOTA Models on CIFAR-100 Dataset                 
+
+> Method Architecture Type Accuracy (%)
+> ResNet-56 [25] CNN 74.81 ResNet-110 [25] CNN 76.63 ViT-Lite-7/4 [31] Standard ViT 73.94 CVT-7/4 [31] Compact ViT 76.49 CCT-2/3×2 [31] Compact Convolutional ViT 66.93 CCT-7/3×2 [31] Compact Convolutional ViT 77.72
+> HAViT (Ours) Modified ViT 77.07
+
+D. Results Comparison with State-of-the-Art Models on CIFAR-100 Dataset 
+
+Table IV benchmarks HAViT on CIFAR-100, where it achieves 77.07% accuracy, a strong result against estab-lished ViT and CNN baselines. It outperforms standard Vision Transformers like ViT-Lite-7/4 (73.94%), Compact Vision Transformers like CVT-7/4 (76.49%) and Compact Convolution ViT like CCT-2/3x2 (66.93%) [31], as well as classic CNNs like ResNet-56 (74.81%) and ResNet-110 (76.63%) [25]. While method like CCT-7/3x2 (77.72%) [31] score slightly higher, it requires complex pretraining. In contrast, HAViT remains competitive solely through simple architectural changes, avoiding the need for elaborate pre-training schemes. 
+
+E. Results Comparison with State-of-the-Art Models on TinyImageNet Dataset 
+
+Table V details our evaluation on TinyImageNet, where HAViT reaches 59.07% accuracy. This positions it compet-itively against specialized architectures, especially consid-TABLE V: Accuracy Comparison with SOTA Models on TinyImageNet Dataset 
+
+Method Architecture Type Accuracy (%) 
+
+ResNet-18 [25] CNN 53.32 ResNet-56 [25] CNN 58.77 ViT (baseline) [1] Standard ViT 57.82 HSViT-C3A4 [29] Modified ViT 56.73 SATA-ViT [30] Modified ViT 58.77 
+
+HAViT (Ours) Modified ViT 59.07 
+
+ering HAViT relies on a simple architectural modification rather than complex training schemes. The proposed HAViT model is able to outperform the SOTA models, such as ResNet-18 (53.22%), ResNet-56 (58.77%), ViT (57.82%), HSViT (56.73%) and SATA-ViT (58.77%). It shows that the proposed historical attention provides the useful past information while future transformer encoder layers process the embeddings. 
+
+F. Attention Visualization Analysis 
+
+Fig. 5 highlights distinct attention dynamics: while Base ViT tends to fixate on central object regions, HAViT produces a more distributed attention pattern due to inter-layer blend-ing. This expanded coverage allows the model to capture critical context and background details that the baseline often misses. The difference is particularly sharp in complex scenes such as those with bicycles or multiple subjects where HAViT maintains awareness of both foreground and back-ground elements, leading to richer feature representation. VI. CONCLUSION 
+
+We have presented a novel historical attention propagation mechanism for Vision Transformers that overcomes the lim-itation of independent attention computations by preserving and blending historical attention matrices across layers. Our approach introduces an attention memory system, where each layer’s self attention Aself is combined with the previous layer’s history Hprev and we find α = 0 .45 to be universally optimal across ViT, CaiT architectures on CIFAR-100 and TinyImageNet. Random initialization of H0 consistently outperforms zero initialization, accelerating convergence and boosting accuracy by up to 1.33% over baseline models. Cross-architecture experiments confirm the broad applicabil-ity of our method, with CaiT gaining +1.01%. These results demonstrate practical benefits with minimal architectural overhead and offer insights into attention dynamics, high-lighting the value of inter-layer historical information shar-ing and contributing an effective refinement to transformer design by establishing attention continuity as a lightweight complement to existing deep learning architectures. VII. ACKNOWLEDGMENT We gratefully acknowledge the Indian Institute of Informa-tion Technology Allahabad, Ministry of Education, Govt.of India, for providing the fellowship to pursue this work. REFERENCES [1] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly et al. ,“An image is worth 16x16 words: Transformers for image recognition at scale,” arXiv preprint arXiv:2010.11929 , 2020. [2] H. Touvron, M. Cord, A. Sablayrolles, G. Synnaeve, and H. J´ egou, “Going deeper with image transformers,” in Proceedings of the IEEE/CVF international conference on computer vision , 2021, pp. 32– 42. [3] B. N. Patro, V. P. Namboodiri, and V. S. Agneeswaran, “Spectformer: Frequency and attention is what you need in a vision transformer,” in 2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) . IEEE, 2025, pp. 9543–9554. [4] J. Go and J. Ryu, “Channel propagation networks for refreshable vision transformer,” in 2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) . IEEE, 2025, pp. 1353–1362. [5] M. Nafez, A. Koochakian, A. Maleki, J. Habibi, and M. H. Rohban, “Patchguard: Adversarially robust anomaly detection and localization through vision transformers and pseudo anomalies,” in Proceedings of the Computer Vision and Pattern Recognition Conference , 2025, pp. 20 383–20 394. [6] J. Park, K. Kahatapitiya, D. Kim, S. Sudalairaj, Q. Fan, and M. S. Ryoo, “Grafting vision transformers,” in Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) ,January 2024, pp. 1145–1154. [7] D. Zhou, B. Kang, X. Jin, L. Yang, X. Lian, Z. Jiang, Q. Hou, and J. Feng, “Deepvit: Towards deeper vision transformer,” arXiv preprint arXiv:2103.11886 , 2021. [8] N. Setyawan, C.-C. Sun, M.-H. Hsu, W.-K. Kuo, and J.-W. Hsieh, “Microvit: a vision transformer with low complexity self attention for edge device,” in 2025 IEEE International Symposium on Circuits and Systems (ISCAS) . IEEE, 2025, pp. 1–5. [9] S. Saha and L. Xu, “Vision transformers on the edge: A comprehensive survey of model compression and acceleration strategies,” Neurocom-puting , p. 130417, 2025. [10] W. Brandon, M. Mishra, A. Nrusimha, R. Panda, and J. R. Kelly, “Reducing transformer key-value cache size with cross-layer attention, 2024,” URL https://arxiv. org/abs/2405.12981 .[11] J. He, B. Liu, and H. Chen, “Hdpnet: Hourglass vision transformer with dual-path feature pyramid for camouflaged object detection,” in 
+
+Proceedings of the Winter Conference on Applications of Computer Vision (WACV) , February 2025, pp. 8627–8636. [12] H. Guo, Y. Wang, Z. Ye, J. Dai, and Y. Xiong, “big. little vi-sion transformer for efficient visual recognition,” arXiv preprint arXiv:2410.10267 , 2024. [13] Z. Dang, J. Li, and L. Liu, “Cascaded dual vision transformer for accurate facial landmark detection,” in 2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) . IEEE, 2025, pp. 5884–5894. [14] J. Yang, C. Li, P. Zhang, X. Dai, B. Xiao, L. Yuan, and J. Gao, “Focal self-attention for local-global interactions in vision transformers. arxiv 2021,” arXiv preprint arXiv:2107.00641 , vol. 3. [15] J. Olszewski, D. Rymarczyk, P. W´ ojcik, M. Pach, and B. Zieli´ nski, “Tore: Token recycling in vision transformers for efficient active visual exploration,” in 2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) . IEEE, 2025, pp. 8606–8616. [16] S. Yun and Y. Ro, “Shvit: Single-head vision transformer with memory efficient macro design,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 5756–5767. [17] C. Xue, B. Zhong, Q. Liang, Y. Zheng, N. Li, Y. Xue, and S. Song, “Similarity-guided layer-adaptive vision transformer for uav tracking,” in Proceedings of the Computer Vision and Pattern Recognition Conference , 2025, pp. 6730–6740. [18] S. A. Koohpayegani and H. Pirsiavash, “Sima: Simple softmax-free attention for vision transformers,” in Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , 2024, pp. 2607–2617. [19] D. Han, X. Pan, Y. Han, S. Song, and G. Huang, “Flatten transformer: Vision transformer using focused linear attention,” in Proceedings of the IEEE/CVF international conference on computer vision , 2023, pp. 5961–5971. [20] S. Zhang, H. Liu, S. Lin, and K. He, “You only need less attention at each stage in vision transformers,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 6057–6066. [21] E. Essa, “Feature fusion vision transformers using mlp-mixer for enhanced deepfake detection,” Neurocomputing , vol. 598, p. 128128, 2024. [22] H. Touvron, M. Cord, M. Douze, F. Massa, A. Sablayrolles, and H. J´ egou, “Training data-efficient image transformers & distillation through attention,” in International conference on machine learning .PMLR, 2021, pp. 10 347–10 357. [23] Z. Liu, Y. Lin, Y. Cao, H. Hu, Y. Wei, Z. Zhang, S. Lin, and B. Guo, “Swin transformer: Hierarchical vision transformer using shifted windows,” in Proceedings of the IEEE/CVF international conference on computer vision , 2021, pp. 10 012–10 022. [24] Y. Xu, C. Li, D. Li, X. Sheng, F. Jiang, L. Tian, and A. Sirasao, “Fdvit: Improve the hierarchical architecture of vision transformer,” in 
+
+Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023, pp. 5950–5960. [25] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , June 2016. [26] D. Shi, “Transnext: Robust foveal visual perception for vision trans-formers,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2024, pp. 17 773–17 783. [27] J. H. Tan, “Pre-training of lightweight vision transformers on small datasets with minimally scaled images,” arXiv preprint arXiv:2402.03752 , 2024. [28] T. Zhang, W. Xu, B. Luo, and G. Wang, “Depth-wise convolutions in vision transformers for efficient training on small datasets,” Neuro-computing , vol. 617, p. 128998, 2025. [29] C. Xu, C.-T. Li, C. P. Lim, and D. Creighton, “Hsvit: Horizontally scalable vision transformer,” arXiv preprint arXiv:2404.05196 , 2024. [30] X. Chen, Q. Hu, K. Li, C. Zhong, and G. Wang, “Accumulated trivial attention matters in vision transformers on small datasets,” in 
+
+Proceedings of the IEEE/CVF winter conference on applications of computer vision , 2023, pp. 3984–3992. [31] A. Hassani, S. Walton, N. Shah, A. Abuduweili, J. Li, and H. Shi, “Escaping the big data paradigm with compact transformers,” arXiv preprint arXiv:2104.05704 , 2021. [32] A. Verma, S. R. Dubey, and S. K. Singh, “Patch attention excitation based vision transformer for small-sized datasets,” in ICASSP 2025-2025 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) . IEEE, 2025, pp. 1–5. [33] K. Han, Y. Wang, H. Chen, X. Chen, J. Guo, Z. Liu, Y. Tang, A. Xiao, C. Xu, Y. Xu et al. , “A survey on vision transformer,” IEEE transactions on pattern analysis and machine intelligence , vol. 45, no. 1, pp. 87–110, 2022. [34] T. Nauen, S. Palacio, F. Raue, and A. Dengel, “Which transformer to favor: A comparative analysis of efficiency in vision transformers. arxiv 2023,” arXiv preprint arXiv:2308.09372 .[35] A. Krizhevsky, V. Nair, and G. Hinton, “Cifar-10 (canadian institute for advanced research),” URL http://www. cs. toronto. edu/kriz/cifar. html , vol. 5, no. 4, p. 1, 2010. [36] Y. Le and X. Yang, “Tiny imagenet visual recognition challenge,” CS 231N , vol. 7, no. 7, p. 3, 2015.
