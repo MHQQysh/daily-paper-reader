@@ -1,0 +1,495 @@
+Title: Amped: Adaptive Multi-stage Non-edge Pruning for Edge Detection
+
+URL Source: https://arxiv.org/pdf/2603.27661v1
+
+Published Time: Tue, 31 Mar 2026 01:10:13 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Amped: Adaptive Multi-stage Non-edge Pruning for Edge Detection 
+
+Yuhan Gao 1,2 , Xinqing Li 1 , Xin He 3 , Bing Li 4 , Xinzhong Zhu 5 ,Ming-Ming Cheng 1,2,6 , and Yun Liu 1,2,6⋆ 
+
+> 1
+
+VCIP, College of Computer Science, Nankai University  
+
+> 2
+
+Academy for Advanced Interdisciplinary Studies, Nankai University  
+
+> 3
+
+School of Computer Science and Engineering, Tianjin University of Technology  
+
+> 4
+
+School of Information and Communication Engineering, UESTC  
+
+> 5
+
+School of Computer Science and Technology, Zhejiang Normal University  
+
+> 6
+
+Nankai International Advanced Research Institute, Shenzhen Futian 
+
+Abstract. Edge detection is a fundamental image analysis task that underpins numerous high-level vision applications. Recent advances in Transformer architectures have significantly improved edge quality by capturing long-range dependencies, but this often comes with computa-tional overhead. Achieving higher pixel-level accuracy requires increased input resolution, further escalating computational cost and limiting prac-tical deployment. Building on the strong representational capacity of re-cent Transformer-based edge detectors, we propose an Adaptive Multi-stage non-edge Pruning framework for Edge Detection ( Amped ). Amped identifies high-confidence non-edge tokens and removes them as early as possible to substantially reduce computation, thus retaining high accu-racy while cutting GFLOPs and accelerating inference with minimal per-formance loss. Moreover, to mitigate the structural complexity of existing edge detection networks and facilitate their integration into real-world systems, we introduce a simple yet high-performance Transformer-based model, termed Streamline Edge Detector ( SED ). Applied to both ex-isting detectors and our SED, the proposed pruning strategy provides a favorable balance between accuracy and efficiency—reducing GFLOPs by up to 40% with only a 0.4% drop in ODS F-measure. In addition, despite its simplicity, SED achieves a state-of-the-art ODS F-measure of 86.5%. The code will be released. 
+
+Keywords: Edge Detection · Token Pruning · Adaptive Pruning · Multi-stage Non-edge Pruning · Streamline Edge Detector 
+
+## 1 Introduction 
+
+Edge detection is a foundational task in computer vision. By locating disconti-nuities in brightness, texture, or color, it delineates object boundaries and other salient structures [31, 57], providing cues for downstream tasks such as image  
+
+> ⋆
+
+Corresponding author: Yun Liu (liuyun@nankai.edu.cn) 
+
+> arXiv:2603.27661v1 [cs.CV] 29 Mar 2026
+
+2 Gao et al. Attention            
+
+> Block
+> Pruning?
+> Non -edge
+> Prediction
+> Edge
+> Map ≥α?
+> Set 1 Set 0
+> Attention
+> Block
+> Binary
+> Decision
+> Mask
+> Yes
+> Yes
+> No
+> No
+> Attention
+> Block
+> Pruning?
+> Non -edge
+> Prediction
+> Edge
+> Map ≥α?
+> Set 1 Set 0
+> Attention
+> Block
+> Binary
+> Decision
+> Mask
+> Yes
+> Yes
+> No
+> No
+> ×N
+> Attention
+> Block
+> Pruning?
+> Non -edge
+> Prediction
+> Edge
+> Map ≥α?
+> Set 1 Set 0
+> Attention
+> Block
+> Binary
+> Decision
+> Mask
+> Yes
+> Yes
+> No
+> No
+> ×N
+
+Fig. 1: Non-edge pruning flowchart. As the backbone network extracts features, our method adaptively generates a binary decision mask by thresholding the interme-diate edge score maps to determine which tokens should be pruned. 
+
+segmentation [6,29,63], object detection [15,51], generic object proposal genera-tion [50, 64, 67], and weakly supervised learning [23, 33, 54]. Thus, improving the performance of edge detection models remains critical to advancing the overall understanding and analytical power of visual systems. Since the introduction of the Vision Transformer (ViT) [13], transformer-based edge detection methods [36,41] have demonstrated clear advantages, owing to their strong capability for global context modeling and capturing long-range dependencies [49]. They yield significantly sharper and more consistent edge maps, especially in scenes with complex structures, diverse textures, or heavy occlusion. Recent methods achieve state-of-the-art results on BSDS500 [1] and NYUDv2 [46] datasets, outperforming conventional convolutional neural net-work (CNN)-based methods [21, 31, 57] by a large margin in both accuracy and robustness. While transformer-based edge detection methods have manifested significant advantages in edge accuracy, the substantial computational cost and high la-tency introduced when processing high-resolution images severely hinder their practical deployment on resource-constrained devices, such as mobile or em-bedded systems. Therefore, to enhance model efficiency while preserving high accuracy, it is crucial to lightweight these models, which is typically achieved through model compression techniques and token pruning is notably effective among them. However, most token pruning methods are designed for image classification [42, 60, 62], which is fundamentally different from edge detection. Image classification is an image-level prediction robust to the loss of individual tokens, whereas edge detection is a dense per-pixel task requiring rich spatial de-Amped 3
+
+tails. Existing indiscriminate token pruning can thus impair the model’s ability to capture fine edges. The core technical difficulty, therefore, lies in determining 
+
+how to accurately evaluate the importance of each token for pruning. 
+
+Furthermore, the inherent multi-scale feature utilization in edge detection adds another layer of complexity to pruning. An efficient model leverages fea-tures from different transformer layers, each with a distinct role: shallow layers capture fine-grained, low-level intensity changes, while deep layers integrate high-level semantics for object-boundary recognition. Both are crucial for generating complete and accurate edge maps. This characteristic demands a more nuanced pruning strategy, presenting a core challenge: how to design a pruning criterion that adapts to the distinct contributions of features at different hierarchies? 
+
+Finally, we observe that existing transformer-based edge detectors often rely on structurally complex decoders, e.g ., elaborately designed CNNs for feature fusion and upsampling. These intricate architectures not only introduce sub-stantial computational overhead but also pose two significant practical obstacles: the complex internal information flow impedes the effective application of impor-tance score-based adaptive pruning, and the overall design considerably increases the difficulty of integrating and deploying the model in real-world, complex sys-tems. This raises the final technical challenge: how to design a simple yet effective edge detector that facilitates efficient pruning? 
+
+To address the aforementioned technical challenges, we propose an Adaptive 
+
+Multi-stage non-edge Pruning framework for Edge Detection ( Amped ), as shown in Fig. 1. The key insight behind Amped is that the vast majority of image pixels correspond to non-edge regions, implying that high-confidence non-edge tokens can be safely pruned with minimal risk of error. Accordingly, we compute an edge score map to estimate token importance, and then apply thresholding to obtain a binary decision mask that preserves critical edge tokens while pruning redundant ones. This mask dynamically guides the attention computation in sub-sequent transformer layers, thereby enabling efficient, data-dependent pruning. To tackle the hierarchical nature of edge detectors, Amped exploits intrinsic edge score predictions from different layers as hierarchical supervision to progressively refine pruning decisions. Specifically, at each stage, a preliminary edge map is generated to produce a binary decision mask that identifies pruning candidates for the next stage, forming an adaptive multi-stage pruning process. Finally, to improve practical deployment feasibility, we design a Streamline Edge Detector (SED ) architecture that that achieves high accuracy with reduced computa-tional load, making it inherently compatible with model pruning. Our contributions can be summarized as follows: 
+
+– We introduce a novel non-edge pruning strategy that explicitly identifies and removes redundant non-edge tokens while preserving critical tokens for edge prediction, enabling fine-grained pruning tailored to edge detection. 
+
+– We develop an adaptive multi-stage non-edge pruning method to progres-sively refine pruning decisions across transformer layers, effectively aligning with the hierarchical nature of edge detection. 4 Gao et al. 
+
+– We propose a streamline yet effective transformer-based model, SED, which surpasses existing edge detectors by a significant margin and is compatible with model pruning, thereby benefiting practical deployment. 
+
+## 2 Related Work 
+
+2.1 Edge Detection 
+
+Edge detection aims to identify object boundaries and salient contours, with the key challenge being to balance localization accuracy, robustness to noise, and contour continuity. Early methods [5, 44, 47] primarily rely on hand-crafted differential operators, most notably the Canny detector [5]. With the advent of machine learning, statistical methods [1,11,12,19,38,43] such as gPb [1] improve accuracy by integrating multiple local features with classifier-based strategies. Deep learning has transformed this field [3, 4, 21, 37, 45, 53, 65]. Fully con-volutional networks, such as HED [57] and RCF [31], enable end-to-end edge learning and aggregate multi-scale features through hierarchical fusion. Building on this success, Transformer models have emerged as strong backbones. ViT [13] uses self-attention to model global context and mitigates CNNs’ limitations in capturing long-range dependencies. Consequently, numerous Transformer de-signs [26, 41, 61] combine CNN’s local feature extraction with Transformer’s global context modeling to improve edge detection accuracy. However, the self-attention mechanism incurs quadratic computational complexity with respect to the input length. To this end, this work exploits model pruning to improve the efficiency of Transformer-based edge detectors. 
+
+2.2 Model Compression 
+
+Model compression has evolved from static, coarse-grained strategies to dynamic, fine-grained approaches. Early works emphasize post-training methods such as weight pruning [20, 35], quantization [25], and low-rank decomposition [10, 27]. These techniques reduce model size but often deliver limited compression at fixed accuracy, offer restricted flexibility, and exhibit poor hardware affinity. As deep learning rises, structured pruning [22, 34, 56] make a shift toward systematic, hardware-aware compression and acceleration. With the widespread adoption of the Transformer [13,52], research has shifted to optimizing attention and developing dynamic compression for input-adaptive, fine-grained computation [14], such as token pruning [17] and early exiting [58]. Notably, token pruning removes redundant tokens in Transformer while retain-ing informative ones for subsequent computation, and has achieved considerable success in recent studies. Against this backdrop, recent work focuses on improv-ing efficiency without sacrificing accuracy to meet the low-latency, low-power, and high-throughput constraints of mobile edge devices and real-time vision ap-plications. Existing token pruning research, however, has largely concentrated on image classification, where substantial speedups and compression have been Amped 5Input                                 
+
+> Non -edge
+> Pruning
+> ViT Stage2
+> Non -edge
+> Pruning
+> ViT Stage3
+> Non -edge
+> Pruning
+> Non -edge Prediction Head
+> Non -edge Pruning
+> Edge Map
+> Mask
+> ViT Stage1
+> Patch
+> Embedding
+> ViT Stage4
+> Mask
+> Features
+> Z(1) (1)
+> Z(1)
+> M(2) (2)
+> M(2)
+> ~
+> Z(2) (2)
+> Z(2) ~
+> Z(2)
+> Z(1)
+> M(2)
+> ~
+> Z(2)
+> Z(2) (2)
+> Z(2)
+> M(3) (3)
+> M(3)
+> ~
+> Z(3) (3)
+> Z(3) ~
+> Z(3)
+> Z(2)
+> M(3)
+> ~
+> Z(3)
+> Z(3) (3)
+> Z(3)
+> M(4) (4)
+> M(4)
+> ~
+> Z(4) (4)
+> Z(4) ~
+> Z(4)
+> Z(3)
+> M(4)
+> ~
+> Z(4)
+> Z(1) (1)
+> Z(1)
+> M(1) (1)
+> M(1)
+> Z(1)
+> M(1)
+> Z(1)
+> M(2)
+> ~
+> Z(2)
+> Z(2)
+> M(3)
+> ~
+> Z(3)
+> Z(3)
+> M(4)
+> ~
+> Z(4)
+> Z(1)
+> M(1)
+> Element -wise Index
+> Decoder
+> ⊙⊙
+> ⊙⊙
+> ⊙⊙
+> ⊙
+> Transformer Block
+> Patch Embedding
+
+Fig. 2: Overview of the proposed Amped framework . Amped trims high-confidence non-edge tokens by computing the edge score map and comparing it against a stage-specific threshold. The proposed SED utilizes a simple linear decoder, a design that effectively reduces model complexity while maintaining high precision. Z(l) and 
+
+M(l) denote the feature map and binary decision mask of pruning stage l, and ˜Z(l)
+
+represents the recovered feature map of stage l.
+
+reported [42, 60, 62]. In this work, we aim to bridge this gap by introducing to-ken pruning specifically tailored for edge detection models, improving efficiency while preserving accuracy. 
+
+## 3 Method 
+
+Fig. 2 illustrates our Amped framework. In Sec. 3.1, we detail our non-edge pruning method, which generates edge score maps at intermediate layers to guide the pruning of high-confidence non-edge tokens. Sec. 3.2 presents our adaptive multi-stage pruning strategy, which dynamically adjusts pruning intensity across different stages according to the distinct information focus of shallow versus deep features. Finally, Sec. 3.3 introduces our structurally simple SED model, which attains high-precision edge detection. 
+
+3.1 Non-edge Pruning 
+
+Edge detection can be regarded as a specialized form of pixel-wise dense clas-sification. The output is divided into edge pixels rich in structural information and non-edge pixels lacking critical contour details. However, unlike ViT-based image classification [13, 32], which is empirically robust to aggressive pruning of low-importance tokens [30, 42], edge detection is highly sensitive to spatial details. Thus, incorrect pruning of tokens directly leads to severe issues such as fragmented contours and blurry boundaries, significantly degrading output quality. Striking the crucial balance between preserving critical edges and reduc-ing computational load, our pruning method specifically targets the numerically 6 Gao et al. 
+
+dominant yet unevenly distributed non-edge tokens, achieving significant com-putational efficiency gains while maintaining fine-grained detail preservation. To separate non-edge tokens from edge tokens, we employ a lightweight non-edge prediction head at each pruning stage. For a given pruning stage l with input X(l) ∈ RNl×C , which has Nl tokens and each token has C channels, the head is a linear layer with weight W(l)pred followed by a sigmoid function σ(·),which produces a token-wise edge score vector: 
+
+P(l) = σ
+
+
+
+X(l)W(l)pred 
+
+
+
+, (1) where P(l) stores the edge score of each token p(l) 
+
+> i
+
+.By thresholding the token-wise scores P(l) with a stage-specific threshold αl
+
+as constrained in Eq. (8), we obtain a binary decision mask M(l) ∈ RNl×1:
+
+M(l) 
+
+> i
+
+=
+
+(
+
+1, if p(l) 
+
+> i
+
+≥ αl,
+
+0, otherwise , M(l) 
+
+> i
+
+∈ { 0, 1}, (2) where M(l) 
+
+> i
+
+= 1 indicates a retained token and M(l) 
+
+> i
+
+= 0 indicates a pruned token. For high-precision dense prediction tasks, during subsequent attention computation in Transformer, pseudo-inhibition can cause numerical precision to leave small residuals that perturb the self-attention calculation. To avoid this effect, in models like ViT [13], we use hard pruning strategy and explicitly remove pruned tokens from the attention computation. Let I(l) 
+
+> M
+
+= {i ∈ [1 , N l] | M(l) 
+
+> i
+
+= 1 }
+
+denote the index set of tokens selected by the binary mask M(l), N ′ 
+
+> l
+
+= |I(l)| be the length of remaining tokens and πM : RNl×C → RN ′  
+
+> l×C
+
+perform as a projection operator defined by the mask M(l).
+
+˜X(l) = πM (X(l)) = 
+
+n
+
+x(l) 
+
+> i
+
+| i ∈ I(l)
+
+> M
+
+o
+
+(3) We then proceeds to the multi-head self-attention computation, with ˜Q(l), ˜K(l)
+
+and ˜V(l) standing for matrices computed from trimmed ˜X(l), and Z(l) denoting the output feature map of pruning stage l:
+
+A(l) = ˜Q(l) ˜K(l) ⊤
+
+√C ∈ RN ′   
+
+> l×N′
+> l
+
+, (4) 
+
+Z(l) 
+
+> i
+
+= 
+
+> N′
+> l
+
+X
+
+> j=1
+
+exp( A(l) 
+
+> i,j
+
+)
+
+PN ′ 
+
+> l
+> k=1
+
+exp( A(l)
+
+> i,k
+
+)˜V(l) 
+
+> j
+
+. (5) 
+
+Z(l) is fed into following layers for calculation until the next pruning operation. Upon completing the backbone processing, we proceed to the decoder, which operates on a full-length token sequence to predict the edge probability map. To this end, the sequence Z(l) must be restored to its original length. We achieve this by accumulating the pruning masks across network depth. Specifically, let Amped 7
+
+˜M(l) ∈ RN ×1 denote the pruning mask with respect to the original full-length tokens at the l-th pruning stage, in which N is the number of tokens before pruning. The mask is updated using M(l) as follows: 
+
+˜M(l) = ˜M(l−1) , ˜M(l) 
+
+> ik
+
+= M(l) 
+
+> k
+
+, w.r.t. i k ∈ { i| ˜M(l) 
+
+> i
+
+= 1 }, (6) where ˜M(0) = 1N is defined as an all-ones vector. Then, we scatter the retained tokens back to their original positions according to ˜M(l). Let ˜Z(l) represent the recovered full-length token sequence for stage l. Starting from stage l, we set 
+
+˜Z(l) = Z(l) and the reconstruction is performed as: 
+
+˜F(l) = X(t), ˜F(l) 
+
+> ik
+
+= ˜Z(l) 
+
+> k
+
+, w.r.t. i k ∈ { i| ˜M(t) 
+
+> i
+
+= 1 }, ˜Z(l) = ˜F(l), (7) which is iterated for t = l, l − 1, · · · , 2, 1 to get final ˜Z(l) ∈ RN ×C . Repeating this procedure for all stages l yields full-length token sequences for the decoder. 
+
+3.2 Adaptive Multi-Stage Non-edge Pruning 
+
+Transformer-based edge detection models rely on multi-scale features with dis-tinct characteristics [31,41]: shallow features capture precise localization despite semantic ambiguity, whereas deep features provide clear semantics at the cost of coarse localization. This inherent property necessitates effective cross-level integration, so we introduce an adaptive multi-stage pruning strategy that dy-namically evaluates token importance at different transformer stages according to their intrinsic characteristics, particularly their predicted edge maps. Specifically, in the shallow layers of the network, spatial details in the fea-ture maps are crucial for precise edge localization, even though the predicted edge maps at this stage are often noisy and of low confidence. Using a high threshold here would prematurely discard valuable localization cues. We there-fore adopt a lower threshold in shallow layers, implementing a more conservative pruning strategy to preserve spatial details. In contrast, deep layers encode fea-tures rich in high-level semantic information, whose primary role is semantic contour recognition rather than pixel-level localization, and their edge predic-tions are typically clearer and of higher confidence. Consequently, we set a higher threshold in deep layers, enabling more extensive yet reliable pruning of tokens confidently predicted as non-edge, thereby improving computational efficiency. Therefore, for a network with L pruning stages, stage-specific thresholds 
+
+{αl}Ll=1 is aimed to approximate a non-decreasing sequence along the depth as closely as possible, which is mathematically expressed as: 
+
+α1 ≤ α2 ≤ · · · ≤ αL, α l ∈ [0 , 1] . (8) This approach conservatively preserves spatial details in shallow layers while ag-gressively eliminating semantic redundancy in deep layers, ultimately achieving an optimal balance between accuracy and computational efficiency. 8 Gao et al. 
+
+3.3 Streamline Edge Detector 
+
+Current edge detection models predominantly employ a Transformer encoder coupled with a heavy, computationally intensive decoder, which hinders effective compression and deployment and complicates integration into broader vision sys-tems due to its rigid design. To address these limitations, we design a Streamline Edge Detection (SED) model that achieves superior accuracy while substantially reducing architectural complexity. This SED architecture yields a dual advan-tage of deployment efficiency and modular flexibility, supporting straightforward integration into general-purpose vision pipelines and thus fostering the practical adoption of edge detection in real-world scenarios. We adapt the SAM-ViT [28] backbone for SED to build SED-SViT , leverag-ing its strong low-level feature representations while circumventing its semantic bottlenecks. Unlike conventional edge detectors trained on closed datasets with limited scene diversity, SAM is pre-trained at scale via a supervised-to-automatic mask annotation pipeline without predefined categories, yielding robust open-world boundary representations [2]. However, SAM is designed for prompt mask prediction rather than rich semantic reasoning, which induces a strong represen-tational bias toward generic contours and region boundaries and makes it difficult to repurpose the model for heterogeneous downstream tasks. In practice, existing follow-up works usually use SAM as a frozen or lightly adapted feature extrac-tor or mask generator [24, 55], and the few fine-tuning efforts largely remain within generic segmentation variants [18, 40] rather than extending to substan-tially different downstream tasks. Motivated by this, we deliberately discard the complex prompt-conditioned mask decoder and retain only the SAM-ViT image encoder as our backbone, turning SAM into a boundary-sensitive yet streamline architecture, SED-SViT, which is amenable to our pruning framework. In our experiments, we additionally construct SED-ViT by replacing SAM-ViT [28] in SED-SViT with vanilla ViT [13] for comparison with SED-SViT. During decoding, we deliberately avoid heavy decoders and adopt a lightweight multi-scale fusion head that operates directly on the recovered full-length token sequences. Let  ˜Z(l) represent the recovered full-length token sequence at stage  l.Each stage is first passed through a stage-specific linear projection: 
+
+ˆZ(l) = f (l)dec 
+
+˜Z(l)
+
+, l = 0 , . . . , L,  (9) where  f (l)dec (·) is a learnable linear layer used to align channel information across different stages. We then fuse multi-scale information by concatenating the pro-jected features from all stages along the channel dimension: 
+
+Zfuse =
+
+h ˆZ(1) ; ˆZ(2) ; . . . ; ˆZ(L)i
+
+. (10) Finally, we apply a final projection followed by normalization and point-wise activation to obtain the final output tokens used for edge map prediction: 
+
+Zout = ϕ
+
+
+
+Norm  Zfuse Wproj + bproj 
+
+
+
+, (11) Amped 9
+
+where  Wproj  and  bproj  are learnable projection parameters and  ϕ(·) implies a point-wise activation. 
+
+## 4 Experiments 
+
+4.1 Experimental Setup Datasets. We evaluate the proposed method on two well-known edge detection benchmarks: BSDS500 [1] and NYUDv2 [46]. BSDS500 [1] contains 500 natural images split into 200 for training, 200 for validation, and 100 for testing. Each image is annotated by multiple annotators, yielding rich and highly consistent boundary ground truth. Following common practice [21, 31, 41, 61], we pretrain the model on the PASCAL VOC Context dataset [39], which provides 10,103 images with pixel-level annotations covering complete scenes and high-quality semantic boundaries. The dataset’s diverse scenes make it a strong pretraining source for edge detection. NYUDv2 [46] is an indoor RGB-D dataset contain-ing 1,449 images, i.e ., 795 for training and 654 for testing. It provides dense pixel-level annotations across diverse indoor scenes. In addition to RGB images, it offers silhouettes derived from depth and surface normals, supplying comple-mentary geometric and appearance cues. 
+
+Implementation Details. To comprehensively evaluate our pruning method, we conduct extensive experiments on the state-of-the-art method EDTER [41] and our SED architectures. We use SED-SViT-B/L and SED-ViT-B/L to denote SED-SViT and SED-ViT with base/large SAM-ViT and ViT backbones, respectively. SED-SViT-BP/LP and SED-ViT-BP/LP indicates their cor-responding pruned versions. All experiments are implemented in PyTorch based on the MMSegmentation framework [7]. SED-SViT and SED-ViT are initialized from the pretrained weights of SAM-ViT [28] and ViT [13], respectively. For SED-SViT and SED-ViT, the input is resized to 1024 × 1024 with a large patch size of 16. The batch size is 8 on BSDS500 and 4 on NYUDv2, and all models are trained for 40k iterations on both datasets. All experiments are executed on a computing cluster equipped with two NVIDIA GeForce RTX 4090 GPUs. 
+
+Evaluation Metrics. For evaluation, we adopt three standard metrics [1]: ODS (Optimal Dataset Scale) F-measure, OIS (Optimal Image Scale) F-measure, and Average Precision (AP). ODS is computed using a single global threshold selected to maximize the F-measure over the entire test set, whereas OIS selects an optimal threshold for each individual image. Before scoring, all predicted edge maps are processed with non-maximum suppression [12]. Following common practice [21,31,41,61], the localization tolerance is set to 0.0075 for the BSDS500 datset [1] and 0.011 for the NYUDv2 dataset [46]. 10 Gao et al. 
+
+Table 1: Ablation study of non-edge pruning scores for SED-SViT and SED-ViT on BSDS500 [1]. All results are obtained using models with Base-scale backbones. Pruning Scores SED-SViT GFLOPs SED-ViT GFLOPs ODS OIS ODS OIS origin 0.849 0.868 484.5 0.826 0.847 663.7 [0.25, 0.35, 0.45] 0.843(-0.6) 0.864(-0.4) 355.4( ↓26.65%) 0.820(-0.6) 0.838(-0.9) 407.3( ↓38.63%) [0.3, 0.4, 0.5] 0.843(-0.6) 0.863(-0.5) 348.5( ↓28.07%) 0.818(-0.8) 0.837(-1.0) 406.2( ↓38.80%) [0.35, 0.45, 0.55] 0.840(-0.9) 0.860(-0.8) 339.6( ↓29.91%) 0.816(-1.0) 0.837(-1.0) 390.2( ↓41.21%) [0.4, 0.5, 0.6] 0.824(-2.5) 0.846(-2.2) 216.6( ↓55.29%) 0.812(-1.4) 0.831(-1.6) 332.3( ↓49.93%) 
+
+4.2 Ablation Study Effect of Non-edge Pruning Score. We first conduct experiments to de-termine the optimal pruning score threshold for each model based on its per-formance. The corresponding quantitative results are presented in Tab. 1. We aim to achieve favorable trade-off between accuracy and efficiency. Experimen-tal results indicate that the SED-SViT model demonstrates an excellent balance when using pruning scores of [0 .3, 0.4, 0.5] , while GFLOPs are substantially re-duced by 28.07%, ODS F-measure and OIS F-measure decrease by only 0.6% and 0.5%, respectively. For the SED-ViT architecture, a well-proportioned result is obtained with pruning scores of [0 .3, 0.4, 0.5] , achieving a 38.80% reduction on GFLOPs with only a 0.8% and 1.0% degradation in ODS and OIS, respectively. The data in the table further reveals a consistent pattern: within the bounds of reasonable threshold settings, as pruning score increases, more non-edge tokens are removed, leading to a more significant reduction in GFLOPs. Meanwhile, this aggressive pruning also results in a corresponding decline in accuracy. 
+
+Effect of Multi-stage Pruning. We evaluate the proposed adaptive multi-stage non-edge pruning on SED-SViT and SED-ViT, and the results are pre-sented in Tab. 2. Pruning exclusively at the 3rd layer for the ViT-Base model [13], reduces computation by only about 15%. However, accuracy metrics incur appre-ciable drops for SED-SViT and SED-ViT, with ODS F-measure decreases 0.5% and 0.2% separately, and OIS F-measure decreases 0.4% and 0.8%, respectively. Pruning at three levels shows the best overall trade-off with 28.07% and 38.80% GFLOPs decline, and 0.6% and 0.8% ODS F-measure decline, for SED-SViT and SED-ViT, respectively. These results suggest that shallow features are cru-cial for edge localization and should be pruned conservatively, whereas deeper layers contain redundant non-edge tokens that can be removed more aggressively, which confirms the effectiveness of our adaptive multi-stage pruning. 
+
+Effect of Backbone Scale. To assess the generalization ability of our pro-posed non-edge pruning method across backbone scales, we conduct systematic experiments on backbones of varying sizes. The experimental results are pre-sented in Tab. 3. Compared to the base model, the large model achieves higher Amped 11 
+
+Table 2: Ablation study of multi-stage pruning for SED-SViT and SED-ViT on BSDS500 [1]. All results are obtained using models with Base-scale backbones and pruning scores of [0.3, 0.4, 0.5]. Pruning Layers SED-SViT GFLOPs SED-ViT GFLOPs ODS OIS ODS OIS origin 0.849 0.868 484.5 0.826 0.847 663.7 3 0.844(-0.5) 0.864(-0.4) 411.7( ↓15.03%) 0.820(-0.6) 0.839(-0.8) 566.2( ↓14.69%) 3, 6 0.841(-0.8) 0.861(-0.7) 356.0( ↓26.52%) 0.816(-1.0) 0.836(-1.1) 446.9( ↓32.67%) 3, 6, 9 0.843(-0.6) 0.863(-0.5) 348.5( ↓28.07%) 0.818(-0.8) 0.837(-1.0) 406.2( ↓38.80%) (a) Input  (b) Ground truth  (c) RCF  (d) EDTER  (f) SED-SViT-L (e) SED-SViT-LP 
+
+Fig. 3: Qualitative comparisons between our method and baselines on three challenging samples from the BSDS500 test set [1]. 
+
+accuracy. After pruning, the ODS F-measure improves by 2.0% and 1.5% for SED-SViT and SED-ViT, respectively. Meanwhile, the computational cost re-duction reflected in GFLOPs changes from 27.97% to 21.94% for SED-SViT, and from 38.79% to 36.41% for SED-ViT. Our analysis of the results proves the effectiveness and reliability of both our pruning method and the SED model when applied to backbone models of different sizes. The trend in the results re-veals a positive correlation between the capacity of the backbone network and its parameter count, with larger models yielding sharper and more coherent edge features. This improvement in accuracy comes at the cost of pruning fewer non-edge tokens, resulting in a more limited reduction in GFLOPs. 
+
+4.3 Comparison with State-of-the-arts BSDS500. We apply the proposed non-edge pruning to both the existing Transformer-based edge detection model EDTER [41] and our SED model. Quantitative results are presented in Tab. 3. On the BSDS500 dataset [1], prun-ing the EDTER model leads to a decrease of 0.4% in ODS F-measure, 0.6% in OIS F-measure, and 0.5% in AP, while the GFLOPs of the encoder-decoder network is reduced by 42.17%. On our SED-ViT method, for the base model, all accuracy metrics drop by less than 1% with a 38.79% reduction in GFLOPs, and 12 Gao et al. 
+
+Table 3: Results of Amped applied to the prior method EDTER [41] and our models SED-SViT and SED-ViT on BSDS500 [1] and NYUDv2 [46]. Methods Origin GFLOPs Pruned GFLOPs ODS OIS AP ODS OIS AP BSDS500  EDTER 0.829 0.845 0.883 356.4* 0.825(-0.4) 0.839(-0.6) 0.878(-0.5) 206.8*( ↓41.98%) SED-ViT-B 0.826 0.847 0.884 663.7 0.818(-0.8) 0.837(-1.0) 0.877(-0.7) 406.2( ↓38.79%) SED-ViT-L 0.835 0.854 0.890 2069.6 0.833(-0.2) 0.850(-0.4) 0.888(-0.2) 1316.1( ↓36.41%) SED-SViT-B 0.849 0.868 0.902 484.5 0.843(-0.6) 0.863(-0.5) 0.897(-0.5) 348.5( ↓28.07%) SED-SViT-L 0.865 0.882 0.911 1489.2 0.863(-0.2) 0.881(-0.1) 0.912(+0.1) 1169.1( ↓21.49%) NYUDv2  EDTER 0.758 0.771 0.747 542.5* 0.752(-0.6) 0.766(-0.5) 0.748(+0.1) 358.4*( ↓33.94%) SED-ViT-B 0.753 0.769 0.788 663.7 0.744(-0.9) 0.762(-0.7) 0.776(-1.2) 416.1( ↓37.31%) SED-ViT-L 0.764 0.781 0.799 2069.6 0.762(-0.2) 0.780(-0.1) 0.790(-0.9) 1342.8( ↓35.12%) SED-SViT-B 0.779 0.797 0.806 484.5 0.772(-0.7) 0.789(-0.8) 0.802(-0.4) 338.0( ↓30.23%) SED-SViT-L 0.799 0.818 0.836 1489.2 0.791(-0.8) 0.811(-0.7) 0.819(-1.7) 1100.1( ↓26.13%) * For EDTER [41], the reported GFLOPs exclude its prediction heads due to their substantial computational cost, i.e ., 3503.3 GFLOPs in stage I and 4922.9 GFLOPs in stage II, primarily caused by deconvolution layers with extremely large kernels. 
+
+for the large model, all metrics drop by less than 0.4% with a 36.41% reduction in GFLOPs. For SED-SViT, pruning results in accuracy drops of less than 0.6% for the base model with a 27.97% GFLOPs reduction, and less than 0.2% for the large model while still achieving a 21.49% GFLOPs reduction. In Tab. 4, we compare our proposed SED model with previous methods, in-cluding DeepEdge [3], DeepContour [45], HFL [4], HED [57], COB [37], RCF [31], CED [53], BDCN [21], DSCD [8], PiDiNet [48], UAED [66], PEdger-L [16], EDTER [41], and DiffEdge [61]. Our approach surpasses the state-of-the-art results with 86.3% ODS F-measure, 88.1% OIS F-measure, and 91.2% AP under single-scale testing. The precision-recall curves of our methods and baselines are plotted in Fig. 4. In addition, Fig. 3 shows the qualitative results before and af-ter pruning, comparing to previous models and demonstrating that our method detects clearer, more continuous, and more accurate edges. In Fig. 5, we visualize the progressive non-edge pruning process. As can be observed, our method can prune most non-edge regions without intermediate edge signal supervision. 
+
+NYUDv2. We evaluate the proposed method on RGB images from the NYUDv2 dataset [46], conducting performance analysis and pruning validation. Quanti-tative results are summarized in Tab. 3. After applying non-edge pruning to the EDTER model [41], the ODS F-measure reduces 0.6% and the OIS F-measure declines 0.5%. Notably, AP improves by 0.1%, accompanied by a 33.94% re-duction in encoder-decoder GFLOPs. By pruning unimportant non-edge tokens, we analyze that the model can concentrate on edge tokens rich in information, thereby enhancing the output quality. In our SED method, SED-ViT demon-strates a favorable accuracy-efficiency trade-off after pruning: for the base model, ODS/OIS decline by no more than 0.9% with a 37.31% GFLOPs reduction; for the large model, ODS/OIS drops are constrained within 0.2% while achieving a Amped 13 
+
+Table 4: Quantitative comparison on the BSDS500 test set [1]. All results are evaluated with single scale input. Encoder Types Methods Pub.’Year ODS OIS AP Traditional Canny [5] TPAMI’86 0.600 0.640 0.580 gPb-UCM [1] TPAMI’10 0.726 0.757 0.696 SE [12] TPAMI’14 0.746 0.767 0.803 OEF [19] CVPR’15 0.746 0.770 0.820 CNN DeepEdge [3] CVPR’15 0.753 0.772 0.807 DeepContour [45] CVPR’15 0.757 0.776 0.800 HFL [4] ICCV’15 0.767 0.788 0.795 HED [57] ICCV’15 0.788 0.808 0.840 COB [37] TPAMI’17 0.793 0.820 0.859 RCF [31] CVPR’17 0.811 0.830 -CED [53] CVPR’17 0.815 0.833 0.889 BDCN [21] CVPR’19 0.828 0.844 0.890 DSCD [8] ACMMM’20 0.822 0.859 –PiDiNet [48] ICCV’21 0.807 0.823 -UAED [66] CVPR’23 0.838 0.855 0.902                     
+
+> PEdger-L [16] ACMMM’23 0.823 0.841 -Transformer EDTER [41] CVPR’22 0.829 0.845 0.883 DiffEdge [61] AAAI’24 0.834 0.848 -SED-SViT-BP -0.843 0.863 0.897 SED-SViT-LP -0.863 0.881 0.912
+
+35.12% decrease in GFLOPs. For SED-SViT, the base model exhibits less than 0.8% accuracy degradation with a 30.23% GFLOPs cut, and the large model limits accuracy loss to within 0.8% on ODS/OIS while still reducing GFLOPs by 26.13%. Moreover, we compare the proposed SED with existing advanced ap-proaches, including HED [57], RCF [31], AMH-Net [59], LPCB [9], BDCN [21], PiDiNet [48], PEdger-L [16], EDTER [41], and DiffEdge [61], in Tab. 5. Under single-scale testing, our method achieves leading performance with 79.1% ODS F-measure and 81.1% OIS F-measure. 
+
+## 5 Conclusion 
+
+In this paper, we introduce an adaptive multi-stage non-edge pruning method based on the characteristics of edge detection. This approach generates interme-diate edge score maps at different Transformer layers and employs thresholds to effectively identify and remove high-confidence non-edge tokens. Furthermore, we redesign the conventionally complex decoder structure into a streamline edge detection architecture that is inherently pruning-friendly and deployment-ready. Experimental results demonstrate that our non-edge pruning strategy signifi-cantly reduces computational costs while maintaining accuracy, and the new architecture extracts clearer and more comprehensive edge features, validating 14 Gao et al. 
+
+Fig. 4: Precision-recall curves on the BSDS500 test set [1]. (a) Image  (b) Stage 2  (c) Stage 3  (d) GT  (e) Prediction (a) Image (b) Stage 2 (c) Stage 3 (d) GT (e) Prediction 
+
+Fig. 5: Visualization of progressive non-edge pruning for SED-SViT (top) and SED-ViT (bottom). Most pruned tokens lie in smooth background regions, while tokens near object boundaries are largely preserved, especially for SED-SViT. 
+
+the effectiveness and superiority of the proposed framework. Thus, this work demonstrates the potential of non-edge pruning for edge detection. More ad-vanced pruning techniques are expected in the future to further enhance the pruning performance for existing strong edge detection models. Amped 15 
+
+Table 5: Quantitative comparison on the NYUDv2 test set [46]. All results are eval-uated with single scale input. Encoder Types Methods Pub.’Year ODS OIS AP Traditional gPb-UCM [1] TPAMI’10 0.632 0.661 0.562 SE [12] TPAMI’14 0.695 0.708 0.679 OEF [19] CVPR’15 0.751 0.767 –CNN HED [57] ICCV’15 0.720 0.734 0.734 RCF [31] CVPR’17 0.729 0.742 -AMH-Net [59] NeurIPS’17 0.744 0.758 0.765 LPCB [9] ECCV’18 0.739 0.754 -BDCN [21] CVPR’19 0.748 0.763 0.770 
+
+PiDiNet [48] ICCV’21 0.733 0.747 -PEdger-L [16] ACMMM’23 0.742 0.757 -Transformer EDTER [41] CVPR’22 0.758 0.771 0.747 DiffEdge [61] AAAI’24 0.761 0.766 -SED-SViT-BP - 0.772 0.789 0.802 SED-SViT-LP - 0.791 0.811 0.819 
+
+## Acknowledgements 
+
+This work is supported in part by the Fundamental Research Funds for the Cen-tral Universities (Nankai University, No. 070-63253235) and in part by NSFC (No. 62576176). The computational resources are supported by the Supercom-puting Center of Nankai University (NKSC). 
+
+## References 
+
+1. Arbelaez, P., Maire, M., Fowlkes, C., Malik, J.: Contour detection and hierarchical image segmentation. IEEE TPAMI 33 (5), 898–916 (2010) 2, 4, 9, 10, 11, 12, 13, 14, 15 2. Ariff, S.H.S., Liu, Y., Sun, G., Yang, J., Ding, H., Geng, X., Jiang, X.: Evaluating sam2 for video semantic segmentation. Machine Intelligence Research (2026) 8 3. Bertasius, G., Shi, J., Torresani, L.: DeepEdge: A multi-scale bifurcated deep net-work for top-down contour detection. In: CVPR. pp. 4380–4389 (2015) 4, 12, 13 4. Bertasius, G., Shi, J., Torresani, L.: High-for-low and low-for-high: Efficient bound-ary detection from deep object features and its applications to high-level vision. In: ICCV. pp. 504–512 (2015) 4, 12, 13 5. Canny, J.: A computational approach to edge detection. IEEE TPAMI 8(6), 679– 698 (1986) 4, 13 6. Cheng, M.M., Liu, Y., Hou, Q., Bian, J., Torr, P., Hu, S.M., Tu, Z.: HFS: Hier-archical feature selection for efficient image segmentation. In: ECCV. pp. 867–882 (2016) 2 7. Contributors, M.: MMSegmentation: Openmmlab semantic segmentation toolbox and benchmark. https://github.com/open-mmlab/mmsegmentation (2020) 9 16 Gao et al. 8. Deng, R., Liu, S.: Deep structural contour detection. In: ACM MM. pp. 304–312 (2020) 12, 13 9. Deng, R., Shen, C., Liu, S., Wang, H., Liu, X.: Learning to predict crisp boundaries. In: ECCV. pp. 562–578 (2018) 13, 15 10. Denton, E.L., Zaremba, W., Bruna, J., LeCun, Y., Fergus, R.: Exploiting linear structure within convolutional networks for efficient evaluation. In: NeurIPS. pp. 1269–1277 (2014) 4 11. Dollar, P., Tu, Z., Belongie, S.: Supervised learning of edges and object boundaries. In: CVPR. pp. 1964–1971 (2006) 4 12. Dollár, P., Zitnick, C.L.: Fast edge detection using structured forests. IEEE TPAMI 
+
+37 (8), 1558–1570 (2014) 4, 9, 13, 15 13. Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., Uszkoreit, J., Houlsby, N.: An image is worth 16x16 words: Transformers for image recognition at scale. In: ICLR. pp. 1–12 (2021) 2, 4, 5, 6, 8, 9, 10 14. Fan, A., Grave, E., Joulin, A.: Reducing transformer depth on demand with struc-tured dropout. In: ICLR. pp. 1–12 (2020) 4 15. Ferrari, V., Fevrier, L., Jurie, F., Schmid, C.: Groups of adjacent contour segments for object detection. IEEE TPAMI 30 (1), 36–51 (2008) 2 16. Fu, Y., Guo, X.: Practical edge detection via robust collaborative learning. In: ACM MM. pp. 2526–2534 (2023) 12, 13, 15 17. Goyal, S., Choudhury, A.R., Raje, S., Chakaravarthy, V., Sabharwal, Y., Verma, A.: Power-bert: Accelerating bert inference via progressive word-vector elimination. In: ICML. pp. 3690–3699 (2020) 4 18. Gu, H., Dong, H., Yang, J., Mazurowski, M.A., et al.: How to build the best medical image segmentation algorithm using foundation models: a comprehensive empirical study with Segment Anything Model. Machine Learning for Biomedical Imaging 
+
+3(May 2025 issue), 88–120 (2025) 8 19. Hallman, S., Fowlkes, C.C.: Oriented edge forests for boundary detection. In: CVPR. pp. 1732–1740 (2015) 4, 13, 15 20. Han, S., Pool, J., Tran, J., Dally, W.: Learning both weights and connections for efficient neural network. In: NeurIPS. pp. 1135–1143 (2015) 4 21. He, J., Zhang, S., Yang, M., Shan, Y., Huang, T.: Bi-directional cascade network for perceptual edge detection. In: CVPR. pp. 3828–3837 (2019) 2, 4, 9, 12, 13, 15 22. He, Y., Zhang, X., Sun, J.: Channel pruning for accelerating very deep neural networks. In: ICCV. pp. 1389–1397 (2017) 4 23. Hou, Q., Massiceti, D., Dokania, P.K., Wei, Y., Cheng, M.M., Torr, P.H.: Bottom-Up Top-Down cues for weakly-supervised semantic segmentation. In: EMMCVPR. pp. 263–277 (2017) 2 24. Huang, D., Xiong, X., Ma, J., Li, J., Jie, Z., Ma, L., Li, G.: AlignSAM: Aligning segment anything model to open context via reinforcement learning. In: CVPR. pp. 3205–3215 (2024) 8 25. Jacob, B., Kligys, S., Chen, B., Zhu, M., Tang, M., Howard, A., Adam, H., Kalenichenko, D.: Quantization and training of neural networks for efficient integer-arithmetic-only inference. In: CVPR. pp. 2704–2713 (2018) 4 26. Jie, J., Guo, Y., Wu, G., Wu, J., Hua, B.: EdgeNAT: Transformer for efficient edge detection. arXiv preprint arXiv:2408.10527 (2024) 4 27. Kim, Y.D., Park, E., Yoo, S., Choi, T., Yang, L., Shin, D.: Compression of deep convolutional neural networks for fast and low power mobile applications. In: ICLR (2016) 4 Amped 17 28. Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., Xiao, T., Whitehead, S., Berg, A.C., Lo, W.Y., et al.: Segment Anything. In: ICCV. pp. 4015–4026 (2023) 8, 9 29. Li, X., Li, X., Zhang, L., Cheng, G., Shi, J., Lin, Z., Tan, S., Tong, Y.: Improving semantic segmentation via decoupled body and edge supervision. In: ECCV. pp. 435–452 (2020) 2 30. Liang, Y., Ge, C., Tong, Z., Song, Y., Wang, J., Xie, P.: Not All Patches are What You Need: Expediting vision transformers via token reorganizations. In: ICLR. p. 13 (2022) 5 31. Liu, Y., Cheng, M.M., Hu, X., Bian, J.W., Zhang, L., Bai, X., Tang, J.: Richer convolutional features for edge detection. IEEE TPAMI 41 (8), 1939–1946 (2019) 1, 2, 4, 7, 9, 12, 13, 15 32. Liu, Y., Wu, Y.H., Sun, G., Zhang, L., Chhatkuli, A., Van Gool, L.: Vision trans-formers with hierarchical attention. Machine Intelligence Research 21 (4), 670–683 (2024) 5 33. Liu, Y., Wu, Y.H., Wen, P., Shi, Y., Qiu, Y., Cheng, M.M.: Leveraging instance-, image-and dataset-level information for weakly supervised instance segmentation. IEEE TPAMI 44 (3), 1415–1428 (2020) 2 34. Liu, Z., Li, J., Shen, Z., Huang, G., Yan, S., Zhang, C.: Learning efficient con-volutional networks through network slimming. In: ICCV. pp. 2736–2744 (2017) 435. Luo, J.H., Wu, J., Lin, W.: ThiNet: A filter level pruning method for deep neural network compression. In: ICCV. pp. 5058–5066 (2017) 4 36. Ma, J., Duan, J., Tang, X., Zhang, X., Jiao, L.: Eatder: Edge-assisted adaptive transformer detector for remote sensing change detection. IEEE TPAMI 62 , 1–15 (2023) 2 37. Maninis, K.K., Pont-Tuset, J., Arbeláez, P., Van Gool, L.: Convolutional oriented boundaries: From image segmentation to high-level tasks. IEEE TPAMI 40 (4), 819–833 (2017) 4, 12, 13 38. Martin, D.R., Fowlkes, C.C., Malik, J.: Learning to detect natural image bound-aries using local brightness, color, and texture cues. IEEE TPAMI 26 (5), 530–549 (2004) 4 39. Mottaghi, R., Chen, X., Liu, X., Cho, N.G., Lee, S.W., Fidler, S., Urtasun, R., Yuille, A.: The role of context for object detection and semantic segmentation in the wild. In: CVPR. pp. 891–898 (2014) 9 40. Peng, Z., Xu, Z., Zeng, Z., Yang, X., Shen, W.: SAM-PARSER: Fine-Tuning SAM efficiently by parameter space reconstruction. In: AAAI. pp. 4515–4523 (2024) 8 41. Pu, M., Huang, Y., Liu, Y., Guan, Q., Ling, H.: EDTER: Edge detection with transformer. In: CVPR. pp. 1402–1412 (2022) 2, 4, 7, 9, 11, 12, 13, 15 42. Rao, Y., Zhao, W., Liu, B., Lu, J., Zhou, J., Hsieh, C.J.: DynamicViT: Efficient vision transformers with dynamic token sparsification. In: NeurIPS. pp. 13937– 13949 (2021) 2, 5 43. Ren, X., Bo, L.: Discriminatively trained sparse code gradients for contour detec-tion. In: NeurIPS. pp. 584–592 (2012) 4 44. Roberts, L.G.: Machine perception of three-dimensional solids. Ph.D. thesis, Mas-sachusetts Institute of Technology (1963) 4 45. Shen, W., Wang, X., Wang, Y., Bai, X., Zhang, Z.: DeepContour: A deep convo-lutional feature learned by positive-sharing loss for contour detection. In: CVPR. pp. 3982–3991 (2015) 4, 12, 13 46. Silberman, N., Hoiem, D., Kohli, P., Fergus, R.: Indoor segmentation and support inference from rgbd images. In: ECCV. pp. 746–760 (2012) 2, 9, 12, 15 18 Gao et al. 47. Sobel, I.: Camera models and machine perception. Tech. rep., Computer Science Department, Technion (1972) 4 48. Su, Z., Liu, W., Yu, Z., Hu, D., Liao, Q., Tian, Q., Pietikäinen, M., Liu, L.: Pixel difference networks for efficient edge detection. In: ICCV. pp. 5117–5127 (2021) 12, 13, 15 49. Sun, G., Liu, Y., Probst, T., Paudel, D.P., Popovic, N., Van Gool, L.: Rethinking global context in crowd counting. Machine Intelligence Research 21 (4), 640–651 (2024) 2 50. Uijlings, J.R., Van De Sande, K.E., Gevers, T., Smeulders, A.W.: Selective search for object recognition. IJCV 104 (2), 154–171 (2013) 2 51. Ullman, S., Basri, R.: Recognition by linear-combinations of models. IEEE TPAMI 
+
+13 (10), 992–1006 (1991) 2 52. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, Ł., Polosukhin, I.: Attention is all you need. In: NeurIPS. pp. 5998–6008 (2017) 4 53. Wang, Y., Zhao, X., Huang, K.: Deep crisp boundaries. In: CVPR. pp. 3892–3900 (2017) 4, 12, 13 54. Wei, Y., Liang, X., Chen, Y., Shen, X., Cheng, M.M., Feng, J., Zhao, Y., Yan, S.: STC: A simple to complex framework for weakly-supervised semantic segmenta-tion. IEEE TPAMI 39 (11), 2314–2320 (2016) 2 55. Wu, J., Wang, Z., Hong, M., Ji, W., Fu, H., Xu, Y., Xu, M., Jin, Y.: Medical SAM Adapter: Adapting segment anything model for medical image segmentation. Medical image analysis 102 , 103547 (2025) 8 56. Xia, M., Zhong, Z., Chen, D.: Structured pruning learns compact and accurate models. In: ACL. pp. 1513–1528 (2022) 4 57. Xie, S., Tu, Z.: Holistically-nested edge detection. In: ICCV. pp. 1395–1403 (2015) 1, 2, 4, 12, 13, 15 58. Xin, J., Tang, R., Lee, J., Yu, Y., Lin, J.: DeeBERT: Dynamic early exiting for accelerating BERT inference. In: ACL. pp. 2246–2251 (2020) 4 59. Xu, D., Ouyang, W., Alameda-Pineda, X., Ricci, E., Wang, X., Sebe, N.: Learn-ing deep structured multi-scale features using attention-gated CRFs for contour prediction. In: NeurIPS. pp. 3961–3970 (2017) 13, 15 60. Xu, Y., Zhang, Z., Zhang, M., Sheng, K., Li, K., Dong, W., Zhang, L., Xu, C., Sun, X.: Evo-ViT: Slow-fast token evolution for dynamic vision transformer. In: AAAI. pp. 2964–2972 (2022) 2, 5 61. Ye, Y., Xu, K., Huang, Y., Yi, R., Cai, Z.: DiffusionEdge: Diffusion probabilistic model for crisp edge detection. In: AAAI. pp. 6675–6683 (2024) 4, 9, 12, 13, 15 62. Yin, H., Vahdat, A., Alvarez, J.M., Mallya, A., Kautz, J., Molchanov, P.: A-ViT: Adaptive tokens for efficient vision transformer. In: CVPR. pp. 10809–10818 (2022) 2, 5 63. Yu, C., Wang, J., Peng, C., Gao, C., Yu, G., Sang, N.: Learning a discriminative feature network for semantic segmentation. In: CVPR. pp. 1857–1866 (2018) 2 64. Zhang, Z., Liu, Y., Chen, X., Zhu, Y., Cheng, M.M., Saligrama, V., Torr, P.H.: Sequential optimization for efficient high-quality object proposal generation. IEEE TPAMI 40 (5), 1209–1223 (2017) 2 65. Zhou, C., Huang, Y., Pu, M., Guan, Q., Deng, R., Ling, H.: MuGE: Multiple granularity edge detection. In: CVPR. pp. 25952–25962 (2024) 4 66. Zhou, C., Huang, Y., Pu, M., Guan, Q., Huang, L., Ling, H.: The treasure beneath multiple annotations: An uncertainty-aware edge detector. In: CVPR. pp. 15507– 15517 (2023) 12, 13 67. Zitnick, C.L., Dollár, P.: Edge Boxes: Locating object proposals from edges. In: ECCV. pp. 391–405 (2014) 2

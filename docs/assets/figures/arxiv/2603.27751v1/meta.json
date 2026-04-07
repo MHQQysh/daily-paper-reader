@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-001.webp",
+      "caption": "Table 1: Training hyperparameters.",
+      "page": 11,
+      "index": 1,
+      "width": 606,
+      "height": 549
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-002.webp",
+      "caption": "Figure 5: Evaluation win rate against the heuristic bot curriculum over training. The beliefaware model consistently achieves higher win rates after an initial ramp-up period. The dashed line indicates the 50% random baseline.",
+      "page": 15,
+      "index": 2,
+      "width": 708,
+      "height": 405
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-003.webp",
+      "caption": "Figure 2: Architecture comparison between baseline MuZero (left) and Belief-Aware MuZero / SkyNet (right). Both share the same representation, dynamics, and prediction networks. SkyNet adds an ego conditioning layer that injects player identity before prediction, and two auxiliary heads (winner and rank) that shape the latent representation via outcome-prediction objectives. Pink-shaded outputs indicate the additional belief heads.",
+      "page": 7,
+      "index": 3,
+      "width": 807,
+      "height": 493
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-004.webp",
+      "caption": "Figure 4: Convergence of the belief-aware model’s auxiliary prediction heads. The winner head loss (left) and rank head loss (right) both decrease substantially over training, confirming that the network learns to predict game outcomes with increasing accuracy.",
+      "page": 14,
+      "index": 4,
+      "width": 888,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-005.webp",
+      "caption": "Table 2: Evaluation statistics over training (self-play vs. heuristic opponents). Bracketed ranges: µ± 1.96σ across checkpoints.",
+      "page": 14,
+      "index": 5,
+      "width": 727,
+      "height": 242
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-006.webp",
+      "caption": "Figure 3: Training loss curves for baseline MuZero and Belief-Aware MuZero. Raw values shown in light color; 20-iteration rolling averages in bold. Both models converge, with the belief-aware model’s total loss higher due to the additional auxiliary loss terms.",
+      "page": 14,
+      "index": 6,
+      "width": 876,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-007.webp",
+      "caption": "Figure 8: Linear probe R2 on frozen latent vectors for seven game-state features. Features left of the dashed line are directly observable or semi-observable; features to the right are hidden. Negative R2 indicates worse-than-mean prediction. The ego-conditioned belief representation is the only variant that achieves positive R2 on both hidden-card features.",
+      "page": 18,
+      "index": 7,
+      "width": 902,
+      "height": 447
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-008.webp",
+      "caption": "Figure 7: Training diagnostics for both models (20-iteration rolling averages). Gradient norms (left) stabilize in a healthy range for both models. Policy entropy (right) decreases gradually without premature collapse, indicating progressive strategy refinement.",
+      "page": 18,
+      "index": 8,
+      "width": 876,
+      "height": 311
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-009.webp",
+      "caption": "Figure 1: A player’s 3 × 4 card grid during a game of Skyjo, with the deck shown at right. Cards range from −2 to 12, with lower total scores being more desirable. Image credit: 3rd Grade Thoughts (https://www.3rdgradethoughts.com/2019/01/ board-game-review-skyjo.html).",
+      "page": 5,
+      "index": 9,
+      "width": 544,
+      "height": 414
+    },
+    {
+      "url": "assets/figures/arxiv/2603.27751v1/fig-010.webp",
+      "caption": "Figure 6: Head-to-head win rates between SkyNet (Belief-Aware) and baseline MuZero at matched training checkpoints (1000 games each). The crossover between iterations 250 and 500 shows SkyNet overtaking the baseline after sufficient training.",
+      "page": 16,
+      "index": 10,
+      "width": 708,
+      "height": 389
+    }
+  ]
+}

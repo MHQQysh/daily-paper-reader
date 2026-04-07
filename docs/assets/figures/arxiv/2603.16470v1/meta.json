@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.16470v1/fig-001.webp",
+      "caption": "Fig. 4: Comparative results with L ∈ {4, 6} satellites and K = 6 users in perfect CSI and delayed CSI scenarios.The increment in satellites clearly increases the sum rate by 20%",
+      "page": 11,
+      "index": 1,
+      "width": 522,
+      "height": 359
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16470v1/fig-002.webp",
+      "caption": "Fig. 5: Comparative results with L ∈ [4, 8] satellites and K = 6 users in delayed CSI scenarios. The highest sum rate is guaranteed with L = 6",
+      "page": 11,
+      "index": 2,
+      "width": 522,
+      "height": 359
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16470v1/fig-003.webp",
+      "caption": "Fig. 3: DS-PPO performance with K ∈ {2, 4} users in perfect CSI and delayed CSI , in presence of handovers. The delayed observations effects are neglectable in both cases.",
+      "page": 11,
+      "index": 3,
+      "width": 517,
+      "height": 673
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16470v1/fig-004.webp",
+      "caption": "Fig. 1: System model: a cluster of L satellites providing service for K users.",
+      "page": 3,
+      "index": 4,
+      "width": 536,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16470v1/fig-005.webp",
+      "caption": "Fig. 6: Comparative results with other algorithms.",
+      "page": 12,
+      "index": 5,
+      "width": 473,
+      "height": 354
+    },
+    {
+      "url": "assets/figures/arxiv/2603.16470v1/fig-006.webp",
+      "caption": "Fig. 2: DS-PPO for enhanced TPM generation.",
+      "page": 5,
+      "index": 6,
+      "width": 536,
+      "height": 273
+    }
+  ]
+}

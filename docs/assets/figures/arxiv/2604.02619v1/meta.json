@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pymupdf-images",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02619v1/fig-001.webp",
+      "caption": "",
+      "page": 6,
+      "index": 1,
+      "width": 1746,
+      "height": 706
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02619v1/fig-002.webp",
+      "caption": "",
+      "page": 6,
+      "index": 2,
+      "width": 1814,
+      "height": 728
+    }
+  ]
+}
