@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-001.webp",
+      "caption": "Table 1: Five implementation failure modes in the v1 PPO baseline and their targeted fixes applied in v2.",
+      "page": 6,
+      "index": 1,
+      "width": 977,
+      "height": 597
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-002.webp",
+      "caption": "Table 4: Ablation study. Each variant removes exactly one fix from v3. Win rate vs. random at episode 12,000 (seed 42 unless noted). ∆ is computed relative to the 10-seed mean (77.1%). †Seed 42 v3 full achieved 93.9%; seed-matched ∆ = −6.8 pp.",
+      "page": 11,
+      "index": 2,
+      "width": 782,
+      "height": 266
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-003.webp",
+      "caption": "Figure 5: Training diagnostic curves (mean ± std over 10 seeds). Entropy decreases as the policy specialises; explained variance rises toward 1.0, confirming the critic learns accurate TD-λ return estimates.",
+      "page": 11,
+      "index": 3,
+      "width": 956,
+      "height": 372
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-004.webp",
+      "caption": "Figure 1: The Territory Paint Wars environment on a 10×10 grid. Light pink/green tiles are owned by each agent; dark pink/dark green tiles are locked and cannot be reclaimed; grey tiles are neutral. Agents (spheres) paint the tile they occupy each step.",
+      "page": 2,
+      "index": 4,
+      "width": 976,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-005.webp",
+      "caption": "Figure 3: Competitive overfitting in v2 self-play. Win rate vs. random rises then collapses, while self-play win rate gives no warning. Opponent mixing (v3) prevents the collapse.",
+      "page": 7,
+      "index": 5,
+      "width": 947,
+      "height": 536
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-006.webp",
+      "caption": "Figure 4: Learning curves: rolling-100 Pink self-play win rate for all 10 seeds (v3, opponent mixing). Despite high rolling variance (co-adaptive oscillation), the cumulative win rate climbs steadily for all seeds, confirming persistent learning.",
+      "page": 10,
+      "index": 6,
+      "width": 950,
+      "height": 524
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-007.webp",
+      "caption": "Figure 2: Win-rate progression across all versions. The red bar (v2 at ep 12,000) exposes competitive overfitting; the blue bar (v3 mean, 10 seeds) shows the recovery via opponent mixing. Error bar on v3 mean shows ±1 SD across seeds.",
+      "page": 3,
+      "index": 7,
+      "width": 950,
+      "height": 522
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-008.webp",
+      "caption": "Table 2: PPO+GAE v3 hyperparameters. Values are identical for both agents.",
+      "page": 8,
+      "index": 8,
+      "width": 672,
+      "height": 391
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04983v1/fig-009.webp",
+      "caption": "Table 3: 10-seed convergence study. Cumul. WR: Pink cumulative self-play win rate at ep 12,000. vs. Random: generalisation win rate against a uniformly-random opponent (100 games for seeds 42–49; 500 games for seeds 50–51).",
+      "page": 9,
+      "index": 9,
+      "width": 872,
+      "height": 505
+    }
+  ]
+}

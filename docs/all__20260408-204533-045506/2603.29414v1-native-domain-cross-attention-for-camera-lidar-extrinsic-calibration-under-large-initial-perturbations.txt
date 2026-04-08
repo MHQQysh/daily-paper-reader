@@ -1,0 +1,421 @@
+Title: Native-Domain Cross-Attention for Camera-LiDAR Extrinsic Calibration Under Large Initial Perturbations
+
+URL Source: https://arxiv.org/pdf/2603.29414v1
+
+Published Time: Wed, 01 Apr 2026 00:49:00 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+> THIS PAPER HAS BEEN ACCEPTED TO IEEE ROBOTICS AND AUTOMATION LETTERS. 1
+
+# Native-Domain Cross-Attention for Camera–LiDAR Extrinsic Calibration Under Large Initial Perturbations 
+
+Ni Ou 1, Zhuo Chen 2, Xinru Zhang 3 and Junzheng Wang 1,∗
+
+Abstract —Accurate camera–LiDAR fusion relies on precise extrinsic calibration, which fundamentally depends on establish-ing reliable cross-modal correspondences under potentially large misalignments. Existing learning-based methods typically project LiDAR points into depth maps for feature fusion, which distorts 3D geometry and degrades performance when the extrinsic initialization is far from the ground truth. To address this issue, we propose an extrinsic-aware cross-attention framework that directly aligns image patches and LiDAR point groups in their native domains. The proposed attention mechanism explicitly injects extrinsic parameter hypotheses into the corre-spondence modeling process, enabling geometry-consistent cross-modal interaction without relying on projected 2D depth maps. Extensive experiments on the KITTI and nuScenes benchmarks demonstrate that our method consistently outperforms state-of-the-art approaches in both accuracy and robustness. Under large extrinsic perturbations, our approach achieves accurate calibration in 88% of KITTI cases and 99% of nuScenes cases, substantially surpassing the second-best baseline. We have open sourced our code on GitHub to benefit the community. 
+
+Index Terms —Sensor fusion, autonomous driving, camera, LiDAR, calibration 
+
+I. I NTRODUCTION 
+
+# CAMERA and LiDAR are indispensable sensors in au-tonomous driving, each providing unique yet comple-mentary information essential for robust perception. Cam-eras deliver high-resolution imagery rich in semantic detail, whereas LiDAR offers precise structural information through three-dimensional, albeit sparse, point cloud measurements. The fusion of these modalities has substantially advanced in-telligent transportation systems, enabling superior performance across a wide range of autonomous driving tasks, including object detection [1], [2] and tracking [3], [4], SLAM [5], [6], and scene flow estimation [7], [8]. Accurate fusion of camera and LiDAR data requires an extrinsic matrix that defines the spatial relationship between the two sensors. This matrix is typically obtained through a camera–LiDAR calibration process. The core challenge in calibration lies in extracting and matching reliable correspon-dences between camera and LiDAR observations. To facilitate 
+
+> 1
+
+Ni Ou, Junzheng Wang are with the School of Automation, Beijing Institute of Technology, Beijing, 100081, China. 
+
+> 2
+
+Zhuo Chen is with the Robot Perception Lab, Centre for Robotics Research, Department of Engineering, King’s College London, London WC2R 2LS, United Kingdom. 
+
+> 3
+
+Xinru Zhang is with the School of Integrated Circuits and Electronics, Beijing Institute of Technology, Beijing, 100081, China. 
+
+> ∗
+
+This work was supported by the National Natural Science Foundation of China under Grant 62173038. Corresponding Author: Junzheng Wang. Email: 
+
+wangjz@bit.edu.cn Miscalibrated Depth Map Miscalibrated Projected Points 
+
+> (a) Miscalibrated projection and depth map.
+
+Image Patches 
+
+Point Groups 
+
+> Patch
+> Coordinates
+> Patch
+> Features
+
+Q 
+
+> Group
+> Centroids
+> Group
+> Features
+> Projected
+> Coordinates
+
+K,V 
+
+> Extrinsic
+> Parameters
+
+Q
+
+K,V 
+
+Extrinsic -Aware 
+
+Cross Attention 
+
+> (b) Extrinsic-aware cross-attention.
+
+Fig. 1. Illustration of the problem caused by miscalibrated depth maps and our proposed method. (a) Projecting LiDAR points onto the image plane produces incomplete and distorted object structures. (b) Image patches and point groups are encoded separately and fused through extrinsic-aware cross-attention, enabling structure-preserving cross-modal feature interaction. 
+
+this process, target-based methods have been developed us-ing calibration objects such as planar boards [9], [10] and boxes [11], which contain hand-crafted geometric features recognizable by both sensors. However, these methods require placing the calibration target at multiple positions in front of the sensors, making them impractical for online or in-vehicle calibration scenarios where extrinsic parameters may drift due to vehicle vibrations, thermal expansion, or gradual deformation of mechanical structures. To overcome these limitations, targetless calibration meth-ods have been proposed to eliminate the reliance on ded-icated calibration targets and instead exploit cross-modality correspondences present in natural scenes. Some approaches estimate the extrinsic matrix by applying the Perspective-n-
+
+0000–0000/00$00.00 © 2021 IEEE  
+
+> arXiv:2603.29414v1 [cs.CV] 31 Mar 2026 THIS PAPER HAS BEEN ACCEPTED TO IEEE ROBOTICS AND AUTOMATION LETTERS. 2
+
+Point (PnP) algorithm to matched correspondences, such as edges [12], [13] or learned feature pairs [14], [15]. These methods offer strong interpretability and can perform well even under large initial calibration errors. However, their effectiveness is highly dependent on the recall of feature matching, rendering them sensitive to scene structure and environmental variations. In contrast, other works adopt an end-to-end learning framework [16]–[21] that directly re-gresses extrinsic parameters from fused RGB images and miscalibrated LiDAR depth maps. Although these approaches avoid explicit correspondence extraction and matching, they often exhibit degraded performance when confronted with large initial calibration errors. We attribute the limitations of end-to-end calibration meth-ods to their reliance on miscalibrated depth maps and fusion mechanism. As illustrated in Fig. 1a, generating such a depth map requires projecting 3D LiDAR points onto a 2D grid using the given initial extrinsic matrix. Since projection is not a distance-preserving transformation, it distorts object geometry and inevitably discards points that fall outside the image frame, which hinders reliable feature extraction from LiDAR projections and weakens the effectiveness of subse-quent fusion modules. To mitigate these issues, we redesign the point feature extraction branch and introduce a cross-modality fusion module. As shown in Fig. 1b, position-aware image and point features are extracted in their native domains, enabling cross-modality interaction while preserving floating-point precision and avoiding the discard of LiDAR points. Our main contributions are summarized as follows:  
+
+> •
+
+We propose a novel end-to-end camera–LiDAR cal-ibration framework that incorporates extrinsic-aware cross-attention, mitigating geometric distortion and point dropout introduced by depth-map projection, thereby en-abling more reliable fusion of image and point features.  
+
+> •
+
+We introduce a cross-modal coordinate alignment strat-egy that fundamentally differentiates our cross-attention from existing baselines. By injecting aligned coordinates alongside a harmonic embedding scheme, our mechanism expands the effective field of view and maintains high positional sensitivity, enabling robust feature correlation even under large initial perturbations.  
+
+> •
+
+Extensive experiments on the KITTI [22] and nuScenes [23] datasets demonstrate that our method consistently outperforms state-of-the-art baselines in both accuracy and robustness. Comprehensive ablation studies validate the effectiveness of each component of our approach. II. R ELATED WORKS 
+
+A. Target-based Methods 
+
+Target-based methods rely on calibration targets jointly ob-servable by cameras and LiDARs to provide reliable geometric constraints. Planar chessboards [24]–[26] are widely used due to their point, line, and plane constraints. Variants such as triangular boards [27], [28] and circular-hole designs [29], [30] further improve LiDAR feature extraction, especially for low-resolution sensors. Beyond planar designs, 3D calibration targets exploit richer geometric structures and are more readily available in natural environments. For example, V-shaped objects [31] enable point–line correspondences, while orthogonal trihedrons [32] and box-like structures [11] provide multiple perpendicular plane constraints for robust extrinsic estimation. These ap-proaches improve geometric observability and reduce ambigu-ity compared to 2D targets. However, they remain unsuitable for online calibration in dynamic scenes and still rely on reliable target detection in complex environments. 
+
+B. Targetless Methods 
+
+Targetless calibration methods eliminate the need for spe-cific targets by extracting geometric, semantic, or learned correspondences from natural scenes. Edges of image intensity and LiDAR range are typical geometric correspondences [12], [13], [33]. Additionally, Neural Radiance Field [34], [35] and 3D Gaussian Splatting [36] exploit multi-view geometric and photometric consistency to jointly optimize scene represen-tation and sensor poses. In addition to these geometry-driven approaches, learning-based correspondence methods [14], [15] have been developed to align image pixels and LiDAR points within a learned feature space. Other targetless methods rely on objective functions rather than explicit correspondences for extrinsic optimization. For instance, semantic-based meth-ods [37], [38] maximize the consistency of projected points within segmented image regions. Moreover, information-theoretic methods [39], [40] estimate the optimal extrinsics by maximizing the mutual information between image grayscale values and projected LiDAR intensity values. Beyond these targetless approaches, end-to-end frameworks directly estimate extrinsics without explicit correspondence extraction. Early methods regress extrinsics by fusing RGB images and miscalibrated LiDAR depth maps (e.g., Calib-Net [16]), sometimes employing VAE-based regularization (RGGNet [17]) or monocular depth alignment with LSTM refinement (CalibDepth [41]). Other works construct cost volumes for cross-modal fusion; LCCNet [18] computes lo-cal feature similarities to build a dense cost volume, which LCCRAFT [19] iteratively refines using a ConvGRU module. Recently, attention-based methods like MSANet [20] and CalibFormer [21] have emerged, which flatten RGB and depth-map features into tokens to capture global context through cross-attention. Our method fundamentally differs from these baselines in its LiDAR encoding space and fusion mechanism. Ex-isting approaches extract features from 2D-projected depth maps, which introduces structural distortion and inevitably discards out-of-frame points under large misalignments—a limitation shared by correlation-based [16] and cost-volume-based [18] networks. Furthermore, while MSANet [20] and CalibFormer [21] utilize cross-attention for feature matching, they lack a cross-modal coordinate alignment strategy to expand the miscalibrated field of view, severely bottlenecking their interaction capacity under large initial perturbations. In contrast, our extrinsic-aware cross-attention operates directly on native 3D point features, leveraging coordinate alignment THIS PAPER HAS BEEN ACCEPTED TO IEEE ROBOTICS AND AUTOMATION LETTERS. 3Image Features 
+
+Point Features 
+
+Cross Attention ×2
+
+Fused Features    
+
+> 𝜋 𝑹 𝐶𝐿 𝒑 𝑖 +𝒕 𝐶𝐿
+
+Q
+
+K,V 
+
+𝑪 𝐼 
+
+𝑭 𝐼 
+
+𝑪 𝑃 
+
+𝑭 𝑃 
+
+> PointGPT
+> Image
+> Point Cloud
+> DINO -V2
+> unflatten to 2D
+
+Basic 
+
+Blocks 
+
+> pooling & flatten
+
+𝜉 rot /𝜉 tsl 
+
+concat 
+
+concat 
+
+Branch ×2               
+
+> Fig. 2. Overall framework of our method. FIand FPdenote the sequences of image and point features, respectively, while CIand CPrepresent their corresponding positional embeddings. ξrot and ξtsl are the rotational and translational components of ξdefined in Eq. (1).
+
+to robustly correlate both in-frame and out-of-frame LiDAR geometries with image patches. III. M ETHOD 
+
+The overall pipeline of our method is illustrated in Fig. 2. The input RGB image and 3D point cloud are first divided into image patches and point groups, respectively, and then encoded into feature vectors. After being concatenated with their corresponding positional embeddings, image and point features are fused through a cross-attention module and sub-sequently aggregated through convolutional blocks to predict the extrinsic parameters. To decouple rotation and translation learning, the cross-attention and aggregation branches are designed symmetrically for the estimation of rotational and translational components, respectively. 
+
+A. Problem Definition 
+
+Let the RGB image and LiDAR point cloud be denoted as I and P , and the LiDAR and camera coordinate systems as OL and OC , respectively. Let K ∈ R3×3 denote the intrinsic camera matrix, and TCL ∈ R4×4 denote the extrinsic transformation from OL to OC .The intrinsic matrix K is typically fixed, whereas the extrinsic matrix TCL may vary over time due to factors such as vehicle vibrations or temperature fluctuations. If we denote the ground-truth extrinsic matrix as T gt CL and the perturbed one after external disturbances as T (0) 
+
+> CL
+
+, the relative perturbation can be expressed as ∆TCL = T gt CL (T (0) 
+
+> CL
+
+)−1 ∈ SE (3) . The goal of the calibration model is to estimate ∆TCL given I,
+
+P , K, and T (0)  
+
+> CL
+
+as inputs. To remove the geometric constraints of ∆TCL , the model predicts its Lie algebra representation ξ,which is then mapped back to the Lie group as: 
+
+T pred CL = ∆ TCL T (0)  
+
+> CL
+
+= G(ξ)T (0) 
+
+> CL
+
+, (1) where G(·) denotes the exponential mapping from the Lie algebra se (3) to the Lie group SE (3) , and T pred CL represents the predicted extrinsic matrix. 
+
+B. Feature Encoding 
+
+As illustrated in Fig. 2, we adopt DINOv2 [42], a pretrained Vision Transformer (ViT) [43], as the image encoder. The in-put image is first divided into patches, which are subsequently embedded and encoded into patch-level feature tokens. Addi-tionally, learnable positional embeddings are added to each token to produce spatial awareness. These enriched feature to-kens are then processed through cascaded transformer blocks, enabling the model to capture global contextual dependencies across the entire image. The point encoder follows the architecture of Point-GPT [44], where the point cloud is divided into local groups analogous to image patches. Regarding the grouping strategy, a fixed number of centroids are first selected from the orig-inal point cloud using Furthest Point Sampling (FPS). Each centroid, along with its k-nearest neighboring points, forms a local group. Each group of points is encoded into a feature vector by PointNet [45], and the resulting feature tokens are subsequently processed by transformer layers to capture global geometric context. Overall, both the RGB image and the LiDAR point cloud are encoded into sequences of feature vectors, denoted as FI
+
+and FP , whose lengths correspond to the number of image patches and point groups, respectively. 
+
+C. Cross-Attention 
+
+Cross-attention enables interaction between image and point features and produces a fused representation. However, di-rectly cross-attending these modality-specific features is in-sufficient for estimating the extrinsic matrix: as discussed in Sec. III-B, both FI and FP are extracted in their native THIS PAPER HAS BEEN ACCEPTED TO IEEE ROBOTICS AND AUTOMATION LETTERS. 4
+
+domains and are inherently independent of the extrinsic matrix 
+
+TCL . To address this fundamental limitation, we introduce extrinsic awareness by injecting positional embeddings defined on the image feature plane. 
+
+1) Image feature plane: Let W and H denote the width and height of the original image, and WP and HP denote the width and height of each patch, respectively. If each image patch is regarded as a pixel, the set of patches forms an image feature plane F 2DI with width NW = W/W P and height 
+
+NH = H/H P . For numerical stability, patch coordinates are normalized to [−1, 1] . The coordinate of the patch at the i-th row and j-th column ( i ∈ [0 , N H − 1] , j ∈ [0 , N W − 1] ) is  2i/N H − 1, 2j/N W − 1 .
+
+2) Coordinate Alignment: To structurally align native 3D LiDAR features with 2D image patches, each LiDAR point pi
+
+is first transformed from the LiDAR coordinate system to the camera coordinate system: 
+
+pCi = RCL pi + tCL , (2) and then projected onto the image plane: 
+
+wi
+
+
+
+ui
+
+vi
+
+1
+
+ =
+
+
+
+ui
+
+vi
+
+wi
+
+ = Kp Ci ⇒
+
+ui
+
+vi
+
+
+
+= π(pCi ), (3) where π(·) denotes the projection operator and (ui, v i) are the pixel coordinates corresponding to pCi . To align the pro-jected LiDAR points with the image patch grid, we scale the projected LiDAR coordinates (ui, v i) by the patch dimensions 
+
+(WP , H P ):
+
+˜ui
+
+˜vi
+
+
+
+=
+
+W −1 
+
+> P
+
+00 H−1
+
+> P
+
+
+
+π(pCi ), (4) and then normalize them to the range [−1, 1] as (2˜ ui/N W −
+
+1, 2˜ vi/N H −1) . Unlike image patch coordinates, the projected LiDAR coordinates may extend beyond the image region (see Fig. 1a). To constrain the maximum projection range, we introduce a margin ratio rp and clip the normalized coordinates within the range [−(1 + rp), (1 + rp)] along both axes to preserve spatial continuity while preventing invalid positions. 
+
+3) Harmonic embedding: Inspired by NeRF [46], we en-code 2D coordinates into high-dimensional representations using harmonic functions: 
+
+˜xi = cos( ω020πx i), . . . , cos( ω02nh−1πx i), x i
+
+,
+
+˜yi = sin( ω020πy i), . . . , sin( ω02nh−1πy i), y i
+
+, (5) where [xi, y i] denotes an image or point coordinate pair, and 
+
+nh is the number of harmonic functions. The original coor-dinates are appended to the sinusoidal embeddings to retain absolute positional information and complement the multi-frequency encoding. This representation introduces positional cues at multiple frequencies, enhancing the cross-attention module’s sensitivity to fine-grained spatial relationships. To ensure that the longest period of the harmonic embedding precisely covers the marginal range [−(1 + rp), (1 + rp)] , we set ω0 = 1 /(1 + rp).
+
+4) Multi-head attention: Denote [· ; ·] as channel-wise con-catenation. Then, stacking the pairs [ ˜ xi; ˜ yi] yields the posi-tional embeddings derived from the image-plane and projected LiDAR coordinates, denoted as CI and CP , respectively. We concatenate positional embeddings and features along the channel dimension to form the tokens: 
+
+X = [ FI ; CI ],
+
+Y = [ FP ; CP ] (6) Following improvements from prior ViT literature [47], we adopt a scale-free cross-attention variant: 
+
+Qi = RMSNorm(LayerNorm( X)W Qi ) (7) 
+
+Ki = RMSNorm( XW Ki ), Vi = Y W Vi (8) 
+
+Ai = Softmax( QiK⊤ 
+
+> i
+
+)Vi (9) 
+
+O = [ A1; A2; . . . ; Ah]W O (10) where W Qi , W Ki , W Vi , W Oi are projection weights, h is the number of heads, and O is the module output. Since rotation and translation estimation benefit from distinct cues, we duplicate the cross-attention block and output two feature vectors, which are then processed separately for rotational and translational components. 
+
+D. Aggregation 
+
+Following prior works [16]–[18], our method employs con-volutional kernels for feature aggregation and MLP layers for extrinsic regression. While previous approaches use only separate linear projections for rotation and translation esti-mation, we hypothesize that earlier modules—such as con-volutional blocks—should also be decoupled to enable finer-grained feature aggregation. Since the cross-attention modules output 1D feature vectors, we first reshape (unflatten) them into 2D feature maps with the same spatial resolution as 
+
+F 2DI . We then apply two independent basic blocks [48] for feature encoding of the rotational and translational branches, respectively. The resulting feature maps are spatially pooled into compact representations and subsequently flattened into 1D vectors for MLP regression. Finally, two separate MLP heads are used to predict ξrot and ξtsl , i.e ., the rotational and translational components of the extrinsic update ξ ∈ se (3) .IV. E XPERIMENTS 
+
+A. Dataset Description 
+
+We evaluate our method against state-of-the-art learning-based [15]–[19], [41] and learning-free approaches [37], [40] on the KITTI Odometry [22] and nuScenes [23] datasets. As implementations for recent cross-attention baselines [20], [21] are publicly unavailable, we design a targeted ablation study in Sec. IV-E. This experiment simulates their core mechanism to explicitly demonstrate the superiority of our cross-modal coordinate alignment and depth map expansion under severe miscalibration. For dataset splits, we use KITTI sequences 00, 02–08, 10, 12, and 21 for training, 11, 17, and 20 for validation, and 13– 16 and 18 for testing. For nuScenes, we follow the official split and reserve 20% of the training data for validation. THIS PAPER HAS BEEN ACCEPTED TO IEEE ROBOTICS AND AUTOMATION LETTERS. 5
+
+These two datasets pose distinct challenges: nuScenes con-tains sparser LiDAR point clouds and more nighttime scenes, while KITTI exhibits a more severe train–test distribution shift. Specifically, the training–testing gap measured by Fr´ echet In-ception Distance (FID) is 39.60 for KITTI compared to 15.22 for nuScenes, indicating stronger generalization demands on the KITTI dataset. To evaluate calibration performance under different ini-tialization errors, we perturb the ground-truth extrinsics to generate the initial extrinsic matrix: 
+
+T (0)  
+
+> CL
+
+= Tr T gt CL ,
+
+where Tr introduces rotational and translational perturbations of (15 ◦, 15 cm) , (10 ◦, 25 cm) , and (10 ◦, 50 cm) .
+
+B. Implementation Details 
+
+We employ DINOv2-tiny [42] as the image encoder and PointGPT-tiny [44] as the point encoder, each producing feature embeddings of 384 channels. For the positional em-bedding, we use six harmonic functions and set the projection margin to rp = 2. The multi-head cross-attention module contains 6 heads, each with a 64-dimensional subspace. The aggregation module consists of two basic residual blocks [48], which progressively reduce the feature dimensionality from 384 to 96. Within the MLP layers, the hidden dimension is set to 128, and SiLU [49] is adopted as the activation function. Regarding training configurations, the input point clouds are downsampled to 40,000 points for the KITTI Odometry dataset and 20,000 points for the nuScenes dataset. Input images are resized to 224 × 448 (H × W ) for both datasets. During inference, we adopt a three-step iterative refinement strategy: the predicted extrinsic matrix from each step is used as the initial estimate for the next iteration, and the final prediction after three iterations is taken as the output. 
+
+C. Metrics 
+
+We evaluate the calibration accuracy by computing the pose difference between the predicted and ground-truth extrinsic matrices, i.e ., ∆Terr = T pred 
+
+> CL
+
+ T gt 
+
+> CL
+
+−1. From ∆Terr , we ex-tract the Euler angles (Roll, Pitch, Yaw) representing rotational errors and the translation components (X, Y, Z) representing translational errors, and compute the root mean squared error (RMSE) for both rotation and translation. In addition, we assess calibration robustness using two success-rate metrics, denoted as L1 and L2. Specifically, 
+
+L1 measures the percentage of predictions whose rotational RMSE is below 1◦ and translational RMSE is below 2.5 cm, while L2 adopts a more relaxed threshold of (2 ◦, 5 cm) .
+
+D. Evaluation 
+
+Table I presents the quantitative calibration results on the KITTI [22] and nuScenes [23] datasets. On the KITTI Odometry dataset, our proposed method consistently achieves superior performance over baselines across most metrics under all initialization ranges, except for a slightly higher rotational RMSE than LCCRAFT under 10 ◦25cm. Notably, our ap-proach demonstrates a clear advantage in translation accuracy, achieving a translational RMSE nearly half that of the clos-est competitor across all initialization settings. Although the performance of all methods degrades as the initial translation error increases, our method remains the most robust, achieving 88% L2 success rate and 41% L1 success rate under the most challenging perturbation of 10 ◦50cm. Compared with KITTI, nuScenes has a smaller train–test distribution gap but uses a 32-beam LiDAR instead of 64 beams. Our method achieves lower translation errors and higher success rates than the baselines on nuScenes. Although its rotational errors are slightly higher than CalibDepth under 15 ◦15cm and 10 ◦50cm, the differences are marginal and do not affect overall success rates. While learning-based baselines perform relatively better on nuScenes under 15 ◦15cm and 10 ◦25cm, their performance degrades under the challenging setting of 10 ◦50cm. In contrast, our method remains robust, achieving 99% L2 and 90% L1 success rates. Learning-free methods perform relatively poorly in our ex-periments. DirectCalib [40] optimizes extrinsics by maximiz-ing mutual information and relies on dense projected LiDAR intensity maps, which are more suitable for static scanning scenarios and differ from the sparse and dynamic autonomous driving data used in our experiments. CalibAnything [37] is primarily designed for small rotational perturbations and thus degrades significantly under larger rotations. We also present qualitative comparisons with two strongest baselins, LCCRAFT and CalibDepth, across urban, rural, highway, and nighttime scenes (Fig. 3). ROI zoom-ins show that our method achieves more consistent alignment across environments, particularly along object boundaries such as vehicle contours, tree trunks, guardrails, and headlights. In contrast, LCCRAFT aligns well in urban and rural scenes but degrades in highway and nighttime conditions, whereas CalibDepth performs better in highway and nighttime scenes but is less accurate in other scenarios. This robustness stems from incorporating LiDAR point features projected beyond the image frame. As indicated by Eq. (2) and Eq. (3), when the extrinsics RCL and tCL deviate significantly from the ground truth, projected LiDAR points may shift substantially or fall outside the image plane. In such cases (Fig. 1a), simple concatenation of image features and miscalibrated depth maps fails to establish reliable correspon-dences, whereas our cross-attention mechanism preserves and exploits these cross-modal relationships. 
+
+E. Ablation Analysis 
+
+We ablate key components of our method on KITTI under 10 ◦50cm in Tab. II, where the default configuration is high-lighted in light gray. Replacing cross-attention with feature concatenation in 2D ( 1st row) degrades all metrics. Using a 2D depth-map encoder instead of our 3D encoder ( 2nd 
+
+row) reduces translation accuracy and success rates, although rotation improves, possibly due to the enlarged projection margin compensating for 2D spatial distortions. For positional encoding, removing the harmonic formulation (nh = 0 ) leads to a substantial performance drop. Setting nh =THIS PAPER HAS BEEN ACCEPTED TO IEEE ROBOTICS AND AUTOMATION LETTERS. 6        
+
+> TABLE I CALIBRATION RESULTS ON KITTI AND NU SCENES DATASETS (M EAN ±STANDARD DEVIATION )
+
+Dataset Range Method Rotation ( ◦)↓ Translation (cm) ↓ Success Rate (%) ↑
+
+RMSE MAE RMSE MAE L1 L2
+
+KITTI [22] 
+
+15 ◦ 15cm 
+
+CoFiI2P [15] 4.613 ±3.071 2.066 ±1.228 134.8 ±75.09 62.64 ±32.60 0.00% 0.04% DirectCalib [40] 13.09 ±23.55 6.315 ±11.38 194.9 ±1967 98.42 ±1099 0.26% 1.54% CalibAnything [37] 18.27 ±14.78 9.439 ±7.889 27.25 ±15.11 13.79 ±7.742 0.00% 1.90% CalibNet [16] 2.019 ±2.104 0.764 ±0.726 5.798 ±3.598 2.836 ±1.783 8.00% 32.28% RGGNet [17] 3.878 ±3.380 1.421 ±1.199 6.069 ±4.037 2.971 ±2.016 5.40% 18.56% LCCNet [18] 2.095 ±2.208 0.804 ±0.784 6.121 ±4.076 3.012 ±2.055 9.16% 31.72% LCCRAFT [19] 0.530 ±0.784 0.206 ±0.270 6.030 ±3.553 2.897 ±1.702 11.20% 44.12% CalibDepth [41] 1.057 ±1.199 0.418 ±0.414 4.573 ±2.798 2.230 ±1.344 17.24% 56.88% Ours 0.431 ±1.045 0.212 ±0.500 2.199 ±1.816 1.087 ±0.902 54.64% 96.64% 
+
+10 ◦ 25cm 
+
+CoFiI2P 2.939 ±2.134 1.285 ±0.841 60.74 ±33.26 28.08 ±14.59 0.04% 0.12% DirectCalib 13.08 ±26.34 6.464 ±13.15 147.1 ±401.2 69.93 ±190.9 0.38% 1.79% CalibAnything 5.323 ±8.955 2.598 ±4.530 28.20 ±25.50 14.16 ±13.08 0.95% 12.38% CalibNet 2.280 ±2.379 0.891 ±0.908 6.466 ±3.746 3.151 ±1.842 4.24% 26.64% RGGNet 3.987 ±3.492 1.524 ±1.391 6.235 ±4.088 3.045 ±2.025 4.88% 17.84% LCCNet 2.496 ±2.532 0.959 ±0.946 6.083 ±3.867 2.978 ±1.933 7.16% 27.76% LCCRAFT 0.593 ±0.783 0.229 ±0.269 6.271 ±3.906 2.949 ±1.792 11.20% 42.44% CalibDepth 1.989 ±2.479 0.744 ±0.894 5.441 ±3.389 2.597 ±1.623 9.40% 39.16% Ours 0.654 ±1.435 0.319 ±0.646 2.594 ±1.755 1.292 ±0.888 48.84% 92.56% 
+
+10 ◦ 50cm 
+
+CoFiI2P 2.897 ±2.182 1.263 ±0.860 87.00 ±38.02 38.33 ±15.83 0.00% 0.00% DirectCalib 12.66 ±24.06 6.216 ±11.71 223.0 ±1394 110.0 ±728.9 0.00% 0.77% CalibAnything 6.024 ±9.581 2.900 ±4.737 49.91 ±48.21 24.90 ±24.36 0.95% 8.57% CalibNet 2.339 ±2.388 0.925 ±0.914 8.304 ±4.912 4.028 ±2.385 2.04% 17.36% RGGNet 4.032 ±3.533 1.570 ±1.437 6.505 ±4.065 3.183 ±2.019 4.08% 16.44% LCCNet 2.548 ±2.551 0.994 ±0.958 6.723 ±4.550 3.286 ±2.254 6.04% 25.56% LCCRAFT 0.951 ±1.117 0.352 ±0.386 6.485 ±4.199 3.084 ±2.067 9.16% 39.08% CalibDepth 1.775 ±2.143 0.668 ±0.738 5.275 ±3.200 2.557 ±1.520 8.68% 41.76% Ours 0.764 ±0.911 0.371 ±0.436 2.747 ±1.427 1.363 ±0.705 41.04% 87.68% 
+
+nuScenes [23] 
+
+15 ◦ 15cm 
+
+CoFiI2P 5.085 ±4.312 2.504 ±1.957 179.2 ±97.26 81.67 ±46.58 0.00% 0.00% DirectCalib 14.89 ±22.03 7.182 ±10.29 451.8 ±1633 212.4 ±773.7 0.00% 0.17% CalibAnything 7.512 ±4.565 3.895 ±2.480 7.240 ±4.983 3.773 ±2.711 0.52% 3.30% CalibNet 2.121 ±1.997 0.896 ±0.844 6.335 ±3.827 2.900 ±1.716 8.24% 35.04% RGGNet 4.205 ±3.504 1.756 ±1.504 6.063 ±4.090 2.879 ±1.952 4.61% 17.35% LCCNet 2.344 ±2.469 1.005 ±1.100 5.588 ±4.489 2.642 ±2.211 13.65% 41.91% LCCRAFT 0.708 ±1.648 0.275 ±0.573 5.570 ±4.481 2.286 ±1.704 27.09% 57.52% CalibDepth 0.299 ±0.196 0.150 ±0.103 3.326 ±2.637 1.381 ±0.955 48.90% 79.14% Ours 0.366 ±0.228 0.185 ±0.119 0.506 ±0.278 0.246 ±0.134 97.89% 99.93% 
+
+10 ◦ 25cm 
+
+CoFiI2P 3.843 ±2.151 1.863 ±1.026 104.6 ±79.45 49.77 ±37.49 0.00% 0.00% DirectCalib 13.25 ±22.32 6.225 ±10.25 267.6 ±1005 122.7 ±463.4 0.17% 0.17% CalibAnything 4.734 ±3.168 2.477 ±1.720 11.94 ±8.318 6.253 ±4.504 1.74% 5.73% CalibNet 2.098 ±1.976 0.888 ±0.836 6.336 ±3.840 2.897 ±1.720 8.37% 35.86% RGGNet 3.949 ±3.327 1.558 ±1.296 6.028 ±4.088 2.853 ±1.942 5.21% 18.30% LCCNet 2.406 ±2.559 1.037 ±1.143 5.858 ±5.719 2.781 ±2.873 13.55% 41.54% LCCRAFT 0.636 ±1.206 0.251 ±0.421 5.629 ±4.276 2.308 ±1.603 24.78% 55.01% CalibDepth 0.393 ±0.251 0.196 ±0.127 3.778 ±2.844 1.583 ±1.039 41.26% 74.10% Ours 0.392 ±0.281 0.194 ±0.145 0.526 ±0.330 0.257 ±0.160 97.18% 99.70% 
+
+10 ◦ 50cm 
+
+CoFiI2P 3.743 ±2.327 1.766 ±1.051 54.16 ±33.93 26.31 ±16.86 0.00% 0.00% DirectCalib 12.74 ±22.00 6.209 ±10.68 359.0 ±1156 169.0 ±544.8 0.00% 0.33% CalibAnything 4.734 ±3.168 2.477 ±1.720 23.88 ±16.64 12.51 ±9.008 0.52% 3.47% CalibNet 2.470 ±2.284 1.023 ±0.912 8.783 ±5.665 3.987 ±2.561 4.01% 20.94% RGGNet 5.827 ±4.176 2.707 ±2.029 7.250 ±4.832 3.771 ±2.617 2.32% 8.47% LCCNet 2.829 ±3.150 1.212 ±1.472 7.559 ±12.08 3.596 ±6.163 6.97% 29.41% LCCRAFT 0.937 ±1.539 0.365 ±0.534 7.407 ±5.334 3.203 ±2.221 13.72% 40.14% CalibDepth 0.363 ±0.236 0.182 ±0.120 5.711 ±4.593 2.222 ±1.610 27.77% 54.38% Ours 0.595 ±0.364 0.299 ±0.187 0.775 ±0.459 0.382 ±0.223 89.81% 99.16% 
+
+6 achieves the best trade-off between translation accuracy and success rates, consistently outperforming smaller nh variants and RoPE-2D [50] (with base frequency fB = 1000 ). Crucially, we validate the effectiveness of field-of-view expansion by masking out-of-frame points (i.e., removing the projection margin). As shown by the 6th vs. 8th rows in the 3D encoding space and the 2nd vs. 3rd rows in the 2D encoding space, removing this margin leads to a significant performance degradation. In the 2D setting, the translation RMSE increases from 3.429 cm to 15.56 cm, while the L1
+
+success rate drops from 39.84% to 0.60%. These results high-light the importance of preserving out-of-frame geometries for robust cross-attention under large initial perturbations, distinguishing our design from prior attention-based methods THIS PAPER HAS BEEN ACCEPTED TO IEEE ROBOTICS AND AUTOMATION LETTERS. 7LCCRAFT 
+
+CalibDepth 
+
+Ours 
+
+Ground -Truth 
+
+Rural Urban  Highway  Nighttime 
+
+Fig. 3. LiDAR projection maps generated using the predicted extrinsic matrix T pred  
+
+> CL
+
+from different methods across urban, rural, highway, and nighttime scenes. Selected regions of interest (ROIs) are zoomed in for clearer visualization. TABLE II ABLATION ON KITTI AT 10 ◦ 50cm (M EAN ± STANDARD DEVIATION )Index Dual Branches Projection Margin Encoding Space Positional Embedding Image Encoder Rotation RMSE ( ◦)↓
+
+Translation RMSE (cm) ↓
+
+Success Rate (%) ↑
+
+L1 L2
+
+1 ✓ ✗ 3D concatenation DINOv2 1.534 ±1.304 3.002 ±2.861 22.60% 73.64% 2 ✓ ✓ 2D harmonic ( nh = 6 ) DINOv2 0.244 ±0.279 3.429 ±2.490 39.84% 83.12% 3 ✓ ✗ 2D harmonic ( nh = 6 ) DINOv2 1.111 ±1.055 15.56 ±8.714 0.60% 6.12% 4 ✓ ✓ 3D harmonic ( nh = 0 ) DINOv2 1.297 ±1.197 3.199 ±1.591 20.12% 76.88% 5 ✓ ✓ 3D harmonic ( nh = 2 ) DINOv2 0.728 ±0.893 2.845 ±3.767 40.76% 89.16% 
+
+6 ✓ ✓ 3D harmonic ( nh = 6 ) DINOv2 0.764 ±0.911 2.747 ±1.427 41.04% 87.68% 7 ✓ ✓ 3D harmonic ( nh = 10 ) DINOv2 0.825 ±1.134 2.924 ±1.733 37.24% 85.52% 8 ✓ ✗ 3D harmonic ( nh = 6 ) DINOv2 1.407 ±1.923 8.786 ±21.41 25.08% 73.92% 9 ✓ ✓ 3D RoPE-2D ( fB = 10 3) DINOv2 0.786 ±0.812 3.251 ±3.888 32.20% 85.40% 10 ✗ ✓ 3D harmonic ( nh = 6 ) DINOv2 1.019 ±1.101 3.031 ±2.465 33.88% 84.32% 11 ✓ ✓ 3D harmonic ( nh = 6 ) ResNet-18 0.726 ±1.033 2.994 ±1.381 36.08% 85.68% 
+
+such as CalibFormer [21] and MSANet [20]. Additionally, decoupling the aggregation branches for ξrot 
+
+and ξtsl (6th vs. 10 th row) reduces rotational and translational RMSE by 25.0% and 9.4%, respectively. Finally, substituting the DINOv2 [42] image encoder with ResNet-18 [48] ( 6th 
+
+vs. 11 th row) drops overall success rates by 3%–5%, demon-strating DINOv2’s superior complementary representations for cross-modal calibration. V. C ONCLUSION 
+
+In this paper, we analyze the limitations of existing cam-era–LiDAR calibration methods that rely on miscalibrated depth maps and propose an extrinsic-aware cross-attention framework to address these issues. Extensive experiments on the KITTI and nuScenes datasets validate the effectiveness of our method, achieving improved accuracy and robustness compared with state-of-the-art baselines. For future work, we plan to extend cross-attention be-yond semantic features to incorporate structural cues such as lines, edges, and object-level geometry, further enhancing interpretability and reliability. Another promising direction is to expand the image feature plane to better accommodate the large spatial extent of projected depth maps, enabling more stable calibration under extreme misalignment. REFERENCES [1] Y. Ai, X. Yang, R. Song, C. Cui, X. Li, Q. Cheng, B. Tian, and L. Chen, “Lidar-camera fusion in perspective view for 3d object detection in surface mine,” IEEE Transactions on Intelligent Vehicles , 2023. [2] H. Wu, C. Wen, S. Shi, X. Li, and C. Wang, “Virtual sparse convolution for multimodal 3d object detection,” in CVPR , 2023, pp. 21 653–21 662. THIS PAPER HAS BEEN ACCEPTED TO IEEE ROBOTICS AND AUTOMATION LETTERS. 8
+
+[3] W. Zhang, H. Zhou, S. Sun, Z. Wang, J. Shi, and C. C. Loy, “Robust multi-modality multi-object tracking,” in Proceedings of the IEEE/CVF international conference on computer vision , 2019, pp. 2365–2374. [4] S. Wang, R. Pi, J. Li, X. Guo, Y. Lu, T. Li, and Y. Tian, “Object tracking based on the fusion of roadside lidar and camera data,” IEEE Transactions on Instrumentation and Measurement , vol. 71, pp. 1–14, 2022. [5] J. Lin and F. Zhang, “R 3 live: A robust, real-time, rgb-colored, lidar-inertial-visual tightly-coupled state estimation and mapping package,” in 
+
+ICRA . IEEE, 2022, pp. 10 672–10 678. [6] Y. Zhu, C. Zheng, C. Yuan, X. Huang, and X. Hong, “Camvox: A low-cost and accurate lidar-assisted visual slam system,” in ICRA . IEEE, 2021, pp. 5049–5055. [7] H. Liu, T. Lu, Y. Xu, J. Liu, W. Li, and L. Chen, “Camliflow: bidirectional camera-lidar fusion for joint optical flow and scene flow estimation,” in CVPR , 2022, pp. 5791–5801. [8] H. Zhou, Y. Chang, and Z. Shi, “Bring event into rgb and lidar: Hierarchical visual-motion fusion for scene flow,” in CVPR , 2024, pp. 26 477–26 486. [9] L. Grammatikopoulos, A. Papanagnou, A. Venianakis, I. Kalisperakis, and C. Stentoumis, “An effective camera-to-lidar spatiotemporal calibra-tion based on a simple calibration target,” Sensors , vol. 22, no. 15, p. 5576, 2022. [10] Z. Huang, X. Zhang, A. Garcia, and X. Huang, “A novel, efficient and accurate method for lidar camera calibration,” in ICRA . IEEE, 2024, pp. 14 513–14 519. [11] Z. Pusztai and L. Hajder, “Accurate calibration of lidar-camera systems using ordinary boxes,” in ICCV Workshops , Oct 2017. [12] J. Levinson and S. Thrun, “Automatic online calibration of cameras and lasers.” in Robotics: science and systems , vol. 2, no. 7. Citeseer, 2013. [13] C. Yuan, X. Liu, X. Hong, and F. Zhang, “Pixel-level extrinsic self cal-ibration of high resolution lidar and camera in targetless environments,” 
+
+RA-L , vol. 6, no. 4, pp. 7517–7524, 2021. [14] S. Ren, Y. Zeng, J. Hou, and X. Chen, “Corri2p: Deep image-to-point cloud registration via dense correspondence,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 33, no. 3, pp. 1198– 1208, 2022. [15] S. Kang, Y. Liao, J. Li, F. Liang, Y. Li, X. Zou, F. Li, X. Chen, Z. Dong, and B. Yang, “Cofii2p: Coarse-to-fine correspondences-based image to point cloud registration,” RA-L , 2024. [16] G. Iyer, R. K. Ram, J. K. Murthy, and K. M. Krishna, “Calibnet: Geo-metrically supervised extrinsic calibration using 3d spatial transformer networks,” in IROS . IEEE, 2018, pp. 1110–1117. [17] K. Yuan, Z. Guo, and Z. J. Wang, “Rggnet: Tolerance aware lidar-camera online calibration with geometric deep learning and generative model,” 
+
+RA-L , vol. 5, no. 4, pp. 6956–6963, 2020. [18] X. Lv, B. Wang, Z. Dou, D. Ye, and S. Wang, “Lccnet: Lidar and camera self-calibration using cost volume network,” in CVPR , 2021, pp. 2894– 2901. [19] Y.-C. Lee and K.-W. Chen, “Lccraft: Lidar and camera calibration using recurrent all-pairs field transforms without precise initial guess,” in 
+
+ICRA . IEEE, 2024, pp. 16 669–16 675. [20] F. Xiong, Z. Zhang, Y. Kong, C. Shen, M. Hu, L. Kuang, and X. Han, “Msanet: Lidar-camera online calibration with multi-scale fusion and attention mechanisms,” Remote Sensing , vol. 16, no. 22, p. 4233, 2024. [21] Y. Xiao, Y. Li, C. Meng, X. Li, J. Ji, and Y. Zhang, “Calibformer: A transformer-based automatic lidar-camera calibration network,” in ICRA .IEEE, 2024, pp. 16 714–16 720. [22] A. Geiger, P. Lenz, and R. Urtasun, “Are we ready for autonomous driving? the kitti vision benchmark suite,” in CVPR . IEEE, 2012, pp. 3354–3361. [23] H. Caesar, V. Bankiti, A. H. Lang, S. Vora, V. E. Liong, Q. Xu, A. Kr-ishnan, Y. Pan, G. Baldan, and O. Beijbom, “nuscenes: A multimodal dataset for autonomous driving,” arXiv preprint arXiv:1903.11027 , 2019. [24] R. Unnikrishnan and M. Hebert, “Fast extrinsic calibration of a laser rangefinder to a camera,” Robotics Institute, Pittsburgh, PA, Tech. Rep. CMU-RI-TR-05-09 , 2005. [25] G. Pandey, J. McBride, S. Savarese, and R. Eustice, “Extrinsic cali-bration of a 3d laser scanner and an omnidirectional camera,” IFAC Proceedings Volumes , vol. 43, no. 16, pp. 336–341, 2010. [26] L. Zhou, Z. Li, and M. Kaess, “Automatic extrinsic calibration of a camera and a 3d lidar using line and plane correspondences,” in IROS .IEEE, 2018, pp. 5562–5569. [27] Y. Park, S. Yun, C. S. Won, K. Cho, K. Um, and S. Sim, “Calibration between color camera and 3d lidar instruments with a polygonal planar board,” Sensors , vol. 14, no. 3, pp. 5333–5353, 2014. [28] X. Xu, L. Zhang, J. Yang, C. Liu, Y. Xiong, M. Luo, Z. Tan, and B. Liu, “Lidar–camera calibration method based on ranging statistical charac-teristics and improved ransac algorithm,” Robotics and Autonomous Systems , vol. 141, p. 103776, 2021. [29] J. Zhang, Y. Liu, M. Wen, Y. Yue, H. Zhang, and D. Wang, “L 2 v 2 t 2 calib: Automatic and unified extrinsic calibration toolbox for different 3d lidar, visual camera and thermal camera,” in 2023 IEEE Intelligent Vehicles Symposium (IV) . IEEE, 2023, pp. 1–7. [30] C. Guindel, J. Beltr´ an, D. Mart´ ın, and F. Garc´ ıa, “Automatic extrinsic calibration for lidar-stereo vehicle sensor setups,” in ITSC . IEEE, 2017, pp. 1–6. [31] K. Kwak, D. F. Huber, H. Badino, and T. Kanade, “Extrinsic calibration of a single line scanning lidar and a camera,” in IROS . IEEE, 2011, pp. 3283–3289. [32] X. Gong, Y. Lin, and J. Liu, “Extrinsic calibration of a 3d lidar and a camera using a trihedron,” Optics and Lasers in Engineering , vol. 51, no. 4, pp. 394–401, 2013. [33] K. Banerjee, D. Notz, J. Windelen, S. Gavarraju, and M. He, “Online camera lidar fusion and object detection on hybrid data for autonomous driving,” in 2018 IEEE Intelligent Vehicles Symposium (IV) . IEEE, 2018, pp. 1632–1638. [34] Q. Herau, N. Piasco, M. Bennehar, L. Roldao, D. Tsishkou, C. Migniot, P. Vasseur, and C. Demonceaux, “Soac: Spatio-temporal overlap-aware multi-sensor calibration using neural radiance fields,” in CVPR , 2024, pp. 15 131–15 140. [35] ——, “Moisst: Multimodal optimization of implicit scene for spatiotem-poral calibration,” in IROS . IEEE, 2023, pp. 1810–1817. [36] Q. Herau, M. Bennehar, A. Moreau, N. Piasco, L. Rold˜ ao, D. Tsishkou, C. Migniot, P. Vasseur, and C. Demonceaux, “3dgs-calib: 3d gaussian splatting for multimodal spatiotemporal calibration,” in IROS . IEEE, 2024, pp. 8315–8321. [37] Z. Luo, G. Yan, and Y. Li, “Calib-anything: Zero-training lidar-camera extrinsic calibration method using segment anything,” arXiv preprint arXiv:2306.02656 , 2023. [38] Z. Huang, Y. Zhang, Q. Chen, and R. Fan, “Online, target-free lidar-camera extrinsic calibration via cross-modal mask matching,” IEEE Transactions on Intelligent Vehicles , 2024. [39] G. Pandey, J. McBride, S. Savarese, and R. Eustice, “Automatic tar-getless extrinsic calibration of a 3d lidar and camera by maximizing mutual information,” in Proceedings of the AAAI conference on artificial intelligence , vol. 26, no. 1, 2012, pp. 2053–2059. [40] K. Koide, S. Oishi, M. Yokozuka, and A. Banno, “General, single-shot, target-less, and automatic lidar-camera extrinsic calibration toolbox,” 
+
+arXiv preprint arXiv:2302.05094 , 2023. [41] J. Zhu, J. Xue, and P. Zhang, “Calibdepth: Unifying depth map repre-sentation for iterative lidar-camera online calibration,” in ICRA . IEEE, 2023, pp. 726–733. [42] M. Oquab, T. Darcet, T. Moutakanni, H. Vo, M. Szafraniec, V. Khalidov, P. Fernandez, D. Haziza, F. Massa, A. El-Nouby et al. , “Dinov2: Learning robust visual features without supervision,” arXiv preprint arXiv:2304.07193 , 2023. [43] A. Dosovitskiy, “An image is worth 16x16 words: Transformers for image recognition at scale,” arXiv preprint arXiv:2010.11929 , 2020. [44] G. Chen, M. Wang, Y. Yang, K. Yu, L. Yuan, and Y. Yue, “Pointgpt: Auto-regressively generative pre-training from point clouds,” NeurIPS ,vol. 36, 2024. [45] C. R. Qi, H. Su, K. Mo, and L. J. Guibas, “Pointnet: Deep learning on point sets for 3d classification and segmentation,” in CVPR , 2017, pp. 652–660. [46] B. Mildenhall, P. P. Srinivasan, M. Tancik, J. T. Barron, R. Ramamoorthi, and R. Ng, “Nerf: Representing scenes as neural radiance fields for view synthesis,” Communications of the ACM , vol. 65, no. 1, pp. 99–106, 2021. [47] M. Dehghani, B. Mustafa, J. Djolonga, J. Heek, M. Minderer, M. Caron, A. Steiner, J. Puigcerver, R. Geirhos, I. M. Alabdulmohsin et al. , “Patch n’pack: Navit, a vision transformer for any aspect ratio and resolution,” 
+
+NeurIPS , vol. 36, pp. 2252–2274, 2023. [48] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in CVPR , 2016, pp. 770–778. [49] S. Elfwing, E. Uchibe, and K. Doya, “Sigmoid-weighted linear units for neural network function approximation in reinforcement learning,” 
+
+Neural networks , vol. 107, pp. 3–11, 2018. [50] J. Su, M. Ahmed, Y. Lu, S. Pan, W. Bo, and Y. Liu, “Roformer: En-hanced transformer with rotary position embedding,” Neurocomputing ,vol. 568, p. 127063, 2024.

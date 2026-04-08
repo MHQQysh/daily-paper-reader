@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.29414v1/fig-001.webp",
+      "caption": "TABLE II ABLATION ON KITTI AT 10◦ 50cm (MEAN ± STANDARD DEVIATION)",
+      "page": 7,
+      "index": 1,
+      "width": 1064,
+      "height": 287
+    },
+    {
+      "url": "assets/figures/arxiv/2603.29414v1/fig-002.webp",
+      "caption": "Fig. 3. LiDAR projection maps generated using the predicted extrinsic matrix T pred CL from different methods across urban, rural, highway, and nighttime scenes. Selected regions of interest (ROIs) are zoomed in for clearer visualization.",
+      "page": 7,
+      "index": 2,
+      "width": 1013,
+      "height": 549
+    },
+    {
+      "url": "assets/figures/arxiv/2603.29414v1/fig-003.webp",
+      "caption": "Fig. 2. Overall framework of our method. FI and FP denote the sequences of image and point features, respectively, while CI and CP represent their corresponding positional embeddings. ξrot and ξtsl are the rotational and translational components of ξ defined in Eq. (1).",
+      "page": 3,
+      "index": 3,
+      "width": 1010,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2603.29414v1/fig-004.webp",
+      "caption": "TABLE I CALIBRATION RESULTS ON KITTI AND NUSCENES DATASETS (MEAN ± STANDARD DEVIATION)",
+      "page": 6,
+      "index": 4,
+      "width": 1064,
+      "height": 1164
+    },
+    {
+      "url": "assets/figures/arxiv/2603.29414v1/fig-005.webp",
+      "caption": "Fig. 1. Illustration of the problem caused by miscalibrated depth maps and our proposed method. (a) Projecting LiDAR points onto the image plane produces incomplete and distorted object structures. (b) Image patches and point groups are encoded separately and fused through extrinsic-aware crossattention, enabling structure-preserving cross-modal feature interaction.",
+      "page": 1,
+      "index": 5,
+      "width": 490,
+      "height": 683
+    }
+  ]
+}

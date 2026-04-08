@@ -6,136 +6,154 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-04-07 · 2026-04-07 19:45:30
-- 运行时间：2026-04-07 20:01:06 UTC
+- 最新运行日期：2026-04-08 · 2026-04-08 20:45:33
+- 运行时间：2026-04-08 21:04:51 UTC
 - 运行状态：成功
-- 本次总论文数：38
-- 精读区：24
+- 本次总论文数：44
+- 精读区：30
 - 速读区：14
 
 ### 今日简报（AI）
-今日深度研读 38 篇论文，重点攻克 Transformer 数学本质与多模态大模型的量化剪枝难题。
-满分论文揭示了应用数学视角下的注意力机制，并提出 QAPruner 方案，在保持精度的同时大幅压缩视觉 Token。
-建议关注物理引导注意力（PGT）及幻觉缓解技术，把握 AI 迈向科学计算与高可靠性的新趋势。
-- 详情：[/all__20260407-194530-819091/README](/all__20260407-194530-819091/README)
+今日精选 44 篇前沿论文，深度解析 Transformer 数学原理与多模态大模型的量化剪枝技术。
+重点关注为应用数学家设计的注意力机制详解，以及通过 QAPruner 实现视觉 Token 高效压缩的突破。
+建议优先研读 Transformer 基础理论以夯实底层逻辑，并关注长文本压缩与跨模态校准的工程实践。
+- 详情：[/all__20260408-204533-045506/README](/all__20260408-204533-045506/README)
 
 ### 精读区论文标签
-1. [Understanding Transformers and Attention Mechanisms: An Introduction for Applied Mathematicians](/all__20260407-194530-819091/2604.00965v1-understanding-transformers-and-attention-mechanisms-an-introduction-for-applied-mathematicians)  
+1. [Understanding Transformers and Attention Mechanisms: An Introduction for Applied Mathematicians](/all__20260408-204533-045506/2604.00965v1-understanding-transformers-and-attention-mechanisms-an-introduction-for-applied-mathematicians)  
    标签：评分：10.0/10、query:attn
-   evidence：介绍注意力机制、多头注意力和 Transformer 架构
-2. [QAPruner: Quantization-Aware Vision Token Pruning for Multimodal Large Language Models](/all__20260407-194530-819091/2604.02816v1-qapruner-quantization-aware-vision-token-pruning-for-multimodal-large-language-models)  
+   evidence：注意力机制、多头注意力和Transformer架构介绍
+2. [QAPruner: Quantization-Aware Vision Token Pruning for Multimodal Large Language Models](/all__20260408-204533-045506/2604.02816v1-qapruner-quantization-aware-vision-token-pruning-for-multimodal-large-language-models)  
    标签：评分：10.0/10、query:llm
-   evidence：多模态大语言模型的量化感知视觉令牌剪枝
-3. [Decomposing Communication Gain and Delay Cost Under Cross-Timestep Delays in Cooperative Multi-Agent Reinforcement Learning](/all__20260407-194530-819091/2604.03785v1-decomposing-communication-gain-and-delay-cost-under-cross-timestep-delays-in-cooperative-multi-agent-reinforcement-learning)  
+   evidence：多模态大模型的量化感知视觉标记剪枝
+3. [SLaB: Sparse-Lowrank-Binary Decomposition for Efficient Large Language Models](/all__20260408-204533-045506/2604.04493v1-slab-sparse-lowrank-binary-decomposition-for-efficient-large-language-models)  
+   标签：评分：10.0/10、query:llm
+   evidence：利用激活感知剪枝分数进行模型压缩和网络剪枝
+4. [Territory Paint Wars: Diagnosing and Mitigating Failure Modes in Competitive Multi-Agent PPO](/all__20260408-204533-045506/2604.04983v1-territory-paint-wars-diagnosing-and-mitigating-failure-modes-in-competitive-multi-agent-ppo)  
    标签：评分：10.0/10、query:marl
-   evidence：跨时间步延迟下的协作多智能体强化学习
-4. [REAM: Merging Improves Pruning of Experts in LLMs](/all__20260407-194530-819091/2604.04356v1-ream-merging-improves-pruning-of-experts-in-llms)  
-   标签：评分：10.0/10、query:llm
-   evidence：合并改进了大语言模型中的专家剪枝
-5. [SLaB: Sparse-Lowrank-Binary Decomposition for Efficient Large Language Models](/all__20260407-194530-819091/2604.04493v1-slab-sparse-lowrank-binary-decomposition-for-efficient-large-language-models)  
-   标签：评分：10.0/10、query:llm
-   evidence：SLaB框架通过稀疏-低秩-二进制分解和激活感知剪枝分数实现大模型压缩
-6. [Compressing Transformer Language Models via Matrix Product Operator Decomposition: A Case Study on PicoGPT](/all__20260407-194530-819091/2603.28534v1-compressing-transformer-language-models-via-matrix-product-operator-decomposition-a-case-study-on-picogpt)  
+   evidence：研究竞争性多智能体PPO和零和博弈中的失败模式
+5. [Bypassing the CSI Bottleneck: MARL-Driven Spatial Control for Reflector Arrays](/all__20260408-204533-045506/2604.05162v1-bypassing-the-csi-bottleneck-marl-driven-spatial-control-for-reflector-arrays)  
+   标签：评分：10.0/10、query:marl
+   evidence：采用中心化训练分布式执行 (CTDE) 架构的多智能体强化学习框架
+6. [Breakthrough the Suboptimal Stable Point in Value-Factorization-Based Multi-Agent Reinforcement Learning](/all__20260408-204533-045506/2604.05297v1-breakthrough-the-suboptimal-stable-point-in-value-factorization-based-multi-agent-reinforcement-learning)  
+   标签：评分：10.0/10、query:marl
+   evidence：基于价值分解的多智能体强化学习稳定点分析
+7. [Coalitional Zero-Sum Games for ${H_{\infty}}$ Leader-Following Consensus Control](/all__20260408-204533-045506/2604.06089v1-coalitional-zero-sum-games-for-hinfty-leader-following-consensus-control)  
+   标签：评分：10.0/10、query:marl
+   evidence：多智能体系统的联盟极小极大零和博弈
+8. [Spectral Compact Training: Pre-Training Large Language Models via Permanent Truncated SVD and Stiefel QR Retraction](/all__20260408-204533-045506/2604.00733v1-spectral-compact-training-pre-training-large-language-models-via-permanent-truncated-svd-and-stiefel-qr-retraction)  
    标签：评分：9.0/10、query:llm
-   evidence：通过矩阵乘积算子分解压缩Transformer
-7. [Learning Partial Action Replacement in Offline MARL](/all__20260407-194530-819091/2603.28573v1-learning-partial-action-replacement-in-offline-marl)  
+   evidence：通过永久截断SVD进行大模型预训练以减少内存占用
+9. [Spectral Compact Training: Pre-Training Large Language Models via Permanent Truncated SVD and Stiefel QR Retraction](/all__20260408-204533-045506/2604.00733v2-spectral-compact-training-pre-training-large-language-models-via-permanent-truncated-svd-and-stiefel-qr-retraction)  
+   标签：评分：9.0/10、query:llm
+   evidence：通过 SVD 对大规模 Transformer 进行模型压缩
+10. [IWP: Token Pruning as Implicit Weight Pruning in Large Vision Language Models](/all__20260408-204533-045506/2604.00757v1-iwp-token-pruning-as-implicit-weight-pruning-in-large-vision-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：大视觉语言模型中作为隐式权重剪枝的Token剪枝
+11. [Swift-SVD: Theoretical Optimality Meets Practical Efficiency in Low-Rank LLM Compression](/all__20260408-204533-045506/2604.01609v1-swift-svd-theoretical-optimality-meets-practical-efficiency-in-low-rank-llm-compression)  
+   标签：评分：9.0/10、query:llm
+   evidence：低秩大模型压缩和基于SVD的缩减
+12. [Attention Mechanisms Through the Lens of Numerical Methods: Approximation Methods and Alternative Formulations](/all__20260408-204533-045506/2604.01757v1-attention-mechanisms-through-the-lens-of-numerical-methods-approximation-methods-and-alternative-formulations)  
+   标签：评分：9.0/10、query:attn
+   evidence：注意力机制快速近似方法的综述
+13. [T5Gemma-TTS Technical Report](/all__20260408-204533-045506/2604.01760v1-t5gemma-tts-technical-report)  
+   标签：评分：9.0/10、query:attn
+   evidence：带有交叉注意力的编码器-解码器编解码器语言模型
+14. [HieraVid: Hierarchical Token Pruning for Fast Video Large Language Models](/all__20260408-204533-045506/2604.01881v1-hieravid-hierarchical-token-pruning-for-fast-video-large-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：用于快速视频大语言模型的层级Token剪枝
+15. [AA-SVD : Anchored and Adaptive SVD for Large Language Model Compression](/all__20260408-204533-045506/2604.02119v1-aa-svd--anchored-and-adaptive-svd-for-large-language-model-compression)  
+   标签：评分：9.0/10、query:llm
+   evidence：用于大语言模型压缩的低秩分解
+16. [Multi-agent Reinforcement Learning-based Joint Design of Low-Carbon P2P Market and Bidding Strategy in Microgrids](/all__20260408-204533-045506/2604.02728v1-multi-agent-reinforcement-learning-based-joint-design-of-low-carbon-p2p-market-and-bidding-strategy-in-microgrids)  
    标签：评分：9.0/10、query:marl
-   evidence：离线多智能体强化学习与动作替换
-8. [OneComp: One-Line Revolution for Generative AI Model Compression](/all__20260407-194530-819091/2603.28845v1-onecomp-one-line-revolution-for-generative-ai-model-compression)  
-   标签：评分：9.0/10、query:llm
-   evidence：用于生成式 AI 模型压缩和量化的开源压缩框架
-9. [IWP: Token Pruning as Implicit Weight Pruning in Large Vision Language Models](/all__20260407-194530-819091/2604.00757v1-iwp-token-pruning-as-implicit-weight-pruning-in-large-vision-language-models)  
-   标签：评分：9.0/10、query:llm
-   evidence：在大视觉语言模型中将标记剪枝视为隐式权重剪枝
-10. [Optimal Brain Decomposition for Accurate LLM Low-Rank Approximation](/all__20260407-194530-819091/2604.00821v1-optimal-brain-decomposition-for-accurate-llm-low-rank-approximation)  
-   标签：评分：9.0/10、query:llm
-   evidence：利用Hessian信息进行大语言模型低秩近似
-11. [Screening Is Enough](/all__20260407-194530-819091/2604.01178v2-screening-is-enough)  
-   标签：评分：9.0/10、query:attn
-   evidence：用筛选机制取代Softmax注意力的新型语言模型架构
-12. [Swift-SVD: Theoretical Optimality Meets Practical Efficiency in Low-Rank LLM Compression](/all__20260407-194530-819091/2604.01609v1-swift-svd-theoretical-optimality-meets-practical-efficiency-in-low-rank-llm-compression)  
-   标签：评分：9.0/10、query:llm
-   evidence：基于SVD的大语言模型低秩压缩
-13. [Attention Mechanisms Through the Lens of Numerical Methods: Approximation Methods and Alternative Formulations](/all__20260407-194530-819091/2604.01757v1-attention-mechanisms-through-the-lens-of-numerical-methods-approximation-methods-and-alternative-formulations)  
-   标签：评分：9.0/10、query:attn
-   evidence：注意力机制及其快速近似方法的综述
-14. [HieraVid: Hierarchical Token Pruning for Fast Video Large Language Models](/all__20260407-194530-819091/2604.01881v1-hieravid-hierarchical-token-pruning-for-fast-video-large-language-models)  
-   标签：评分：9.0/10、query:llm
-   evidence：VideoLLM的分层Token剪枝
-15. [AA-SVD : Anchored and Adaptive SVD for Large Language Model Compression](/all__20260407-194530-819091/2604.02119v1-aa-svd--anchored-and-adaptive-svd-for-large-language-model-compression)  
-   标签：评分：9.0/10、query:llm
-   evidence：基于低秩分解的大语言模型压缩框架
-16. [VISTA: Visualization of Token Attribution via Efficient Analysis](/all__20260407-194530-819091/2604.02217v1-vista-visualization-of-token-attribution-via-efficient-analysis)  
-   标签：评分：9.0/10、query:attn
-   evidence：用于解释模型如何关注输入数据的模型无关标记重要性可视化技术
-17. [Multi-agent Reinforcement Learning-based Joint Design of Low-Carbon P2P Market and Bidding Strategy in Microgrids](/all__20260407-194530-819091/2604.02728v1-multi-agent-reinforcement-learning-based-joint-design-of-low-carbon-p2p-market-and-bidding-strategy-in-microgrids)  
+   evidence：基于多智能体强化学习的微网交易与竞价框架
+17. [Multi-Turn Reinforcement Learning for Tool-Calling Agents with Iterative Reward Calibration](/all__20260408-204533-045506/2604.02869v1-multi-turn-reinforcement-learning-for-tool-calling-agents-with-iterative-reward-calibration)  
    标签：评分：9.0/10、query:marl
-   evidence：基于多智能体强化学习的微网联合设计
-18. [Collaborative Multi-Mode Pruning for Vision-Language Models](/all__20260407-194530-819091/2604.02956v1-collaborative-multi-mode-pruning-for-vision-language-models)  
+   evidence：强化学习中对话轮次间的信用分配
+18. [Collaborative Multi-Mode Pruning for Vision-Language Models](/all__20260408-204533-045506/2604.02956v1-collaborative-multi-mode-pruning-for-vision-language-models)  
    标签：评分：9.0/10、query:llm
-   evidence：针对 Transformer 模型的联合参数与 Token 剪枝
-19. [MI-Pruner: Crossmodal Mutual Information-guided Token Pruner for Efficient MLLMs](/all__20260407-194530-819091/2604.03072v1-mi-pruner-crossmodal-mutual-information-guided-token-pruner-for-efficient-mllms)  
+   evidence：视觉语言模型的联合参数与令牌剪枝
+19. [MI-Pruner: Crossmodal Mutual Information-guided Token Pruner for Efficient MLLMs](/all__20260408-204533-045506/2604.03072v1-mi-pruner-crossmodal-mutual-information-guided-token-pruner-for-efficient-mllms)  
    标签：评分：9.0/10、query:llm
-   evidence：MI-Pruner用于多模态大语言模型中的视觉标记剪枝
-20. [Fast Cross-Operator Optimization of Attention Dataflow](/all__20260407-194530-819091/2604.03446v1-fast-cross-operator-optimization-of-attention-dataflow)  
+   evidence：互信息引导的Token剪枝器用于高效多模态大模型
+20. [Decomposing Communication Gain and Delay Cost Under Cross-Timestep Delays in Cooperative Multi-Agent Reinforcement Learning](/all__20260408-204533-045506/2604.03785v1-decomposing-communication-gain-and-delay-cost-under-cross-timestep-delays-in-cooperative-multi-agent-reinforcement-learning)  
+   标签：评分：9.0/10、query:marl
+   evidence：协作式多智能体强化学习中的通信增益与延迟成本
+21. [Diagonal-Tiled Mixed-Precision Attention for Efficient Low-Bit MXFP Inference](/all__20260408-204533-045506/2604.03950v1-diagonal-tiled-mixed-precision-attention-for-efficient-low-bit-mxfp-inference)  
    标签：评分：9.0/10、query:flattn
-   evidence：注意力数据流优化，包括分块和计算排序
-21. [Automated Attention Pattern Discovery at Scale in Large Language Models](/all__20260407-194530-819091/2604.03764v1-automated-attention-pattern-discovery-at-scale-in-large-language-models)  
-   标签：评分：9.0/10、query:attn
-   evidence：大规模解释和可视化注意力模式
-22. [Diagonal-Tiled Mixed-Precision Attention for Efficient Low-Bit MXFP Inference](/all__20260407-194530-819091/2604.03950v1-diagonal-tiled-mixed-precision-attention-for-efficient-low-bit-mxfp-inference)  
-   标签：评分：9.0/10、query:flattn
-   evidence：使用Triton实现的对角分块注意力内核，优化内存效率和并行性
-23. [Finite-Time Analysis of Q-Value Iteration for General-Sum Stackelberg Games](/all__20260407-194530-819091/2604.04394v1-finite-time-analysis-of-q-value-iteration-for-general-sum-stackelberg-games)  
+   evidence：对角分块注意力用于内存效率和分块级优化
+22. [VA-FastNavi-MARL: Real-Time Robot Control with Multimedia-Driven Meta-Reinforcement Learning](/all__20260408-204533-045506/2604.03998v1-va-fastnavi-marl-real-time-robot-control-with-multimedia-driven-meta-reinforcement-learning)  
    标签：评分：9.0/10、query:marl
-   evidence：一般和马尔可夫博弈中Q值迭代的有限时间分析
-24. [Explainable Autonomous Cyber Defense using Adversarial Multi-Agent Reinforcement Learning](/all__20260407-194530-819091/2604.04442v1-explainable-autonomous-cyber-defense-using-adversarial-multi-agent-reinforcement-learning)  
+   evidence：多机器人控制的多媒体驱动元强化学习
+23. [REAM: Merging Improves Pruning of Experts in LLMs](/all__20260408-204533-045506/2604.04356v1-ream-merging-improves-pruning-of-experts-in-llms)  
+   标签：评分：9.0/10、query:llm
+   evidence：合并 MoE 大模型中的专家作为剪枝的替代方案
+24. [Explainable Autonomous Cyber Defense using Adversarial Multi-Agent Reinforcement Learning](/all__20260408-204533-045506/2604.04442v1-explainable-autonomous-cyber-defense-using-adversarial-multi-agent-reinforcement-learning)  
    标签：评分：9.0/10、query:marl
-   evidence：用于自主网络防御的对抗性多智能体强化学习
+   evidence：用于网络防御的对抗性多智能体强化学习
+25. [TriAttention: Efficient Long Reasoning with Trigonometric KV Compression](/all__20260408-204533-045506/2604.04921v1-triattention-efficient-long-reasoning-with-trigonometric-kv-compression)  
+   标签：评分：9.0/10、query:llm
+   evidence：大语言模型长推理中的KV缓存内存压缩
+26. [RCP: Representation Consistency Pruner for Mitigating Distribution Shift in Large Vision-Language Models](/all__20260408-204533-045506/2604.04972v1-rcp-representation-consistency-pruner-for-mitigating-distribution-shift-in-large-vision-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：大型视觉语言模型的剪枝方法
+27. [Prune-Quantize-Distill: An Ordered Pipeline for Efficient Neural Network Compression](/all__20260408-204533-045506/2604.04988v1-prune-quantize-distill-an-ordered-pipeline-for-efficient-neural-network-compression)  
+   标签：评分：9.0/10、query:llm
+   evidence：将非结构化剪枝与量化和蒸馏相结合
+28. [Nash Approximation Gap in Truncated Infinite-horizon Partially Observable Markov Games](/all__20260408-204533-045506/2604.05131v1-nash-approximation-gap-in-truncated-infinite-horizon-partially-observable-markov-games)  
+   标签：评分：9.0/10、query:marl
+   evidence：在马尔可夫博弈中建模多智能体顺序决策
+29. [Learning to Focus: CSI-Free Hierarchical MARL for Reconfigurable Reflectors](/all__20260408-204533-045506/2604.05165v1-learning-to-focus-csi-free-hierarchical-marl-for-reconfigurable-reflectors)  
+   标签：评分：9.0/10、query:marl
+   evidence：分层多智能体强化学习架构
+30. [MARL-GPT: Foundation Model for Multi-Agent Reinforcement Learning](/all__20260408-204533-045506/2604.05943v1-marl-gpt-foundation-model-for-multi-agent-reinforcement-learning)  
+   标签：评分：9.0/10、query:marl
+   evidence：使用基于Transformer的观测编码器处理多种MARL任务的基础模型
 
 ### 速读区论文标签
-1. [SAGE: Sink-Aware Grounded Decoding for Multimodal Hallucination Mitigation](/all__20260407-194530-819091/2603.27898v1-sage-sink-aware-grounded-decoding-for-multimodal-hallucination-mitigation)  
-   标签：评分：8.0/10、query:attn
-   evidence：在生成过程中动态调节自注意力以减轻幻觉
-2. [Rényi Entropy: A New Token Pruning Metric for Vision Transformers](/all__20260407-194530-819091/2603.27900v1-rnyi-entropy-a-new-token-pruning-metric-for-vision-transformers)  
+1. [Developing Adaptive Context Compression Techniques for Large Language Models (LLMs) in Long-Running Interactions](/all__20260408-204533-045506/2603.29193v1-developing-adaptive-context-compression-techniques-for-large-language-models-llms-in-long-running-interactions)  
    标签：评分：8.0/10、query:llm
-   evidence：视觉Transformer的Token剪枝指标
-3. [Physics-Guided Transformer (PGT): Physics-Aware Attention Mechanism for PINNs](/all__20260407-194530-819091/2603.27929v1-physics-guided-transformer-pgt-physics-aware-attention-mechanism-for-pinns)  
-   标签：评分：8.0/10、query:attn
-   evidence：将物理结构直接嵌入自注意力机制中
-4. [On the Role of Encoder Depth: Pruning Whisper and LoRA Fine-Tuning in SLAM-ASR](/all__20260407-194530-819091/2603.27981v1-on-the-role-of-encoder-depth-pruning-whisper-and-lora-fine-tuning-in-slam-asr)  
-   标签：评分：8.0/10、query:llm
-   evidence：Whisper 编码器的层剪枝与 LoRA 恢复
-5. [Heddle: A Distributed Orchestration System for Agentic RL Rollout](/all__20260407-194530-819091/2603.28101v1-heddle-a-distributed-orchestration-system-for-agentic-rl-rollout)  
+   evidence：大语言模型的自适应上下文压缩以控制内存增长
+2. [Differentiable Normative Guidance for Nash Bargaining Solution Recovery](/all__20260408-204533-045506/2603.29297v1-differentiable-normative-guidance-for-nash-bargaining-solution-recovery)  
    标签：评分：8.0/10、query:marl
-   evidence：智能体强化学习 Rollout 的编排系统
-6. [Efficient Inference of Large Vision Language Models](/all__20260407-194530-819091/2603.27960v1-efficient-inference-of-large-vision-language-models)  
+   evidence：自主智能体的纳什议价解恢复
+3. [Native-Domain Cross-Attention for Camera-LiDAR Extrinsic Calibration Under Large Initial Perturbations](/all__20260408-204533-045506/2603.29414v1-native-domain-cross-attention-for-camera-lidar-extrinsic-calibration-under-large-initial-perturbations)  
+   标签：评分：8.0/10、query:attn
+   evidence：用于相机与激光雷达对齐的外参感知交叉注意力
+4. [SeGPruner: Semantic-Geometric Visual Token Pruner for 3D Question Answering](/all__20260408-204533-045506/2603.29437v1-segpruner-semantic-geometric-visual-token-pruner-for-3d-question-answering)  
+   标签：评分：8.0/10、query:llm
+   evidence：用于大语言模型推理效率的视觉标记剪枝
+5. [VecAttention: Vector-wise Sparse Attention for Accelerating Long Context Inference](/all__20260408-204533-045506/2603.29494v1-vecattention-vector-wise-sparse-attention-for-accelerating-long-context-inference)  
+   标签：评分：8.0/10、query:attn
+   evidence：针对视频模型的向量级稀疏注意力机制
+6. [Understand and Accelerate Memory Processing Pipeline for Disaggregated LLM Inference](/all__20260408-204533-045506/2603.29002v1-understand-and-accelerate-memory-processing-pipeline-for-disaggregated-llm-inference)  
    标签：评分：7.0/10、query:llm
-   evidence：视觉令牌压缩和高效架构设计的综述
-7. [ExFusion: Efficient Transformer Training via Multi-Experts Fusion](/all__20260407-194530-819091/2603.27965v1-exfusion-efficient-transformer-training-via-multi-experts-fusion)  
+   evidence：压缩上下文内存与推理加速
+7. [PolarQuant: Optimal Gaussian Weight Quantization via Hadamard Rotation for LLM Compression](/all__20260408-204533-045506/2603.29078v1-polarquant-optimal-gaussian-weight-quantization-via-hadamard-rotation-for-llm-compression)  
    标签：评分：7.0/10、query:llm
-   evidence：通过多专家融合实现高效Transformer训练
-8. [RetinexDualV2: Physically-Grounded Dual Retinex for Generalized UHD Image Restoration](/all__20260407-194530-819091/2603.27979v1-retinexdualv2-physically-grounded-dual-retinex-for-generalized-uhd-image-restoration)  
+   evidence：用于大模型压缩的训练后权重量化，实现近乎无损的性能
+8. [Compiling Code LLMs into Lightweight Executables](/all__20260408-204533-045506/2603.29813v1-compiling-code-llms-into-lightweight-executables)  
+   标签：评分：7.0/10、query:llm
+   evidence：将大语言模型编译为轻量级可执行文件以进行本地部署
+9. [Less Is More? Selective Visual Attention to High-Importance Regions for Multimodal Radiology Summarization](/all__20260408-204533-045506/2603.29901v1-less-is-more-selective-visual-attention-to-high-importance-regions-for-multimodal-radiology-summarization)  
    标签：评分：7.0/10、query:attn
-   evidence：新型物理调节多头自注意力（PC-MSA）机制
-9. [Compressing Code Context for LLM-based Issue Resolution](/all__20260407-194530-819091/2603.28119v1-compressing-code-context-for-llm-based-issue-resolution)  
-   标签：评分：7.0/10、query:llm
-   evidence：大语言模型的上下文蒸馏与压缩
-10. [Variational Neurons in Transformers for Language Modeling](/all__20260407-194530-819091/2603.28219v1-variational-neurons-in-transformers-for-language-modeling)  
-   标签：评分：7.0/10、query:attn
-   evidence：Transformer前馈层中的变分神经元
-11. [Hydra: Unifying Document Retrieval and Generation in a Single Vision-Language Model](/all__20260407-194530-819091/2603.28554v1-hydra-unifying-document-retrieval-and-generation-in-a-single-vision-language-model)  
-   标签：评分：6.0/10、query:attn
-   evidence：用于文档检索和生成的视觉语言模型
-12. [ResAdapt: Adaptive Resolution for Efficient Multimodal Reasoning](/all__20260407-194530-819091/2603.28610v1-resadapt-adaptive-resolution-for-efficient-multimodal-reasoning)  
+   evidence：用于放射学的视觉文本注意力摘要器
+10. [HabitatAgent: An End-to-End Multi-Agent System for Housing Consultation](/all__20260408-204533-045506/2604.00556v1-habitatagent-an-end-to-end-multi-agent-system-for-housing-consultation)  
+   标签：评分：7.0/10、query:marl
+   evidence：基于大语言模型的多智能体架构，包含专门的智能体角色
+11. [Route-Induced Density and Stability (RIDE): Controlled Intervention and Mechanism Analysis of Routing-Style Meta Prompts on LLM Internal States](/all__20260408-204533-045506/2603.29206v1-route-induced-density-and-stability-ride-controlled-intervention-and-mechanism-analysis-of-routing-style-meta-prompts-on-llm-internal-states)  
    标签：评分：6.0/10、query:llm
-   evidence：高效多模态推理的输入侧自适应
-13. [Multi-Agent LLMs for Adaptive Acquisition in Bayesian Optimization](/all__20260407-194530-819091/2603.28959v1-multi-agent-llms-for-adaptive-acquisition-in-bayesian-optimization)  
-   标签：评分：6.0/10、query:marl
-   evidence：用于优化中自适应采集的多智能体大语言模型
-14. [Omni-NegCLIP: Enhancing CLIP with Front-Layer Contrastive Fine-Tuning for Comprehensive Negation Understanding](/all__20260407-194530-819091/2603.29258v1-omni-negclip-enhancing-clip-with-front-layer-contrastive-fine-tuning-for-comprehensive-negation-understanding)  
+   evidence：大模型激活稀疏性与内部状态分析
+12. [Scaling the Long Video Understanding of Multimodal Large Language Models via Visual Memory Mechanism](/all__20260408-204533-045506/2603.29252v1-scaling-the-long-video-understanding-of-multimodal-large-language-models-via-visual-memory-mechanism)  
    标签：评分：6.0/10、query:attn
-   evidence：提升视觉语言模型中的否定理解能力
+   evidence：多模态大模型中的视觉KV缓存与记忆机制
+13. [Quantization with Unified Adaptive Distillation to enable multi-LoRA based one-for-all Generative Vision Models on edge](/all__20260408-204533-045506/2603.29535v1-quantization-with-unified-adaptive-distillation-to-enable-multi-lora-based-one-for-all-generative-vision-models-on-edge)  
+   标签：评分：6.0/10、query:llm
+   evidence：用于边缘端模型压缩的量化与蒸馏
+14. [One-for-All: A Lightweight Stabilized and Parameter-Efficient Pre-trained LLM for Time Series Forecasting](/all__20260408-204533-045506/2603.29756v1-one-for-all-a-lightweight-stabilized-and-parameter-efficient-pre-trained-llm-for-time-series-forecasting)  
+   标签：评分：6.0/10、query:llm
+   evidence：针对时间序列对冻结的大模型进行参数高效微调
 
 
 <div class="dpr-home-promo-card">

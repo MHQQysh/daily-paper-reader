@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.29078v1/fig-001.webp",
+      "caption": "Table 5: Lloyd–Max centroids for N (0, 1). Only non-negative values shown; full codebook is symmetric.",
+      "page": 9,
+      "index": 1,
+      "width": 980,
+      "height": 254
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.00556v1/fig-001.webp",
+      "caption": "Table 2. Performance on the complex query subset (60 queries with ≥3 constraints).",
+      "page": 10,
+      "index": 1,
+      "width": 718,
+      "height": 297
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00556v1/fig-002.webp",
+      "caption": "Fig. 3. Product Demo of Fangdongdong. Scan the QR code above, or search for \"Fangdongdong\" in WeChat to access the product and experience the real estate decision-making system powered by HabitatAgent.",
+      "page": 13,
+      "index": 2,
+      "width": 364,
+      "height": 571
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00556v1/fig-003.webp",
+      "caption": "Fig. 1. HabitatAgent overview. Four specialized agents—Memory, Retrieval, Generation, and Validation—are executed as a five-stage workflow. In particular, Stage 1a (constraint extraction), Stage 1b (memory fusion), and Stage 5 (memory update) are internal substeps of the Memory Agent.",
+      "page": 4,
+      "index": 3,
+      "width": 1153,
+      "height": 630
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00556v1/fig-004.webp",
+      "caption": "Table 1. Overall performance comparison on the full dataset (300 queries). Best results are in bold.",
+      "page": 9,
+      "index": 4,
+      "width": 721,
+      "height": 546
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00556v1/fig-005.webp",
+      "caption": "Fig. 2. Use case of HabitatAgent. A user query is processed through constraint extraction, hybrid retrieval (GraphRAG), evidence-grounded generation, and multi-tier validation to produce a verified recommendation.",
+      "page": 5,
+      "index": 5,
+      "width": 710,
+      "height": 700
+    }
+  ]
+}

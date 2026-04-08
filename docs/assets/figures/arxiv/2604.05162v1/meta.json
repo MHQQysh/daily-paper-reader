@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05162v1/fig-001.webp",
+      "caption": "Figure 3. Reward convergence for proposed and baseline algorithms for reflecting element control. Our proposed beam-focusing-ma framework achieves a peak convergence value of 42, outperforming the beam-focusing-sa and column-based-ma baseline methods (both converging near 25). Mean cumulative rewards are depicted by solid lines, with shaded envelopes representing the variance across multiple training trials.",
+      "page": 4,
+      "index": 1,
+      "width": 529,
+      "height": 316
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05162v1/fig-002.webp",
+      "caption": "Figure 2. Workflow of the Deep Reinforcement Learning and the integrated environment with Sionna and Blender.",
+      "page": 3,
+      "index": 2,
+      "width": 529,
+      "height": 370
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05162v1/fig-003.webp",
+      "caption": "Figure 4. Heat map visualizations of spatial signal focusing capabilities: (a) an unassisted NLOS environment and (b) a conventional flat reflector. The proposed (e) multi-agent beam-focusing model demonstrates superior spatial selectivity compared to both the (c) single-agent and (d) column-based multi-agent baselines. RSSI values are color-coded in dBm; user positions are identified by purple circles, and the cylindrical obstacle is depicted in brown.",
+      "page": 5,
+      "index": 3,
+      "width": 529,
+      "height": 802
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05162v1/fig-004.webp",
+      "caption": "Figure 5. Temporal RSSI performance under dynamic user mobility. Over a 300-step evaluation period, the proposed multi-agent beam-focusing framework (beam-focusing-ma) achieves superior stability and signal strength, averaging -66.83 dBm. This outperforms both the hardware-constrained column-based approach (-73.65 dBm) and the single-agent baseline (-79.70 dBm). Solid lines trace the mean RSSI, shaded regions illustrate ±1 standard deviation, and horizontal dashed lines indicate the overall temporal averages.",
+      "page": 5,
+      "index": 4,
+      "width": 529,
+      "height": 316
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05162v1/fig-005.webp",
+      "caption": "Figure 6. Temporal RSSI performance under varying degrees of user localization noise. The system demonstrates graceful degradation, maintaining robust signal averages ranging from -68.15 dBm (ideal location data) to - 72.36 dBm (1.0 m noise). Mean values are depicted by solid lines and overall temporal averages by dashed lines. The shaded regions (±1 standard deviation) illustrate the performance variance, visually highlighting the increased temporal instability the agents experience under severe positional uncertainty.",
+      "page": 5,
+      "index": 5,
+      "width": 529,
+      "height": 318
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05162v1/fig-006.webp",
+      "caption": "Figure 1. Reflector Design.",
+      "page": 2,
+      "index": 6,
+      "width": 502,
+      "height": 404
+    }
+  ]
+}
