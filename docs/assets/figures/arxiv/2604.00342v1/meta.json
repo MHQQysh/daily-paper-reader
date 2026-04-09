@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.00342v1/fig-001.webp",
+      "caption": "Table 2: Prompt Tuning (PT) Performance. Mean ± STD. High-variance and lower performance in complex operators (VNPool, DiffPool) demonstrate the optimization challenges of PT compared to simpler baselines.",
+      "page": 6,
+      "index": 1,
+      "width": 470,
+      "height": 314
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00342v1/fig-002.webp",
+      "caption": "Figure 1: The proposed Multi-Token Graph Pooling Framework. Dotted lines indicate alternate pooling methods for generating tokens.Current GraphRAG systems compress subgraphs into a single token by mean pooling or use node-level positional embeddings as tokens. Using hierarchical Clustering and Pruning operators to project the graph into a rich sequence of k soft tokens (yellow squares with colored borders) preserve structural fidelity better than simple linearization while remaining more efficient than full textualization.",
+      "page": 2,
+      "index": 2,
+      "width": 947,
+      "height": 461
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00342v1/fig-003.webp",
+      "caption": "Table 3: LoRA fine-tuning across varying ranks (r) and alphas (a). The use of LoRA adapters provides the necessary interface flexibility to map hierarchical graph signals which otherwise fail to converge into the LLM’s latent space.",
+      "page": 7,
+      "index": 3,
+      "width": 1026,
+      "height": 319
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00342v1/fig-004.webp",
+      "caption": "Table 6: We explicitly compare Feature-Only (SF ) vs. Structure-Aware (SE) models. The high values in the top-left quadrants (SF ∩ SE) confirm high redundancy.",
+      "page": 8,
+      "index": 4,
+      "width": 867,
+      "height": 223
+    }
+  ]
+}

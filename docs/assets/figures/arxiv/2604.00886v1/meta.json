@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.00886v1/fig-001.webp",
+      "caption": "Figure 1: PixelPrune patch selection on a document image (left) and GUI screenshot (right). Kept patches are shown in original color; dropped patches are grayed out. Token reduction: 70% (document) and 93% (GUI).",
+      "page": 2,
+      "index": 1,
+      "width": 736,
+      "height": 268
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00886v1/fig-002.webp",
+      "caption": "Table 1: Training-free results on Document Understanding Benchmarks (%). Numbers in parentheses show PixelPrune’s dataset-level retain ratio; all baselines use the same per-image token budget.",
+      "page": 7,
+      "index": 2,
+      "width": 822,
+      "height": 326
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00886v1/fig-003.webp",
+      "caption": "Table 8: Distance metrics and thresholds. Document = training-free; GUI = +KD model from Section 4.3. τ is normalized to [0, 1].",
+      "page": 10,
+      "index": 3,
+      "width": 818,
+      "height": 325
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00886v1/fig-004.webp",
+      "caption": "Table 9: Pixel-level patch redundancy and resolution statistics (patch size 32×32, exact match). Duplicate Ratio = fraction of non-unique patches (global dedup within each image).",
+      "page": 14,
+      "index": 4,
+      "width": 818,
+      "height": 286
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00886v1/fig-005.webp",
+      "caption": "Figure 2: Prefill latency breakdown across Qwen3-VL scales (2B, 4B, 8B) at five resolutions (2562– 40962, log scale). Each bar splits into Vision Encoder (red, including ViT and Patch Merger) and LLM Prefill (blue). At 40962, the vision encoder accounts for 86%, 72%, and 75% of total prefill time for the 2B, 4B, and 8B models respectively.",
+      "page": 3,
+      "index": 5,
+      "width": 776,
+      "height": 238
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00886v1/fig-006.webp",
+      "caption": "Table 12: General-domain evaluation on Qwen3-VL-2B (training-free, Max distance metric). Each benchmark reports retain ratio (%) and accuracy (%). Bold indicates the best accuracy among PixelPrune variants per benchmark.",
+      "page": 17,
+      "index": 6,
+      "width": 818,
+      "height": 201
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00886v1/fig-007.webp",
+      "caption": "Figure 3: Illustration of PixelPrune’s Pred-2D prediction. For each target patch X , three causal neighbors—A (left), B (upper), C (upper-left)—determine the predicted patch X̂ . The rule selects the neighbor most likely to match X: when the upper and upper-left patches agree, the target is more likely to follow the left neighbor, and vice versa. If X matches its prediction, it is omitted; otherwise, it is retained.",
+      "page": 5,
+      "index": 7,
+      "width": 765,
+      "height": 194
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00886v1/fig-008.webp",
+      "caption": "Table 11: Training from scratch convergence: intermediate evaluation results every 400 steps. We report grounding accuracy (%) on ScreenSpot V2 (SSv2) and ScreenSpot Pro (SSPro). “Full” = trained and evaluated with all tokens; “PixelPrune” = trained and evaluated with compressed tokens.",
+      "page": 16,
+      "index": 8,
+      "width": 818,
+      "height": 467
+    }
+  ]
+}

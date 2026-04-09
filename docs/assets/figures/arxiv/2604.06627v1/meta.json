@@ -1,0 +1,102 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-001.webp",
+      "caption": "Table 11: Hyperparameter search of DiffuMask on the Yahoo dataset under one-shot and five-shot settings.",
+      "page": 15,
+      "index": 1,
+      "width": 613,
+      "height": 236
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-002.webp",
+      "caption": "Table 9: Effect of inference hyperparameters on GSM8K performance.",
+      "page": 15,
+      "index": 2,
+      "width": 750,
+      "height": 219
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-003.webp",
+      "caption": "Table 10: Hyperparameter search of DiffuMask on the Yelp dataset under one-shot and five-shot settings.",
+      "page": 15,
+      "index": 3,
+      "width": 613,
+      "height": 208
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-004.webp",
+      "caption": "Table 12: Hyperparameter search of DiffuMask on the AG News dataset under one-shot, five-shot, and twenty-shot settings.",
+      "page": 15,
+      "index": 4,
+      "width": 867,
+      "height": 264
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-005.webp",
+      "caption": "Table 2: Out-of-domain evaluation on classification benchmarks. Relative token reduction (↓) and accuracy change (±) are shown with respect to the full prompt.",
+      "page": 7,
+      "index": 5,
+      "width": 831,
+      "height": 294
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-006.webp",
+      "caption": "Figure 1: Data generation pipeline for DIFFUMASK. The method applies hierarchical shot-level and token-level pruning to generate pruned prompt candidates, which are evaluated and filtered into training and validation sets. GSM8K is shown as a representative example; the pipeline is applicable to any dataset with long prompts.",
+      "page": 3,
+      "index": 6,
+      "width": 950,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-007.webp",
+      "caption": "Table 3: Cross-model evaluation. Accuracy (%) on the GSM8K test set using full and DIFFUMASK-pruned prompts across eight LLMs. (GPT4.1nan = GPT-4.1nano; Gem2.5Fl = Gemini-2.5-Flash; Gem2.5Pro = Gemini-2.5-Pro; Llam3.3-70 = Llama-3.3-70B-Instruct; Llam4-Mav = Llama-4-Maverick)",
+      "page": 8,
+      "index": 7,
+      "width": 465,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-008.webp",
+      "caption": "Table 4: Performance of top-32 random selection with 100 data points.",
+      "page": 12,
+      "index": 8,
+      "width": 447,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-009.webp",
+      "caption": "Figure 2: Overview of the proposed DiffuMask framework compared with a Masked DLM baseline.",
+      "page": 5,
+      "index": 9,
+      "width": 950,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-010.webp",
+      "caption": "Table 13: Universal Part-of-Speech (POS) tags",
+      "page": 16,
+      "index": 10,
+      "width": 404,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-011.webp",
+      "caption": "Table 14: Accuracy-based evaluation used for out-ofdomain datasets.",
+      "page": 16,
+      "index": 11,
+      "width": 427,
+      "height": 377
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06627v1/fig-012.webp",
+      "caption": "Figure 3: Comparison of POS Tag Distribution (Original Prompts vs Removed Parts of Prompts)",
+      "page": 16,
+      "index": 12,
+      "width": 461,
+      "height": 760
+    }
+  ]
+}
