@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.01694v1/fig-001.webp",
+      "caption": "Table 1: Comparison of BLOGS-MC (new knowledge), TruthfulQA-MC1 and HellaSwag accuracies across different finetuning methods for the blog post training. For each accuracy value we averaged 8 runs per hyperparameter choice. Additional columns for optimal adapter rank (r), learning rate (LR), and training epochs are included for completeness. The last columns shows the number of parameters of the full model or the number of trainable parameters for the LoRA and MiCA runs, respectively.",
+      "page": 6,
+      "index": 1,
+      "width": 886,
+      "height": 181
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01694v1/fig-002.webp",
+      "caption": "Figure 3: Retention of domain knowledge for the history book and for several fine-tuning methods for Llama-2.",
+      "page": 6,
+      "index": 2,
+      "width": 481,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01694v1/fig-003.webp",
+      "caption": "Figure 1: (a) Diagram of a LoRA-style low-rank adaptation module applied to a weight matrix. (b) Diagram of a MiCAstyle adaptation module illustrating its distinct update structure compared to LoRA (blue: constrained components, orange: fine-tuned components initialized as indicated in each trapezoid). U [:, −r :] means all rows, last r columns of the matrix U defined in the text.",
+      "page": 2,
+      "index": 3,
+      "width": 960,
+      "height": 365
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01694v1/fig-004.webp",
+      "caption": "Table 5: LoRA and MiCA adapter configurations and trainings hyperparameters.",
+      "page": 14,
+      "index": 4,
+      "width": 456,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01694v1/fig-005.webp",
+      "caption": "Figure 2: Retention of domain knowledge from the BLOGS dataset as a function of number of training epochs for MiCA and LoRA. Error bars denote the standard error of 8 evaluation runs. The horizontal dashed line shows the baseline performance of the respective foundation model. The green dashed line in (b) shows results for a fixed B matrix initialized with random SVD components instead of the minor componenents and same hyperparameters as for the MiCA runs.",
+      "page": 5,
+      "index": 5,
+      "width": 439,
+      "height": 728
+    }
+  ]
+}

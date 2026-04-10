@@ -1,0 +1,515 @@
+Title: Dual-Attention Based 3D Channel Estimation
+
+URL Source: https://arxiv.org/pdf/2604.01769v1
+
+Published Time: Fri, 03 Apr 2026 00:45:40 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+# Dual-Attention Based 3D Channel Estimation 
+
+Xiangzhao Qin and Sha Hu Lund Research Center Huawei Technologies Sweden AB, Sweden. email: {chrisqin, hu.sha }@huawei.com 
+
+Abstract —For multi-input and multi-output (MIMO) chan-nels, the optimal channel estimation (CE) based on linear min-imum mean square error (LMMSE) requires three-dimensional (3D) filtering. However, the complexity is often prohibitive due to large matrix dimensions. Suboptimal estimators approximate 3DCE by decomposing it into time, frequency, and spatial domains, while yields noticeable performance degradation under correlated MIMO channels. On the other hand, recent advances in deep learning (DL) can explore channel correlations in all domains via attention mechanisms. Building on this capability, we propose a dual attention mechanism based 3DCE network (3DCENet) that can achieve accurate estimates. 
+
+I. I NTRODUCTION 
+
+Artificial intelligence (AI) and deep learning (DL) are po-tential enablers for the sixth generation (6G) systems [1]–[8]. Emerging proposals consider using AI to replace or enhance those essential modules in communication systems such as channel estimation (CE) [9]–[12] and multi-input and multi-output (MIMO) detection [13]–[16]. An AI receiver example is depicted in Fig. 1. In advanced end-to-end (E2E) designs, transmit blocks can also be replaced with AI modules. In the context of CE, conventional linear minimum-mean-square-error (LMMSE) estimator [17], [18] works well in practice. However, an optimal CE requires three-dimensional (3D) processings, whose complexity can be prohibitive. Sub-optimal estimators decompose 3DCE into completely sepa-rate filters in time, frequency, and spatial domains (3 ×1D), or a joint 2D filter in time-frequency domains and a 1D filter in spatial domain (2D+1D). These simplifications can result in performance losses under correlated MIMO chan-nels. On the other hand, DL based CE including super-resolution convolutional neural-network (SRCNN) [3], Chan-nelNet [11], enhanced deep super-resolution (EDSR) [10], Channelformer [12], and others have been proposed to ap-proach LMMSE based CE, but there are still noticeable losses compared to the optimal 3DCE. In this paper, we firstly derive the optimal 3DCE based on demodulation reference signal (DMRS) in the fifth-generation new-radio (5G-NR) system, and analyze the optimal noise-power allocation to different domains. Followed by theoret-ical analysis, we propose a 3DCE network (3DCENet) that explores channel correlations among all domains by merging the least-square (LS) estimates from all antenna-ports, time and frequency resource elements (REs) as an input feature. The 3DCENet is constructed with dual attention mechanisms comprising of a spatial attention (SA) and a time-frequency attention (TFA) that enhances filter operations on spatial and time-frequency domains, respectively. Numerical results show that the proposed 3DCENet outperforms conventional genie     
+
+> Modulator OFDM Waveform
+> Wireless Channel
+> LLR-Net.
+> Encoder
+> Decoder
+> AI Receiver MIMO-Net
+> Source bits Coded bits Symbols Noise Decoded bits
+> CE-Net Received data
+
+Fig. 1. An AI receiver design comprised of AI based CE, MIMO detection, and log-likelihood ratios (LLRs) computations [1], [2]. 
+
+2D and (2D+1D) based CE up to 4dB in terms of mean-square-error (MSE), and is superior than SRCNN and EDSR based 2D estimators. 
+
+Notations:: The operators (·)T , (·)†, and ⊗ denote the transpose, Hermitian conjugate, and Kronecker product, re-spectively. The operation vec (H) vectorizes a matrix H by stacking the column vectors on top of each other, and vec −1(·)
+
+is the inverse operation. II. CE FOR MIMO S YSTEM 
+
+Consider an Nr × Nt MIMO system, where Nr and Nt
+
+denote the numbers of receive and transmit antennas, re-spectively. The transmit symbols and DMRS are assembled in OFDM symbols. Each subframe comprises of Ns OFDM symbols, and each symbol consist of Nc subcarriers (SCs). In total there are N = NcNs resource elements (REs) in one subframe. Further, there are Np REs allocated with DMRS and Nd REs transmits data, with Np + Nd = N . A typical DMRS pattern is shown in Fig. 2. The received signal vector ym,n (k) ∈ CNp×1 corresponds to the DMRS received on the mth antenna and transmitted from the nth antenna on the kth OFDM symbol, and hm,n (k) ∈
+
+CNp×1 is the channel vector to be estimated of the same size. Assuming K symbols are used for CE, the received signal and channel vectors are stacked together as 
+
+ym,n = [ yT
+
+> m,n
+
+(1) , yT
+
+> m,n
+
+(2) , · · · , yT
+
+> m,n
+
+(K)] T, (1) 
+
+hm,n = [ hT
+
+> m,n
+
+(1) , hT
+
+> m,n
+
+(2) , · · · , hT
+
+> m,n
+
+(K)] T. (2) The received signal corresponding to DMRS reads 
+
+ym,n = Pnhm,n + wm,n , (3) where Pn ∈ CKN p×KN p is a diagonal matrix whose diagonal elements carry DMRS from the nth transmit antenna. The 
+
+> arXiv:2604.01769v1 [cs.LG] 2 Apr 2026
+
+noise wm,n ∈ CKN p×1 is modelled as additional white Gaus-sian noise (AWGN) with a zero-mean and a covariance matrix 
+
+σ2 
+
+> w
+
+I. The LS estimates of hm,n is obtained as 
+
+ˆhLS  
+
+> m,n
+
+= (P † 
+
+> n
+
+Pn
+
+)−1 P † 
+
+> n
+
+ym,n . (4) 
+
+A. Correlation Models in Different Domains 
+
+Further stacking the channel vectors hm,n for different transmit and receiver antennas into a single vector h as 
+
+h = [hT1,1, hT1,2, · · · , hT1,N t , hT2,1, hT2,2, · · · , hT2,N t , · · · ,
+
+hT 
+
+> Nr,1
+
+, hT 
+
+> Nr,2
+
+, · · · , hT 
+
+> Nr,N t
+
+]T. (5) The correlation matrix of h equals 
+
+R3D = E {hh †} = Rs ⊗ Rtf = ( Rs,r ⊗ Rs,t ) ⊗ Rtf , (6) where Rs is the spatial correlation among antennas, and Rtf 
+
+is the correlation matrix in time and frequency domains which is assumed to be identical for all transmit and receive antenna-pairs. The correlation matrix Rs is further decomposed into 
+
+Rs,r and Rs,t , which are correlations among receive and transmit antennas, respectively, and both can be modelled (with ‘ ∗’ denotes ‘ t’ or ‘ r’) as 
+
+Rs, ∗ =
+
+
+
+r11 r12 · · · · · · r1N∗
+
+r21 r22 · · · · · · r2N∗
+
+... ... . . . . . . ...
+
+rN∗1 rN∗2 · · · · · · rN∗N∗
+
+. (7) On the other hand, the 2D correlation matrix on time and frequency domains reads 
+
+Rtf = E {hm,n h†
+
+> m,n
+
+} = Rt ⊗ Rf , (8) where Rt denotes channel correlation in time domain which is determined by the Doppler spread, and Rf denotes channel correlation in frequency domain which is determined by the frequency selectivity or power delay profile (pdp). In 5G-NR system, the spatial correlation is modelled as an exponential model specified by a parameter α < 1 such that 
+
+rij = α|i−j|. (9) With Jakes model, for a time difference ∆t, the correlation is 
+
+Rt(∆ t) = J0(2 πf d∆t), (10) where J0 is the zeroth-order Bessel function of the first kind, and fd is the maximum Doppler shift. The frequency correlation is the discrete Fourier transform (DFT) of pdp, and with a frequency difference ∆f , it equals 
+
+Rf (∆ f ) = ∑
+
+> ℓ
+
+σ2 
+
+> ℓ
+
+exp( −2πτ ℓ∆f ), (11) where τℓ and σ2 
+
+> ℓ
+
+are the delay and power of the ℓth channel path in time domain, respectively.          
+
+> Fig. 2. DMRS configurations for Nt= 4 ,Nf= 12 ,Ns= 14 , and Np= 3 .
+
+B. The Optimal 3DCE 
+
+A 3DCE exploits correlations across all domains in spatial, time, and frequency, described in (9)-(11). With (6), the optimal LMMSE based 3DCE of h reads 
+
+h3D = W3D ˆhLS , (12) where ˆhLS is the LS estimate of h. The filter equals 
+
+W3D = R3D AT(AR3D AT + σ2 
+
+> w
+
+I)−1, (13) where the selection matrix A is of sizes KN P NrNt×N N rNt.Denote a selection matrix An for the nth transmit antenna which is of sizes KN p × KN and each row contains a single one where a DMRS is located and remaining entries are zeros. Letting Diag [A1, A2, · · · , ANt
+
+] denote a block-diagonal matrix whose diagonal blocks are Am, it holds that 
+
+A = INr ⊗ Diag [A1, A2, · · · , ANt
+
+]. (14) For the pattern in Fig. 2, An for the four transmit antennas are permuted versions of each other. It can be seen that if the optimal 3DCE is applied, a matrix inversion of sizes 
+
+KN pNr Nt×KN pNr Nt for AR3D AT+σ2 
+
+> w
+
+I is needed, whose complexity can be prohibitive. 
+
+C. Suboptimal (2D+1D)-CE and (3 ×1D)-CE 
+
+A standard approach for simplifying 3DCE is to apply a joint 2D filtering on time and frequency domains, and a 1D filtering on spatial domain. Assuming An = A1 for all n in (14), it holds that 
+
+A = INr Nt ⊗ A 1. (15) Note that 
+
+R3D AT = ( Rs ⊗ Rtf )( INr Nt ⊗ A T1 = Rs ⊗ (Rtf AT1 ), (16) 
+
+AR3D AT = Rs ⊗ (A1Rtf AT1 ). (17) The inversion can be approximated as 
+
+(AR3D AT+σ2
+
+> w
+
+I)−1 ≈ (Rs +σ2 
+
+> s
+
+I)−1 ⊗(A1Rtf AT1 +σ2 
+
+> tf
+
+I)−1,
+
+(18) and the 3DCE filter in (13) is 
+
+ˆW3D ≈ Ws ⊗ Wtf , (19) Fig. 3. The proposed 3DCE design that comprises a two-stage process of SA followed by TFA modules. 
+
+where 
+
+Ws = Rs(Rs + σ2 
+
+> s
+
+I)−1, (20) 
+
+Wtf = Rtf AT1 (A1Rtf AT1 + σ2 
+
+> tf
+
+I)−1 . (21) The parameters σ2 
+
+> s
+
+and σ2 
+
+> tf
+
+denote the noise powers in spatial and time-frequency domains, respectively. Inserting (19) back into (12) yields 
+
+h3D ≈ (Ws ⊗ Wtf )ˆhLS = vec (Wtf ˆH3D W T 
+
+> s
+
+), (22) where 
+
+ˆH3D = vec −1(ˆhLS ). (23) It can be readily seen that the 3DCE can be approximated by a 2D filtering in time-frequency domain and a 1D filtering on spatial domain. Note that the sub-optimality of (2D+1D)-CE lies in the fact that the tensor decomposition (18) is not exact and renders accuracy losses. Note that the inversion of A1Rtf AT1 + σ2 
+
+> tf
+
+I when com-puting the 2DCE is still of sizes KN p × KN p. To further reduce complexity and following the same analysis, it can be further decomposed into two 1D filters on time and frequency domains separately. To be specific, the 2DCE for the nth transmit antenna, denoted as Wtf,n , is approximated as 
+
+ˆWtf,n ≈ Wt,n ⊗ Wf,n , (24) where 
+
+Wt,n = RtAT
+
+> nt
+
+(Ant RtAT 
+
+> nt
+
++ σ2 
+
+> t
+
+I)−1, (25) 
+
+Wf,n = Rf AT 
+
+> nf
+
+(Anf Rf AT 
+
+> nf
+
++ σ2 
+
+> f
+
+I)−1. (26) The variables σ2 
+
+> t
+
+, σ2 
+
+> f
+
+denote the noise powers on time and frequency domains, respectively. The matrices Ant of sizes 
+
+Kp × K and Anf of sizes Np × Nc are selection matrices for the nth transmit antenna on time and frequency domains, respectively, and each row contains a single one where a DMRS symbol is located, and the remaining entries are zeros. Different simplifications of 2DCE and comparisons to ( 2×
+
+1D)-CE have been well studied in for OFDM systems and there are many existing literatures, see e.g. [18]. In general, there are some slight degradations from the decomposition (24), but it can be well justified by the complexity reductions. Hence, we will mainly focus on comparisons between the optimal 3DCE and (2D+1D)-CE, and examine the potential gains by exploring the spatial domain with DL based designs. 
+
+D. Optimal Noise Power Allocation 
+
+A motivation to consider designing the AI based 3DCE is due to the noise- power splitting issue with conventional ap-proaches, which is typically overlooked. As shown in (18), the noise power σ2 
+
+> w
+
+is split into the spatial and the time-frequency domains as σ2 
+
+> s
+
+and σ2 
+
+> tf
+
+, respectively. It is suboptimal to set them both to σ2 
+
+> w
+
+, which enhances the noise significantly. Our observation is that σ2 
+
+> s
+
+and σ2 
+
+> tf
+
+should be jointly designed, and one heuristic principle can be to minimize the trace difference between AR3D AT+σ2 
+
+> w
+
+I and (Rs+σ2 
+
+> s
+
+I)⊗(A1 Rtf AT1 +σ2 
+
+> tf
+
+I).Note that 
+
+(Rs + σ2 
+
+> s
+
+I) ⊗ (A1Rtf AT1 + σ2 
+
+> tf
+
+I) − A R3D AT
+
+= σ2 
+
+> s
+
+(I ⊗ (A1Rtf AT1 + σ2 
+
+> tf
+
+I)) + σ2 
+
+> tf
+
+(( Rs + σ2 
+
+> s
+
+I) ⊗ I)+σ2 
+
+> s
+
+σ2 
+
+> tf
+
+I. (27) To minimize trace difference, it should hold that 
+
+σ2 
+
+> w
+
+= σ2 
+
+> s
+
++ σ2 
+
+> tf
+
++ σ2 
+
+> s
+
+σ2 
+
+> tf
+
+. (28) This shows that both σ2 
+
+> s
+
+and σ2 
+
+> tf
+
+are smaller than σ2 
+
+> w
+
+. If setting 
+
+σ2 
+
+> s
+
+= σ2 
+
+> tf
+
+= σ2 
+
+> ∗
+
+, the optimal solution is 
+
+σ2 
+
+> ∗
+
+= √σ2 
+
+> w
+
++ 1 − 1. (29) Similar issue exists when further decomposing (24), and the noise power σ2 
+
+> tf
+
+allocated in time and frequency domains is split into σ2 
+
+> t
+
+and σ2 
+
+> f
+
+, respectively, which should also be optimized similarly. III. 3DCEN ET BASED ON DUAL ATTENTION 
+
+Dual attention mechanism [25] learns multi-domain features via customized attention mechanisms, where spatial correla-tion is processed by a spatial attention (SA) and correlations from delay-Doppler are handled by a time-frequency attention (TFA). Due to the sub-optimality of (2D+1D)-CE, we apply dual attention mechanism and propose the 3DCENet that comprises of SA and TFA, with a detailed paradigm in Fig. 3. 
+
+A. Preprocess of LS Estimates 
+
+The first step is a preprocess to interpolate LS estimate on DMRS to data REs. The input tensor Hp ∈ CNp×Nr ×Nt is constructed as 
+
+Hp[: , m, n ] = ˆhLS 
+
+> m,n
+
+. (30) A Gaussian tensor Π ∈ CNd×Np×Nr ×Nt interpolates Hp on the first dimension to Hin ∈ C Nd ×Nr×Nt as 
+
+Hin = Π · Hp. (31) Then, Hin is passed via an SRCNN represented by 
+
+FSRCNN (·), and the output tensor Hout ∈ C Nd×Nr ×Nt reads 
+
+Hout = FSRCNN 
+
+(
+
+Hin )
+
+. (32) 
+
+B. Spatial Attention (SA) 
+
+After preprocess and combining the estimates Hout on data REs and Hp on DMRS, a complete channel tensor Hout is formed as a 6D tensor with dimensions (b, N r, N t, 2, N s, N c),where b denotes the batch size and ‘2’ represent the real and imaginary parts. Then, time and frequency domains together with real and imaginary parts are merged together such that it becomes a 4D tensor ¯H with dimensions (b, N r, N t, 2NsNc).Then, ¯H is compressed in the last dimension to ¯x with dimensions (b, N r , N t, d ), and ¯x is permuted to x with dimensions (b, d, N r , N t) and sent to SA module. In SA module, x is further compressed via a max-pooling layer and an average-pooling layer to obtain xmean and xmax ,respectively, both with dimensions (b, 1, N r, N t) and con-catenated as x = [ xmean , xmax ]. Then, x is passed via a convolution-layer to obtain a scaling tensor with dimensions 
+
+(b, 1, N r, N t), which is multiplexed to the input x. The output from the SA module has the same dimensions as x,and multiple SA models can be concatenated sequentially. After the SA process, the obtained tensor is reshaped and passed through a feed-forward network (FFN) and a linear-layer and recovered into a 4D tensor xTFA with dimensions 
+
+(2 NsNc, b, N r, N t), as shown in Fig. 3. 
+
+C. Time-Frequency Attention (TFA) 
+
+Before TFA module, xTFA is further compressed in spatial domain ( Nr and Nt), followed by a positional encoding (PE) to obtain a tensor ¯xTFA with dimensions (2 NsNc, b, d ). Later, 
+
+¯xTFA is processed with multiple transformer encoder blocks to explore correlations in time and frequency domains. Since the complete 3DCENet design is jointly trained, it enhances conventional (2D+1D)-CE design by optimizing the interactions between SRCNN2D, SA, and TFA modules to approach the optimal 3DCE. The training is based on labels                            
+
+> TABLE I NUMBER OF PARAMETER AND MAC OPERATIONS OF THE 3DCEN ET .
+> Module Number of Weights MACs per Batch
+> SA (2 NsNc)d+ 2 dd ff
+> +dff + 2 d+ 99 2NrNt(dN sNc+dd ff + 49)
+> TFA 4d2+ 5 d+ 2 dd ff +dff 2L(2 d2+Ld +dd ff )
+
+Hlabel ∈ CNd×Nr ×Nt and MSE losses. After 3DCENet, the estimates of H is sent to the MIMO detection module as shown in Fig. 1. 
+
+D. Complexity of SA and TFA Modules 
+
+The computational complexity of 3DCENet is dominated by the SA and TFA modules. Below we summarize the number of trainable parameters and the multiply–accumulate operations (MACs) per batch for each module. 
+
+a) SA: The SA block consists of three components: (i) a channel compression layer mapping 2NsNc input channels to 
+
+d channels; (ii) a fixed convolution layer Conv2D(2 , 1, 7, 3) 
+
+used to generate spatial attention weights; and (iii) a two-layer FFN with hidden dimension dff . The convolution layer contains exactly 2 × 1 × 72 + 1 = 99 trainable parameters and requires 98 NrNt MACs per batch. 
+
+b) TFA.: The TFA block is a standard transformer en-coder operating on a sequence of length L = 2 NsNc. Each encoder blocks includes multi-head self-attention (MHA) and a two-layer FFN. The MHA contributes the quadratic term 
+
+2L2d from correlation and weighted sum, and 4Ld 2 from projections. The FFN has a complexity of 2Ldd ff , which dominates the overall complexity. Combining all components, the total number of weights and MACs are shown in Table I. IV. N UMERICAL SIMULATION 
+
+The 3DCENet is constructed as in Fig. 3 with d = 512 in SA module. In TFA module, 4 transformer encoders are applied with 4 hidden layers each, and the model size and FFN size are both set to 512. This yields about 6M trainable parameters and 3G Flops per CE. The MIMO channel is modelled as extended typical urban (ETU) and extended pedestrian-A (EPA) channels [22] in time domain, and with a medium spatial correlation specified by α = 0 .3 as in (9) for both transmit and receive antennas . In Fig. 4 and 5, MSEs are evaluated under correlated 
+
+4 × 4 MIMO and ETU100Hz channel. The 3DCE is ap-proximated by (2D+1D)-CE as in (19). As seen, (2D+1D)-CE with σtf = σs = σ outperforms the genie 2DCE about 1dB. Noticeably, there is additional 1.4dB gains with the optimal power allocation σ∗ in (29). Further, it is also better than setting σtf = σ and a small σs = 0 .1σ2. In Fig. 5, 3DCENet significantly outperforms conventional AI based SRCNN2D and EDSR2D estimators. Moreover, (2D+1D)-CE with optimal noise power shows 3dB gains over the genie 2DCE, and 3DCENet provides another 1dB enhancements. In Fig. 6, BLERs are shown under correlated 2×2 MIMO and EVA70Hz channel, with 16QAM modulation. As seen, 3DCENet together with a graph neural network aided expec-tation propagation (GEPNet) [16] detector performs close to Fig. 4. CE-MSEs with different noise power allocations under correlated 
+
+4×4 MIMO and ETU100Hz channel. 
+
+Fig. 5. CE-MSEs with the proposed 3DCENet and other methods. 
+
+2DCE with optimal maximum likelihood (ML) detector. It is also 2dB better than a conventional 2DCE with EP detector, and outperforms SRCNN2D-CE with GEPNet by 0.7dB. V. C ONCLUSIONS 
+
+We have derived the optimal noise power-allocation in dif-ferent domains for conventional 3DCE, and proposed a double attention mechanism based 3DCENet to enhance (2D+1D)-CE in MIMO systems . Numerical results have shown that 3DCENet can achieve accurate CE and outperforms both conventional and AI based 2DCE designs under correlated MIMO channel by fully exploiting correlations in all domains. REFERENCES [1] X. Qin, S. Hu, J. Zhang, J. Qian, and H. Wang, “AI Receiver Design with Deep Learning Based Channel Estimation and MIMO Detection”, Int. Symp. Personal, Indoor Mobile Radio Commun. (PIMRC) pp. 1-7, Sep. 2024. [2] J. Zhang, H. Wang, Y. Li, and J. Qian, “Learning the discrete maximum a posteriori distribution for soft MIMO detection”, IEEE Wireless Commun. Netw.Conf. (WCNC), pp. 1-7 Apr. 2024. [3] M. Soltani, V. Pourahmadi, A. Mirzaei, and H. Sheikhzadeh, “Deep learning-based channel estimation,” IEEE Commun. Lett. , vol. 23, No. 4, pp. 652-655, Apr. 2019. [4] P. Jiang, C. K. Wen, S. Jin, and G. Y. Li, “Dual CNN-based channel estimation for MIMO-OFDM systems,” IEEE Trans. Commun. , vol. 69, no. 9, pp. 5859-5872, Sep. 2021. [5] J. Sun, Y. Zhang, J. Xue, and Z. Xu, “Learning to search for MIMO detection,” IEEE Trans. Wireless Commun. , vol. 19, no. 11, pp. 7571-7584, Nov. 2020. [6] S. Cammerer et al., “A neural receiver for 5G NR multi-user MIMO,” IEEE Global Commun. Conf. (GLOBECOM) Wkshps, Kuala Lumpur, Malaysia, Dec. 2023, pp. 329-334. [7] T. Raviv, S. Park, O. Simeone, and N. Shlezinger, “Modular model-based Bayesian learning for uncertainty-aware and reliable deep MIMO receivers,” https://doi.org/10.48550/arXiv.2302.02436, Mar. 2023. 
+
+Fig. 6. BLER of 2×2 MIMO and 16QAM modulation. [8] Z. Zhou, L. Liu, S. Jere, J. Zhang, and Y. Yi, “RCNet: Incorporating structural information into deep RNN for online MIMO-OFDM symbol detection with limited training,” IEEE Trans. Wireless Commun. , vol. 20, no. 6, pp. 3524-3537, Jun. 2021. [9] D. Maruyama, K. Kanai and J. Katto, “Performance Evaluations of Channel Estimation Using Deep-learning Based Super-resolution,” IEEE Ann. Cons. Commun. Netw. Conf. (CCNC), Las Vegas, NV, USA, 2021, pp. 1-6. [10] B. Lim, S. Son, H. Kim, S. Nah, and K. M. Lee, “Enhanced deep resid-ual networks for single image super-resolution,” IEEE Conf. Comput. Vision Patt. Recognition Workshops (CVPRW), Honolulu, 2017, pp. 1132-1140. [11] M. Soltani, V. Pourahmadi, A. Mirzaei and H. Sheikhzadeh, “Deep learning-based channel estimation,” IEEE Commun. Lett. , vol. 23, no. 4, pp. 652-655, Apr. 2019. [12] D. Luan and J. Thompson, “Channelformer: Attention based neural solution for wireless channel estimation and effective online training,” 
+
+IEEE Trans. Wireless Commun. , pp. 6562-6577, vol. 22, no. 10, 2023. [13] L. Schmid and L. Schmalen, “Low-complexity near-optimum sym-bol detection based on neural enhancement of factor graphs,” IEEE Trans. Commun. , vol. 70, no. 11, pp. 7562-7575, Nov. 2022. [14] M. Honkala, D. Korpi, J. M. J. Huttunen, “DeepRx: Fully convolutional deep learning receiver,” IEEE Trans. Wireless Commun. , vol. 20, no. 6, pp. 3925-3940, Jun. 2021. [15] F. A. Aoudia and J. Hoydis, “End-to-end learning for OFDM: from neural receivers to pilotless communication,” IEEE Trans. Wireless Commun. , vol. 21, no. 2, pp. 1049-1063, Feb. 2022. [16] X. Zhou, J. Zhang, C. K. Wen, S. Jin, S. Han, “Graph neural networks-enhanced expectation propagation algorithm for MIMO turbo receiver,” 
+
+IEEE Trans. Signal Process. , vol. 71, pp. 3458-3473. Oct. 2023. [17] Y. Liu, Z. Tan, H. Hu, L. J. Cimini, and G. Y. Li, “Channel estimation for OFDM,” IEEE Commun. Surv. Tut. , vol. 16, no. 4, pp. 1891-1908, May 2014. [18] Y. Choi, J. H. Bae and J. Lee, “Low-Complexity 2D LMMSE Channel Estimation for OFDM Systems,” IEEE Veh. Technol. Conf. (VTC2015-Fall), Boston, MA, USA, 2015, pp. 1-5. [19] T-H. Im, J. Kim, and Y. S Cho, “A low complexity QRM-MLD for MIMO systems,” IEEE 65th Veh. Technol. Conf. (VTC), Dublin, Ireland, Apr. 2007, pp. 1550–2252. [20] J. Zhang, H. Wang, J. Qian, and Z. Gao, “Soft MIMO detection using marginal posterior probability statistics,” IEEE Global Com-mun. Conf. (GLOBECOM), Brazil, Dec. 2022, pp. 3198-3204. [21] D. W¨ ubben, R. Bohnke, V. Kuhn, and K. D. Kammeyer, “MMSE-based lattice-reduction for near-ML detection of MIMO systems,” Proc. ITG Wkshps Smart Ant. , Munich, Germany, Mar. 2004, pp. 106-113. [22] 3GPP TS 36. 101,“Evolved universal terrestrial radio access (E-UTRA); user equipment (UE) radio transmission and reception,”. [23] A. Kosasih, V. Onasis, W. Hardjawana, V. Miloslavskaya, V. Andrean, J-S. Leu, and B. Vucetic, “Graph neural network aided expectation propagation detector for MU-MIMO systems,” IEEE Wireless Commun. Netw. Conf. (WCNC), New York, NY, USA, Apr. 2022, pp. 1212-1217. [24] N. T. Nguyen and K. Lee, “Application of deep learning to sphere decoding for large MIMO systems,” IEEE Trans. Wireless. Commun. ,vol. 20, no. 10, pp. 6787–6803, Oct. 2021. [25] B. Zhou, X. Yang, S. Ma, F. Gao, and G. Yang, “Pay less but get more: a dual attention-based channel estimation network for massive MIMO systems with low density pilots”, IEEE Trans. Wireless. Commun., Early Access, 2023.

@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04384v1/fig-001.webp",
+      "caption": "Table 2: Effective rank: number of singular components for the stated variance threshold (median across all heads). The spectral gap between M and Ẽ persists across all five models.",
+      "page": 3,
+      "index": 1,
+      "width": 698,
+      "height": 190
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04384v1/fig-002.webp",
+      "caption": "Table 1: Cumulative variance captured by the top r singular components (median across all heads). Ẽ concentrates its variance in a few components. WT QWK does not. Models are grouped by head dimension: dh = 64 (left) and dh = 128 (right).",
+      "page": 3,
+      "index": 2,
+      "width": 702,
+      "height": 240
+    }
+  ]
+}

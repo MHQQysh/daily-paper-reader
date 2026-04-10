@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.01826v1/fig-001.webp",
+      "caption": "Figure 12. Effectiveness of RoPE text position ID perturbations for safety alignment.",
+      "page": 15,
+      "index": 1,
+      "width": 496,
+      "height": 273
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01826v1/fig-002.webp",
+      "caption": "Table 1. Cross-concept evaluation of SafeRoPE against baseline methods. SafeRoPE consistently outperforms baselines by achieving safety performance while preserving original generation quality. Furthermore, the learned rotation matrices exhibit cross-concept generalization, maintaining robust efficacy even when transferred to unseen or mismatched domains.",
+      "page": 7,
+      "index": 2,
+      "width": 977,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01826v1/fig-003.webp",
+      "caption": "Figure 6. Qualitative comparison of different methods for concept erasure. Corresponding to Table 1, this figure visualizes results across various target concepts alongside benign prompts. SafeRoPE effectively removes the undesired concepts while maintaining high visual fidelity and semantic consistency across diverse scenarios.",
+      "page": 7,
+      "index": 3,
+      "width": 986,
+      "height": 508
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01826v1/fig-004.webp",
+      "caption": "Figure 10. Comparison of unsafe-token detection across full heads and safety-critical heads. Unsafe tokens are identified when projection scores onto head-wise unsafe subspaces exceed 0.7. Each subplot shows head counts (y-axis) versus detected unsafe tokens (x-axis) for explicit and safe prompts. Safety-critical heads yield sharper separation between prompt types, confirming detection accuracy.",
+      "page": 14,
+      "index": 4,
+      "width": 1036,
+      "height": 325
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01826v1/fig-005.webp",
+      "caption": "Figure 4. Overview of how SafeRoPE identifies safety-critical heads and applies risk-aware rotations. (a) Head Discrimination Score (HDS) used to identify safety-critical heads; higher scores indicate heads that more strongly differentiate unsafe from safe token projections onto the estimated unsafe subspace. (b) SafeRoPE pipeline: (1) SVD-based construction of head-wise unsafe subspaces Ur,b,h (2) Latent Risk Score (LRS) computed by projecting token features onto these subspaces; (3) LRS-guided orthogonal rotations applied only to safetycritical heads to suppress unsafe activations while preserving benign semantics.",
+      "page": 4,
+      "index": 5,
+      "width": 1036,
+      "height": 401
+    },
+    {
+      "url": "assets/figures/arxiv/2604.01826v1/fig-006.webp",
+      "caption": "Figure 13. Qualitative comparison on unsafe prompts from Unsafe-1K and I2P..",
+      "page": 17,
+      "index": 6,
+      "width": 829,
+      "height": 964
+    }
+  ]
+}

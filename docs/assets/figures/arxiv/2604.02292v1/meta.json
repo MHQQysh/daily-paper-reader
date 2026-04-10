@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02292v1/fig-001.webp",
+      "caption": "Fig. 2. Attention probability curves for broad and focused heads from BERT-Tiny (top) and selected BERT-Small heads (bottom), comparing float32 softmax and retrained HCCS. Differences in absolute probabilities are expected, especially on focused heads: HCCS is a surrogate rather than an exact softmax replica, and retraining adapts the model to a new but effective attention distribution.",
+      "page": 7,
+      "index": 1,
+      "width": 1004,
+      "height": 336
+    }
+  ]
+}

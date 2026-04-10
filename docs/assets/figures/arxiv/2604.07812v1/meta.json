@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-001.webp",
+      "caption": "Figure 1. Comparison of visual token pruning methods on multiple benchmarks for Qwen2.5-VL-7B, where the proposed approach consistently outperforms all baselines.",
+      "page": 1,
+      "index": 1,
+      "width": 446,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-002.webp",
+      "caption": "Table 3. Performance comparison of different pruning methods on Qwen2.5-VL-7B using native resolution input on image bench-",
+      "page": 6,
+      "index": 2,
+      "width": 1035,
+      "height": 535
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-003.webp",
+      "caption": "Table 2. Performance comparison of different pruning methods on InternVL3-8B using fixed resolution input on image bench-",
+      "page": 6,
+      "index": 3,
+      "width": 1035,
+      "height": 367
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-004.webp",
+      "caption": "Figure 2. Left. The ablation process of the visual attention head. After ablating the attention heads as described above, the model’s visual comprehension ability noticeably declines. Right. Ablation results of visual attention heads. Different heads exhibit varying impacts on visual tasks, and their importance shows consistent trends across multiple datasets.",
+      "page": 2,
+      "index": 4,
+      "width": 1036,
+      "height": 317
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-005.webp",
+      "caption": "Table 4. Performance comparison of different pruning methods on Qwen2.5-VL-7B using native resolution input on video bench-",
+      "page": 7,
+      "index": 5,
+      "width": 1035,
+      "height": 623
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-006.webp",
+      "caption": "Figure 7. Continued.",
+      "page": 14,
+      "index": 6,
+      "width": 1036,
+      "height": 613
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-007.webp",
+      "caption": "Figure 3. Overview of HAWK. We first employ a text-guided attention mechanism to assess the relevance of each visual embedding relative to the current textual instructions. Then, we integrate it with head importance weights for token pruning. A training-free method that reduces computation with minimal performance loss.",
+      "page": 4,
+      "index": 7,
+      "width": 1000,
+      "height": 497
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-008.webp",
+      "caption": "Table 8. Overview of Evaluation Benchmarks. We select ten image-based benchmarks (divided into general/reasoning and text/diagram categories) and two video-based benchmarks to comprehensively evaluate the model’s capabilities.",
+      "page": 12,
+      "index": 8,
+      "width": 1026,
+      "height": 509
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07812v1/fig-009.webp",
+      "caption": "Table 1. Performance comparison of different pruning methods on Qwen2.5-VL-7B using fixed resolution input on image bench-",
+      "page": 5,
+      "index": 9,
+      "width": 1035,
+      "height": 536
+    }
+  ]
+}

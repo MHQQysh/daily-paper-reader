@@ -1,0 +1,430 @@
+Title: MiCA Learns More Knowledge Than LoRA and Full Fine-Tuning
+
+URL Source: https://arxiv.org/pdf/2604.01694v1
+
+Published Time: Fri, 03 Apr 2026 00:33:47 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# MiCA Learns More Knowledge Than LoRA and Full Fine-Tuning 
+
+## Sten Rüdiger ∗ Sebastian Raschka †
+
+## April 3, 2026 
+
+# Abstract 
+
+Minor Component Adaptation (MiCA) is a novel parameter-efficient fine-tuning method for large lan-guage models that focuses on adapting underutilized subspaces of model representations. Unlike conven-tional methods such as Low-Rank Adaptation (LoRA), which target dominant subspaces, MiCA leverages Sin-gular Value Decomposition to identify subspaces re-lated to minor singular vectors associated with the least significant singular values and constrains the update of parameters during fine-tuning to those directions. This strategy leads to up to 5.9x improvement in knowledge acquisition under optimized training hyperparameters and a minimal parameter footprint of 6-60% compared to LoRA. These results suggest that constraining adap-tation to minor singular directions provides a more effi-cient and stable mechanism for integrating new knowl-edge into pre-trained language models. 
+
+# 1 Introduction 
+
+The rapid advancement of large language models (LLMs) has introduced new challenges in adapting these models to specific tasks and domains without incurring the immense computational costs associated with full fine-tuning. Parameter-efficient fine-tuning (PeFT) methods have emerged as a viable alternative, allowing models to be adapted by updating a small sub-set of parameters while preserving the majority of the pre-trained model weights. Among the most prominent PeFT approaches is Low-Rank Adaptation (LoRA), which introduces trainable low-rank matrices into ex-isting layers of the model to enable efficient adaptation [1]. MiCA (Minor Component Adaptation) extends the capabilities of existing PeFT methods by introducing a novel strategy to identify and adapt the most informa-tive and underutilized subspaces of model representa-tions. MiCA aims to minimize parameter footprint, maximize knowledge acquisition, and reduce catas-trophic forgetting.  
+
+> ∗Independent Researcher, Email: sten.ruediger@gmail.com
+> †RAIR Lab
+
+To empirically validate the effectiveness of MiCA, a comprehensive experimental setup will be described, including the datasets, models, and comparative meth-ods used in our evaluation. The results and analysis of these experiments will then be presented and discussed, highlighting the performance of MiCA across various tasks and benchmarks. Finally, we will touch upon po-tential applications and use cases for MiCA, followed by a concluding summary of our contributions and an outlook on future research directions. 
+
+# 2 Related Work 
+
+Parameter-efficient fine-tuning strategies have gar-nered attention as practical alternatives to full model fine-tuning, particularly in the era of large language models with billions of parameters [2, 3, 4]. These methods aim to preserve most of the pre-trained model while introducing lightweight, trainable components that adapt the model to new tasks. Among these, LoRA modules have been particularly influential. 
+
+## 2.1 Low-Rank Adaptation 
+
+LoRA inserts pairs of low-rank matrices into the exist-ing weight matrices of a model. During training, only these low-rank matrices are updated, while the original weights remain frozen. The key insight behind LoRA is that model updates can often be effectively repre-sented in a low-dimensional subspace. By decompos-ing the weight update into the product of two smaller matrices (typically much smaller than the original pa-rameter space), LoRA significantly reduces the number of trainable parameters and memory footprint. Let W ∈ Rd×d denote a pre-trained weight matrix in a transformer layer (e.g., a projection matrix). Here, 
+
+d denotes the dimension of the layer, and r ≪ d is the rank of the update. In parameter-efficient fine-tuning methods such as LoRA, the weight matrix is modified via a low-rank update: 
+
+Wfinal = W + ∆ W, where ∆W = αr BA. 
+
+1
+
+> arXiv:2604.01694v1 [cs.LG] 2 Apr 2026
+
+# Pre-trained Weights 
+
+# W ∈ Rd×d
+
+# B = 0 
+
+# A = N (0 , σ 2)
+
+# h
+
+# x
+
+# +
+
+# r
+
+# d
+
+> (a)
+
+# Pre-trained Weights 
+
+# W ∈ Rd×d
+
+# B = U[: ,−r:] 
+
+# A = 0 
+
+# h
+
+# x
+
+# +
+
+# r
+
+# d          
+
+> (b)
+> Figure 1: (a) Diagram of a LoRA-style low-rank adaptation module applied to a weight matrix. (b) Diagram of a MiCA-style adaptation module illustrating its distinct update structure compared to LoRA (blue: constrained components, orange: fine-tuned components initialized as indicated in each trapezoid). U[: ,−r:] means all rows, last rcolumns of the matrix Udefined in the text.
+
+The matrices are defined as: 
+
+• A ∈ Rr×d,
+
+• B ∈ Rd×r ,
+
+• α is a scaling parameter that determines how strongly the trained adapter weights influence the original pre-trained model weights, and 
+
+• d is the dimension of W .Since r ≪ d, the update ∆W has rank at most r,allowing efficient adaptation with substantially fewer trainable parameters than full fine-tuning. During training, W remains frozen and only A and B are op-timized. Although we describe the square case for clarity of exposition, transformer weight matrices are in general rectangular, W ∈ Rdout ×din . The formulation extends directly by choosing A ∈ Rr×din and B ∈ Rdout ×r , so that ∆W = BA matches the shape of W . All argu-ments presented in this work apply analogously to the general case. Low-rank adaptation methods such as LoRA have become a standard approach for parameter-efficient fine-tuning of large language models. Instead of up-dating the full weight matrix W , only a rank-r correc-tion ∆W is learned, reducing the number of trainable parameters from O(d2) to O(rd ). This substantially lowers memory consumption, optimizer state size, and communication cost in distributed training. Beyond computational efficiency, low-rank updates also act as an implicit regularizer. By constraining adaptation to a low-dimensional subspace, they reduce the risk of catastrophic forgetting and often preserve pre-trained capabilities more effectively than full fine-tuning [5]. 
+
+## 2.2 Limitations of Current Approaches 
+
+Low-rank adaptation methods such as LoRA have demonstrated strong empirical performance and sub-stantial parameter efficiency. However, they leave a central question unresolved that is, which subspace should be adapted? 
+
+In standard LoRA, both low-rank factors are op-timized freely, meaning that the effective adaptation subspace is learned implicitly during training and may drift over time. While this flexibility can be beneficial, it does not explicitly account for the spectral structure of the pre-trained weight matrix. In particular, con-ventional low-rank adaptation does not distinguish be-tween dominant and minor directions in weight space. As a consequence, updates may overlap with high-energy components that encode general pre-trained ca-pabilities. Such overlap can lead to interference, in-efficient use of representational capacity, or undesir-able shifts in previously acquired knowledge. Although parameter-efficient fine-tuning methods are generally less prone to catastrophic forgetting than full fine-tuning [6, 7], they do not explicitly optimize for knowl-edge retention, and degradation on unrelated tasks can still occur. Several recent approaches incorporate singular value decomposition (SVD) into the adaptation process, such as PiSSA [8]. However, these methods primarily use spectral information for initialization; the adapta-tion parameters are subsequently free to evolve during training [9, 10]. Consequently, the effective subspace 2may again drift toward dominant components. These observations suggest that low-rank adapta-tion alone is not sufficient and that the choice and stability of the adaptation subspace may play a cru-cial role. MiCA addresses this limitation by explic-itly constraining learning to fixed minor singular direc-tions, introducing a spectrally grounded mechanism for parameter-efficient specialization. The core hypothesis of MiCA is therefore that a sub-set of minor components, those associated with low singular values in a weight matrix, can be activated for critical task-specific adaptability. These compo-nents are typically discarded or ignored in conventional low-rank approximations, which prioritize dominant di-rections. MiCA inverts this logic and proposes that the less-expressed directions, while accounting for a smaller portion of the original matrix weights, may of-fer higher marginal utility for task-specific learning. It holds especially when the dominant subspace is already saturated with generic, pre-trained knowledge. This leads to a refinement of the PeFT principle: rather than merely reducing dimensionality, we should aim to adapt the model in directions that are both underused and maximally informative for the new task. MiCA bears similarity to Minor Component Analy-sis (MCA) [11], a lesser-known counterpart to Princi-pal Component Analysis (PCA). While PCA extracts dominant eigenvectors associated with the largest eigenvalues (capturing maximum variance), MCA fo-cuses on eigenvectors associated with the smallest eigenvalues. These minor components are typically or-thogonal to the dominant subspace and may contain weak signals or structure that PCA overlooks. Analo-gously, MiCA leverages MCA-like logic to identify hid-den components in the weight space directions that are less significant in a variance sense but potentially more adaptable, plastic, or task-relevant. By adapting these minor components instead of reusing or reinitializing arbitrary low-rank directions, MiCA offers a data-driven, semantically grounded mechanism for efficient model adaptation thus preserv-ing core model capabilities while enhancing domain-specific expressiveness. 
+
+# 3 Methodology 
+
+MiCA extends LoRA’s architecture by explicitly incor-porating the SVD of the pre-trained weight matrix. Let W ∈ Rd×d denote a pre-trained weight matrix in a transformer layer. Its singular value decomposition is given by 
+
+W = U ΣV ⊤,
+
+where: 
+
+• U ∈ Rd×d is an orthogonal matrix whose columns are the left singular vectors, 
+
+• V ∈ Rd×d is an orthogonal matrix whose columns are the right singular vectors, 
+
+• Σ ∈ Rd×d is a diagonal matrix containing the sin-gular values σ1 ≥ σ2 ≥ · · · ≥ σd ≥ 0.Although we describe the square case for clarity, the formulation extends directly to rectangular weight ma-trices W ∈ Rdout ×din via the standard SVD. 
+
+## 3.1 Integration with Transformer Lay-ers 
+
+MiCA integrates into attention layers by adding low-rank matrices A ∈ Rr×d and B ∈ Rd×r , initialized based on the singular vectors derived from SVD. The weight update is defined as before: 
+
+∆W = αr BA 
+
+The final adapted weights in the transformer layers are computed as before in LoRA: 
+
+Wfinal = W + ∆ W. 
+
+Following the original LoRA study, adapters were applied to the query and value projection matrices (qproj , vproj ) in each transformer block unless otherwise stated. 
+
+## 3.2 Parameter Selection and Injection Points 
+
+The rank r is chosen based on computational con-straints and the desired balance between adaptability and computational efficiency. MiCA specifically selects the least significant singular vectors from the decom-position to be updated with new knowledge. For a constrained output space: 
+
+• Compute the complete SVD: W = U ΣV T
+
+• Select the last r singular vectors of: Ur = U [: , −r :] 
+
+• Initialize: B = Ur , A = 0 
+
+Note that with this choice, the updated matrix projects into subspaces that belong to small singular values. This targeted initialization helps to keep sub-spaces injecting parameters efficiently at critical points within transformer layers, typically at attention. 33.3 Training Procedure 
+
+During training, MiCA adapts transformer layers by optimizing the matrix A via gradient descent while keeping the original weights W and the ma-trix B frozen. The objective function is standard for transformer-based fine-tuning tasks, with an added low-rank update structure. We use a fine-tuning strategy that leverages the sep-aration of pre-training and instruction-tuning phases commonly used in large language models [12, 13, 14]. Rather than fine-tuning an instruction-tuned model di-rectly, we fine-tune the base model (i.e., the model pre-trained without instruction-following capabilities) on the target task. After this task-specific fine-tuning, we additively compose the resulting model weights with the delta between the instruction-tuned model and its corresponding base model: 
+
+θfinal = θFT base + ( θinstr − θbase )
+
+Here, θFT base represents the fine-tuned base model, and 
+
+(θinstr − θbase ) denotes the instruction delta derived from the original instruction tuning. This technique assumes a near-linear locality in the weight space and builds on the empirical observation that instruction tuning modifies a relatively constrained set of parame-ters relevant to instruction adherence. This approach offers two key advantages: (1) it en-ables the model to retain strong task-specific alignment learned during fine-tuning on domain-specific data, and (2) it reintroduces general instruction-following capa-bilities without requiring costly end-to-end instruction re-tuning. Preliminary tests suggested improved com-posability and reduced interference compared to fine-tuning on top of instruction-tuned checkpoints directly. 
+
+# 4 Experimental Setup 
+
+To assess the effectiveness of MiCA in improving fine-tuning quality, we conducted a suite of experiments across various datasets, models, and methods. Our experiments address multiple dimensions: knowledge retention, domain generalization, catastrophic forget-ting, and parameter efficiency. We explored several training and testing setups that span general language understanding, synthetic ques-tion answering, coding tasks, and domain-specific ap-plications: 
+
+• OpenAI blog posts from May and June 2024 (called BLOGS dataset below) together with re-lated synthetic QAs for multiple-choice tasks for domain question answering performance (BLOGS-MC). The posts were published after the knowl-edge cutoff of the LLMs tested below. 
+
+• TruthfulQA [15] and Hellaswag [16] benchmarks for adversarial robustness and factuality. 
+
+• A German history book [17] from 2024 that is sim-ilarly not in training sets of foundational models from before 2024. 
+
+• Testing data include target domains (to evaluate domain-specific performance) and source domains (to measure knowledge retention and catastrophic forgetting). To test the performance of MiCA, we used: 
+
+• Full fine-tuning (Full FT): updating the entire model to learn domain-specific knowledge, 
+
+• LoRA, 
+
+• Pre-trained models (Llama-2-7B, [18] with aknowledge cutoff July 2023 and Qwen-2.5 [19] with a knowledge cutoff October 2023) as non-adapted references. This experimental framework provides our basis for evaluating MiCA’s impact on fine-tuning outcomes across different scenarios, target domains, and param-eter constraints. The technical details of our method can be found in the appendix. 
+
+# 5 Results and Analysis 
+
+This section presents the findings from our experimen-tal evaluation of MiCA compared to other fine-tuning methods, particularly LoRA and full fine-tuning. Our experiments span multiple training–testing setups, in-cluding continued pre-training on texts of different sizes, on synthetic multiple-choice tasks, and general knowledge benchmarks. These controlled cross-domain evaluations allow us to assess MiCA’s improvements in knowledge acquisition, its robustness when transferring from heterogeneous training sources to evaluation do-mains, its mitigation of catastrophic forgetting, and its parameter efficiency compared to LoRA. 
+
+## 5.1 BLOGS dataset 
+
+To evaluate the knowledge uptake and retention ca-pabilities of MiCA, we first conducted continued pre-training experiments on the Llama-2-7B and Qwen2.5-7B models. The training corpus, BLOGS, consisted of ten blog articles from OpenAI’s website (300 to 600 words per post), each expanded via GPT-4-generated paraphrasing to produce a total of thirty texts. These documents introduced previously unseen domain knowledge that is not contained in the base model, allowing a controlled study of how effectively MiCA incorporates novel information. 4To quantify knowledge uptake, we constructed a syn-thetic evaluation dataset, BLOGS-MC, comprising 300 multiple-choice questions derived directly from blog content by asking GPT-4 [20]. We refer to the result-ing evaluation benchmark as BLOGS-MC. For broader generalization effects, we additionally evaluated the TruthfulQA and Hellaswag benchmarks. Both MiCA and LoRA were trained under an in-dependently optimized hyperparameter search. The search space included adapter rank r, learning rate, and number of training epochs. To ensure a fair com-parison, all experiments used identical training scripts, tokenization settings, and data orderings, each config-uration being evaluated across multiple random seeds. 2 4 6 8 10       
+
+> Epochs
+> 56
+> 57
+> 58
+> 59
+> 60
+> 61
+> 62
+> 63
+> 64
+> BLOGS-MC Accuracy (%)
+> Llama-2-7B-chat baseline
+> MiCA
+> LoRA
+> (a) Baseline: Llama-2-7B 246810
+> Epochs
+> 72
+> 73
+> 74
+> 75
+> 76
+> 77
+> 78
+> BLOGS-MC Accuracy (%)
+> Qwen2.5-7B-Instruct baseline
+> MiCA
+> LoRA
+> Random Components (fixed B)
+> (b) Baseline: Qwen2.5-7B
+> Figure 2: Retention of domain knowledge from the BLOGS dataset as a function of number of training epochs for MiCA and LoRA. Error bars denote the standard error of 8 eval-uation runs. The horizontal dashed line shows the baseline performance of the respective foundation model. The green dashed line in (b) shows results for a fixed Bmatrix initial-ized with random SVD components instead of the minor componenents and same hyperparameters as for the MiCA runs.
+
+Figure 2 shows the accuracy of BLOGS-MC as a function of the number of continued pre-training epochs for both the Llama (a) and Qwen models (b). Each curve represents the mean performance of eight independent training runs with different ran-dom seeds, while the error bars denote the correspond-ing standard error. Across both models, MiCA con-sistently achieves higher domain-knowledge accuracy than LoRA throughout training. The improvement emerges already in the early epochs and remains sta-ble as training progresses, suggesting that restricting updates to minor singular directions enables more effi-cient knowledge integration. Table 1 summarizes the performance of MiCA and LoRA on the 300-item multiple-choice knowledge test, alongside their respective levels of general knowledge and reasoning as measured by TruthfulQA (mc1) and Hellaswag. It reports the best-performing configu-ration from the training curves shown in Figure 2. Across both model families, MiCA achieves the high-est BLOGS-MC accuracy. For Llama-2-7B-chat, MiCA reaches 61.33%, improving over the baseline model (56.18%) by 5.15 percentage points and over the best LoRA configuration (58.28%) by 3.05 points. A simi-lar pattern is observed for Qwen2.5-7B-Instruct, where MiCA achieves 75.63% accuracy compared to 73.87% for LoRA and 72.91% for the instruct baseline. MiCA achieves the highest BLOGS-MC accuracy while using substantially fewer trainable parameters than LoRA. For the Llama model, MiCA uses an adapter rank of r = 16, while LoRA requires r = 128 to reach its best precision. Moreover, MiCA updates only one of the two LoRA matrices, effectively halv-ing the parameter count relative to standard LoRA for the same rank. Taken together, this results in about 6% trainable parameters for the MiCA configuration, achieving competitive or superior performance com-pated to LoRA. For the Qwen model, both methods reach highest BLOG score for r = 32 , but because of the freezing of B, MiCA still needs only about 60% of the parameter count. Overall, the results demonstrate that MiCA provides a more parameter-efficient and representation-stable fine-tuning strategy for acquiring new knowledge in Llama-2-7B-chat, delivering higher accuracy and lower computational footprint compared to LoRA. However, these results alone do not establish whether the im-provement arises specifically from adapting minor sin-gular directions or from restricting updates to any fixed low-rank subspace. We investigate this question in the ablation study in Section 7. 
+
+## 5.2 HISTORY book in German 
+
+A second continued pre-training test with a much longer text base involved a 300-page history book in 5Method BLOGS-MC TruthQA HellaSwag r LR Ep. Params 
+
+Llama-2-7B-chat 56.18 34.79 60.40 – – – 6,747M LoRA (optimal) 58.28 35.47 60.41 128 1e-4 8 67M MiCA (optimal) 61.33 35.29 60.11 16 5e-4 4 4M Qwen2.5-7B-Instr. 72.91 43.27 60.60 – – – 7,626M LoRA (optimal) 73.87 42.95 60.95 32 5e-4 4 10M MiCA (optimal) 75.63 43.38 61.62 32 5e-4 8 6M  
+
+> Table 1: Comparison of BLOGS-MC (new knowledge), TruthfulQA-MC1 and HellaSwag accuracies across different fine-tuning methods for the blog post training. For each accuracy value we averaged 8 runs per hyperparameter choice. Additional columns for optimal adapter rank ( r), learning rate (LR), and training epochs are included for completeness. The last columns shows the number of parameters of the full model or the number of trainable parameters for the LoRA and MiCA runs, respectively.
+
+Method Accuracy (%) HellaSwag (%) Learning rate r # epochs 
+
+Llama-2-7B-chat 27.4 57.8 – – –Full FT (chat) 30.4 57.3 2e-5 – 1LoRA 29.4 1 57.7 5e-4 32 8MiCA 39.2 2 57.8 2e-3 32 8   
+
+> Table 2: Retention of new knowledge for the HISTORY dataset: accuracy on multiple choice tests for several fine-tuning methods (Llama-2) with respective optimal hyperparameter choices. ( 1mean of results for two runs, 2identical results across four independent runs)
+
+German (HISTORY dataset, approximately 100,000 tokens). The evaluation of the model’s ability to ac-quire new knowledge was performed using a custom-built dataset HISTORY-MC of 102 multiple-choice questions (A-D) based on the book’s content (questions and answers were generated with Claude Sonnet 3.5). The base model Llama-2-7B was used for training, and the resulting PeFT matrices were subsequently merged with the instruct variant of the model as described in Section 3.3. As before, hyper-parameters learning rate, number of epochs (with a maximum of 8), and rank ( r) were optimized for both LoRA and MiCA. The results (see Figure 3) indicate that MiCA, with optimal param-eters, achieved a significantly higher precision in an-swering questions about new knowledge (39.2% with four equivalent results) compared to LoRA (29.4% on average over two runs) and the fully fine-tuned chat model (30.4%), which were also independently opti-mized for hyperparameters. The original chat variant of the model achieved an accuracy of 27.4%. Anal-ysis of the HellaSwag dataset yielded similar results for PeFT methods (approximately 0.57-0.58 Acc) but significantly mode forgetting for the full fine-tuning method. The optimal learning rates for MiCA and LoRA differed (2e-3 vs. 5e-4), while both methods achieved the best results with a rank of 32 and 8 train-ing epochs. The fully fine-tuned model used a learning rate of 2e-5 and was trained for only one epoch. The observation of minimal catastrophic forgetting Base Model LoRA Full Fine-tune MiCA   
+
+> 20
+> 25
+> 30
+> 35
+> 40
+> 45
+> Accuracy (%)
+> 27.4
+> 29.4 30.4
+> 39.2
+> Figure 3: Retention of domain knowledge for the history book and for several fine-tuning methods for Llama-2.
+
+is potentially explained by the fact that training was conducted in German, while general knowledge tests were performed in English (HellaSwag). As in the case of BLOGS, MiCA is more parameter-efficient and achieved the most significant improvement in accuracy on new knowledge with about half of the number of trainable parameters as LoRA. Comparing the small-scale blog experiments with the substantially larger history corpus suggests an intriguing pattern, the performance gap between MiCA and LoRA widens as domain data increases. This suggests that constrain-ing adaptation to minor singular directions becomes increasingly beneficial in higher-signal regimes, where unconstrained updates risk overwriting dominant pre-6trained structure. The results further indicate that spectrally localized adaptation mitigates interference even under extended continued pre-training. 
+
+# 6 Ablation: Minor vs. Major Singular Subspaces 
+
+To isolate whether MiCA’s gains arise specifically from adapting minor singular directions rather than from any fixed orthonormal subspace, we compare four vari-ants on Qwen-2.5-7B training on the blog posts: 1. Instruct baseline (no fine-tuning) 2. Major-r adaptation : projection onto the top-r
+
+singular vectors 3. Minor-r adaptation (MiCA) : projection onto the bottom-r singular vectors 4. Random components : the matrix B is fixed and initialized from r randomly chosen compo-nents of the SVD The random-component variant serves as a control to test whether MiCA’s gains arise merely from restrict-ing adaptation to a fixed low-dimensional orthonor-mal subspace. If this were the case, randomly selected singular vectors should perform comparably to minor components. All three adapted variants use the same rank r, learn-ing rate, number of steps, and trainable parameter count. In all cases, the projection matrix B is fixed and only the coefficient matrix A is trained. Thus, the only varying factor is the choice of singular subspace. Method BLOGS-MC (%) Instruct (no FT) 72.91 Major-r 74.21 
+
+r random components 73.75 
+
+Minor-r (MiCA) 75.63 
+
+> Table 3: Ablation on Qwen-2.5-7B comparing adaptation in major vs. minor and randomly chosen singular subspaces.
+
+All subspace-restricted adaptations improve over the instruct baseline on the domain BLOGS-MC bench-mark, indicating that constrained low-rank adapta-tion alone provides benefits. However, adapting along 
+
+minor singular directions outperforms major-direction and random component adaptation, yielding improve-ment over both other choices. Fig. 2 B also contains the random-component results across training epochs. While random directions ini-tially follow a similar improvement trajectory as the other subspace-restricted methods, they plateau earlier and converge to a lower final accuracy than MiCA. This suggests that the minor singular subspace not only pro-vides higher final performance but also supports more stable adaptation dynamics during training. Taken together, the results provide direct empirical support for MiCA’s central hypothesis: minor singu-lar directions form a more plastic subspace for domain adaptation, while dominant or random directions are structurally less plastic. 
+
+# 7 Discussion, Limitations, and Outlook 
+
+MiCA introduces a spectrally grounded approach to parameter-efficient fine-tuning by constraining adap-tation to minor singular directions of pre-trained weights. Empirically, this yields improved knowledge acquisition, potentially reduced catastrophic forget-ting, and significantly lower parameter counts com-pared to LoRA under matched optimization. 
+
+## 7.1 Limitations 
+
+MiCA in the current setup is not designed for instruc-tion fine-tuning. Since it restricts adaptation to minor spectral components of the base model, tasks that pri-marily require structural instruction-following rather than knowledge integration may not benefit from this constraint. However, future research may explore the potential of applying Singular Value Decomposition to the delta weights obtained from instruction fine-tuning processes versus the base model. This could poten-tially pave the way for extending the benefits of MiCA to instruction-based tasks by identifying and adapting only the most salient weight changes. Additionally, while we demonstrate consistent im-provements on 7B-scale models, the scaling behavior with respect to model size, dataset size, and task com-plexity remains an open question. Finally, computing SVDs for very large layers may introduce additional preprocessing cost, although this is a one-time opera-tion. 
+
+## 7.2 Practical Implications 
+
+MiCA is particularly suited for domain specializa-tion scenarios where integrating new factual knowl-edge while preserving pre-trained capabilities is criti-cal. Its reduced parameter footprint makes it attractive for on-device adaptation and federated learning set-tings, where communication and memory constraints are central. These properties suggest that spectrally 7constrained adaptation may serve as a principled foun-dation for deploying lightweight, domain-specific LLM variants. An interesting extension is to combine spectrally constrained adaptation with reinforcement learning ob-jectives. Since MiCA restricts updates to minor singu-lar directions, it localizes representational change. Re-inforcement learning with explicit KL regularization has been observed to produce more behaviorally tar-geted updates and, in some settings, reduced catas-trophic forgetting compared to supervised fine-tuning. A two-stage pipeline — (1) continued pre-training with MiCA for knowledge injection, followed by (2) RL-based alignment on labeled or preference data — may further stabilize domain adaptation while preserving pre-trained capabilities. Investigating whether spectral constraints and reward-based optimization act syner-gistically in reducing interference is a promising direc-tion for future work. 
+
+# References 
+
+[1] Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 , 2021. [2] Brian Lester, Rami Al-Rfou, and Noah Constant. The power of scale for parameter-efficient prompt tuning. arXiv preprint arXiv:2104.08691 , 2021. [3] Xiang Lisa Li and Percy Liang. Prefix-tuning: Op-timizing continuous prompts for generation. In 
+
+Proceedings of ACL 2021 , pages 4582–4597, 2021. [4] Elena Ben-Zaken, Shauli Ravfogel, and Yoav Goldberg. Bitfit: Simple parameter-efficient fine-tuning for transformer-based masked language-models. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Process-ing , pages 1–9, 2021. [5] Dan Biderman, Jacob Portes, Jose Javier Gonza-lez Ortiz, Mansheej Paul, Philip Greengard, Con-nor Jennings, Daniel King, Sam Havens, Vitaliy Chiley, Jonathan Frankle, et al. Lora learns less and forgets less. arXiv preprint arXiv:2405.09673 ,2024. [6] Xudong Chen, Lei Shu, Tengfei Ma, Xinyu Ye, Nicholas Carlini, Pin-Yu Chen, Shiqi Wang, and Cho-Jui Hsieh. Continual learning with pretrained language models. In Findings of the Association for Computational Linguistics: EMNLP 2020 ,pages 270–282, 2020. [7] Vinay V. Ramasesh, Ethan Dyer, and Maithra Raghu. Anatomy of catastrophic forgetting: Hid-den representations and task semantics. Proceed-ings of ICLR 2022 , 2022. [8] Fanxu Meng, Zhaohui Wang, and Muhan Zhang. Pissa: Principal singular values and singular vec-tors adaptation of large language models. Ad-vances in Neural Information Processing Systems ,37:121038–121072, 2024. [9] Seokju Yun, Seunghye Chae, Dongheon Lee, and Youngmin Ro. Soma: Singular value decomposed minor components adaptation for domain gener-alizable representation learning. In Proceedings of the Computer Vision and Pattern Recognition Conference , pages 25602–25612, 2025. [10] Yu-Ang Lee, Ching-Yun Ko, Pin-Yu Chen, and Mi-Yen Yeh. Learning rate matters: Vanilla lora may suffice for llm fine-tuning. arXiv preprint arXiv:2602.04998 , 2026. [11] Erkki Oja. Principal and minor components in neural networks. Neural Networks , 5(6):927–935, 1992. [12] Jason Wei, Maarten Bosma, et al. Finetuned language models are zero-shot learners. arXiv preprint arXiv:2109.01652 , 2021. [13] Long Ouyang, Jeff Wu, Xu Jiang, et al. Training language models to follow instructions with hu-man feedback. In Advances in Neural Information Processing Systems , 2022. [14] Tim Dettmers, Mike Lewis, Sam Shleifer, and Luke Zettlemoyer. Qlora: Efficient finetuning of quantized llms. arXiv preprint arXiv:2305.14314 ,2023. [15] Stephanie Lin, Jacob Hilton, and Owain Evans. Truthfulqa: Measuring how models mimic human falsehoods. Proceedings of ACL 2022 , 2021. [16] Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. Hellaswag: Can a ma-chine really finish your sentence? In Proceedings of ACL 2019 , pages 4791–4800, 2019. [17] Günther Rüdiger. Astronomen, Akten und Af-fären. Vom Anfang zum Ende des Astrophysik-alischen Observatoriums zu Potsdam. Berichte und Erinnerungen. Journal of Astronomical His-tory and Heritage , 27(3):727–728, 2024. [18] Hugo Touvron, Louis Martin, Kevin Stone, et al. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 , 2023. 8[19] Qwen. Qwen2.5 technical report, 2025. [20] OpenAI. Gpt-4 technical report, 2024. 9A Technical Details - BLOGS corpus 
+
+This appendix documents the implementation details for Continued Pre-Training (CPT) with parameter-efficient adapters (LoRA / MiCA-style variants), including model choices, hyperparameters, prompting, data construc-tion, and evaluation protocol. Unless stated otherwise, all experiments were run with fixed hyperparameters across methods to ensure comparability. 
+
+## A.1 Software Stack and Core Libraries 
+
+We used the Hugging Face transformers ecosystem together with TRL’s SFT trainer: 
+
+• transformers (model loading, tokenization, generation pipelines) 
+
+• peft (LoRA adapters, adapter save/load) 
+
+• custom peft (MiCA) 
+
+• trl (SFTTrainer , SFTConfig )
+
+• datasets (in-memory datasets) The SFT trainer is here adapted for CPT with suitable options (no chat template and packing=True ). 
+
+## A.2 Data Construction 
+
+Training corpus. The training set consists of blog-like texts loaded from CSV files: 
+
+• blogs.csv 
+
+• paraphrased_blogs.csv 
+
+All rows are appended into a single list texts , and then converted to a HF Dataset with one field text per example. 
+
+Evaluation corpus (QA multiple-choice set). Evaluation accuracy is computed on a curated multiple-choice QA dataset: 
+
+• qa_openaiblog.csv 
+
+Each row contains a Question string and a correct Answer in {A,B,C,D}. 
+
+Training blog paragraph : OpenAI has developed into a worldwide entity that serves hundreds of millions of users, millions of developers, and the largest corporations globally. To advance our mission further, we are intensifying our focus on what we excel at: pioneering research and leveraging it to develop and deploy AI technologies safely. We are delighted to announce the addition of two key leaders equipped with the essential expertise, skills, and values to advance our mission: Sarah Friar joins as Chief Financial Officer, leading a finance team dedicated to supporting our mission through sustained investment in our fundamental research and adapting to the evolving demands of our expanding customer base and the intricate global landscape. Kevin Weil comes on board as Chief Product Officer, heading a team that aims to transform our research into products and services that benefit consumers, developers, and enterprises. "Sarah and Kevin’s extensive experience will help OpenAI expand our operations, design strategies for our next growth phase, and ensure our teams are well-resourced to flourish," said OpenAI CEO Sam Altman. Sarah was most recently the CEO of Nextdoor, after roles as CFO at Square and positions at Goldman Sachs, McKinsey, and Salesforce. She serves on the boards of Walmart and Consensys, is a Fellow at the Aspen Institute, and Co-Chair at Stanford’s Digital Economy Lab, part of the Stanford Institute for Human-Centered AI (HAI). Kevin previously held the role of President, Product and Business at Planet Labs, co-founded the Libra cryptocurrency, and served as VP of Product for Novi at Facebook, Instagram, and as SVP of Product at Twitter. He is also a term member at the Council on Foreign Relations (CFR) and a board member of The Nature Conservancy and Black Product Managers Network. "Joining a team that’s both exceptionally talented and committed to its mission is an honor," Sarah 
+
+10 Friar commented. "I aim to ensure OpenAI continues to lead in conducting essential research and enhancing the use of AI tools for everyone’s benefit." Kevin Weil added, "The product team at OpenAI is defining the standard for innovative breakthroughs and the considerate implementation of AI technologies. I am excited to contribute to the next stage of growth as we strive to build AGI responsibly and safely."       
+
+> Evaluation MCQ row :Question: In what year was the partnership between OpenAI and Apple announced to integrate ChatGPT into Apple experiences? A) 2022 B) 2023 C) 2024 D) 2025 Answer: <one of A/B/C/D>
+
+## A.3 Prompting and Formatting 
+
+Qwen 2.5 prompt template. For Qwen experiments, each multiple-choice question is formatted as: 
+
+> <|system|>Answer the following question by choosing A, B, C, or D. Do only answer with the correct letter. <|user|><QUESTION> <|assistant|>
+
+The model is required to generate exactly one token (A, B, C, or D). Decoding is greedy ( do_sample=False )with max_new_tokens=1 . The first occurrence of a letter in {A, B, C, D } in the generated output is treated as the model prediction. 
+
+Llama 2 prompt template. For Llama-2 experiments, we use the instruction-format template:  
+
+> [INST]Answer the following question by choosing A, B, C, or D. Do only answer with the correct letter. <QUESTION> [/INST]
+
+This corresponds to the standard Llama-2 instruction format with [INST] ... [/INST] markers. 
+
+Deterministic Evaluation. Evaluation uses: 
+
+• Greedy decoding ( do_sample=False )
+
+• max_new_tokens=1 
+
+This ensures that reported accuracies reflect deterministic model behavior rather than sampling variance. 
+
+## A.4 Models 
+
+Base model for adapter training. Adapters were trained on a base causal LM: 
+
+• Qwen experiments: Qwen/Qwen2.5-7B (base) 
+
+Base model for evaluation (instruct). For evaluation, the trained adapter is loaded onto an instruction-tuned base: 
+
+• Qwen evaluation base: Qwen/Qwen2.5-7B-Instruct 
+
+This separation (base for training vs instruct for evaluation) is used to maintain instruction-following format during multiple-choice evaluation while still training adapters on the base model weights. The adapter weights are loaded via PeftModel.from_pre-trained .
+
+Llama 2 configuration We also report Llama 2 experiments following the same procedure, swapping only 
+
+model_id and model_base :
+
+• Training base: meta-llama/Llama-2-7b-hf 
+
+• Evaluation base (chat): meta-llama/Llama-2-7b-chat-hf 
+
+11 Hyperparameter Value Per-device train batch size 4Gradient accumulation steps 1Weight decay 0.01 Warmup ratio 0.1 LR scheduler cosine Max grad norm 0.3 Precision bf16 Max sequence length 512  
+
+> Table 4: SFT hyperparameters used in all runs (TRL SFTConfig ).
+
+## A.5 Adapter Method and Target Modules 
+
+LoRA configuration. The LoRA configuration used in the code is: 
+
+• dropout: lora_dropout = 0.05 
+
+• alpha = 16 :
+
+• Target modules: q_proj , v_proj 
+
+## A.6 Training Hyperparameters 
+
+All runs use the same training configuration unless otherwise stated. The key hyperparameters from the script are shown in Table 4. 
+
+# B Technical Details - HISTORY Corpus 
+
+This appendix documents the implementation details for Continued Pre-Training (CPT) on the AIP historical corpus with parameter-efficient adapters (LoRA and MiCA), including model choices, hyperparameters, data construction, prompting, and evaluation protocol. All experiments were run on AWS SageMaker optimizing hyperparameter configuration for both methods. 
+
+## B.1 Software Stack and Core Libraries 
+
+We used the Hugging Face transformers ecosystem together with the peft library: 
+
+• transformers (model loading, tokenization, generation pipelines) 
+
+• peft (standard LoRA adapters, adapter save/load) 
+
+• custom peft (MiCA, using SVD weight initialisation) Training uses the Hugging Face Trainer API directly (not TRL’s SFTTrainer ), with gradient checkpointing enabled and torch_dtype=bfloat16 for memory efficiency. 
+
+## B.2 Data Construction 
+
+Training corpus. The training set consists of a single German-language historical monograph on the As-trophysikalisches Institut Potsdam (AIP) and the East German Akademie der Wissenschaften , stored as a plain-text file. The pre-processing pipeline operates as follows: 1. The full text is read and split into paragraphs at double-newline boundaries. 2. Each paragraph is tokenised and, if it exceeds the maximum sequence length, split at sentence boundaries (’. ’ delimiter) to form chunks of at most max_length = 1024 tokens. 3. If a single sentence exceeds the limit, it is further split at the word level. 12 The dataset is then loaded inside the SageMaker training job from using HuggingFace datasets in streaming mode. 
+
+Evaluation corpus (QA multiple-choice set). Evaluation accuracy is computed on a curated German-language multiple-choice QA dataset derived directly from the AIP corpus. Each row contains a question 
+
+string with four labelled options (A–D) and a correct answer letter. Questions cover specific historical facts from the monograph, including people, institutions, dates, and scientific events.      
+
+> Sample training passage:
+> Eine schwere Tatra-Limousine passierte im Spätherbst 1965 das weit geöffnete schmiedeeiserne Tor mit dem sachlichen Schriftzug "OBSERVATORIEN" auf dem Potsdamer Telegraphenberg. Der Pförtner hat seine Loge verlassen und grüßt fast militärisch, denn kein Geringerer als Max Steenbeck, frisch ernannter Vorsitzender des Forschungsrates der DDR ...
+> Sample evaluation MCQ row:
+> "Wer wurde im Spätherbst 1965 vom Pförtner am Potsdamer Telegraphenberg fast militärisch gegrüßt? A) Werner Heisenberg B) Max Steenbeck C) Fritz Krause D) Dr. Lore Oetken","B"
+
+## B.3 Prompting and Formatting 
+
+Training tokenisation. Each text chunk is tokenised with padding to max_length and truncation enabled. Labels are set equal to input_ids (standard causal language modelling objective). 
+
+Llama 2 evaluation prompt template. For evaluation, each multiple-choice question is wrapped in a German-language instruction prompt: 
+
+> Du bist ein Assistent, der Multiple-Choice-Fragen beantwortet. Wähle die richtige Antwort (A, B, C oder D) für die folgende Frage: {question} Antworte nur mit dem Buchstaben der richtigen Antwort (A, B, C oder D).
+
+The model generates up to 10 new tokens; the first occurrence of a letter in {A, B, C, D } in the output is taken as the prediction. 
+
+## B.4 Models 
+
+Base model for adapter training. Adapters are trained on the base causal LM: 
+
+• meta-llama/Llama-2-7b-hf 
+
+Base model for evaluation. For evaluation, the trained adapter is loaded onto the instruction-tuned variant: 
+
+• meta-llama/Llama-2-7b-chat-hf 
+
+This separation (base for training, instruct for evaluation) preserves instruction-following behavior during the multiple-choice evaluation while keeping adapter training on the raw base model weights. 
+
+## B.5 Adapter Configurations and Training Hyperparameters 
+
+Both LoRA and MiCA use the same target modules but differ in rank, initialisation, and learning rate; see Table 5. 
+
+## B.6 Infrastructure 
+
+Training is executed on AWS SageMaker using the HuggingFace estimator with PyTorch distributed training across all available GPUs on a single node of 8 × H100 80 GB. 13 Parameter Value Dropout 0.05 Target modules q_proj , v_proj 
+
+Per-device train batch size auto Gradient accumulation steps 1Weight decay 0.01 Warmup ratio 0.1 LR scheduler cosine Max grad norm 1.0 Precision bf16 Max sequence length 1024 tokens Logging steps 100 
+
+> Table 5: LoRA and MiCA adapter configurations and trainings hyperparameters.
+
+14

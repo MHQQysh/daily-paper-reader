@@ -1,0 +1,508 @@
+Title: Energy Saving for Cell-Free Massive MIMO Networks: A Multi-Agent Deep Reinforcement Learning Approach
+
+URL Source: https://arxiv.org/pdf/2604.07133v1
+
+Published Time: Thu, 09 Apr 2026 01:23:05 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# Energy Saving for Cell-Free Massive MIMO Networks: A Multi-Agent Deep Reinforcement Learning Approach 
+
+Qichen Wang ∗, Keyu Li ∗, Ozan Alp Topal ∗, Özlem Tu˘ gfe Demir †, Mustafa Ozger ‡∗ , and Cicek Cavdar ∗∗Department of Communication Systems, KTH Royal Institute of Technology, Sweden ({qichenw, keyul, oatopal, cavdar}@kth.se) 
+
+†Department of Electrical and Electronics Engineering, Bilkent University, Turkiye (ozlemtugfedemir@bilkent.edu.tr) 
+
+‡Department of Electronic Systems, Aalborg University, Denmark (mozger@es.aau.dk) 
+
+Abstract —This paper focuses on energy savings in downlink operation of cell-free massive MIMO (CF mMIMO) networks under dynamic traffic conditions. We propose a multi-agent deep reinforcement learning (MADRL) algorithm that enables each access point (AP) to autonomously control antenna re-configuration and advanced sleep mode (ASM) selection. After the training process, the proposed framework operates in a fully distributed manner, eliminating the need for centralized control and allowing each AP to dynamically adjust to real-time traffic fluctuations. Simulation results show that the proposed algorithm reduces power consumption (PC) by 56.23% compared to systems without any energy-saving scheme and by 30.12% relative to a non-learning mechanism that only utilizes the lightest sleep mode, with only a slight increase in drop ratio. Moreover, compared to the widely used deep Q-network (DQN) algorithm, it achieves a similar PC level but with a significantly lower drop ratio. 
+
+Index Terms —cell-free massive MIMO, antenna re-configuration, advanced sleep mode, multi-agent deep reinforcement learning 
+
+I. I NTRODUCTION 
+
+Cell-free massive MIMO (CF mMIMO) has emerged as a promising architecture for future mobile communication systems, primarily due to its ability to provide almost uni-formly high quality of service (QoS) to user equipments (UEs) across the network [1]. In a typical CF mMIMO setup, a large number of distributed access points (APs) jointly serve a smaller number of UEs through coherent transmission. To accommodate the increasing demand and growing number of UEs, this architecture relies on an ultra-dense deployment of APs. However, such deployment inevitably incurs substantial energy consumption [2], primarily due to the increased number of APs and the overhead of synchronization and control signaling across these densely deployed APs. Several studies have been conducted to address the energy efficiency challenges in CF mMIMO systems. The works in [3], [4] investigate AP selection as a means to improve energy efficiency, where UEs are served by subsets of APs, chosen based on channel conditions or power thresholds, rather than by all available APs. Similarly, [5] focuses on AP clustering and simple AP activation strategies to enhance energy effi-ciency. In addition, AP sleep mode has been widely studied as another line of research. The studies in [6], [7] propose adaptive deactivation of underutilized APs, with [7] further enhancing the approach by incorporating transmit power opti-mization. Meanwhile, [8] introduces a multi-level sleep mode framework and demonstrates the effectiveness of coordinated sleep scheduling. As a complementary technique, antenna-level optimization has also been considered. [9] introduces a joint scheme of power allocation and antenna deactivation for energy-efficient CF mMIMO under wireless fronthaul. The current research on energy-efficient CF mMIMO sys-tems largely relies on snapshot-based settings, where all UE ar-rivals are assumed to be known at a single time instant. These static approaches overlook temporal dynamics in decision-making, and thus cannot effectively model realistic traffic vari-ations. In our previous work [10], dynamic traffic arrivals were introduced but only in a cellular network context. Regarding CF mMIMO, determining antenna element configurations and managing AP sleep modes under dynamic traffic conditions remains an open challenge. In this paper, we propose a multi-agent deep reinforcement learning (MADRL) algorithm that enables APs to jointly optimize antenna re-configuration and advanced sleep mode (ASM) selection under dynamic traffic. The main contributions of this paper are outlined as follows:  
+
+> •
+
+We develop a comprehensive CF mMIMO simulation framework that integrates empirically derived mobile traf-fic patterns from deep packet inspection (DPI) data of a Swedish operator, thereby enabling realistic and dynamic evaluation of system performance under practical traffic conditions.  
+
+> •
+
+We propose a multi-agent proximal policy optimization (MAPPO)-based algorithm that jointly manages antenna re-configuration and ASMs selection of APs, with the objective of minimizing power consumption (PC) while maintaining the data rate satisfaction.  
+
+> •
+
+Simulation results show that the proposed MAPPO-based algorithm achieves substantial energy savings com-pared to non-learning baselines with simple energy-saving mechanisms. Moreover, it outperforms the deep Q-learning network (DQN) algorithm by learning better traffic-sensitive policies that achieve a lower drop ratio under the same PC. 
+
+> arXiv:2604.07133v1 [cs.IT] 8 Apr 2026
+
+II. S YSTEM MODEL 
+
+We focus on the downlink of a CF mMIMO system, as illustrated in Fig. 1. In our system model, L APs, each equipped with Mmax antennas, are deployed at fixed locations and connected to a centralized cloud via fronthaul links. Within the coverage area, UEs with single-antenna arrive randomly at various locations according to an arrival rate λ.When a UE arrives, it selects a subset of APs with the strongest channel gains to which it sends its service request. In response to dynamic traffic conditions, APs can implement adaptive energy-saving strategies, including turning antennas on and off, and transitions among multiple sleep modes.  
+
+> Fig. 1. CF MIMO system model.
+
+A. Channel Model 
+
+The channel between AP l and UE k is characterized by a large-scale fading coefficient βl,k , capturing path loss and shadowing. The small-scale fading is assumed to follow independent and identically distributed Rayleigh fading. The coherence block has τc symbols, of which τp are used for uplink channel estimation and τc −τp are used for downlink data. During the uplink training phase, each UE transmits a pilot of length τp. In a large network with K UEs (where 
+
+K > τ p), it is not possible to assign orthogonal pilots to all the UEs. Instead, some UEs can share the same pilot sequence. The set of UE indices that share the same pilot as UE k is denoted by Pk. Each AP obtains the channel estimate of UEs, where the average gain of the channel estimate of UE k at AP 
+
+l is denoted by χl,k .To keep the architecture scalable, we follow a user-centric AP-UE association: each UE k is jointly served only by a subset of APs, Mk ⊆ { 1, . . . , L }, instead of by the whole network, L denoting the total number of APs. We rank the large-scale fading coefficients in descending order and construct the cluster as  
+
+> |M k|
+
+X
+
+> i=1
+
+βℓi,k ≥ 0.9
+
+> L
+
+X
+
+> l=1
+
+βl,k , (1) where |M k| is the adaptive cluster size and li’s are the indices of the APs serving UE k. This 90% -gain rule [11] guarantees that at least 90% of the available large-scale energy reaches UE k while dramatically shrinking the signaling footprint and precoding dimension. Each AP precodes and transmits data streams intended for the UEs in its serving set. Let Kl ⊆ { 1, . . . , K } denote the set of UEs served by AP l. The transmitted signal from AP l
+
+is given by 
+
+xl = X
+
+> k∈K l
+
+√pl,k wl,k ςk, (2) where ςk is the data symbol intended for UE k with E[|ςk|2] = 1, wl,k ∈ Cml is the precoding vector, where ml denotes the number of activated antennas at AP l, and pl,k is the transmit power allocation coefficient, determined by our power allocation policy (see Section II-B). To mitigate downlink interference in a distributed manner, we adopt the local protective partial zero-forcing (PPZF) precoding scheme [12] due to its balanced complexity-performance trade-off. The received signal at UE k consists of the desired component, coherent interference due to pilot contamination, and non-coherent interference plus noise. Thus, the effective signal-to-interference-plus-noise ratio (SINR) with PPZF pre-coding is given by (3), where τ str  
+
+> l
+
+≤ τp represents the number of pilot signals for the strong-channel UEs at AP l. The indi-cator δl,k specifies whether UE k belongs to the interference-suppression set of AP l, while the set Pk comprises the UEs sharing the same pilot sequence with UE k, thereby capturing the effect of pilot contamination. The σ2 is the noise variance. Finally, the achievable downlink data rate for UE k is computed as: 
+
+rk =
+
+ τc − τp
+
+τc
+
+
+
+B log 2
+
+ 1 + SINR PPZF 
+
+> k
+
+ , (4) where B is the system bandwidth. 
+
+B. Power Allocation 
+
+For AP l, the total transmit power is defined as pl = mlpa,where pa is the average transmit power per antenna. Equiv-alently, it can be expressed as pl = P 
+
+> k∈K l
+
+pl,k . The power allocated to UE k ∈ K l according to [11] is given by: 
+
+pl,k = pl · χl,k 
+
+P 
+
+> j∈K l
+
+χl,j 
+
+(5) where χl,k reflects the quality of the channel estimate between AP l and UE k, thereby favoring UEs with stronger channels. 
+
+C. Advanced Sleep Modes 
+
+ASMs enable the AP to gradually enter deeper sleep modes by systematically deactivating hardware components such as the radio frequency (RF) module and the power amplifier (PA). Although higher sleep modes yield significant energy savings, they involve a trade-off in the form of increased wake-up latency. According to [13], [14], four sleep modes (SM 0–3) are defined based on the associated wake-up latency, each with a corresponding PC discount factor, as summarized in Table I. Among them, SM 0 denotes the active state. SINR PPZF  
+
+> k
+
+=
+
+PLl=1 
+
+p(ml − τ str  
+
+> l
+
+)pl,k χl,k 
+
+2
+
+P 
+
+> t∈P k\{ k}
+
+PLl=1 
+
+p(ml − τ str  
+
+> l
+
+)pl,t χl,k 
+
+2
+
++ PKt=1 
+
+PLl=1 pl,t (βl,k − δl,k χl,k ) + σ2
+
+. (3)                     
+
+> TABLE I ADVANCED SLEEP MODES [14]. Sleep mode s0123Wake-up latency ∆s0μs37 μs500 μs5000 μsPC discount factor ηs10.675 0.55 0.23
+
+D. Power Consumption Model 
+
+We adopt the functional split 7.2 as in open radio ac-cess network (O-RAN) architecture. All RF, filtering, fast Fourier transform (FFT) / inverse FFT (iFFT), and precoding operations are executed at the AP side, while modulation, coding, and higher-layer processing are carried out in a pool of general-purpose processors (GPPs) in the cloud. Consequently, the network PC naturally splits into an AP part and a cloud part: 
+
+Pnet =
+
+> L
+
+X
+
+> l=1
+
+Pl
+
+| {z } 
+
+> AP-side
+
++ Pcloud 
+
+| {z } 
+
+> cloud-side
+
+. (6) 
+
+1) AP–side power: For AP l (l = 1 , . . . , L ), we follow the generic model in [9]. The total instantaneous power is 
+
+Pl = mlPst + ∆ tr 
+
+X
+
+> k∈K l
+
+pl,k +
+
+
+
+P proc 0 + ∆ proc 
+
+> AP
+
+CAP ,l 
+
+Cmax AP 
+
+
+
+, (7) where Pst is the hardware-dependent static PC and the slope 
+
+∆tr models the load-dependent transmit power. The two terms in parentheses account for the processing power, where 
+
+P proc 0 is the idle processing power per AP, and ∆proc  
+
+> AP
+
+is the slope of the load-dependent processing PC for AP l. Here, 
+
+CAP ,l denotes the processing utilization in giga-operations per second (GOPS) for AP l, and Cmax AP represents the maximum processing capacity. When the AP enters sleep mode sl ∈{1, 2, 3}, its transmit power is set to zero, while the remaining terms are scaled down by empirical factors ηsl as proposed in [15]. This leads to the expression for the PC in sleep mode: 
+
+P sleep  
+
+> l
+
+= ηsl Pl.
+
+2) Cloud–side power: The cloud PC can be given as 
+
+Pcloud = P fixed + 1
+
+σcool 
+
+
+
+P comp  
+
+> 0
+
++ ∆ proc GPP 
+
+CGPP 
+
+Cmax GPP 
+
+
+
+, (8) where P fixed denotes the load-independent fixed PC. The two terms in parentheses correspond to the processing power, adjusted by the cooling efficiency σcool . Here, P comp  
+
+> 0
+
+is the idle processing power, and the remaining parameters are defined analogously to those on the AP side. The detailed definitions of CAP ,l and CGPP can be found in [9]. 
+
+E. Traffic Model 
+
+We process DPI data from a mobile operator to build a real-istic traffic model, with detailed processing methodology de-scribed in [16]. Traffic flows are categorized into three service classes z ∈ { delay-stringent , delay-sensitive , delay-tolerant },with 3GPP packet delay budgets of 50 ms, 100 ms, and 150 ms, respectively. For each service class z, traffic flows are aggregated into 20-minute intervals, averaged over a week, and expressed as the temporal-spatial traffic density κz,t [Mbit · s−1 · km −2] for timestep t. This yields a time-varying traffic density profile, which is mapped to a dynamic arrival rate for UEs. Assuming that each UE initiates a single traffic flow of identical size 
+
+xmax (Mb), the arrivals are modeled as a space-homogeneous Poisson process with time-dependent mean: 
+
+λz,t = κz,t A∆txmax , (9) where A denotes the area size (km 2), ∆t the simulation step duration, and xmax the demand size (Mb). Hence, UE arrivals follow a non-stationary Poisson process, directly reflecting the temporal variations of the traffic load. Each UE is assigned a delay budget Dmax  
+
+> k
+
+according to its service class. Its demand decreases with the achieved data rate, while its delay decreases over time. A UE departs from the system when either its demand is fully served or its delay budget expires. At departure, the remaining demand and delay are denoted xrem  
+
+> k
+
+and Drem  
+
+> k
+
+, respectively. We define the average required rate as rreq  
+
+> k
+
+= xmax 
+
+> Dmax
+> k
+
+and the average achieved rate as 
+
+rach  
+
+> k
+
+= xmax − xrem 
+
+> k
+
+Dmax  
+
+> k
+
+− Drem 
+
+> k
+
+. Their ratio is given by ρk = rach 
+
+> k
+
+rreq 
+
+> k
+
+. When the achieved rate is below the required rate ( rach  
+
+> k
+
+< r req  
+
+> k
+
+), the drop ratio can be expressed as 1 − ρk = xrem 
+
+> k
+
+xmax .
+
+F. Problem Formulation 
+
+Our objective is to minimize the network PC while guar-anteeing a low average drop ratio. The problem can be formulated as: 
+
+min   
+
+> sl, m l,∀l
+
+Pnet (10) s.t. 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+xrem 
+
+> k
+
+xmax ≤ δdrop , ∀k, (10a) 
+
+ml ∈ { 0, 1, . . . , M max } , ∀l, (10b) 
+
+τ str  
+
+> l
+
+∈ { 0, 1, . . . , m l − 1}, ∀l, (10c) 
+
+sl ∈ { 0, 1, 2, 3}, ∀l. (10d) Constraint (10a) enforces that the average drop ratio remains below the threshold value δdrop . Constraint (10b) ensures that the number of active antennas at each AP is an integer variable that does not exceed the equipped antennas. Constraint (10c) guarantees a non-zero effective SINR for PPZF precoding as shown in (3). Constraint (10d) regulates the available sleep modes. III. M ULTI -A GENT PPO-B ASED ALGORITHM 
+
+In this section, we propose a MAPPO-based resource alloca-tion algorithm to jointly optimize antenna re-configuration and ASMs selection. Each AP is modeled as an agent with its own actor network, while a centralized critic deployed in the cloud leverages global information to guide training. The framework follows the centralized training and decentralized execution (CTDE) paradigm: actor and critic networks are jointly trained in the cloud, and only the actor networks are deployed at the APs for fully decentralized decision-making during execution. 
+
+A. Markov Decision Process Model 
+
+We formulate the multi-agent resource allocation problem as a Markov decision process (MDP), represented by the tuple 
+
+〈S, A, P, R, γ 〉: 
+
+> •
+
+State space S: At timestep t, each agent observes partial local information ot, including its own configuration (e.g., PC, number of activated antennas, sleep mode) and aggregate UE statistics (e.g., total demand and achieved rate), along with neighboring AP states. Relying on such partial and varying observations makes independent critics suffer from non-stationarity, as the environment dynamics change with concurrently learning agents. To address this, we adopt a centralized critic with access to the global state st (e.g., total network PC, UE arrival rate, average drop ratio, and delay ratio), which provides a more stationary learning signal and a consistent value estimation that stabilizes training.  
+
+> •
+
+Action space A: The action space is defined as A =
+
+Am × A s, where Am = {− 1, 0, +1 } denotes antenna re-configuration actions (activating or deactivating one antenna at a time), and As = {0, 1, 2, 3} represents available sleep mode choices.  
+
+> •
+
+Reward function R: For UE k, we introduce the rate satisfaction (RS) score function as: 
+
+ξk =
+
+(ρk − 1, ρk < 1,ϕ
+
+
+
+1 − 1
+
+> ρk
+
+
+
+, ρk ≥ 1. (11) If ρk < 1, the achieved rate is insufficient to meet the demand, and ξk = ρk − 1 is negative, serving as a penalty term, and its magnitude directly equals the drop ratio. Conversely, when ρk ≥ 1, the UE’s demand can be fully met. In this case, a non-negative reward is assigned according to ξk = ϕ
+
+
+
+1 − 1
+
+> ρk
+
+
+
+, with 1 
+
+> ρk
+
+quantifying the proportion of the experienced delay relative to the delay budget. The coefficient ϕ acts as an attenuation factor scaling the positive component of ξk. As shown in Fig. 2, a smaller ϕ yields a slower growth of the positive term with ρ, thus keeping the optimization biased toward reducing data drops.       
+
+> Fig. 2. ξvs. ρfor different ϕvalues.
+
+Defining a global reward encourages agents to cooperate by optimizing a shared objective, thereby mitigating non-stationarity. This is conceptually similar to the role of a centralized critic, which leverages global information to provide consistent learning signals. Accordingly, we design the global reward at timestep t as: 
+
+R = wqos 
+
+1
+
+K
+
+> K
+
+X
+
+> k=1
+
+ξk − wpc Pnet , (12) where wrs and wpc denote the weights to balance RS score and PC. Kt is the total number of UEs at timestep t. 
+
+> •
+
+Transition probability P and discount factor γ: The environment dynamics, including traffic arrivals, UE as-sociations, and channel variations, determine the tran-sition from st to st+1 under joint actions at, while a discount factor γ ∈ (0 , 1] balances immediate and future rewards. 
+
+B. Learning Process 
+
+At timestep t, the actor network with parameter θ samples an action at from a probability distribution, πθ (at | ot), gener-ated over its action space. The critic network with parameter φ
+
+estimates the value of the current state ˆVφ(st) and the value of the next state, ˆVφ(st+1 ), resulting from selected action. Given the collected values, the temporal-difference (TD) error can be computed as: 
+
+˜δt = Rt + γ ˆVφ(st+1 ) − ˆVφ(st). (13) Then, the actor network with parameter θ is updated by maximizing the following objective function: 
+
+L (θ) = E
+
+h
+
+min 
+
+
+
+rt(θ) ˆAt, clip (rt(θ), 1 − ε, 1 + ε) ˆAt
+
+i 
+
++ ceH (πθ | ot) ,
+
+(14) where ˆAt = PT −tk=0 (γψ )k ˜δt+k is the advantage function approximated by generalized advantage estimation (GAE), the parameter ψ to balance bias and variance, rt(θ) =   
+
+> πθ(at|ot)
+> πθold (at|ot)
+
+denotes the ratio of action selection probabilities under the current policy πθ relative to the previous policy πθold ,
+
+ceH (πθ | ot) presents the entropy bonus. The clip function, by restricting the probability ratio between the new and old policies, is a key mechanism that enables PPO to maintain stable convergence: it prevents overly large updates, reduces training oscillations, and ensures smoother convergence. The advantage becomes particularly pronounced in multi-agent environments, where agents can easily affect one another and induce environmental instability. In such settings, the clip function suppresses overly aggressive updates, so that enhances cooperative stability among agents. The critic network can be updated by minimizing the Huber loss function: 
+
+LV (φ) = E
+
+h
+
+LHb 
+
+> ϵ
+
+˜δt
+
+i 
+
+, (15) with 
+
+LHb  
+
+> ϵ
+
+(e) = 
+
+( 12 e2, |e| ≤ ϵ, ϵ  |e| − 12 ϵ , |e| > ϵ, (16) where ϵ is the threshold parameter. The Huber loss function integrates the strengths of both mean squared error (MSE) and mean absolute error (MAE), offering a balance between sensitivity to outliers and stable gradient behavior. IV. N UMERICAL RESULTS 
+
+Our simulation area is a square region of size 1 km × 1 km, where L = 25 APs are deployed in a regular 5 × 5 grid. Each AP is equipped with Mmax = 8 antennas, where each antenna operates with an average transmit power of pa = 250 mW. The large-scale fading coefficient βl,k follows the 3GPP urban microcell (UMi) non-line-of-sight (NLOS) models [17]. The system operates over a bandwidth of B = 20 MHz centered at carrier frequency fc = 5 GHz, with a pilot length of τp = 7 .The drop ratio threshold is set to δdrop = 0 .1% . The UEs are generated uniformly within the area following the traffic model in Section II-E, each with a demand size of xmax = 1 .5 Mbits. MAPPO agents are trained for 200 episodes, each sim-ulating one week, with timestep ∆t = 1 ms. Actions are selected every 20 timesteps ( 20 ms), consistent with the default periodicity of synchronization signal block transmission [15]. The main hyperparameters are listed in Table II. In the reward function, wrs = 60 (with attenuation ϕ = 5 × 10 −3) and 
+
+wpc = 0 .4.                       
+
+> TABLE II HYPERPARAMETERS USED FOR MAPPO TRAINING .
+> Parameter Value
+> Discount factor γ0.99
+> Entropy coefficient ce0.01
+> Actor learning rate ηπ5×10 −4
+> Critic learning rate ηv5×10 −4
+> PPO epochs 10
+> Mini-batches 32
+> Clip parameter ε0.2
+> GAE parameter ψ0.95
+> Huber loss parameter ϵ10
+
+We compare the performance of our proposed MAPPO-based algorithm with two non-learning and one learning-based baselines. The first baseline, Always-on , keeps all APs active and all antennas permanently turned on without any energy-saving mechanisms. The second, dynamic antenna configu-ration with SM1 (DAC-SM1 ), switches an AP to SM1 when idle and reactivates it upon UE association, while antenna activation is stepwise adjusted using dual thresholds on the ratio of total achieved to demand rate of its connected UEs (deactivating one antenna if the ratio exceeds 55, activating one if it falls below 45). As a representative learning-based benchmark, we also include DQN, a widely adopted DRL algorithm.  
+
+> Fig. 3. Time-varying number of APs in different sleep modes.
+
+Fig. 3 illustrates the number of APs operating in different sleep modes under DQN and MAPPO over a one-day interval. In both cases, the sleep modes are dynamically adjusted according to traffic conditions: during high-traffic daytime hours, a larger number of APs are activated to meet UE demand. However, during low-traffic periods, MAPPO drives more APs into SM3 for energy savings, while keeping more APs active than DQN to maintain service continuity. The daily variation of the total demand rate shown in Fig. 4 reflects the dynamic traffic model described in Section II-E. Fig. 5 presents the time-varying average number of active antennas under different policies. MAPPO closely tracks traffic dynam-ics, with the number of active antennas varying from as few as two to nearly eight, demonstrating a wide adjustment span and strong responsiveness to demand fluctuations. In contrast, both DQN and DAC-SM1 show limited antenna adjustment ranges. DQN struggles to learn effective control policies under a large action space due to its value-based nature. The performance of each algorithm is evaluated using network PC and the average drop ratio over all UEs, where the definition of the per-UE drop ratio is given in Section II-E. The weekly average performance is presented in Fig. 6. MAPPO demonstrates superior energy efficiency compared to the non-learning baselines, achieving a 56.23% reduction in PC relative to the Always-on policy and a 30.12% reduction compared to DAC-SM1 . These energy savings are obtained with only a negligible increase in the drop ratio, which remains well below the constraint indicated by the red dashed line. In contrast, while DQN achieves a comparable level of PC reduction, it incurs a substantially higher drop ratio, revealing its inability to maintain quality of service under dynamic traffic conditions. As observed from Fig. 3 and Fig. 5, although DQN also exhibits some adaptation behavior, this aggregate view does not capture the individual AP dynamics. In practice, the coordination among APs under DQN is less consistent. Fig. 4. Total demand rate. Fig. 5. Average number of active antennas per AP. Fig. 6. Average PC and drop ratio. 
+
+While DQN can react to traffic variations at a coarse level, it fails to learn stable and cooperative control policies under the dynamic and high-dimensional action space of the multi-agent environment. In contrast, MAPPO allows each AP to make independent decisions while maintaining implicit coordination through the shared critic, resulting in more adaptive and efficient control behavior. V. C ONCLUSIONS 
+
+This paper investigates the challenge of minimizing PC in CF mMIMO networks through the joint optimization of antenna re-configuration and ASMs selection under dynamic traffic conditions. We propose a CTDE MAPPO-based al-gorithm to learn effective control policies. Simulation re-sults demonstrate that the MAPPO-based approach achieves a 56.23% reduction in PC compared to the Always-on baseline and a 30.12% reduction relative to DAC-SM1 , with only a slight increase in drop ratio. Moreover, compared to DQN, MAPPO achieves a significantly lower drop ratio under similar PC levels. These results highlight that the proposed algorithm can capture traffic variations and adjust its actions more effectively, enabling energy-efficient and reliable operation in CF mMIMO networks. ACKNOWLEDGMENT 
+
+This work was supported by Swedish Innovation Agency Funded (VINNOVA) through the SweWIN center (2023-00572). REFERENCES [1] G. Interdonato, E. Björnson, H. Quoc Ngo, P. Frenger, and E. G. Larsson, “Ubiquitous cell-free massive MIMO communications,” EURASIP J. on Wireless Commun. and Netw. , vol. 2019, no. 1, pp. 1–13, 2019. [2] T. Van Chien, E. Björnson, and E. G. Larsson, “Optimal design of energy-efficient cell-free massive MIMO: Joint power allocation and load balancing,” in IEEE ICASSP , 2020, pp. 5145–5149. [3] S. S. Mohammed and A. N. Almamori, “Cell-free massive MIMO energy efficiency improvement by access points iterative selection,” 
+
+Journal of Engineering , vol. 30, no. 03, pp. 129–142, 2024. [4] E. Shi, J. Zhang, Z. Liu, Y. Zhu, C. Yuen, D. W. K. Ng, M. Di Renzo, and B. Ai, “Joint precoding and AP selection for energy efficient RIS-aided cell-free massive MIMO using multi-agent reinforcement learning,” 
+
+arXiv preprint arXiv:2411.11070 , 2024. [5] Ö. T. Demir, L. Méndez-Monsanto, N. Bastianello, E. Fitzgerald, and G. Callebaut, “Energy reduction in cell-free massive MIMO through fine-grained resource management,” in 2024 Joint European Conference on Networks and Communications & 6G Summit (EuCNC/6G Summit) .IEEE, 2024, pp. 547–552. [6] J. García-Morales, G. Femenias, and F. Riera-Palou, “Energy-efficient access-point sleep-mode techniques for cell-free mmWave massive MIMO networks with non-uniform spatial traffic density,” IEEE Access ,vol. 8, pp. 137 587–137 605, 2020. [7] Ö. T. Demir, M. Masoudi, E. Björnson, and C. Cavdar, “Cell-free massive MIMO in O-RAN: Energy-aware joint orchestration of cloud, fronthaul, and radio resources,” IEEE Journal on Selected Areas in Communications , vol. 42, no. 2, pp. 356–372, 2024. [8] F. Riera-Palou, G. Femenias, D. López-Pérez, N. Piovesan, and A. De Domenico, “Energy efficient cell-free massive MIMO on 5G deployments: Sleep modes strategies and user stream management,” 
+
+arXiv preprint arXiv:2306.06404 , 2023. [9] O. A. Topal, Ö. T. Demir, E. Björnson, and C. Cavdar, “Energy-efficient cell-free massive MIMO with wireless fronthaul,” in 2024 58th Asilomar Conference on Signals, Systems, and Computers , 2024, pp. 1591–1596. [10] T. Cai, Q. Wang, S. Zhang, Ö. T. Demir, and C. Cavdar, “Multi-agent reinforcement learning for energy saving in multi-cell massive MIMO systems,” in IEEE ICMLCN , 2024, pp. 480–485. [11] Ö. T. Demir, E. Björnson, and L. Sanguinetti, “Foundations of user-centric cell-free massive MIMO,” Foundations and Trends® in Signal Processing , vol. 14, no. 3-4, pp. 162–472, 2021. [12] G. Interdonato, M. Karlsson, E. Björnson, and E. G. Larsson, “Local partial zero-forcing precoding for cell-free massive MIMO,” IEEE Trans. on Wireless Commun. , vol. 19, no. 7, pp. 4758–4774, 2020. [13] A. A. Razzac et al. , “Advanced sleep modes in 5g multiple base stations using non-cooperative multi-agent reinforcement learning,” in 
+
+IEEE GLOBECOM , 2023, pp. 7025–7030. [14] J. Lozano, J. A. Ayala-Romero, A. Garcia-Saavedra, and X. Costa-Perez, “Kairos: Energy-efficient radio unit control for O-RAN via advanced sleep modes,” arXiv preprint arXiv:2501.15853 , 2025. [15] S. K. G. Peesapati, M. Olsson, M. Masoudi, S. Andersson, and C. Cav-dar, “An analytical energy performance evaluation methodology for 5G base stations,” in IEEE WiMob , 2021, pp. 202–207. [16] C. Tianzhang, “Mobile traffic classification and multi-cell base station control for energy-efficient 5G networks,” M.S. thesis, KTH Royal Institute of Tecnology, Stockholm, Sweden, 2023, available at https: //kth.diva-portal.org/smash/get/diva2:1752823/FULLTEXT01.pdf. [17] 3GPP, “Study on channel model for frequencies from 0.5 to 100 GHz (Release 14),” 3GPP, Tech. Rep. TR 38.901 V14.0.0, 2017, eTSI TR 138 901 V14.0.0. [Online]. Available: https://www.etsi.org/deliver/etsi_ tr/138900_138999/138901/14.00.00_60/tr_138901v140000p.pdf

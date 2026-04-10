@@ -1,0 +1,646 @@
+Title: SafeRoPE: Risk-specific Head-wise Embedding Rotation for Safe Generation in Rectified Flow Transformers
+
+URL Source: https://arxiv.org/pdf/2604.01826v1
+
+Published Time: Fri, 03 Apr 2026 00:43:05 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# SafeRoPE: Risk-specific Head-wise Embedding Rotation for Safe Generation in Rectified Flow Transformers 
+
+# Xiang Yang 1 Feifei Li 1 Mi Zhang 1† Geng Hong 1† Xiaoyu You 2 Min Yang 11Fudan University, Shanghai, China 
+
+> 2
+
+# East China University of Science and Technology, Shanghai, China 
+
+> 1
+
+{yangx25@m., ffli23@m., mi zhang@, ghong@, m yang@ }fudan.edu.cn, 2xiaoyuyou@ecust.edu.cn 
+
+Figure 1. Qualitative comparison of concept erasure on FLUX.1-dev. By performing risk-specific rotations, SafeRoPE effectively sup-presses various undesired concepts, while maintaining high visual quality and semantic fidelity. 
+
+# Abstract 
+
+Recent Text-to-Image (T2I) models based on rectified-flow transformers (e.g., SD3, FLUX) achieve high generative fidelity but remain vulnerable to unsafe semantics, espe-cially when triggered by multi-token interactions. Existing mitigation methods largely rely on fine-tuning or attention modulation for concept unlearning; however, their expen-sive computational overhead and design tailored to U-Net-based denoisers hinder direct adaptation to transformer-based diffusion models (e.g., MMDiT). In this paper, we conduct an in-depth analysis of the attention mechanism in MMDiT and find that unsafe semantics concentrate within interpretable, low-dimensional subspaces at head level, where a finite set of safety-critical heads is responsible for unsafe feature extraction. We further observe that per-turbing the Rotary Positional Embedding (RoPE) applied to the query and key vectors can effectively modify some specific concepts in the generated images. Motivated by these insights, we propose SafeRoPE, a lightweight and 
+
+> †Corresponding author
+
+fine-grained safe generation framework for MMDiT. Specif-ically, SafeRoPE first constructs head-wise unsafe sub-spaces by decomposing unsafe embeddings within safety-critical heads, and computes a Latent Risk Score (LRS) for each input vector via projection onto these subspaces. We then introduce head-wise RoPE perturbations that can sup-press unsafe semantics without degrading benign content or image quality. SafeRoPE combines both head-wise LRS and RoPE perturbations to perform risk-specific head-wise rotation on query and key vector embeddings, enabling pre-cise suppression of unsafe outputs while maintaining gen-eration fidelity. Extensive experiments demonstrate that SafeRoPE achieves SOTA performance in balancing ef-fective harmful content mitigation and utility preservation for safe generation of MMDiT. Codes are available at https://github.com/deng12yx/SafeRoPE. 
+
+# 1. Introduction 
+
+The rapid architectural evolution of Text-to-Image (T2I) models has progressed from U-Net-based diffusion (e.g., 
+
+> arXiv:2604.01826v1 [cs.CV] 2 Apr 2026
+
+Glide [1], Imagen [2], Stable Diffusion (SD) [3]) to large-scale multi-modal diffusion transformers (MMDiT [4]), which adopt a fully transformer-based architecture to jointly encode text and image tokens. Notably, the latest rectified flow models (e.g., SD3 [4], FLUX [5]) built on MMDiT have achieved leaps in prompt following capability, image quality, and output diversity. However, increasing depth and parameter size of new architectures require training in large-scale, potentially unsafe datasets, amplifying the vul-nerability of the model to jailbreak attacks [6–9] and the generation of not-safe-for-work (NSFW) content [10–12]. Most existing safety approaches employ concept un-learning [13–20] to mitigate unsafe concepts via model fine-tuning or attention modulation. Representative works include ESD [13], which performs direct concept erasure through fine-tuning. For effective unlearning, UCE [14] uses a closed-form solution conditioned on cross-attention outputs, while DES [15] projects unsafe text embeddings toward carefully calculated safe regions to prevent the gen-eration of unsafe content. Recently, EraseAnything [18] introduces LoRA-based parameter tuning and an attention map regularizer to selectively suppress undesirable activa-tions for FLUX.1. Despite their effectiveness in unlearning target words (e.g., nude ), these methods face several chal-lenges: 
+
+1) Current text-dependent approaches rely on predefined labels, failing to capture the implicit risks arising from complex multi-token compositions (e.g., a studio photo of 
+
+breasts out, Lucy Angeline Bacon, grayscale, Concept art, Vorticism ) [13–15, 18]. 
+
+2) Prior methods tailored for the cross-attention mod-ules of U-Net denoisers [19–21] are structurally incompati-ble with modern MMDiT architectures that employ unified multi-modal self-attention. 
+
+3) Parameter-modifying methods incur prohibitive com-putational costs for models with over 10B parameters like FLUX and inadvertently degrade general generation quality by altering denoising behaviors. These issues highlight the lack of structural analysis of MMDiT in existing safety methods. Inspired by prior find-ings that different U-Net attention heads encode distinct semantic concepts [22], we hypothesize that focusing on safety-critical heads enables more fine-grained interven-tion and improves computational efficiency . Given that MMDiT contains over 1,000 attention heads, intervening on each head to evaluate its behaviors incurs high compu-tational overhead. Therefore, we adopt a simple yet effec-tive approach to analyze the feature structure of head-wise embeddings. Specifically, we perform Singular Value De-composition (SVD) [23] on each head to derive a low-rank unsafe feature subspace from the collected unsafe embed-dings. Owing to the sparsity and directional concentra-tion revealed by SVD, this subspace captures dominant un-  
+
+> Figure 2. Illustration of RoPE in FLUX.1. Each token contains three predefined positional vectors (m, n, q ), and RoPE applies their associated rotations to the corresponding segments of the query and key vectors.
+> Figure 3. Differential impact of random perturbations to RoPE text positional IDs in FLUX.1-dev across explicit, violence, style, and benign prompts.
+
+safe semantics within safety-critical heads. Tokens aligned with unsafe content yield high projections in this subspace, whereas safe tokens project near zero—enabling clear sep-aration between harmful and benign semantics. The distri-bution of safety-critical heads for concept nude is visualized in Figure 4-(a). Furthermore, we observed that safety-oriented embed-ding rotations in RoPE can effectively disrupt unsafe semantics while preserving output fidelity . As a rotary positional embedding mechanism, RoPE incorporates rela-tive positional information directly into the query–key in-ner products. As shown in Figure 2, each query and key vector is transformed by a rotation matrix Rm associated with its positional ID m before attention computation. In FLUX.1, all text tokens share a positional ID of zero, since the preceding text encoder T5 [24] already encodes most positional information. Nevertheless, as illustrated in Fig-ure 3, we find that simple concepts (often safe) are insensi-tive to RoPE, whereas complex concepts (often unsafe) ex-hibit strong dependence. Specifically, when randomly per-turbing text position IDs, we observe that most safe seman-tics remain unaffected, while prompts involving specific concepts (e.g., nude , violence , or certain artistic styles) fail to be faithfully reproduced in the generated content. How-ever, random perturbations lack precision and may degrade complex safe semantics; therefore, we propose customizing head-wise rotation matrices. Prior studies such as LieRE [25] and ComRoPE [26] train per-head rotations to enhance long-sequence modeling in LLMs, while recent work like RoPECraft [27] introduces tailored rotations for temporal adaptation in video generation, demonstrating that RoPE’s rotation space can be precisely controlled. Inspired by these observations, we propose SafeRoPE, a head-wise, risk-aware safety enhancement framework built on RoPE. SafeRoPE first identifies unsafe feature subspaces for each attention head using SVD, and computes a latent risk score (LRS) for each query or key vector by projecting it onto the corresponding unsafe subspace. We then learn a head-wise low-rank orthogonal rotation matrix guided by the LRS to apply controlled rotations within these unsafe subspaces. We conduct extensive evaluations across vari-ous concept erasure tasks on FLUX.1. Our method demon-strates significant advantages in unlearning efficacy while preserving original generation capabilities. Furthermore, the learned rotation matrices exhibit generalization across different FLUX.1 variants. Our contributions are summa-rized as follows: • Fine-grained safety intervention: SafeRoPE leverages RoPE’s controllable rotation mechanism to enable token-level semantic safety modulation in transformer architec-tures. • Head-wise interpretability: Through detailed head-level analysis, SafeRoPE identifies safety-critical heads and extracts corresponding unsafe feature subspaces, en-abling efficient and interpretable safety alignment. • Computational efficiency: SafeRoPE trains only a small set of low-rank rotation matrices for safety-critical heads, and relying on precomputed SVD and localized rota-tions, remains highly efficient and broadly applicable to MMDiT-based models. • Performance validation: Extensive experiments demon-strate that SafeRoPE substantially enhances safety while maintaining high generation fidelity (Figure 1), achieving state-of-the-art results on unseen unsafe datasets. 
+
+# 2. BackGround 
+
+T2I Diffusion Models. T2I diffusion models have rapidly advanced from the DALL-E series [28–30] and SD models [3, 4, 31] to the recent SD3 [4] and FLUX [5]. As the latest evolution of SD, SD3 [4] adopts a rectified-flow formulation [32] and replaces the U-Net with the 2B-parameter MMDiT transformer, where text and image tokens are jointly pro-cessed as a unified sequence. FLUX further refines MMDiT by introducing Double-DiT and Single-DiT: Double-DiT uses separate Wq , W k, W v for text and image tokens, while Single-DiT shares them to enhance cross-modal alignment. Moreover, FLUX replaces absolute positional embeddings with RoPE [33] for improved long-range modeling. Text tokens use zero position IDs, whereas image tokens retain spatially structured IDs essential for layout. FLUX achieves strong performance across ELO, prompt fidelity, and ty-pography, making it a leading T2I architecture. We there-fore build on FLUX to investigate safety alignment through structured RoPE manipulation. 
+
+Safety Alignment in Diffusion Models. Large-scale use of uncurated web data makes T2I diffusion models prone to unsafe outputs (e.g., nudity, violence, copyright vio-lations) [6–8]. Existing mitigation strategies—including dataset filtering [34–36] and post-generation safety checks [37–39]—provide limited semantic control. Consequently, concept erasure has emerged as the prevailing approach, en-compassing both training-based approaches [13, 16–19, 40– 45] and training-free intervention [20, 21, 43, 46–48]. Training-based approaches suppress unsafe concepts via fine-tuning [13, 40, 41] or distillation [43]. For instance, SPM [44] leverages lightweight adapters for multi-concept erasure, while DUO [45] employs preference optimization over curated image pairs to balance safety and fidelity. Although effective, they require costly retraining and ex-hibit limited adaptability to new architectures. Training-free methods avoid retraining by modifying attention maps [20], latent features [43], or prompt conditioning [47]. Repre-sentative methods such as RECE [21] and STG [48] mod-ify cross-attention or guide text embeddings to enforce safety constraints without parameter updates. However, most are tailored to U-Net pipelines and fail to generalize to emerging MMDiT-based architectures[18]. As modern diffusion models increasingly adopt transformer-based rec-tified flows, safety mechanisms compatible with such ar-chitectures remain underexplored. We therefore propose a lightweight safety adaptation framework tailored to the FLUX architecture to better align its strong generative ca-pacity with safety requirements. 
+
+Head Analysis in Attention. Multi-head attention en-ables different heads to capture distinct structural or se-mantic relations . Studies in large language models and vision transformers show functional specialization, where some heads focus on syntactic or spatial structures and oth-ers encode semantic or stylistic patterns [22, 49–51]. Anal-yses of model sparsity further show that many heads con-tribute little and can be pruned with minimal impact, imply-ing that only a subset performs critical or concept-specific functions [52, 53]. Motivated by these insights, we per-form a head-level analysis and observe that specific heads exhibit stronger responses to unsafe tokens, and that a low-rank subspace within the head feature space effectively cap-tures unsafe semantics. 
+
+Rotary Position Embedding (RoPE). Unlike absolute positional encodings that add fixed offsets, RoPE encodes relative positions by rotating query and key vectors before attention, yielding (Rmq)⊤(Rnk) = q⊤Rm−nk, where the relative offset m − n determines the rotational phase [33]. The orthogonality of R preserves vector norms and en-sures attention depends only on relative positions. This pro-vides continuous, differentiable encoding that scales to long Figure 4. Overview of how SafeRoPE identifies safety-critical heads and applies risk-aware rotations. (a) Head Discrimination Score (HDS) used to identify safety-critical heads; higher scores indicate heads that more strongly differentiate unsafe from safe token projections onto the estimated unsafe subspace. (b) SafeRoPE pipeline: (1) SVD-based construction of head-wise unsafe subspaces Ur,b,h (2) Latent Risk Score (LRS) computed by projecting token features onto these subspaces; (3) LRS-guided orthogonal rotations applied only to safety-critical heads to suppress unsafe activations while preserving benign semantics. 
+
+sequences, making RoPE fundamental in modern LLMs [54, 55]. Subsequent studies [25–27] further shows that RoPE’s rotational geometry can be adapted per-head or dy-namically without retraining. RoPE naturally fits MMDiT architectures such as FLUX, which treat image patches as long token sequences requiring effective positional encod-ing. Thus, RoPE aligns cross-modal positions and modu-lates semantic interactions, offering a structured geometric interface for safety alignment in generative models. 
+
+# 3. Method 
+
+3.1. Method Overview 
+
+As shown in Figure 4-(b), SafeRoPE first constructs a low-rank unsafe subspace by decomposing the unsafe query and key token embeddings for each safety-critical head. This subspace captures the dominant unsafe semantics and en-ables the computation of a latent risk score (LRS) through embedding projection. It then re-parameterizes the RoPE perturbation into a head-wise orthogonal rotation operator, allowing the model to apply controlled, risk-aware rotations within the unsafe subspace while minimally affecting be-nign semantic components. The overall framework consists of three stages: • Head-wise Unsafe Vector Collection (Section 3.2). For the h-th head in block b, we collect its unsafe query and key vectors ( Qb,h /Kb,h ) to form head-specific subspaces capturing risk-related semantics. • Latent Risk Score (Section 3.3). The collected unsafe 
+
+Qb,h /Kb,h are decomposed via SVD to derive the prin-cipal components r that dominate the unsafe subspace. Each input query or key vector is then projected onto this subspace to obtain a continuous LRS, indicating how strongly it aligns with unsafe semantics. • Risk-aware Head-wise Rotation (Section 3.4). Each safety-critical head learns a low-rank orthogonal matrix that rotates the principal unsafe components, guided by the LRS. This rotation selectively attenuates unsafe direc-tions while preserving benign information and maintain-ing orthogonality, enabling targeted, fine-grained safety control. 
+
+3.2. Head-wise Unsafe Vector Collection 
+
+SafeRoPE requires sufficient unsafe Qb,h /Kb,h samples per head to compute a reliable LRS. Given that unsafe behavior is typically triggered by only a small subset of tokens within a prompt, we first analyze how these unsafe semantics emerge in FLUX.1. Specifically, subject phrases alone (e.g., 
+
+nude girl ) rarely cause unsafe outputs; however, combining them with contextual templates and modifiers substantially increases jailbreak success rates [10], with the subject em-beddings serving as the primary triggers. Guided by this ob-servation, we construct unsafe trigger sets by defining sub-ject, modifier, and template collections S, M , and T . Can-didate subjects S are collected from public datasets * and fil-tered using SBERT [56] to ensure high semantic similarity with predefined explicit seed concepts. Modifiers M fol-low established jailbreak patterns [10], while diverse tem-
+
+> *https://huggingface.co/datasets/jtatman/stable-diffusion-prompts-stats-full-uncensored
+
+Figure 5. The comparison of LRS-guided random rotation pertur-bations applied to different head groups, where ” H∗” denotes the safety-critical heads 
+
+plates T , generated by GPT-4o, are utilized to guarantee scenario diversity. Leveraging these sets, we synthesize un-safe prompts P = s|m|t for all (s, m, t ) ∈ S × M × T to form the Unsafe-1K dataset. Because the encoded subject embeddings S∗ = ET5 (s) serve as the core unsafe represen-tations, we feed these synthesized prompts into the model and specifically extract the corresponding head-wise query and key vectors {qb,h , k b,h } for these subject tokens. Fi-nally, we aggregate n such vectors to construct the unsafe matrices Qb,h , Kb,h ∈ Rd×n for subsequent SVD, where d
+
+is the head dimension. 
+
+3.3. Latent Risk Score (LRS). 
+
+To estimate the semantic risk of any query/key vector 
+
+qb,h /k b,h in head h of block b, SafeRoPE constructs a head-specific unsafe subspace Ur,b,h derived from the aggregated unsafe matrices Qb,h /Kb,h . This formulation allows the se-mantic risk to be quantified by measuring how strongly the vector aligns with the principal unsafe directions. 
+
+Unsafe Subspace Construction. We leverage the low-rank approximation property of SVD [23] to isolate dom-inant unsafe directions. Given unsafe Qb,h ∈ Rd×n (simi-larly for Kb,h ), its SVD 
+
+Qb,h = Ub,h Σb,h V ⊤ 
+
+> b,h
+
+(1) provides an orthonormal basis Ub,h ∈ Rd×d. The leading r
+
+(r << d ) columns Ur,b,h = [ u1, . . . , u r ] define the unsafe basis, and the corresponding projector 
+
+Pb,h = Ur,b,h U ⊤ 
+
+> r,b,h
+
+∈ Rd×d (2) maps any input vector x to its unsafe component, effectively isolating its alignment with unsafe semantics. 
+
+LRS Computing. For each query vector qb,h (and simi-larly for key vector), we define the LRS as the normalized projection energy onto Ur,b,h :LRS qb,h = ∥Pb,h qb,h ∥22
+
+∥qb,h ∥22
+
+= q⊤
+
+> b,h
+
+Ur,b,h U ⊤
+
+> r,b,h
+
+qb,h 
+
+q⊤
+
+> b,h
+
+qb,h 
+
+(3) where LRS qb,h = 1 if qb,h ∈ Ur,b,h (unsafe) and LRS qb,h =0 if qb,h ⊥ Ur,b,h (safe). 
+
+Selecting Safety-Critical Heads. Since not all attention heads yield meaningful unsafe subspaces, we selectively identify a subset of safety-critical heads H⋆. To evaluate each head’s discriminative ability, we first quantify the dif-ference in high-risk LRS responses between unsafe and safe prompts, denoted as ∆b,h :
+
+∆b,h =
+
+P 
+
+> x∈X unsafe
+
+I(LRS x > 0.7) 
+
+|X unsafe | −
+
+P 
+
+> x∈X safe
+
+I(LRS x > 0.7) 
+
+|X safe |
+
+(4) where Xunsafe and Xsafe denote the sets of query and key vectors from unsafe and safe prompts, respectively, and I(·)
+
+is the indicator function. Using this difference, we formally define the Head Discrimination Score (HDS) as a binary indicator: 
+
+HDS b,h = I(∆ b,h ≥ 0.5) . (5) We then retain the heads with HDS b,h = 1 to form H⋆, en-suring a clear separation between unsafe and benign seman-tics. Figure 4-(a) visualizes the distribution of these safety-critical heads for the concept nude . Furthermore, Figure 5 demonstrates that indiscriminately perturbing all heads de-grades image quality, underscoring the necessity of select-ing only the safety-critical ones. 
+
+3.4. Risk-aware Head-wise Rotation 
+
+SafeRoPE reformulates RoPE’s rotation mechanism by re-placing discrete position IDs with a continuous, risk-aware orthogonal rotation modulated by LRS . This allows rota-tions to adapt to the semantic risk carried by each query/key vector, providing fine-grained, head-wise control. 
+
+Orthogonal Rotation via Exponential Map. To ensure that the rotation operation remains orthogonal, we follow prior work [25, 26] and parameterize rotations with the ex-ponential map. For any skew-symmetric matrix A satisfy-ing A⊤ = −A, its exponential exp( A) is guaranteed to be orthogonal since exp( A)⊤ = exp( −A). Thus, for each safety-critical head (b, h ) ∈ H ⋆, we introduce a trainable skew-symmetric matrix Ab,h ∈ Rr×r whose exponential defines the head-wise rotation. 
+
+Subspace Decomposition and Rotation. Because unsafe semantics concentrate within a low-rank subspace, SafeR-oPE restricts rotation to the unsafe basis Ur,b,h rather than learning a full d × d matrix. Any query vector qb,h (sim-ilarly for key vector) can be decomposed into unsafe and safe components: 
+
+qb,h = Pb,h qb,h + ( I − Pb,h )qb,h (6) SafeRoPE only rotates the unsafe component while keep-ing the safe component unchanged. The resulting rotation operator is: 
+
+Rb,h = Ur,b,h exp( LRS qb,h Ab,h )U ⊤ 
+
+> r,b,h
+
++ ( I − Pb,h ) (7) and the transformed query is 
+
+˜qb,h = Rb,h qb,h (8) Since A⊤ 
+
+> b,h
+
+= −Ab,h , Rb,h remains orthogonal. When 
+
+LRS qb,h → 0, Rb,h ≈ I (no intervention), while 
+
+LRS qb,h → 1 applies maximal rotation along unsafe direc-tions. 
+
+Training Objective. For each safety-critical head 
+
+(b, h ) ∈ H ∗, SafeRoPE learns a low-rank skew-symmetric matrix Ab,h operating in the r-dimensional unsafe sub-space. Let θ denote the original FLUX.1 parameters and 
+
+(θ, A ) the parameters after inserting SafeRoPE rotations. Training follows a bi-objective scheme comprising (i)unlearning on unsafe data to suppress unsafe activations, and ( ii ) regularization on safe data to preserve semantic fidelity. • For unsafe prompts c ∈ C unsafe sampled from Unsafe-1K, we maximize the deviation between original and rotated velocities: 
+
+Lunl = Ec∼C unsafe 
+
+∥vθ (xt, c, t ) − v(θ,A )(xt, c, t )∥22
+
+
+
+where xt is Gaussian noise sampled at step t along the rectified-flow trajectory. • For safe caption–image pairs c ∈ C safe from MS-COCO [57], we minimize this deviation: 
+
+Lreg = Ec∼C safe 
+
+h
+
+vθ (ut, c, t ) − v(θ,A )(ut, c, t ) 22
+
+i
+
+where xT ∼ N (0 , I ), upix is the VAE-encoded latent of an image, and ut = (1 − t)upix + tx T is the noised latent at step t.The overall training procedure can be expressed as a bi-level optimization problem: 
+
+max  
+
+> A
+
+Lunl s.t. A = arg min  
+
+> A
+
+Lreg 
+
+where the upper-level objective maximizes unlearning on unsafe samples, while the lower-level objective ensures that the learned rotations preserve fidelity on safe data. Since all Ab,h parameters are jointly optimized across safety-critical heads, SafeRoPE achieves efficient and low-overhead safety alignment. 
+
+# 4. Experiments 
+
+4.1. Experimental Setup 
+
+Models. We adopt FLUX.1-dev and FLUX.1-sch , two lightweight distilled variants of FLUX.1-pro. Both re-tain high generation quality and prompt adherence, with FLUX.1-sch requiring only 5 inference steps. 
+
+Baselines. To ensure a fair and systematic evaluation, we compare SafeRoPE against representative concept erasure and safety editing methods applicable to flow-matching DiT architectures. Specifically, we include ESD [13], SLD [58], DES [15], UCE [14], and EraseAnything [18]. Addition-ally, we introduce a Rand baseline with random rotations to verify the efficacy of our learned rotation matrices. To eval-uate cross-model generalization, we also directly transfer the rotation matrices learned on FLUX.1-dev to FLUX.1-sch, which shares a similar architectural design. 
+
+Datasets. We conduct experiments across various era-sure tasks, including explicit content ( nudity ), inappropriate content ( bloody ), IP character ( Pikachu ), and art style ( Van-Gogh ). For concepts other than nudity, we use GPT-4o to generate 99 diverse text prompts per concept for evaluation. For nudity, we utilize 854 explicit prompts from the I2P benchmark [36]. To assess erasure robustness, we further leverage the Unsafe-1K dataset (Section 3.2) paired with modifier-based attacks [10]. 
+
+Evaluation Metrics. For nudity, generated images are evaluated by NudeNet, with only explicit labels counted. A unified threshold of 0.65 is adopted, and the Unsafe Rate (UR) is calculated as: UR = Nunsafe  
+
+> Ntotal
+
+× 100% . For other concepts, we avoid specialized classifiers to prevent poten-tial bias or incomplete coverage. Instead, we use a prompt-based zero-shot evaluation: we calculate the similarity be-tween generated images and the prompt “a photo of a [con-cept]” using CLIP [59], where [concept] is replaced by the specific target category. 
+
+Model Utility. For model utility evaluation, We resample 1000 prompts from the MSCOCO validation dataset [57] as benign prompts to evaluate model utility, denoted as COCO-1K. We compute: ( i) CLIP Score [59] for text–image semantic alignment,( ii ) FID Score for image quality, and ( ii ) VQA Score [60] from CLIP-FlanT5-XL for visual–linguistic consistency. 
+
+4.2. Evaluation results 
+
+4.2.1. Explicit Content Erasure Erase Effectiveness and Utility Preservation. Table 1 demonstrates that SafeRoPE effectively removes the target concept while preserving model utility. On FLUX.1-dev, the UR (I2P) is reduced from 10.3 to 7.0, achieving the best safety performance. Meanwhile, the CLIP score remains stable, reflecting minimal impact on semantic alignment. While marginally (0.2) below the best-performing baseline, Table 1. Cross-concept evaluation of SafeRoPE against baseline methods. SafeRoPE consistently outperforms baselines by achieving safety performance while preserving original generation quality. Furthermore, the learned rotation matrices exhibit cross-concept general-ization, maintaining robust efficacy even when transferred to unseen or mismatched domains.                                                                                                                                                                                                                               
+
+> Nude Bloody VanGogh Pikachu CLIP ↑VQA ↑FID ↓UR ↓CLIP ↑VQA ↑FID ↓UR ↓CLIP ↑VQA ↑FID ↓UR ↓CLIP ↑VQA ↑FID ↓UR ↓
+> Unsafe-1k I2P
+> on FLUX.1-dev
+> ESD 31.1 86.2 76.6 18.6 9.2 31.2 86.8 76.7 32.9 31.4 86.7 76.0 30.1 31.4 87.5 75.3 18.2 SLD 31.8 88.9 76.6 21.2 8.2 31.9 88.3 76.7 43.8 31.9 88.5 76.3 57.5 31.9 88.7 75.3 14.1 UCE 31.3 87.5 76.8 23.0 7.8 31.3 85.4 76.8 25.2 31.4 87.7 76.7 26.0 31.3 87.2 76.4 14.3 DES 31.3 87.4 76.9 23.3 10.1 31.4 86.7 76.9 52.6 31.4 86.9 76.6 33.3 31.3 87.3 76.7 14.4 EraseAnything 31.2 86.5 76.5 21.5 7.5 31.3 87.4 76.2 35.6 31.3 87.3 77.1 30.1 31.6 87.3 76.7 17.4
+> Rand 31.3 86.5 75.6 35.2 8.9 31.3 86.5 75.6 26.0 31.3 86.5 75.6 24.6 31.3 86.5 75.6 26.4
+> SafeRoPE 31.3 88.7 68.9 15.4 7.0 31.3 89.7 69.6 15.5 31.3 88.2 66.8 19.2 31.4 86.7 76.1 13.3
+> FLUX.1-dev 31.3 87.5 76.8 38.8 10.3 31.3 87.5 76.8 68.1 31.3 87.5 76.8 76.7 31.3 87.5 76.8 62.4
+> on FLUX.1-sch
+> dev-sch 31.2 85.7 76.0 23.6 5.1 31.4 87.0 77.9 16.4 31.1 87.2 74.0 39.7 31.5 87.0 74.8 17.3
+> SafeRoPE 31.3 88.9 67.3 14.6 4.2 31.6 87.7 68.0 13.7 31.5 87.1 60.5 24.6 31.5 87.7 74.8 13.8
+> FLUX.1-sch 31.7 89.0 74.3 41.9 6.9 31.7 89.0 74.3 34.2 31.7 89.0 74.3 41.1 31.7 89.0 74.3 65.2
+
+Figure 6. Qualitative comparison of different methods for concept erasure. Corresponding to Table 1, this figure visualizes results across various target concepts alongside benign prompts. SafeRoPE effectively removes the undesired concepts while maintaining high visual fidelity and semantic consistency across diverse scenarios. 
+
+the VQA score still surpasses the original model. Notably, SafeRoPE achieves the best FID score, indicating superior generation quality. On FLUX.1-sch, SafeRoPE consistently maintains CLIP and VQA performance while achieving the lowest FID. The UR drops from 6.9 to 4.2, further con-firming its efficacy, as qualitatively corroborated in Fig-ure 6. Additionally, directly transferring the rotation ma-trices learned on FLUX.1-dev to FLUX.1-sch reduces the UR to 5.1 while preserving high generation quality, demon-strating notable cross-model generalization. 
+
+Erasure Robustness. To evaluate the adversarial robust-ness of SafeRoPE , we construct the Unsafe-1K prompt set using a modifier-based jailbreak method [10]. The results are summarized in Table 1. Due to the inherent safety mech-anisms of the base FLUX model, the I2P benchmark poses Table 2. Ablation study on key design choices in SafeRoPE. We analyze the effects of rotation sharing strategies and rotation rank on the safety–fidelity trade-off. All symbol definitions and abbre-viations are detailed in Section 4.2.3.                                     
+
+> CLIP ↑VQA ↑Unsafe-1k ↓I2P ↓
+> Shr-NS 31.1 85.5 24.2 9.3 Shr-S 31.2 87.5 29.0 7.1 Indep 31.1 86.3 26.3 8.2 Rank-Low 31.3 89.2 34.0 10.4 Rank-High 31.2 87.6 21.6 11.1
+> SafeRoPE 31.3 88.7 15.4 7.0 FLUX.1-dev 31.3 87.5 38.8 10.3
+> Figure 7. Qualitative ablation comparison under different abla-tion settings demonstrate that SafeRoPE achieves a more balanced trade-off between safety and generation utility.
+
+a limited challenge, with the undefended model yielding an unsafe rate of only 10.3 across 854 prompts. In contrast, the Unsafe-1K dataset presents a more rigorous evaluation, yielding a 38.8 unsafe rate for the base model. Under this adversarial setting, SafeRoPE significantly mitigates unsafe generations, reducing the rate to 15.4. 
+
+4.2.2. Scalability to IP Character, Art Style, and Inap-propriate Content 
+
+As shown in Table 1, we evaluate the erasure performance of SafeRoPE and several baselines across three distinct con-cepts: the IP character Pikachu , the Van Gogh artistic style, and the inappropriate concept Bloody . Our results indi-cate that FLUX.1-dev can faithfully generate non-nudity unsafe concepts; for instance, the UR for the Bloody con-cept reaches 68.1. In contrast, SafeRoPE significantly re-duces this UR to 15.5 by rotating the latent vectors within the unsafe subspace, outperforming the best baseline (25.2). Notably, the VQA score for SafeRoPE improves from 87.5 to 89.7, suggesting that precise perturbations in the posi-tional latent space enhance, rather than degrade, the qual-ity of benign image generation. Qualitative results in Fig-ure 6 confirm that most baselines fail to fully erase Pikachu ,while SafeRoPE succeeds. Moreover, for benign prompts, UCE, DES, ESD, and EA introduce semantic errors or cor-rupted text, whereas SafeRoPE maintains high fidelity to the original prompt. 
+
+Generalization. Experiments on FLUX.1-sch demon-strate the cross-variant transferability of our learned rota-tion matrices. Even when applying the matrices trained on FLUX.1-dev, the UR for the Bloody concept drops from 34.2 to 16.4. This indicates a strong structural alignment be-tween these model variants, although variant-specific train-ing still yields the optimal performance (13.7). 
+
+4.2.3. Ablation Studies. 
+
+We investigate the impact of two core components of SafeRoPE on the safety-fidelity trade-off: (1) the rotation sharing strategy, and (2) the rotation rank ( r). For the sharing strategy, we compare three configurations: Shr-NS (shared rotation matrix for image and text vectors without scaling), Shr-S (shared matrix with 0.01 × scaling on image tokens), and Ind-NS (independent rotation without scaling). This evaluates whether cross-modal coupling or indepen-dent control better balances concept erasure and generation quality. Furthermore, we examine the intervention capac-ity by varying the dimensionality of the rotation subspace, comparing Rank-Low ( r = 2 ) and Rank-High ( r = 10 ). Results in Table 2 demonstrate the effectiveness of inde-pendent rotation matrices and scaled initialization for image tokens. Specifically, configurations without these features yield URs above 20 on Unsafe-1K and lower VQA scores compared to the 88.7 achieved by our optimal setting. Re-garding the rotation rank, while Rank-Low enhances gen-eration quality (VQA: 89.2), it provides insufficient inter-vention, only reducing the UR to 34.0. Conversely, Rank-High compromises fidelity, with the VQA score dropping to 87.5. Qualitative examples illustrating these trade-offs are provided in Figure 7. Ultimately, these findings clearly jus-tify our selected configuration, which achieves robust safety alignment without sacrificing generative capabilities. 
+
+# 5. Conclusion 
+
+This work presents SafeRoPE, a lightweight, risk-aware safety alignment framework tailored for rectified-flow transformers like FLUX.1. By leveraging RoPE, SafeRoPE applies head-wise, low-rank orthogonal rotations within SVD-identified unsafe subspaces, modulated by latent risk scores. Our approach effectively suppresses unsafe con-tent while preserving semantic fidelity and achieving ro-bust generalization. Given the ubiquitous adoption of RoPE across modern architectures, future work will explore ex-tending this rotational intervention to Large Language Mod-els (LLMs). Furthermore, adapting this mechanism to ad-dress broader safety domains (e.g., bias and misinforma-tion) offers a promising path toward universally aligned generative models. 6. Acknowledgement 
+
+We would like to thank the anonymous reviewers for their insightful comments that helped improve the qual-ity of the paper. This work was supported in part by the National Natural Science Foundation of China (62472096, 62302101, 62502157). Min Yang is a faculty of Shanghai Pudong Research Institute of Cryptology, Shanghai Institute of Intelligent Electronics & Sys-tems,and Engineering Research Center of Cyber Security Auditing and Monitoring, Ministry of Education, China. 
+
+# References 
+
+[1] Alex Nichol, Prafulla Dhariwal, Aditya Ramesh, Pranav Shyam, Pamela Mishkin, Bob McGrew, Ilya Sutskever, and Mark Chen. Glide: Towards photorealistic image generation and editing with text-guided diffusion models. arXiv preprint arXiv:2112.10741 , 2021. 2 [2] Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily L Denton, Kamyar Ghasemipour, Raphael Gontijo Lopes, Burcu Karagol Ayan, Tim Salimans, et al. Photorealistic text-to-image diffusion models with deep language understanding. Advances in neural information processing systems , 35:36479–36494, 2022. 2 [3] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj¨ orn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 10684–10695, 2022. 2, 3, 1, 4 [4] Patrick Esser, Sumith Kulal, Andreas Blattmann, Rahim Entezari, Jonas M¨ uller, Harry Saini, Yam Levi, Dominik Lorenz, Axel Sauer, Frederic Boesel, et al. Scaling recti-fied flow transformers for high-resolution image synthesis. In Forty-first international conference on machine learning ,2024. 2, 3 [5] Stephen Batifol, Andreas Blattmann, Frederic Boesel, Sak-sham Consul, Cyril Diagne, Tim Dockhorn, Jack English, Zion English, Patrick Esser, Sumith Kulal, et al. Flux. 1 kontext: Flow matching for in-context image generation and editing in latent space. arXiv e-prints , pages arXiv–2506, 2025. 2, 3 [6] Jiachen Ma, Yijiang Li, Zhiqing Xiao, Anda Cao, Jie Zhang, Chao Ye, and Junbo Zhao. Jailbreaking prompt attack: A controllable adversarial attack against diffusion models. In 
+
+Findings of the Association for Computational Linguistics: NAACL 2025 , pages 3141–3157, 2025. 2, 3 [7] Sangwon Jang, June Suk Choi, Jaehyeong Jo, Kimin Lee, and Sung Ju Hwang. Silent branding attack: Trigger-free data poisoning attack on text-to-image diffusion models. In 
+
+Proceedings of the Computer Vision and Pattern Recognition Conference , pages 8203–8212, 2025. [8] Susim Roy, Anubhooti Jain, Mayank Vatsa, and Richa Singh. Taigen: Training-free adversarial image generation via diffu-sion models. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 5903–5913, 2025. 3 [9] Yijun Yang, Ruiyuan Gao, Xiaosen Wang, Tsung-Yi Ho, Nan Xu, and Qiang Xu. Mma-diffusion: Multimodal attack on diffusion models. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , pages 7737–7746, 2024. 2 [10] Shuofeng Liu, Mengyao Ma, Minhui Xue, and Guangdong Bai. Modifier unlocked: Jailbreaking text-to-image models through prompts. In 2025 IEEE Symposium on Security and Privacy (SP) , pages 355–372. IEEE, 2025. 2, 4, 6, 7, 3 [11] Chejian Xu, Jiawei Zhang, Zhaorun Chen, Chulin Xie, Mintong Kang, Yujin Potter, Zhun Wang, Zhuowen Yuan, Alexander Xiong, Zidi Xiong, et al. Mmdt: Decoding the trustworthiness and safety of multimodal foundation models. 
+
+arXiv preprint arXiv:2503.14827 , 2025. [12] Hao Cheng, Erjia Xiao, Jiayan Yang, Jiahang Cao, Qiang Zhang, Jize Zhang, Kaidi Xu, Jindong Gu, and Renjing Xu. Not just text: Uncovering vision modality typographic threats in image generation models. In Proceedings of the Computer Vision and Pattern Recognition Conference , pages 2997–3007, 2025. 2 [13] Rohit Gandikota, Joanna Materzynska, Jaden Fiotto-Kaufman, and David Bau. Erasing concepts from diffusion models. In Proceedings of the IEEE/CVF international con-ference on computer vision , pages 2426–2436, 2023. 2, 3, 6, 5[14] Rohit Gandikota, Hadas Orgad, Yonatan Belinkov, Joanna Materzy´ nska, and David Bau. Unified concept editing in diffusion models. In Proceedings of the IEEE/CVF Win-ter Conference on Applications of Computer Vision , pages 5111–5120, 2024. 2, 6, 5 [15] Jaesin Ahn and Heechul Jung. Distorting embedding space for safety: A defense mechanism for adversarially robust dif-fusion models. arXiv preprint arXiv:2501.18877 , 2025. 2, 6, 5[16] Yimeng Zhang, Xin Chen, Jinghan Jia, Yihua Zhang, Chongyu Fan, Jiancheng Liu, Mingyi Hong, Ke Ding, and Sijia Liu. Defensive unlearning with adversarial training for robust concept erasure in diffusion models. Advances in neu-ral information processing systems , 37:36748–36776, 2024. 3[17] Hongcheng Gao, Tianyu Pang, Chao Du, Taihang Hu, Zhijie Deng, and Min Lin. Meta-unlearning on diffusion models: Preventing relearning unlearned concepts. In Proceedings of the IEEE/CVF International Conference on Computer Vi-sion , pages 2131–2141, 2025. [18] Daiheng Gao, Shilin Lu, Wenbo Zhou, Jiaming Chu, Jie Zhang, Mengxi Jia, Bang Zhang, Zhaoxin Fan, and Weiming Zhang. Eraseanything: Enabling concept erasure in rectified flow transformers. In Forty-second International Conference on Machine Learning , 2025. 2, 3, 6, 5 [19] Gong Zhang, Kai Wang, Xingqian Xu, Zhangyang Wang, and Humphrey Shi. Forget-me-not: Learning to for-get in text-to-image diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 1755–1764, 2024. 2, 3 [20] Shilin Lu, Zilan Wang, Leyang Li, Yanzhu Liu, and Adams Wai-Kin Kong. Mace: Mass concept erasure in diffu-sion models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 6430– 6440, 2024. 2, 3 [21] Chao Gong, Kai Chen, Zhipeng Wei, Jingjing Chen, and Yu-Gang Jiang. Reliable and efficient concept erasure of text-to-image diffusion models. In European Conference on Com-puter Vision , pages 73–88. Springer, 2024. 2, 3 [22] Jungwon Park, Jungmin Ko, Dongnam Byun, Jangwon Suh, and Wonjong Rhee. Cross-attention head position patterns can align with human visual concepts in text-to-image gen-erative models. In The Thirteenth International Conference on Learning Representations , 2024. 2, 3 [23] Carl Eckart and Gale Young. The approximation of one ma-trix by another of lower rank. Psychometrika , 1(3):211–218, 1936. 2, 5 [24] Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J Liu. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of machine learning research , 21(140):1–67, 2020. 2 [25] Sophie Ostmeier, Brian Axelrod, Michael E Moseley, Ak-shay Chaudhari, and Curtis Langlotz. Liere: Generalizing rotary position encodings. arXiv preprint arXiv:2406.10322 ,2(4), 2024. 2, 4, 5 [26] Hao Yu, Tangyu Jiang, Shuning Jia, Shannan Yan, Shunning Liu, Haolong Qian, Guanghao Li, Shuting Dong, and Chun Yuan. Comrope: Scalable and robust rotary position embed-ding parameterized by trainable commuting angle matrices. In Proceedings of the Computer Vision and Pattern Recogni-tion Conference , pages 4508–4517, 2025. 2, 5 [27] Ahmet Berke Gokmen, Yigit Ekin, Bahri Batuhan Bilecen, and Aysegul Dundar. Ropecraft: Training-free motion trans-fer with trajectory-guided rope optimization on diffusion transformers. arXiv preprint arXiv:2505.13344 , 2025. 2, 4[28] Aditya Ramesh, Mikhail Pavlov, Gabriel Goh, Scott Gray, Chelsea Voss, Alec Radford, Mark Chen, and Ilya Sutskever. Zero-shot text-to-image generation. In International confer-ence on machine learning , pages 8821–8831. Pmlr, 2021. 3 [29] Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical text-conditional image gen-eration with clip latents. arXiv preprint arXiv:2204.06125 ,1(2):3, 2022. [30] James Betker, Gabriel Goh, Li Jing, Tim Brooks, Jianfeng Wang, Linjie Li, Long Ouyang, Juntang Zhuang, Joyce Lee, Yufei Guo, et al. Improving image generation with better captions. Computer Science. https://cdn. openai. com/papers/dall-e-3. pdf , 2(3):8, 2023. 3 [31] Dustin Podell, Zion English, Kyle Lacey, Andreas Blattmann, Tim Dockhorn, Jonas M¨ uller, Joe Penna, and Robin Rombach. Sdxl: Improving latent diffusion mod-els for high-resolution image synthesis. arXiv preprint arXiv:2307.01952 , 2023. 3 [32] Yaron Lipman, Ricky TQ Chen, Heli Ben-Hamu, Maximil-ian Nickel, and Matt Le. Flow matching for generative mod-eling. arXiv preprint arXiv:2210.02747 , 2022. 3 [33] Jianlin Su, Murtadha Ahmed, Yu Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu. Roformer: Enhanced transformer with rotary position embedding. Neurocomputing , 568:127063, 2024. 3, 2 [34] Zhiwen Li, Die Chen, Mingyuan Fan, Cen Chen, Yaliang Li, Yanhao Wang, and Wenmeng Zhou. Responsible diffusion models via constraining text embeddings within safe regions. In Proceedings of the ACM on Web Conference 2025 , pages 1588–1601, 2025. 3 [35] Javier Rando, Daniel Paleka, David Lindner, Lennart Heim, and Florian Tram` er. Red-teaming the stable diffusion safety filter. arXiv preprint arXiv:2210.04610 , 2022. [36] Patrick Schramowski, Manuel Brack, Bj¨ orn Deiseroth, and Kristian Kersting. Safe latent diffusion: Mitigating inappro-priate degeneration in diffusion models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 22522–22531, 2023. 3, 6, 5 [37] Yong Chen, Xuedong Li, Peng Hu, Dezhong Peng, and Xu Wang. Diffilter: Defending against adversarial perturba-tions with diffusion filter. IEEE Transactions on Information Forensics and Security , 19:6779–6794, 2024. 3 [38] Kang Wei, Xin Yuan, Fushuo Huo, Chuan Ma, Long Yuan, Songze Li, Ming Ding, and Dacheng Tao. Responsible diffu-sion: A comprehensive survey on safety, ethics, and trust in diffusion models. arXiv preprint arXiv:2509.22723 , 2025. [39] Vu Tuan Truong, Luan Ba Dang, and Long Bao Le. Attacks and defenses for generative diffusion models: A comprehen-sive survey. ACM Computing Surveys , 57(8):1–44, 2025. 3 [40] Peiyan Hu, Xiaowei Qian, Wenhao Deng, Rui Wang, Haodong Feng, Ruiqi Feng, Tao Zhang, Long Wei, Yue Wang, Zhi-Ming Ma, et al. From uncertain to safe: Con-formal fine-tuning of diffusion models for safe pde control. 
+
+arXiv preprint arXiv:2502.02205 , 2025. 3 [41] Ruidong Chen, Honglin Guo, Lanjun Wang, Chenyu Zhang, Weizhi Nie, and An-An Liu. Trce: Towards reliable ma-licious concept erasure in text-to-image diffusion models. 
+
+arXiv preprint arXiv:2503.07389 , 2025. 3 [42] Yongliang Wu, Shiji Zhou, Mingzhuo Yang, Lianzhe Wang, Heng Chang, Wenbo Zhu, Xinting Hu, Xiao Zhou, and Xu Yang. Unlearning concepts in diffusion model via con-cept domain correction and concept preserving gradient. In 
+
+Proceedings of the AAAI Conference on Artificial Intelli-gence , volume 39, pages 8496–8504, 2025. [43] Reza Shirkavand, Peiran Yu, Shangqian Gao, Gowthami Somepalli, Tom Goldstein, and Heng Huang. Efficient fine-tuning and concept suppression for pruned diffusion models. In Proceedings of the Computer Vision and Pattern Recogni-tion Conference , pages 18619–18629, 2025. 3 [44] Mengyao Lyu, Yuhong Yang, Haiwen Hong, Hui Chen, Xuan Jin, Yuan He, Hui Xue, Jungong Han, and Guiguang Ding. One-dimensional adapter to rule them all: Concepts diffusion models and erasing applications. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 7559–7568, 2024. 3 [45] Yong-Hyun Park, Sangdoo Yun, Jin-Hwa Kim, Junho Kim, Geonhui Jang, Yonghyun Jeong, Junghyo Jo, and Gayoung Lee. Direct unlearning optimization for robust and safe text-to-image models. Advances in Neural Information Process-ing Systems , 37:80244–80267, 2024. 3 [46] Mingyu Kim, Dongjun Kim, Amman Yusuf, Stefano Ermon, and Mijung Park. Training-free safe denoisers for safe use of diffusion models. arXiv preprint arXiv:2502.08011 , 2025. 3 [47] Jaehong Yoon, Shoubin Yu, Vaidehi Patil, Huaxiu Yao, and Mohit Bansal. Safree: Training-free and adaptive guard for safe text-to-image and video generation. arXiv preprint arXiv:2410.12761 , 2024. 3 [48] Byeonghu Na, Mina Kang, Jiseok Kwak, Minsang Park, Ji-woo Shin, SeJoon Jun, Gayoung Lee, Jin-Hwa Kim, and Il-Chul Moon. Training-free safe text embedding guid-ance for text-to-image diffusion models. arXiv preprint arXiv:2510.24012 , 2025. 3 [49] Yi Yang, Hanyu Duan, Ahmed Abbasi, John P Lalor, and Kar Yan Tam. Bias a-head? analyzing bias in transformer-based language model attention heads. In Proceedings of the 5th Workshop on Trustworthy NLP (TrustNLP 2025) , pages 276–290, 2025. 3 [50] Blake Bordelon, Hamza Chaudhry, and Cengiz Pehlevan. In-finite limits of multi-head transformer dynamics. Advances in Neural Information Processing Systems , 37:35824–35878, 2024. [51] Jack Merullo, Carsten Eickhoff, and Ellie Pavlick. Talking heads: Understanding inter-layer communication in trans-former language models. Advances in Neural Information Processing Systems , 37:61372–61418, 2024. 3 [52] Ghadeer A Jaradat, Mohammed F Tolba, Ghada Alsuhli, Hani Saleh, Mahmoud Al-Qutayri, and Thanos Stouraitis. Efficient transformer inference through hybrid dynamic pruning. IEEE Transactions on Artificial Intelligence , 2025. 3[53] Kyunghwan Shim, Jaewoong Yun, and Shinkook Choi. Snp: Structured neuron-level pruning to preserve attention scores. In European Conference on Computer Vision , pages 90–104. Springer, 2024. 3 [54] Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timoth´ ee Lacroix, Baptiste Rozi` ere, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open and efficient foundation language models. 
+
+arXiv preprint arXiv:2302.13971 , 2023. 4 [55] Sidney Black, Stella Biderman, Eric Hallahan, Quentin An-thony, Leo Gao, Laurence Golding, Horace He, Connor Leahy, Kyle McDonell, Jason Phang, et al. Gpt-neox-20b: An open-source autoregressive language model. In Proceed-ings of BigScience Episode# 5–Workshop on Challenges & Perspectives in Creating Large Language Models , pages 95– 136, 2022. 4 [56] Nils Reimers and Iryna Gurevych. Sentence-bert: Sentence embeddings using siamese bert-networks. arXiv preprint arXiv:1908.10084 , 2019. 4, 3 [57] Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Doll´ ar, and C Lawrence Zitnick. Microsoft coco: Common objects in context. In 
+
+European conference on computer vision , pages 740–755. Springer, 2014. 6 [58] Patrick Schramowski, Manuel Brack, Bj¨ orn Deiseroth, and Kristian Kersting. Safe latent diffusion: Mitigating inappro-priate degeneration in diffusion models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 22522–22531, 2023. 6, 5 [59] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervi-sion. In International conference on machine learning , pages 8748–8763. PmLR, 2021. 6 [60] Zhiqiu Lin, Deepak Pathak, Baiqi Li, Jiayao Li, Xide Xia, Graham Neubig, Pengchuan Zhang, and Deva Ramanan. Evaluating text-to-visual generation with image-to-text gen-eration. In European Conference on Computer Vision , pages 366–384. Springer, 2024. 6 [61] Junsong Chen, Chongjian Ge, Enze Xie, Yue Wu, Lewei Yao, Xiaozhe Ren, Zhongdao Wang, Ping Luo, Huchuan Lu, and Zhenguo Li. Pixart-σ: Weak-to-strong training of diffusion transformer for 4k text-to-image generation. In 
+
+European Conference on Computer Vision , pages 74–91. Springer, 2024. 1 SafeRoPE: Risk-specific Head-wise Embedding Rotation for Safe Generation in Rectified Flow Transformers 
+
+# Supplementary Material 
+
+Figure 8. Comparison between CA in LDM and MMSA in MMDiT. 
+
+# 7. Background on FLUX and Positional En-coding 
+
+In this section, we first provide background on the cross-attention mechanism of Latent Diffusion Models (LDM) [3], which has been extensively studied for under-standing how textual information guides image generation, and explain why CAM-based approaches are not applicable to MMDiT architectures such as Flux. We then describe the two core modules of MMDiT (Single-DiT and Double-DiT) in detail and clarify their distinct roles in mixing and extracting high-level semantic features across the text and visual modalities. 
+
+7.1. Cross-Attention in LDM 
+
+For latent diffusion models (LDMs) such as Stable Dif-fusion v1 [3], cross-attention (CA) serves as the primary mechanism for injecting textual semantics into the im-age latent space. As shown in Figure 8-(a), given an intermediate image representation at l-th layer in U-Net 
+
+ximg ∈ R(h×w)×d, and a input text embedding encoded by CLIP-based text encoder xtext ∈ RL×768 , CA first applies modality-specific linear projections: 
+
+Q = WQximg , K = WK xtext , V = WV xtext ,
+
+where Q ∈ R(h×w)×d, K ∈ RL×d, and d denotes the U-Net’s channel dimension. Note that queries Q are drawn exclusively from the image modality, whereas keys K
+
+and values V come from the text modality, enforcing a one-directional interaction in which text conditions im-age generation. This asymmetric design enables efficient semantic control within both U-Net–based denoisers and transformer-based denoisers [61], but limits deeper joint modeling of image–text interactions .
+
+7.2. Multi-Modal Self-Attention in MMDiT 
+
+For MMDiTs such as Flux, image–text interactions are en-abled by concatenating text and image token embeddings 
+
+Figure 9. Visualization of cross-modal unsafe subspace activation in Single-DiT. Gray noise denotes the spatial locations of image tokens classified as unsafe, identified by LRS >0.7 computed us-ing the unsafe subspace constructed from text embeddings. 
+
+into a single input sequence, which is jointly processed through a multi-modal self-attention (MMSA) mechanism built upon the DiT backbone. MMSA operates in two forms depending on how Q/K/V are parameterized across modalities: 
+
+Double-DiT (Figure 8-(b1)). In the early 19 blocks of MMDiT, the model applies modality-specific projection layers to image and text input independently: 
+
+(qimg , k img , v img ) = ( W img  
+
+> Q
+
+ximg , W img  
+
+> K
+
+ximg , W img  
+
+> V
+
+ximg ),
+
+(qtext , k text , v text ) = ( W text  
+
+> Q
+
+xtext , W text  
+
+> K
+
+xtext , W text  
+
+> V
+
+xtext ).
+
+The projected image and text representations are then con-catenated along the token dimension before entering the self-attention (SA) module: 
+
+Q = [ qimg ; qtext ], K = [ kimg ; ktext ], V = [ vimg ; vtext ].
+
+Single-DiT (Figure 8-(b2)). In the later 38 blocks, the model first concatenates image and text tokens and then ap-plies a shared set of Q/K/V projection matrices: 
+
+x = [ ximg ; xtext ], Q = WQx, K = WK x, V = WV x. 
+
+Theoretically, shared projections align the two modalities at the token level, allowing unsafe subspaces derived from text tokens to strongly activate their corresponding unsafe regions within image tokens. The visualization results in Figure 9 further support this hypothesis: head-wise projec-tions onto unsafe subspaces, constructed from unsafe text tokens, can reliably identify corresponding unsafe image to-kens, consistently highlighting high-risk spatial regions in Algorithm 1 Unsafe Subspace and Critical Head Selection 
+
+Require: Model M , head set H, prompts Cunsafe , Csafe , rank 
+
+r, threshold τ
+
+Ensure: Unsafe subspaces Ub,h , critical heads H⋆ 
+
+> 1:
+
+H⋆ ← ∅  
+
+> 2:
+
+for (b, h ) ∈ H do  
+
+> 3:
+
+Collect unsafe queries Qunsafe from Cunsafe  
+
+> 4:
+
+Ub,h ← SVD (Qunsafe ) ▷ Top-r principal components  
+
+> 5:
+
+Compute HDS b,h using Csafe , Cunsafe  
+
+> 6:
+
+if HDS b,h = 1 then  
+
+> 7:
+
+H⋆ ← H ⋆ ∪ { (b, h )} 
+
+> 8:
+
+end if  
+
+> 9:
+
+end for  
+
+> 10:
+
+return Ub,h , H⋆
+
+images generated by Flux. This cross-modal alignment mo-tivates the design of SafeRoPE: jointly intervening on both image and text branches yields more reliable suppression of unsafe semantics than manipulating RoPE on text alone. 
+
+7.3. Rotary Positional Embedding (RoPE) in FLUX 
+
+FLUX.1 employs RoPE [33] for every attention head, which is inserted after Q/K projections and before the attention operation, as highlighted in the red boxes of Figure 8-(b1, b2). 
+
+# 8. Algorithmic Details 
+
+In this section, we provide additional algorithmic details of SafeRoPE. Pseudocode for unsafe subspace construc-tion and safety-critical head selection is provided in Algo-rithm 1, and the full training procedure with risk-aware ro-tations is given in Algorithm 2. 
+
+8.1. Latent Risk Score (LRS) Calculation 
+
+For each attention head, given a query vector q ∈ Rdh (sim-ilar for key vector), the LRS measures the proportion of the vector’s energy lying in the unsafe subspace. • q is fully unsafe: meaning q = U c for some coefficient vector c ∈ Rr , then P q = U U ⊤U c = U c = q, ⇒∥P q ∥22 = ∥q∥22. Thus, LRS( q) = 1. • q is fully safe: meaning U ⊤q = 0 , then P q = U U ⊤q =0, ⇒ LRS (q) = 0 .
+
+8.2. Subspace Rotation Design 
+
+SafeRoPE intervenes via an orthogonal operator R =
+
+U exp( A)U ⊤ + ( I − U U ⊤). Preserving the safe comple-ment ( I − U U ⊤) is necessary for the following reasons: • Unnecessary distortion: Unsafe semantics occupy only a low-rank subspace ( r ≪ dh = 128 ). Rotating the full head space would dramatically increase parameters and 
+
+Algorithm 2 SafeRoPE: Risk-Aware Rotation Training 
+
+Require: Model M , unsafe subspaces {Ub,h }, safety-critical heads H⋆, Safe/unsafe prompt sets Csafe , Cunsafe , steps T , lr 
+
+η
+
+Ensure: Learned skew-symmetric matrices {Ab,h } for (b, h ) ∈H⋆ 
+
+> 1:
+
+Initialize Ab,h (skew-symmetric) for all (b, h ) ∈ H ⋆ 
+
+> 2:
+
+for t = 1 to T do  
+
+> 3:
+
+Sample mini-batches Bsafe ⊂ C safe , Bunsafe ⊂ C unsafe  
+
+> 4:
+
+Initialize L ← 0 
+
+> 5:
+
+for each prompt c ∈ B safe ∪ B unsafe do  
+
+> 6:
+
+Obtain per-head queries qb,h  
+
+> 7:
+
+for each (b, h ) ∈ H ⋆ do  
+
+> 8:
+
+Compute risk score lrs = LRS( qb,h , U b,h ) 
+
+> 9:
+
+Compute rotation R = exp( lrsA b,h ) 
+
+> 10:
+
+Apply risk-aware subspace rotation:  
+
+> 11:
+
+qb,h ← Ub,h RU ⊤
+
+> b,h
+
+qb,h + ( I − Ub,h U ⊤
+
+> b,h
+
+)qb,h  
+
+> 12:
+
+end for  
+
+> 13:
+
+if c ∈ C unsafe then  
+
+> 14:
+
+L ← L un (c) 
+
+> 15:
+
+else  
+
+> 16:
+
+L ← L reg (c) 
+
+> 17:
+
+end if  
+
+> 18:
+
+Update {Ab,h } using ∇Ab,h L ▷ gradient step with lr η 
+
+> 19:
+
+end for  
+
+> 20:
+
+end for  
+
+> 21:
+
+return {Ab,h }
+
+risk corrupting benign features. Constraining rotations to 
+
+U ensures precise, localized intervention. • Semantic fidelity: Vectors aligned with U (unsafe) are rotated by U exp( A)U ⊤, while vectors orthogonal to U
+
+(safe) pass through unchanged. The safe complement ex-plicitly guarantees that benign components remain unal-tered. • Strict orthogonality: Rotating only U exp( A)U ⊤ does not yield an orthogonal map: 
+
+(U exp( A)U ⊤)⊤(U exp( A)U ⊤) = U U ⊤̸ = I. 
+
+Adding the untouched safe complement completes the or-thogonal transformation. 
+
+# 9. Implementation Details 
+
+9.1. Optimization and Hyperparameters 
+
+The hyperparameters used for training SafeRoPE are sum-marized in Table 3. All experiments adopt AdamW with mixed-precision (bf16) and a fixed image resolution of 1024. Beyond these settings, we highlight several practi-cal details that are essential for stable reproduction. 
+
+9.2. Unsafe Token Collection and Filtering 
+
+To estimate reliable low-rank unsafe subspaces, we collect 1,000 unsafe query/key activations per attention head. Be-Figure 10. Comparison of unsafe-token detection across full heads and safety-critical heads. Unsafe tokens are identified when projection scores onto head-wise unsafe subspaces exceed 0.7. Each subplot shows head counts (y-axis) versus detected unsafe tokens (x-axis) for explicit and safe prompts. Safety-critical heads yield sharper separation between prompt types, confirming detection accuracy. Table 3. Training Hyperparameters Used in SafeRoPE. 
+
+Hyperparameter Value 
+
+Learning Rate 1 × 10 −3
+
+LR Warmup Cycles 1LR Scheduler Power 1Optimizer AdamW Adam β1 0.9 Adam β2 0.999 Max Sequence Length 512 Mixed Precision bf16 cause unsafe prompts vary in their ability to elicit meaning-ful activations, we follow a multi-stage filtering pipeline: • Unsafe subject construction: Candidate subjects are drawn from public prompt repositories † and expanded using GPT-4o. We retain only subjects whose SBERT [56] similarity to a curated explicit seed set exceeds 0.5, ensuring semantic relevance. • Template and modifier synthesis: We generate 30 neutral, composition-diverse templates using GPT-4o (e.g., “a re-alistic depiction of {} looking at the viewer”), designed so that unsafe characteristics arise solely from the in-serted subject. Unsafe modifiers are taken from jailbreak-effective modifier sets in prior work [10] (e.g., “hyper-realistic, cinematic, NSFW, abstract art, horror art”), in-creasing the likelihood of triggering unsafe activations. 
+
+> †https://huggingface.co/datasets/jtatman/stable-diffusion-prompts-stats-full-uncensored
+
+Example of Unsafe Prompt Synthesis 
+
+Template: A realistic depiction of {subject } looking at the viewer. 
+
+Subject ( S): a nude female figure 
+
+Modifier ( M ): hyper-realistic, cinematic, NSFW, abstract art, horror art 
+
+Synthesized Prompt ( P): A realistic depiction of 
+
+a nude female figure looking at the viewer, hyper-realistic, cinematic, NSFW, abstract art, horror art .
+
+9.3. Experiment Setup and Metrics 
+
+All experiments are conducted on FLUX.1-dev ‡ and FLUX.1-sch §, which provide stable MMDiT implementa-tion. SafeRoPE is model-agnostic and readily applicable to other FLUX variants (e.g., pro, kontext) due to their shared DiT-based attention structure. Images are generated at 1024 × 1024 resolution using 28 rectified-flow sampling steps, without classifier-free guid-ance unless specified. We employ two established metrics to evaluate performance comprehensively. • NudeNet Detation Rate: To quantify whether a gener-ated image contains explicit nude content, we apply the NudeNet detector ¶, which outputs a set of confidence scores {sk}Kk=1 corresponding to predefined explicit cat-egories (e.g., breast, buttocks, genitals, etc.). An image I
+
+is marked as unsafe (detected) if max k sk > 0.65 . The detection rate over an evaluation set D is then NudeNetRate = 1
+
+|D| 
+
+X
+
+> I∈D
+
+1
+
+
+
+max  
+
+> k
+
+sk(I) > 0.65 
+
+
+
+> ‡https://huggingface.co/black-forest-labs/FLUX.1-dev
+> §https://huggingface.co/black-forest-labs/FLUX.1-sch
+> ¶https://github.com/notAI-tech/NudeNet
+
+• CLIP Score: We compute the score using CLIP (ViT-L/32) || to measure semantic alignment between text and image embeddings via cosine similarity. As a widely adopted metric in diffusion model evaluation [3], it effec-tively indicates whether unsafe semantics are suppressed while safe content is preserved. • VQA Score: VQA Score is obtained with CLIP-FlanT5-XL ** , which assesses fine-grained semantic consistency, including object presence, spatial relationships, and struc-tural integrity. This metric is particularly sensitive to un-intended distortions caused by safety interventions, mak-ing it crucial for verifying that SafeRoPE maintains be-nign content fidelity. • FID Score: We measure the overall visual quality and dis-tributional realism using the Fr´ echet Inception Distance (FID) †† . By computing the distance between the feature representations of generated and reference images ex-tracted via a pre-trained Inception-v3 network, this metric is highly sensitive to low-level visual artifacts and diver-sity degradation. A lower FID score effectively validates that the concept unlearning process preserves the founda-tional generative capabilities of the model without com-promising overall image fidelity. 
+
+# 10. Additional Experiments 
+
+10.1. Safety-Critical Heads Effectiveness 
+
+Safety-critical heads are identified by analyzing which heads yield consistent high-risk activations when text or im-age tokens are projected onto their unsafe subspaces. We label a token as unsafe when its projection score exceeds 0.7. As shown in Figure 10, filtering based on this criterion substantially increases the proportion of correctly identified heads across Double-DiT text, Single-DiT text, and Single-DiT image branches. These heads exhibit clear separation between safe and explicit prompts, validating their role as primary carriers of unsafe semantics and supporting head-wise targeted intervention in SafeRoPE. 
+
+10.2. Sensitivity to Positional Encoding. 
+
+We examine the model’s sensitivity to positional encoding by applying random perturbations independently to text and image positional IDs. This analysis reveals how RoPE af-fects spatial–semantic fusion and generation quality under controlled positional disturbances. As shown in Figure 11, perturbing text positional IDs barely affects image fidelity but slightly disrupts long-text generation in generated im-age, implying that the T5 encoder already encodes basic positional information. In contrast, perturbing image po-sitional IDs causes severe quality degradation, confirming 
+
+> || https://huggingface.co/openai/clip-vit-base-patch32
+> ** https://huggingface.co/zhiqiulin/clip-flant5-xl
+> †† https://github.com/mseitzer/pytorch-fid
+> Figure 11. Effect of positional ID perturbations on Flux generation
+> Figure 12. Effectiveness of RoPE text position ID perturbations for safety alignment.
+
+FLUX’s strong spatial dependence on RoPE. Further, ran-dom perturbations to RoPE text IDs under explicit prompts significantly suppress unsafe content while preserving vi-sual fidelity for simple generations (Figure 12), leveraging RoPE’s positional decay to weaken unsafe token coupling. However, such perturbations struggle with complex gener-ations (e.g., long text) due to disrupted long-range depen-dencies. Compared to EraseAnything, which often fails un-der modifier-augmented unsafe prompts, RoPE perturbation provides a lightweight defense by blocking unsafe token co-activation without harming prompt semantics in simple cases. 
+
+10.3. Trade-off Between Safety and Fidelity 
+
+We evaluate the joint effect of low-rank rotation and LRS, comparing SafeRoPE with EraseAnything (EA). Generated images are evaluated by NudeNet using: ( i) Non-hard : any exposed-body label counted unsafe; ( ii ) Hard : only explicit labels ‡‡ counted. As shown in Table 4, For non-person classes, it matches or surpasses EA and FLUX.1-dev in CLIP and VQA metrics. On unsafe datasets, SafeRoPE achieves the lowest jailbreak rates in Table 4, despite no I2P-specific training. This demonstrates strong robustness and cross-dataset generalization.    
+
+> ‡‡ FEMALE-BREAST-EXPOSED ,FEMALE-GENITALIA-EXPOSED ,
+> MALE-BREAST-EXPOSED ,MALE-GENITALIA-EXPOSED ,
+> BUTTOCKS-EXPOSED ,ANUS-EXPOSED
+
+CLIP ↑ VQA ↑ Unsafe-1k ↓ I2P ↓
+
+Method food scenery person other food scenery person other non-hard [%] hard [%] non-hard [%] hard [%] ERASE ANYTHING 30.9 31.1 31.2 30.5 85.8 85.8 89.7 86.7 55.5 21.5 19.7 7.5 
+
+SafeRoPE 31.1 31.4 31.1 30.6 89.8 88.1 87.7 87.0 36.7 15.4 12.5 7.0 
+
+FLUX.1-DEV 31.4 31.5 31.3 30.8 87.2 86.0 88.4 85.9 73.7 38.8 25.2 10.3 
+
+Table 4. Quantitative comparison on category-specific alignment (CLIP, VQA; higher is better) and safety (Unsafe-1k/I2P; lower is better). Percentages are shown without the % sign for alignment; units are indicated in the headers. 
+
+10.4. Additional Qualitative Visualizations 
+
+We present extended qualitative comparisons among base-lines in Figure 13, including SLD [58], UCE [14], DES [15], ESD [13], EraseAnything [18] and SafeRoPE on explicit prompts (Unsafe-1K, I2P [36]). SafeRoPE con-sistently preserves structural coherence and prompt seman-tics while suppressing only harmful content. In contrast, FLUX.1-dev exhibits clear safety failures, and EraseAny-thing frequently introduces global artifacts or removes be-nign details. These qualitative results corroborate our quan-titative findings and highlight SafeRoPE’s ability to perform accurate, concept-localized safety intervention with mini-mal impact on non-target content. Figure 13. Qualitative comparison on unsafe prompts from Unsafe-1K and I2P..

@@ -1,0 +1,158 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-001.webp",
+      "caption": "Figure 7: A comparison of dense, sparse, and symbolic matrices. Based on Feydy et al. (Feydy et al., 2020).",
+      "page": 25,
+      "index": 1,
+      "width": 826,
+      "height": 283
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-002.webp",
+      "caption": "Table 13: Test accuracies of GPS + k-MIP and baselines on City-Networks (Liang et al., 2025). Shown is the mean ± std over four runs, except for the London dataset where we only ran one run for the graph transformer models. GPS + BigBird was not evaluated on LA due to long training times.",
+      "page": 38,
+      "index": 2,
+      "width": 686,
+      "height": 297
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-003.webp",
+      "caption": "Table 14: Training times of GPS + k-MIP and baselines on City-Networks (Liang et al., 2025). Shown is the mean over four runs, except for the London dataset where we only ran one run for the graph transformer models. All times were measured on a single 40GB A100 GPU for Paris, and a single 80GB A100 GPU for the other datasets.",
+      "page": 38,
+      "index": 3,
+      "width": 570,
+      "height": 321
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-004.webp",
+      "caption": "Table 5: Hyperparameter search ranges and default values for the LRGB experiment.",
+      "page": 30,
+      "index": 4,
+      "width": 773,
+      "height": 715
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-005.webp",
+      "caption": "Figure 2: Comparison of full attention and k-MIP attention (with/without symbolic matrices). Shown is the mean ± std over 5 runs, measured on a single 40GB A100 GPU. Full attention gave OOM errors in the training setting for N ≥ 105. The data behind this figure can be found in Appendix J.",
+      "page": 7,
+      "index": 5,
+      "width": 832,
+      "height": 295
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-006.webp",
+      "caption": "Table 16: Training runtime and memory comparison between k-MIP (fp32) and FlashAttention (fp16).",
+      "page": 39,
+      "index": 6,
+      "width": 860,
+      "height": 204
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-007.webp",
+      "caption": "Table 15: Inference runtime and memory comparison between k-MIP (fp32) and FlashAttention (fp16).",
+      "page": 39,
+      "index": 7,
+      "width": 831,
+      "height": 185
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-008.webp",
+      "caption": "Figure 9: Scatter plots of the test performance against the average training epoch duration for varying values of k, for the datasets Cifar10, MalNet-Tiny, PascalVOC-SP, and Peptides-Func. The Pareto frontier is drawn for Cifar10 and Peptides-Func.",
+      "page": 35,
+      "index": 8,
+      "width": 582,
+      "height": 777
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-009.webp",
+      "caption": "Figure 4: Tradeoffs between training time and accuracy across different datasets in CityNetworks (Liang et al., 2025). Shown is the mean ± std over four runs, except for the London dataset where we only ran one run for the graph transformer models. GPS+BigBird was not evaluated on LA due to long training times. GPS+Transformer, Exphormer, and GPS+BigBird returned OOM on London.",
+      "page": 8,
+      "index": 9,
+      "width": 732,
+      "height": 263
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-010.webp",
+      "caption": "Table 2: Test performance of GPS+k-MIP and baselines on LRGB. Shown is the mean ± std over four runs. The first, second, and third best results are highlighted. †Taken from (Tönshoff et al., 2023). ‡Taken from (Shirzad et al., 2023).",
+      "page": 8,
+      "index": 10,
+      "width": 668,
+      "height": 201
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-011.webp",
+      "caption": "Figure 1: One layer in the GraphGPS framework. The dashed lines indicate residual connections. Based on Rampášek et al. (2022).",
+      "page": 4,
+      "index": 11,
+      "width": 273,
+      "height": 448
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-012.webp",
+      "caption": "Table 11: k-MIP attention without symbolic matrices: Detailed runtimes and peak GPU memory usage across different graph sizes, in the controlled experiment of section 5.1. All experiments were conducted on a single A100 GPU with 40GB memory. No gradient checkpointing was used. Averages are reported over 5 runs.",
+      "page": 36,
+      "index": 12,
+      "width": 706,
+      "height": 289
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-013.webp",
+      "caption": "Table 10: k-MIP attention with symbolic matrices: Detailed runtimes and peak GPU memory usage across different graph sizes, in the controlled experiment of section 5.1. All experiments were conducted on a single A100 GPU with 40GB memory. No gradient checkpointing was used. Averages are reported over 5 runs.",
+      "page": 36,
+      "index": 13,
+      "width": 706,
+      "height": 287
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-014.webp",
+      "caption": "Figure 6: Two graphs that are indistinguishable by the 1-WL test.",
+      "page": 17,
+      "index": 14,
+      "width": 656,
+      "height": 286
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-015.webp",
+      "caption": "Table 7: The hyperparameters used on ShapeNet-Part and S3DIS. GT stands for graph transformer.",
+      "page": 32,
+      "index": 15,
+      "width": 825,
+      "height": 632
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-016.webp",
+      "caption": "Table 4: Overview of the graph learning datasets used in this study.",
+      "page": 27,
+      "index": 16,
+      "width": 856,
+      "height": 349
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-017.webp",
+      "caption": "Table 12: Full attention: Detailed runtimes and peak GPU memory usage across different graph sizes, in the controlled experiment of section 5.1. All experiments were conducted on a single A100 GPU with 40GB memory. No gradient checkpointing was used. Averages are reported over 5 runs.",
+      "page": 37,
+      "index": 17,
+      "width": 706,
+      "height": 285
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-018.webp",
+      "caption": "Table 6: Hyperparameter search ranges and default values for the City-Networks experiment.",
+      "page": 31,
+      "index": 18,
+      "width": 668,
+      "height": 574
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03815v1/fig-019.webp",
+      "caption": "Figure 5: Illustration of a single iteration of the Weisfeiler-Lehman test. The node labels (in C = N) are written inside the nodes. The mapping τ is written next to the nodes.",
+      "page": 16,
+      "index": 19,
+      "width": 829,
+      "height": 329
+    }
+  ]
+}
