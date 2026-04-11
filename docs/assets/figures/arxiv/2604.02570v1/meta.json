@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02570v1/fig-001.webp",
+      "caption": "Figure 3: (a) Naive reconstruction requires materializing and writing back full Kh to VRAM (global GPU memory), leading to excessive memory usage and I/O. (b) Our fused kernel consumes CKh and CV h tiles on-chip with flash decoding, reducing both peak memory footprint and I/O traffic. All the step numbers are shown in circle.",
+      "page": 6,
+      "index": 1,
+      "width": 826,
+      "height": 198
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02570v1/fig-002.webp",
+      "caption": "Figure 1: (a) Architecture of vision-language model. (b) Overview of WSVD framework.",
+      "page": 2,
+      "index": 2,
+      "width": 746,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02570v1/fig-003.webp",
+      "caption": "Table 15: Calibration time breakdown for QSVD and WSVD.",
+      "page": 18,
+      "index": 3,
+      "width": 838,
+      "height": 211
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02570v1/fig-004.webp",
+      "caption": "Table 1: Accuracy evaluation of different methods under FP16 (detailed results in Appendix A.3).",
+      "page": 8,
+      "index": 4,
+      "width": 822,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02570v1/fig-005.webp",
+      "caption": "Table 11: Accuracy evaluation of different methods under FP16 on Qwen-VL 7B and Molmo-7B-O.",
+      "page": 17,
+      "index": 5,
+      "width": 822,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02570v1/fig-006.webp",
+      "caption": "Table 9: Accuracy evaluation of different methods under FP16.",
+      "page": 16,
+      "index": 6,
+      "width": 822,
+      "height": 456
+    }
+  ]
+}

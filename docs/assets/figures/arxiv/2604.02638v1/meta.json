@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02638v1/fig-001.webp",
+      "caption": "Fig. 3. Read path detail. Phase 1 (once per query): FWHT rotation of query, table generation (d × 2b multiplications). Phase 2 (repeated T times): table lookup, adder tree, norm scaling (1 multiplication per key). Total: 5,120 multiplications for T=4096 versus 524,288 conventional (102.4× reduction).",
+      "page": 3,
+      "index": 1,
+      "width": 1076,
+      "height": 439
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02638v1/fig-002.webp",
+      "caption": "TABLE III EFFECT OF SIGN PATTERN OPTIMIZATION. Default worst: MAXIMUM ∆ ACROSS 10 RANDOM SEEDS. Optimized: DETERMINISTIC RESULT WITH SELECTED SIGNS. Reduction: SPIKE ELIMINATION RATE.",
+      "page": 4,
+      "index": 2,
+      "width": 529,
+      "height": 508
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02638v1/fig-003.webp",
+      "caption": "Fig. 2. AXELRAM smart SRAM macro. Write path (left): norm extraction, FWHT butterfly network (448 add/sub, zero multipliers), Lloyd-Max comparator quantization (896 comparators), writing 3-bit indices + FP16 norm to SRAM. Read path (right): pre-computed table lookup (128 parallel reads), adder tree (127 adders), norm scaling (1 multiplication). Pre-computation (top center, once per query): table generation with 1024 multiplications. The fixed codebook ROM (30 bytes) is shared by both paths across all d=128 dimensions.",
+      "page": 2,
+      "index": 3,
+      "width": 914,
+      "height": 914
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02638v1/fig-004.webp",
+      "caption": "Fig. 1. Quantize Once, Never Dequantize. Conventional rotation-based quantization (top) must dequantize and inverse-rotate each stored key before computing attention—T × O(d log d) per query. AXELRAM (bottom) computes attention entirely within the rotated transform domain: the query is rotated once, and scores are computed via pre-computed codebook products with no dequantization. The orthogonal invariance ⟨q,k⟩ = ⟨Rq, Rk⟩ makes this possible, yielding 102.4× fewer multiplications.",
+      "page": 1,
+      "index": 4,
+      "width": 529,
+      "height": 377
+    }
+  ]
+}

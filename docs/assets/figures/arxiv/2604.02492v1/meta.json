@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02492v1/fig-001.webp",
+      "caption": "Table 3: Summary of IPPg across datasets. Accuracy and average inference cost are reported for text-based and image-based prompting. Cost savings are relative to text-only baselines.",
+      "page": 5,
+      "index": 1,
+      "width": 594,
+      "height": 321
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02492v1/fig-002.webp",
+      "caption": "Table 2: FAMMA results by question type and language. Cost savings computed from average per-query costs.",
+      "page": 5,
+      "index": 2,
+      "width": 636,
+      "height": 438
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02492v1/fig-003.webp",
+      "caption": "Table 4: Ablation study: Best accuracy and best efficiency configurations across VQA datasets. ΔAcc and %Saved are relative to baseline.",
+      "page": 7,
+      "index": 3,
+      "width": 710,
+      "height": 271
+    }
+  ]
+}
