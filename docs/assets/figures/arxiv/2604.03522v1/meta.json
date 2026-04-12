@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-001.webp",
+      "caption": "Figure 2: Transformer block architecture, which maps a set of input tokens R65×D into a similarly sized output.",
+      "page": 6,
+      "index": 1,
+      "width": 433,
+      "height": 481
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-002.webp",
+      "caption": "Figure 5: Validation samples from the ViT Small model. From left to right, the columns depict the ground truth topology, model’s predicted topology, and difference. Red indicates the model missing material while blue indicates excess material. Green sections indicate fixed boundary conditions and arrows indicate applied load. The bottom sample depicts the standard cantilevered beam problem with a fixed left wall and a downward point load in the bottom right corner.",
+      "page": 11,
+      "index": 2,
+      "width": 450,
+      "height": 735
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-003.webp",
+      "caption": "Figure 9: Compliance and volume fraction error results for the static ViT Small model. All samples are outside of the training dataset, with a varying input volume fraction. Range of values for the dataset are denoted on the plot.",
+      "page": 15,
+      "index": 3,
+      "width": 464,
+      "height": 310
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-004.webp",
+      "caption": "Figure 8: Select samples from the post-processing results for the ViTSmall-4, showing how pixels are removed to improve floating material without consideration for compliance. Each topology is shown with its compliance C.",
+      "page": 14,
+      "index": 4,
+      "width": 454,
+      "height": 453
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-005.webp",
+      "caption": "Table 1: Comparison of representative machine learning approaches for topology optimization, highlighting trade-offs between physical fidelity and computational efficiency.",
+      "page": 3,
+      "index": 5,
+      "width": 983,
+      "height": 358
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-006.webp",
+      "caption": "Figure 6: Stress and strain over an optimized sample after loading. The ground truth stress and strain are shown on the left. The model topology stress and strain are shown on the right. The maximum stress and strain are denoted on the color bar for the plots, with maximum values denoted. Samples are from the ViT-Small-8 model.",
+      "page": 13,
+      "index": 6,
+      "width": 453,
+      "height": 422
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-007.webp",
+      "caption": "Figure 7: Peak stress and strain scatter plots for model topology and ground truth topology. Each data point is a sample where red indicates the model’s stress or strain is worse (higher) than the ground truth. Green indicates the model’s stress or strain is better (lower) than the ground truth. Samples are from the validation dataset on the ViTSmall-4 model",
+      "page": 13,
+      "index": 7,
+      "width": 414,
+      "height": 834
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-008.webp",
+      "caption": "Figure 3: Full proposed transformer architecture, including a separate treatment of the loading conditions and volume fraction from the stress and strain fields. Example patchification uses an 8 × 8 patch size, producing 64 tokens, although 4 × 4 and 2 × 2 patch sizes are also studied, yielding 256 and 1024 tokens respectively.",
+      "page": 8,
+      "index": 8,
+      "width": 952,
+      "height": 481
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-009.webp",
+      "caption": "Figure 4: Plot of the time sequence (a) and FFT amplitude transformation (b) for the two loads used in the dynamic dataset, sine (orange) and impulse (indigo).",
+      "page": 9,
+      "index": 9,
+      "width": 458,
+      "height": 489
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-010.webp",
+      "caption": "Figure 1: Processing for the inputs of the structural optimization problem for a given problem with boundary conditions x⃗BC , load P⃗ at location x⃗P, and volume fraction f . First, finite element analysis is used to convert the sparse inputs into dense images of the strain energy density and the von Mises stress. The fields of size 64 × 64 are then divided into a sequence of patches, in this example 8 × 8.",
+      "page": 5,
+      "index": 10,
+      "width": 941,
+      "height": 309
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03522v1/fig-011.webp",
+      "caption": "Figure 11: Validation samples from the ViT Small model finetuned on the decoder layers for dynamic data. The left column shows the ground truth topology, the middle column shows the model’s output, and the right column shows the difference between the two.",
+      "page": 16,
+      "index": 11,
+      "width": 436,
+      "height": 695
+    }
+  ]
+}

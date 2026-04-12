@@ -1,0 +1,286 @@
+Title: Selective Aggregation of Attention Maps Improves Diffusion-Based Visual Interpretation
+
+URL Source: https://arxiv.org/pdf/2604.05906v1
+
+Published Time: Wed, 08 Apr 2026 01:20:09 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+# Selective Aggregation of Attention Maps Improves Diffusion-Based Visual Interpretation 
+
+# Jungwon Park 1, Jungmin Ko 2, Dongnam Byun 1 and Wonjong Rhee 2 
+
+> 1
+
+Department of Intelligence and Information, Seoul National University, Seoul, Republic of Korea, {quoded97, east928 }@ snu.ac.kr  
+
+> 2
+
+Interdisciplinary Program in Artificial Intelligence, Seoul National University, Seoul, Republic of Korea, {jungminko, wrhee }@snu.ac.kr 
+
+# Abstract 
+
+Numerous studies on text-to-image (T2I) gener-ative models have utilized cross-attention maps to boost application performance and interpret model behavior. However, the distinct charac-teristics of attention maps from different atten-tion heads remain relatively underexplored. In this study, we show that selectively aggregating cross-attention maps from heads most relevant to a target concept can improve visual interpretabil-ity. Compared to the diffusion-based segmen-tation method DAAM, our approach achieves higher mean IoU scores. We also find that the most relevant heads capture concept-specific features more accurately than the least relevant ones, and that selective aggregation helps di-agnose prompt misinterpretations. These find-ings suggest that attention head selection offers a promising direction for improving the inter-pretability and controllability of T2I generation. 
+
+Keywords — Attention Maps, Attention Heads, Text-to-Image Generation 
+
+I. INTRODUCTION 
+
+Recently, text-to-image (T2I) generative models have achieved impressive results, producing high-quality im-ages that closely align with input text prompts. Built on powerful foundation models such as Stable Diffu-sion [10, 8] and Imagen [12], a wide range of works have extended these capabilities to tasks like image edit-ing [5, 14, 2], multi-concept generation [3, 4], and person-alization [11, 6]. Many of these approaches leverage ar-chitectural components—particularly cross-attention lay-ers—to enhance performance and adaptability. However, despite this progress, studies specifically examining the roles and characteristics of different attention heads have remained largely limited. A previous pioneering study [7] demonstrated that some cross-attention heads are more strongly associated with specific visual concepts than others, and that leveraging this information can improve tasks such as image editing and multi-concept generation. However, its focus was pri-marily limited to practical applications, leaving a gap be-tween the model’s strong performance and a deeper under-standing of the individual roles of attention heads. In this study, we aim to bridge that gap by comparing diffusion-based object segmentation results using only a selected subset of concept-relevant attention heads versus using all heads, as done in the widely adopted interpretability method DAAM [13]. DAAM averages the cross-attention maps correspond-ing to a specific token and shows that the resulting map closely overlaps with the object referred to by that token. This demonstrates that averaged attention maps tend to focus on relevant objects, providing an intuitive explana-tion of how input tokens guide image generation. Build-ing on this insight, attention map visualization has become a widely adopted tool for analyzing how individual to-kens influence different regions of generated images. In this study, we extend this diffusion-based segmentation ap-proach by selectively using only a few attention heads that are more strongly associated with the specified concept, aiming to enhance both interpretability and performance. To identify attention heads related to specific concepts, we first apply the method proposed in HRV [7] to score each head based on its relevance to the given concept. We then select the top 20-25% of attention heads with the highest relevance scores. The attention maps from this selected subset are averaged, and we compute the mean Intersection over Union (IoU) by comparing the re-sult with ground-truth segmentation maps generated using Grounded-SAM [9]. Our approach outperforms the widely used DAAM method, suggesting that selectively chosen at-tention heads provide more accurate and concept-specific features. As part of our analysis, we compared averaged cross-attention maps aggregated from a subset of attention heads most relevant to the concept ‘Animals’ with those from the least relevant heads. The significant performance gap between these two groups reveals that the most relevant 1
+
+> arXiv:2604.05906v1 [cs.CV] 7 Apr 2026
+
+attention heads more accurately capture concept-specific features than the least relevant ones. Additionally, we observe that when a T2I model misinterprets an input prompt—such as when ambiguous terms result in multi-ple concepts being generated in a single image—attention heads associated with different concepts often focus on dis-tinct regions of the generated image, offering insight into the source of such errors. These findings highlight the po-tential of selective attention aggregation as a valuable tool for understanding and diagnosing the behavior of text-to-image generative models. A large body of research in visual generative applica-tions relies on attention maps as a core feature, and we believe that our selectively aggregated attention maps can enhance performance, improve visual interpretability, and enable finer control across these tasks. 
+
+II . METHOD 
+
+A. Preliminaries 1) Cross-Attention Map of T2I Models. Let P be an input text prompt, S the number of tokens in P, and Z t
+
+a noisy image latent at generation timestep t. In the h-th cross-attention head, the spatial features of the noisy im-age latent φ (h)(Zt ) are projected to a query matrix Q (h) 
+
+> t
+
+=
+
+l(h) 
+
+> Q
+
+(φ (h)(Zt )) ∈ Rr2  
+
+> h×dk
+
+, while the CLIP text embedding of the input prompt ψ(P) is projected to a key matrix K (h) =
+
+l(h) 
+
+> K
+
+(ψ(P)) ∈ RS×dk and a value matrix V (h) = l(h) 
+
+> V
+
+(ψ(P)) ∈
+
+RS×dv , using learned linear layers l(h) 
+
+> Q
+
+, l(h) 
+
+> K
+
+, and l(h) 
+
+> V
+
+. Here, 
+
+r2 
+
+> h
+
+denotes the spatial dimension (i.e., height × weight) for head h. Then, the cross-attention map at head h and timestep t is calculated as M(h) 
+
+> t
+
+= softmax Q(h) 
+
+> t
+
+(K(h))T
+
+√dk
+
+!
+
+∈ Rr2 
+
+> h×S
+
+, (1) where dk is the hidden dimension of the keys and queries. Each row of M (h) 
+
+> t
+
+corresponds to a spatial location and de-fines a probability distribution over the S text tokens. Intu-itively, M (h) 
+
+> t
+
+reveals which parts of the text are most rele-vant to each spatial location in the image, thereby guiding how semantic information from the prompt influences the image generation process at timestep t.
+
+2) DAAM [13]. Motivated by the interpretability of the cross-attention map M (h) 
+
+> t
+
+, the diffusion-based inter-pretability method DAAM proposes averaging attention maps across all attention heads and generation timesteps, resulting in the aggregated map: 
+
+bMDAAM = 1
+
+H
+
+> H
+
+# ∑
+
+> h=1
+
+Fh( 1
+
+T
+
+> T
+
+# ∑
+
+> t=1
+
+M(h) 
+
+> t
+
+) ∈ Rr×r×S, (2) where H is the total number of attention heads in the T2I model, T is the total number of generation timesteps, and 
+
+Fh(·) denotes bicubic interpolation used to upscale each head’s spatial resolution r2 
+
+> h
+
+to match the original image resolution r × r. DAAM shows that this averaged attention map offers strong visual interpretability—it can be directly visualized for each token and provides meaningful insight into how different text tokens influence various spatial re-gions of the generated image. This underscores the useful-ness of attention map analysis as a powerful technique for understanding and interpreting the behavior of T2I models. 
+
+3) HRV [7]. HRV reveals that different visual con-cepts are processed unequally across different cross-attention heads, and proposes a method to quantify the relevance of each head to a set of human-specified vi-sual concepts. Given a selected set of N visual concepts 
+
+{C1, . . . , CN }, HRV first uses a state-of-the-art language model to generate 10 representative words–refer to as concept-words–for each concept, which are independently encoded using the CLIP text encoder ψ(·). During random image generation, one concept-word per visual concept is sampled, encoded, and projected into the key embedding space using the head-specific linear layer l(h) 
+
+> K
+
+(·), produc-ing a concatenated matrix eK(h) ∈ RN×dk of key-projected semantic token embeddings for the N sampled concept-words at each cross-attention head position h = 1, · · · , H.Let Q (h) 
+
+> t
+
+∈ Rr2  
+
+> h×dk
+
+be the spatial query features at timestep 
+
+t for head h during the random image generation. Then, the attention map for HRV at head h is computed as: 
+
+eM(h) 
+
+> t
+
+= softmax Q(h) 
+
+> t
+
+(eK(h))T
+
+√dk
+
+!
+
+∈ Rr2  
+
+> h×N
+
+, (3) where each column indicates how strongly each visual con-cept is activated at head h. These attention maps are aver-aged across spatial dimensions r2 
+
+> h
+
+(i.e., height × width) to produce relevance score vector s(h) ∈ RN . The most rele-vant concept at head h is identified via n = argmax 
+
+
+
+s(h)
+
+
+
+,and the h-th component of the head relevance vector vn ∈
+
+RH, corresponding to concept Cn, is incremented by 1. Af-ter aggregating across all timesteps and heads over a suffi-cient number of random image generations, each concept’s head relevance vector vn is normalized to have unit L1
+
+norm. These head relevance vectors (HRVs) indicate which attention heads are most responsive to each visual concept and can be leveraged for interpreting, analyzing, or guiding generation in T2I models. 
+
+B. Selective Attention Map Aggregation 
+
+Based on the head relevance vector vn obtained through HRV, we selectively choose a subset of attention heads that are most relevant to the concept of interest, depend-ing on the goal of the analysis. We then propose to com-pute the averaged attention maps using only these selected heads, rather than aggregating across all heads as done in 2Mean IoU score DAAM - 0.3 0.7490 DAAM - 0.4 0.7540 DAAM - 0.5 0.6261 Ours - 0.3 0.7698 Ours - 0.4 0.7765 
+
+Ours - 0.5 0.6785 Table 1. Quantitative comparison of diffusion-based object se-mantic segmentation. The values following “DAAM -” or “Ours -” (i.e., 0.3, 0.4, 0.5) indicate the thresholds applied to the aggre-gated attention maps when computing the mean Intersection over Union (IoU). 
+
+Fig. 1. Qualitative comparison of diffusion-based object seman-tic segmentation. The original generated images are shown on the left, and the same images with aggregated attention maps overlaid are shown on the right. Red circles highlight regions with unde-sired focus or lack of focus. 
+
+DAAM. Let Hn denote the set of selected attention heads; the DAAM equation is then modified as follows: 
+
+bMOurs = 1
+
+|Hn| ∑
+
+> h∈Hn
+
+Fh( 1
+
+T
+
+> T
+
+# ∑
+
+> t=1
+
+M(h) 
+
+> t
+
+) ∈ Rr×r×S. (4) In the following sections, we demonstrate the effectiveness of this modified analysis method and present several in-sightful findings derived using this approach. 
+
+III . EXPERIMENT 
+
+A. Experimental Setting 
+
+We use Stable Diffusion v1.4 as the base model for both DAAM and our proposed method. Head relevance vectors are computed using a list of 34 visual concepts, each as-sociated with 10 concept-words, as provided by the HRV code repository. For the benchmark focused on the Ani-mals category, we adopt a simple prompt template: “photo of a {animal }”, where the placeholder is replaced with one of the following 10 animal names: bear, bird, cat, cow, Most Relevant 30 Heads Least Relevant 30 Heads Ours - 0.3 0.7698 0.6654 Ours - 0.4 0.7765 0.6172 Ours - 0.5 0.6785 0.4649 Table 2. Comparison of attention map aggregation using the most and least relevant attention heads. Aggregated attention maps are computed using either the 30 most or 30 least relevant attention heads for the concept ‘Animals.’ The values following “DAAM -” or “Ours -” (i.e., 0.3, 0.4, 0.5) indicate the thresholds applied to the aggregated attention maps when computing the mean In-tersection over Union (IoU). 
+
+Fig. 2. Visual comparison of attention map aggregation using the most and least relevant attention heads. The attention maps are computed using either the 30 most or 30 least relevant heads for the concept ‘Animals’ and are overlaid on the generated images to illustrate differences in focus regions. 
+
+dog, elephant, sheep, horse, monkey, and zebra. For each prompt, we generate 10 images using different random seeds, resulting in a total of 100 generated images. 
+
+B. Diffusion-Based Object Semantic Segmentation 
+
+To evaluate the effectiveness of our selective attention map aggregation method, we compare it against DAAM using the benchmark focused on the Animals category. We generate 100 images using the standard Stable Diffusion v1.4 model and obtain corresponding ground-truth seman-tic segmentation maps with Grounded-SAM. For each im-age, we aggregated attention maps which are captured dur-ing generation process—one using DAAM, as defined in Eq. 2, and the other using our method, which averages the 30 attention heads that are most relevant to the con-cept ‘Animals,’ as defined in Eq. 4. To quantitatively com-pare these maps with the ground-truth segmentations, we apply thresholding at values of 0.3, 0.4, or 0.5 to convert the continuous attention maps into binary masks. We then 3Fig. 3. Visual diagnosis of text-to-image misinterpretation with selectively aggregated attention maps. The T2I model mistakenly generates both meanings of the word ‘mouse’–as an animal and as an electronic device. ‘Ours-Animals’ shows the aggregated attention map from the 30 heads most relevant to the concept ‘Animals,’ while ‘Ours-Electronics’ shows the map from the 30 heads most relevant to the concept ‘Electronics’. Note that DAAM aggregates attention maps from all heads in the T2I model. All three visualizations show the aggregated attention maps of the word ‘mouse.’ 
+
+compute the Intersection over Union (IoU) score as IoU v( bM[:, ; , s], G) = Area (ev( bM[:, :, s]) ∩ G)
+
+Area (ev( bM[:, :, s]) ∪ G) , (5) where ev is the thresholding operation with threshold v ∈{0.3, 0.4, 0.5}, bM represents either bMDAAM or bMOurs , s de-notes the token corresponding to the animal name, and G is the ground-truth segmentation map. The final performance is reported as the mean IoU averaged over all 100 gener-ated images. Table 1 presents the quantitative results of DAAM and our method across three different threshold values. At all thresholds, our approach consistently achieves higher mean IoU scores, indicating that the aggregated attention maps produced by our method more closely align with the ground-truth segmentation maps. Figure 1 provides quali-tative comparisons by visualizing the aggregated attention maps overlaid on the generated images. The red circles in the DAAM results highlight regions of undesired focus or lack of focus, illustrating that our method more accurately captures the target objects within the generated images. 
+
+IV . ANALYSIS 
+
+A. Most and Least Relevant Attention Heads 
+
+We compare aggregated attention maps derived from the most relevant 30 attention heads to those from the least rel-evant 30 heads to effectively demonstrate the importance of selective aggregation. As shown in Table 2, using the least relevant heads for the concept ‘Animals’ results in a significant drop in mean IoU compared to using the most relevant heads. Figure 2 further demonstrates that these least relevant heads tend to focus on regions outside of the animals, providing evidence that applying adaptation tech-niques indiscriminately across all attention maps or heads may be suboptimal for various applications. 
+
+B. Visual Diagnosis of Text-to-Image Misinterpretations 
+
+T2I models often misinterpret words in input prompts, either due to inherent limitations of the model or ambigui-ties in the prompts themselves. We find that some of these misinterpretations can be visually explained using our se-lectively aggregated attention maps. In Figure 3, given the input prompt ‘A mouse and other office objects are on the desk,’ the T2I model interprets the word ‘mouse’ as both an animal and an electronic device, generating both con-cepts in a single image. When we visualize the aggregated attention maps using the 30 attention heads most relevant to the concept ‘Animals,’ the focus is solely on the mouse as an animal. In contrast, using the 30 heads most rele-vant to ‘Electronics’ highlights only the electronic mouse. DAAM, which uses all attention heads, shows focus on both objects. This example demonstrates that selective at-tention map aggregation can offer a new way to visually interpret and diagnose misinterpretations in text-to-image generations. 
+
+C. Ablation Study on the Number of Selected Heads 
+
+Our base model, Stable Diffusion v1, contains 128 cross-attention heads, and our method includes a hyper-parameter controlling how many heads to select. To deter-mine an appropriate number, Table 3 presents an ablation study on this parameter using the Animals category bench-mark. The results show that selecting 30 heads achieves the best performance, so we consistently use this number throughout the paper. 
+
+V. LIMITATION AND FUTURE WORK 
+
+Our study has several limitations regarding the scope of the model and data selection. Although we evaluated our approach only on Stable Diffusion v1.4, we expect that our findings can be generalized to other text-to-image models, as they similarly rely on attention heads as key components–an expectation supported by prior research on the roles of different attention heads across various T2I 420 heads 30 heads 40 heads Ours - 0.3 0.7436 0.7698 0.7669 Ours - 0.4 0.7001 0.7765 0.7412 Ours - 0.5 0.5386 0.6785 0.6315 Table 3. Ablation study on the number of selected attention heads. The values following “DAAM -” or “Ours -” (i.e., 0.3, 0.4, 0.5) indicate the thresholds applied to the aggregated attention maps when computing the mean Intersection over Union (IoU). Note that Stable Diffusion v1 contains 128 cross-attention heads. 
+
+models [7, 1]. For experimental convenience, we focused exclusively on the concept of ‘Animals,’ but expanding our approach to encompass a broader range of visual concepts is a critical next step. Building on these preliminary re-sults, future work will aim to apply our method to diverse T2I architectures and broaden its applicability to various visual concepts. 
+
+VI . CONCLUSION 
+
+In this work, we present preliminary findings on se-lectively aggregating attention maps to enhance diffusion-based visual interpretations. Our approach outperforms the widely used DAAM technique in diffusion-based segmen-tation and visually demonstrates that the most relevant at-tention heads effectively capture the corresponding con-cepts within the attention maps, while the least relevant heads do not. Additionally, we provide a case study show-ing how selective attention aggregation can visually di-agnose misinterpretations in text-to-image models. Over-all, our results suggest that selectively leveraging attention maps, rather than aggregating them indiscriminately, leads to enhanced visual interpretability and broader applicabil-ity. 
+
+# ACKNOWLEDGEMENTS 
+
+This work was partly supported by Institute of Informa-tion & communications Technology Planning & Evalua-tion (IITP) grant funded by the Korea government (MSIT) ([NO.RS-2021-II211343, Artificial Intelligence Graduate School Program (Seoul National University)], [No. RS-2023-00235293, Development of autonomous driving big data processing, management, search, and sharing inter-face technology to provide autonomous driving data ac-cording to the purpose of usage]). 
+
+# REFERENCES 
+
+[1] Donghoon Ahn, Jiwon Kang, Sanghyun Lee, Minjae Kim, Jaewon Min, Wooseok Jang, Saungwu Lee, Sayak Paul, Susung Hong, and Seungryong Kim. Fine-grained pertur-bation guidance via attention head selection. arXiv preprint arXiv:2506.10978 , 2025. [2] Mingdeng Cao, Xintao Wang, Zhongang Qi, Ying Shan, Xiaohu Qie, and Yinqiang Zheng. Masactrl: Tuning-free mutual self-attention control for consistent image synthe-sis and editing. In Proceedings of the IEEE/CVF Inter-national Conference on Computer Vision , pages 22560– 22570, 2023. [3] Hila Chefer, Yuval Alaluf, Yael Vinker, Lior Wolf, and Daniel Cohen-Or. Attend-and-excite: Attention-based se-mantic guidance for text-to-image diffusion models. ACM Transactions on Graphics (TOG) , 42(4):1–10, 2023. [4] Weixi Feng, Xuehai He, Tsu-Jui Fu, Varun Jampani, Arjun Akula, Pradyumna Narayana, Sugato Basu, Xin Eric Wang, and William Yang Wang. Training-free structured diffusion guidance for compositional text-to-image synthesis. arXiv preprint arXiv:2212.05032 , 2022. [5] Amir Hertz, Ron Mokady, Jay Tenenbaum, Kfir Aberman, Yael Pritch, and Daniel Cohen-Or. Prompt-to-prompt im-age editing with cross attention control. arXiv preprint arXiv:2208.01626 , 2022. [6] Nupur Kumari, Bingliang Zhang, Richard Zhang, Eli Shechtman, and Jun-Yan Zhu. Multi-concept customiza-tion of text-to-image diffusion. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 1931–1941, 2023. [7] Jungwon Park, Jungmin Ko, Dongnam Byun, Jangwon Suh, and Wonjong Rhee. Cross-attention head position pat-terns can align with human visual concepts in text-to-image generative models. arXiv preprint arXiv:2412.02237 ,2024. [8] Dustin Podell, Zion English, Kyle Lacey, Andreas Blattmann, Tim Dockhorn, Jonas M¨ uller, Joe Penna, and Robin Rombach. SDXL: Improving latent diffusion models for high-resolution image synthesis. In The Twelfth Inter-national Conference on Learning Representations , 2024. [9] Tianhe Ren, Shilong Liu, Ailing Zeng, Jing Lin, Kunchang Li, He Cao, Jiayu Chen, Xinyu Huang, Yukang Chen, Feng Yan, et al. Grounded sam: Assembling open-world models for diverse visual tasks. arXiv preprint arXiv:2401.14159 ,2024. [10] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj¨ orn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 10684–10695, 2022. [11] Nataniel Ruiz, Yuanzhen Li, Varun Jampani, Yael Pritch, Michael Rubinstein, and Kfir Aberman. Dreambooth: Fine tuning text-to-image diffusion models for subject-driven generation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 22500– 22510, 2023. [12] Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily L Denton, Kamyar Ghasemipour, Raphael Gontijo Lopes, Burcu Karagol Ayan, Tim Sali-mans, et al. Photorealistic text-to-image diffusion models with deep language understanding. Advances in neural in-formation processing systems , 35:36479–36494, 2022. [13] Raphael Tang, Linqing Liu, Akshat Pandey, Zhiying Jiang, Gefei Yang, Karun Kumar, Pontus Stenetorp, Jimmy Lin, and Ferhan Ture. What the daam: Interpreting stable diffusion using cross attention. arXiv preprint arXiv:2210.04885 , 2022. [14] Narek Tumanyan, Michal Geyer, Shai Bagon, and Tali Dekel. Plug-and-play diffusion features for text-driven image-to-image translation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 1921–1930, 2023. 
+
+5

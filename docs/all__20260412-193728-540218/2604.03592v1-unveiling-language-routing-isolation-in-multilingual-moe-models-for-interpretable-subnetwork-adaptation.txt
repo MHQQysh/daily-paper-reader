@@ -1,0 +1,1550 @@
+Title: Unveiling Language Routing Isolation in Multilingual MoE Models for Interpretable Subnetwork Adaptation
+
+URL Source: https://arxiv.org/pdf/2604.03592v1
+
+Published Time: Tue, 07 Apr 2026 00:27:22 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+Preprint. Under review. 
+
+# Unveiling Language Routing Isolation in Multilingual MoE Models for Interpretable Subnetwork Adaptation 
+
+Kening Zheng 1 Wei-Chieh Huang 1 Jiahao Huo 1 Zhonghao Li 3 Henry Peng Zou 1
+
+Yibo Yan 2 Xin Zou 2 Jungang Li 2 Junzhuo Li 2 Hanrong Zhang 1
+
+Xuming Hu 2 Philip S. Yu 1∗
+
+> 1
+
+University of Illinois Chicago 2HKUST (Guangzhou) 3University of Maryland 
+
+Abstract 
+
+Mixture-of-Experts (MoE) models exhibit striking performance disparities across languages, yet the internal mechanisms driving these gaps remain poorly understood. In this work, we conduct a systematic analysis of ex-pert routing patterns in MoE models, revealing a phenomenon we term 
+
+Language Routing Isolation , in which high- and low-resource languages tend to activate largely disjoint expert sets. Through layer-stratified analysis, we further show that routing patterns exhibit a layer-wise convergence– divergence pattern across model depth. Building on these findings, we propose RISE (Routing Isolation-guided Subnetwork Enhancement), a framework that exploits routing isolation to identify and adapt language-specific expert subnetworks. RISE applies a tripartite selection strategy, us-ing specificity scores to identify language-specific experts in shallow and deep layers and overlap scores to select universal experts in middle lay-ers. By training only the selected subnetwork while freezing all other pa-rameters, RISE substantially improves low-resource language performance while preserving capabilities in other languages. Experiments on 10 lan-guages demonstrate that RISE achieves target-language F1 gains of up to 10.85% with minimal cross-lingual degradation. 
+
+1 Introduction 
+
+The MoE paradigm has emerged as a powerful architectural approach in modern language modeling, demonstrating remarkable capabilities across a wide range of tasks, including reasoning, code generation, and multilingual understanding (Abdin et al., 2024; DeepSeek-AI et al., 2024b;a). By leveraging sparse expert activation, MoE models enable scaling to tens or hundreds of billions of parameters while maintaining practical inference efficiency, mak-ing them particularly attractive for resource-intensive applications. Despite their empirical success, MoE models exhibit significant performance disparities across languages (Chua et al., 2025). As shown in Table 1, MoE models show accuracy gaps exceeding 80 percent-age points on the MGSM benchmark between high-resource languages (e.g., English) and low-resource languages (e.g., Bengali and Swahili). Recent studies have explored expert mechanisms in multilingual MoE models. Bandarkar et al. (2026) analyzed layer-wise activation probability distributions to characterize routing patterns, while Chen et al. (2026) identified top experts based on total activation frequencies to understand expert specialization. However, these analyses focus either on layer-wise activation distributions or on global activation frequency, without clarifying the distinct functional roles that different model depths play in multilingual processing. To address this gap, we conduct a comprehensive analysis of multilingual routing behavior in MoE models from two complementary perspectives. At the global level, we uncover the routing isolation phenomenon, where high- and low-resource languages rely on nearly 
+
+> ∗
+
+Corresponding author. 
+
+1
+
+> arXiv:2604.03592v1 [cs.CL] 4 Apr 2026
+
+Preprint. Under review.                                  
+
+> Model BN DE EN ES FR JA RU SW TH ZH Avg.
+> Phi-3.5-MoE-instruct 179 88.5 81.5 73 56 77 126.5 65.5 54.9 Qwen3-30B-A3B 46 88.5 96.5 91.5 82 83.5 92.5 48 87.5 86 80.3
+
+Table 1: Accuracy on MGSM across languages. Language codes: BN (Bengali), DE (German), EN (English), ES (Spanish), FR (French), JA (Japanese), RU (Russian), SW (Swahili), TH (Thai), ZH (Chinese). orthogonal sets of experts. Through layer-stratified analysis, we further reveal the layer-wise convergence–divergence phenomenon: routing patterns converge in middle layers (language-agnostic semantic processing) but diverge in shallow and deep layers (language-specific encoding and generation), shedding light on how MoE models process multilingual inputs across layers and revealing a principled structure amenable to multilingual adaptation. Building on these findings, we propose RISE ( Routing Isolation-guided Subnetwork 
+
+Enhancement), a method designed to improve low-resource language performance while preserving the model’s capabilities in high-resource languages. RISE adopts a hierarchical selection strategy to identify the expert subnetwork that pre-dominantly supports the target language. Specifically, in shallow and deep layers, RISE uses a specificity score to identify experts that are particularly associated with the target low-resource language. In middle layers, where routing patterns are more shared across languages, RISE uses an overlap score to select universal experts. Extensive experiments show that RISE consistently improves target-language performance while preserving per-formance on other languages and tasks. In summary, this paper makes the following contributions: 
+
+∂ Empirical finding. We first conduct a systematic analysis of multilingual routing behavior in MoE models from both global and layer-wise perspectives, through which we uncover two key phenomena: routing isolation and layer-wise convergence– divergence . These findings reveal a strong regularity in routing underlying multilin-gual processing in MoE models. 
+
+∑ Methodological contribution. Building on these observations, we then propose RISE, a layer-stratified expert selection method that identifies language-specific sub-networks for low-resource language adaptation by selecting distinctive experts in shallow and deep layers while preserving shared experts in middle layers. 
+
+∏ Empirical validation. We conduct comprehensive experiments across 10 languages using multiple datasets, validating the effectiveness and efficiency of RISE. 
+
+2 Related Work 
+
+Expert Specialization and Routing Analysis. Understanding how experts specialize and how routing mechanisms function has been an active area of research. Early studies fo-cused on analyzing expert utilization patterns and their correlation with input character-istics (Shazeer et al., 2017). More recent work has explored the interpretability of expert behaviors in multilingual settings. Bandarkar et al. (2026) analyzed layer-wise activation probability distributions to characterize how different languages invoke different routing patterns in MoE models. Chen et al. (2026) identified top experts based on total activa-tion frequencies and proposed layerwise steering techniques to understand and control expert specialization across languages. However, these approaches either examine rout-ing from a global frequency perspective or focus on layer-wise distributions independently, without jointly considering the functional roles of different model depths. In contrast, our work reveals a systematic routing isolation phenomenon between high- and low-resource languages, and further reveals a layer-wise convergence–divergence pattern aligned with the functional stages of the model. 2Preprint. Under review. bn de en es fr ja ru sw th zh 
+
+> Language
+> bn
+> de
+> en
+> es
+> fr
+> ja
+> ru
+> sw
+> th
+> zh
+> Language
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Jaccard similarity
+
+(a) Global-level expert activation over-lap across languages in MGSM. 0 10 20 30 40 47    
+
+> Layer Index
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Jaccard Similarity with English
+> Shallow Middle Deep
+> Bengali
+> Chinese
+> French
+> German
+> Japanese
+> Russian
+> Spanish
+> Swahili
+> Thai
+
+(b) Layer-wise expert routing similarity with English. 
+
+Figure 1: Comprehensive routing analysis of Qwen3-30B-A3B : global-level (left) expert acti-vation overlap and layer-wise (right) routing similarity with English. 
+
+3 Routing Analysis 
+
+To understand the multilingual capability disparities in MoE models, we analyze expert routing patterns from two complementary perspectives: global-level activation statistics and layer-wise routing dynamics. These two views operate at different granularities and are complementary rather than contradictory: routing isolation is defined over the globally aggregated top-K routed support across all layers, whereas the layer-wise analysis decom-poses similarity at each depth relative to a high-resource reference language. 
+
+3.1 Routing Isolation at Global Level 
+
+For a given language l, let cl,j denote the total activation count of expert j aggregated across all layers and samples. We select the top-K most frequently activated experts globally: 
+
+Eglobal  
+
+> l
+
+= Top-K
+
+(
+
+{j : j ∈ [1, Ne × L]}, sorted by cl,j
+
+)
+
+(1) where Ne is the number of experts per layer, L is the total number of MoE layers, and K
+
+is the total number of experts considered in the statistics. To quantify the routing overlap between languages, we compute the Jaccard similarity between their top-K expert sets: 
+
+J(l1, l2) = |E global  
+
+> l1
+
+∩ E global  
+
+> l2
+
+||E global  
+
+> l1
+
+∪ E global  
+
+> l2
+
+| (2) where J(l1, l2) ∈ [0, 1 ], with 0 indicating no overlap and 1 indicating complete overlap. We partition languages into high-resource (English, Chinese) and low-resource (Bengali, Swahili, Thai, etc.) groups based on their proportions in the training corpus. Figure 1 (a) shows the global expert activation overlap across languages. We provide more examples of routing isolation in Appendix E. Key observations from the global analysis point to a clear phenomenon between high- and low-resource languages: ∂ As high-resource languages, English and Chinese basically don’t share experts and rotate among many experts with little overlap in their Top-30 choices, reflecting flexible, well-trained routing ; ∑ Low-resource languages repeatedly trigger the same small subset , implying more fixed patterns likely from limited training; ∏ overlap across the two resource groups is negligible, showing their expert sets are almost orthogonal, here we call this routing isolation . Besides this, we also found that languages from the same family (e.g., Indo-European) exhibit greater similarity in expert selection patterns, consistent with 3Preprint. Under review. previous linguistic studies (Tang et al., 2024; Chen et al., 2026), thereby grounding our analysis in established theoretical frameworks. 
+
+3.2 Layer-wise Convergence–Divergence Pattern 
+
+To understand how expert routing patterns evolve across different model depths, we ana-lyze the layer-wise expert overlap with respect to English as the reference language. For each layer i within language l, we compute the Jaccard similarity with English: 
+
+Jl (i) = 
+
+∣∣E (i) 
+
+> l
+
+∩ E (i)
+
+> en
+
+∣∣∣∣E (i) 
+
+> l
+
+∪ E (i)
+
+> en
+
+∣∣ , Jl = [ Jl (0), Jl (1), . . . , Jl (L − 1) ] (3) This yields a per-layer similarity curve Jl that captures routing dynamics across layers. The average similarity within each region is: 
+
+¯J L 
+
+> l
+
+= 1
+
+|L| ∑
+
+> i∈L
+
+Jl (i), L ∈ {Lshallow , Lmiddle , Ldeep 
+
+} (4) We plot the similarity curve Jl and compute the average similarity ¯JL 
+
+> l
+
+for each region, as shown in Figure 1 (b) and Table 2, respectively.                   
+
+> Language Shallow Middle Deep
+> Bengali (BN) 0.12 0.22 0.05 Swahili (SW) 0.04 0.19 0.04 Thai (TH) 0.25 0.33 0.12 Russian (RU) 0.41 0.43 0.17 Japanese (JA) 0.37 0.37 0.10
+
+Table 2: Average layer-wise expert over-lap with English across different lan-guages. Additional analysis results are provided in Table 7-10 in Appendix E. As shown in Table 2, routing similarity with En-glish is consistently lower in the shallow and deep layers, while the middle layers exhibit noticeably higher overlap across all languages. This pattern suggests that the functional strati-fication observed in dense transformers is also reflected in MoE routing behavior. Specifically, the shallow and deep layers tend to capture more language-specific processing, whereas the middle layers appear to support more shared cross-lingual representations. These findings provide a strong empirical basis for our layer-aware expert selection strategy in RISE. 
+
+4 Method 
+
+Building on the routing isolation identified in Section 3, which suggests that MoE models contain language-specific expert subnetworks, we present a systematic approach to identify and train these subnetworks for low-resource languages, thereby improving performance on target languages while minimally affecting other capabilities. Our method consists of three main stages: (1) collecting routing statistics to understand language-expert affinities, (2) selecting language-specific and shared experts based on layer-aware analysis, and (3) training the selected subnetwork while keeping the rest of the model frozen. We detail each stage below. Figure 2 illustrates the overall pipeline of our approach. 
+
+4.1 Routing Statistics Collection 
+
+The first stage of RISE involves analyzing the routing behavior of the pre-trained model across multiple languages. This analysis reveals which experts are preferentially activated for different languages, providing the foundation for our selection strategy. 
+
+Data Preparation. We collect evaluation datasets in M languages Λ = {λ1, λ2, . . . , λM},including the target language λ∗. These datasets should cover the same or similar tasks to ensure comparable routing patterns. For each language λ ∈ Λ, we run inference on the corresponding dataset and record the discrete routing decisions for all MoE layers. Specifically, 4Preprint. Under review. 
+
+Figure 2: Overview of RISE. (a) We first collect routing statistics across multiple languages. (b) Based on layer-aware analysis, we select language-specific experts in shallow/deep lay-ers and cross-lingual shared experts in middle layers. (c) Only the selected experts are trained while keeping all other parameters frozen. for layer l and language λ, we define a binary activation indicator g(l) 
+
+> t,i
+
+for each token t and expert i, and aggregate it into an activation frequency a(l) 
+
+> λ,i
+
+over all Tλ tokens: 
+
+a(l) 
+
+> λ,i
+
+= 1
+
+Tλ
+
+> Tλ
+
+# ∑
+
+> t=1
+
+g(l) 
+
+> t,i
+
+∈ [0, 1 ], g(l) 
+
+> t,i
+
+=
+
+{1, if expert i is activated for token t at layer l
+
+0, otherwise (5) where Tλ is the total number of tokens processed for language λ, and a(l) 
+
+> λ,i
+
+represents the empirical probability that expert i is activated when processing language λ.This yields a routing profile matrix A(l) ∈ RM×N for each layer, where each row corre-sponds to a language and each column to an expert. These matrices capture language– expert affinity patterns that inform our selection strategy. 
+
+4.2 Layer-Aware Expert Selection 
+
+Based on the analysis in Section 3, we partition the L MoE layers into three groups: 
+
+Lshallow = [ 0, L1], Lmiddle = ( L1, L2], Ldeep = ( L2, L − 1] (6) 
+
+Shallow and deep layers. For shallow and deep layers, we seek experts that are preferen-tially activated by the target language λ∗. We quantify this preference using the differential score S(l) 
+
+> λ∗,i
+
+= a(l)
+
+> λ∗,i
+
+/ ¯ a(l) 
+
+> i
+
+, where ¯a(l) 
+
+> i
+
+is the average activation probabilities of corresponding ex-pert i in all languages, serving as a baseline for comparison. The specificity score compares the activation probability of expert i on the target language λ∗ to its average activation prob-ability across all languages. When S(l) 
+
+> λ∗,i
+
+is greater than 1, expert i is preferentially activated by 
+
+λ∗, indicating language-specific behavior; when S(l) 
+
+> λ∗,i
+
+is close to 1, the expert is activated at a similar rate across languages and thus behaves in a language-agnostic manner; and when 
+
+S(l) 
+
+> λ∗,i
+
+is less than 1, the expert is more preferred by other languages. 
+
+Middle layers. For middle layers, we seek experts that capture language-agnostic repre-sentations shared across all languages. We measure this property using the overlap score 
+
+5Preprint. Under review. based on the coefficient of variation: 
+
+O(l) 
+
+> i
+
+= 11 +̂ cv(l)
+
+> i
+
+where ̂ cv(l) 
+
+> i
+
+= σ(a(l) 
+
+> ·,i
+
+)
+
+μ(a(l) 
+
+> ·,i
+
+) (7) Here, ̂ cv represents the coefficient of variation, while σ(·) and μ(·) denote the standard deviation and mean of expert i’s activation probabilities across all languages. The coefficient of variation measures relative dispersion: • Low ̂ cv (high O(l) 
+
+> i
+
+): Uniform activation across languages → shared expert .• High ̂ cv (low O(l) 
+
+> i
+
+): Activation varies significantly → language-specific expert .
+
+Subnetwork Selection. The specificity and overlap scores measure relative preferences but do not account for the absolute activation magnitude. An expert with high specificity but very low overall activation may be less important than one with moderate specificity but high activation. To address this, we define composite scores that incorporate both factors: 
+
+Spec (l, i, λ∗) = S(l) 
+
+> λ∗,i
+
+·
+
+(
+
+1 + α · a(l)
+
+> λ∗,i
+
+)
+
+, Ovlp (l, i) = O(l) 
+
+> i
+
+·
+
+(
+
+1 + α · ¯a(l)
+
+> i
+
+)
+
+(8) where α > 0 is a hyperparameter controlling the importance of absolute activation magni-tude. In our experiments, we set α = 10 .Given a total budget of K experts to train, we allocate them across layer groups using pre-defined ratios (ρs, ρm, ρd) satisfying ρs + ρm + ρd = 1. The complete selection procedure is detailed in Algorithm 1. With the selected expert set E = {(l1, i1), . . . , (lK, iK )}, we proceed to train only these experts while keeping all other parameters frozen. We use standard causal language modeling loss on the target language data Dλ∗ and our loss function is defined as: 
+
+L(Θtrain ) = −Ex∼D λ∗
+
+[ |x|
+
+# ∑
+
+> t=1
+
+log PΘ(xt | x<t)
+
+]
+
+(9) where only Θtrain receives gradient updates. We detail the complete procedure in Algo-rithm 1 and visualize the distribution of selected experts in Appendix F. 
+
+5 Experiments 
+
+In this section, we conduct extensive experiments to answer the following research ques-tions: (RQ1) Can RISE improve model performance on the target low-resource language? 
+
+(RQ2) Does RISE preserve performance on non-target languages and more comprehen-sive tasks? (RQ3) Do the experts identified by RISE predominantly specialize in the target language? (RQ4) Is each layer-group component of RISE’s expert subnet indispensable? 
+
+(RQ5) How sensitive is RISE to its key hyperparameters? 
+
+5.1 Settings Datasets We evaluate on multilingual benchmarks: TyDiQA-GoldP (Clark et al., 2020), an extractive QA dataset covering 9 languages (AR, BN, EN, FI, ID, KO, RU, SW, TE); and 
+
+MGSM (Shi et al., 2022), a math reasoning dataset covering 10 languages (BN, DE, EN, ES, FR, JA, RU, SW, TH, ZH). To verify that RISE does not degrade general capabilities, we further evaluate on TriviaQA , MMLU , HellaSwag , and ARC .6Preprint. Under review.                                                                                                                                                                           
+
+> Setting AR BN EN FI ID KO RU SW TE Avg. Qwen3-30B-A3B (TyDiQA-GoldP, F1 %)
+> Vanilla 49.49 51.51 24.15 22.98 26.86 48.35 27.04 27.05 58.61 37.34
+> Random (64, BN) 48.91 52.17 23.87 22.31 25.61 48.19 25.63 27.73 59.03 37.05
+> Random (128, BN) 50.31 53.52 24.43 22.69 26.49 48.31 26.08 27.22 59.71 37.64
+> TopK (128, BN) 50.20 52.74 24.75 23.13 27.86 47.51 26.94 26.85 59.11 37.68
+> ESFT (Wang et al., 2024) 49.51 51.79 24.08 23.26 26.89 47.33 27.09 25.85 59.70 37.28
+> RISE (128, BN) 49.15 54.23 24.04 23.39 27.61 47.77 27.22 27.40 60.39 37.91
+> RISE (128, RU) 51.06 53.62 23.88 24.15 29.55 49.08 29.62 29.30 60.66 38.99
+> RISE (128, ID) 51.59 53.97 25.65 23.58 31.79 47.75 29.54 30.13 59.95 39.33
+> Phi-3.5-MoE-Instruct (TyDiQA-GoldP, F1 %)
+> Vanilla 36.75 36.04 16.94 19.19 22.09 19.75 16.19 11.55 7.68 20.69
+> Random (16, BN) 38.26 41.93 18.90 19.90 23.23 26.84 18.75 11.64 9.34 23.20
+> Random (32, BN) 37.53 43.61 18.89 20.10 23.28 24.56 18.45 11.44 8.93 22.98
+> TopK (16, BN) 39.63 49.51 18.32 20.78 23.59 34.58 18.91 11.56 10.78 25.30
+> ESFT (Wang et al., 2024) 38.29 45.44 18.10 20.12 23.15 28.84 19.10 12.24 10.09 23.93
+> RISE (16, BN) 37.43 46.89 17.55 19.64 22.75 21.10 17.26 11.56 9.68 22.65
+> RISE (16, RU) 37.68 34.83 17.63 20.85 22.85 21.98 17.81 10.70 8.32 21.41
+> RISE (16, ID) 39.43 36.83 19.00 21.51 22.33 24.50 20.78 11.03 8.49 22.66
+
+Table 3: TyDiQA-GoldP multilingual QA performance (F1, %). Each row corresponds to a training setting; notation (budget, lang) denotes the number of experts selected by RISE and the target language, e.g., (128, BN) selects 128 experts routed by Bengali and trains only those experts on Bengali data. The colored bold value indicates the target language column for each training setting (blue =BN, orange =RU, green =ID); the language code in the first column is colored accordingly. 
+
+Comparison. To demonstrate the effectiveness of RISE, we compare it against the follow-ing settings: randomly selecting an equivalent number of experts; selecting only the top-K
+
+most-activated experts for each language, and varying the expert budget and target lan-guage under the RISE framework. We also include ESFT (Wang et al., 2024) as an expert-selection baseline. Regarding parameter-efficient methods such as LoRA, we further in-clude LoRA as a representative PEFT baseline in Table 6. We note that RISE operates at the level of which experts to train, while LoRA addresses how parameters are updated — the two are orthogonal and can be combined; a fuller discussion is deferred to Appendix H. 
+
+Implementation Details. All experiments were conducted on a single NVIDIA H200 GPU. For GPU memory cost information, we list the details in Table 12. Training was performed for 3 epochs with a per-device batch size of 2 and gradient accumulation of 8 steps (effective batch size of 16), using a learning rate of 2 × 10 −5 and bfloat16 mixed precision. Further details on the training budget, expert allocation, and layer grouping are provided in Table 11 in Appendix G. All hyperparameter settings are held fixed across different target languages and backbone models to ensure a fair comparison. 
+
+5.2 Performance and Cross-lingual Preservation (RQ1 & RQ2) 
+
+To answer RQ1 and RQ2, we comprehensively compare RISE against other methods across two multilingual MoE models. Table 3 presents the main results. We report the following observations. Obs. ∂ RISE consistently improves target-language performance. As shown in Table 3, RISE achieves the best Bengali F1 of 54.23% on Qwen3-30B-A3B , outperforming all competing methods. On Phi-3.5-MoE-Instruct , RISE similarly improves Bengali F1 by 10.85% over the Vanilla baseline, confirming that routing-based expert selection reliably identifies the parameters most critical for the target language. The gains are consistent across multiple target lan-guages: RISE (128, RU) and RISE (128, ID) yield the best per-language F1 on Russian 7Preprint. Under review. (29.62%) and Indonesian (31.79%), respectively, demonstrating that the method general-izes beyond a single low-resource setting. 
+
+Setting TriviaQA MMLU HellaSwag ARC Avg. 
+
+Qwen 59.60 74.40 81.50 85.76 75.32 RISE 59.00 74.65 81.50 86.78 75.48 
+
+∆ −0.50 +0.26 0.00 +0.68 +0.11 Phi 65.50 77.50 70.70 90.85 76.14 RISE 65.70 76.67 70.60 91.53 76.13 
+
+∆ +0.90 −0.53 −0.10 +0.68 +0.24 
+
+Table 4: General ability preservation before and after RISE training. TriviaQA (world knowl-edge), MMLU (academic reasoning), HellaSwag (commonsense inference), ARC (science QA). 
+
+Obs. ∑ RISE delivers targeted im-provements without cross-lingual or cross-task degradation. Table 6 in Ap-pendix D shows that RISE trained ex-clusively on TyDiQA incurs virtually no loss on the held-out MGSM benchmark: RISE (128, BN) achieves an average accuracy of 80.7%, marginally above the Vanilla baseline (80.2%), confirm-ing that the selected subnetworks cap-ture language-specific rather than task-general computation. LoRA, by con-trast, induces severe cross-lingual in-terference: on Phi-3.5-MoE-Instruct ,Thai accuracy collapses by 16.5 percentage points (26.5% →10.0%), and on Qwen3-30B-A3B ,Swahili drops by 7.0 points (48.0% →41.0%). General capability is equally well preserved: Table 4 shows that all four benchmark scores shift by less than 1% after RISE training, indi-cating that selective expert updates leave shared, task-agnostic computation intact. 
+
+5.3 Causal Expert Verification (RQ3) Obs. ∏ The RISE-selected experts are causally responsible for target-language compu-tation. To verify that the identified subnet is genuinely language-specific, we pruned the experts belonging to the selected expert subnetwork in both backbone models and re-evaluated them on TyDiQA-GoldP, as shown in Table 5. The target language suffers catas-trophic collapse on Bengali, while other languages decline only moderately, mirroring the selectivity observed during training. This bidirectional evidence, improvement upon acti-vation and collapse upon ablation, confirms that RISE isolates the true language-specific subnetwork rather than a task-general or spuriously correlated subset of parameters.                                                                
+
+> Setting AR BN EN FI ID KO RU SW TE
+> Qwen3-30B-A3B
+> Vanilla 49.49 51.51 24.15 22.98 26.86 48.35 27.04 27.05 58.61 RISE (128, BN) 49.15 54.23 24.04 23.39 27.61 47.77 27.22 27.40 60.39 Pruned (128, BN) 26.83 ↓22.32 1.00 ↓53.23 24.63 ↑0.59 19.37 ↓4.02 30.99 ↑3.38 12.47 ↓35.30 17.87 ↓9.35 21.09 ↓6.31 7.78 ↓52.61
+> Phi-3.5-MoE-Instruct
+> Vanilla 36.75 36.04 16.94 19.19 22.09 19.75 16.19 11.55 7.68 RISE (16, BN) 37.43 46.89 17.55 19.64 22.75 21.10 17.26 11.56 9.68 Pruned (16, BN) 12.03 ↓25.40 1.85 ↓45.04 16.53 ↓1.02 19.40 ↓0.24 18.79 ↓3.96 16.63 ↓4.47 7.85 ↓9.41 3.46 ↓8.10 1.02 ↓8.66
+
+Table 5: The performance comparison between RISE and its pruned version. 
+
+5.4 Indispensability of Layer-Group Components (RQ4) w/o Shallow w/o Middle w/o Deep Shallow only Middle only Deep only RISE                 
+
+> 35
+> 40
+> 45
+> 50
+> 55
+> 60
+> Score (%)  52.0
+> 47.0
+> 49.5 49.5 49.5 48.0
+> 50.0
+> 53.0 53.8 53.0 52.6 51.4
+> 53.1 54.2
+> 37.8 37.9 37.8 37.5 37.3 37.5 37.9
+> Only-zone
+> MGSM-BN (Accuracy) TyDiQA-BN (F1) TyDiQA-Avg (F1)
+
+Figure 3: Grouped comparison of layer-wise expert subset combinations. w/o means remov-ing the corresponding layer group; Only : retaining only the corresponding layer group. 8Preprint. Under review. To answer RQ4, we conduct an ablation study on the contribution of each layer group by training variants of RISE that omit or retain only one group at a time. Results are reported in Figure 3. Obs. π All three layer groups contribute to RISE, with shallow and deep layers being most critical for target-language adaptation. Removing the shallow or deep layer experts causes the biggest TyDiQA-BN performance drops, whereas w/o Middle yields the smallest degradation. The w/o Middle result further corroborates the routing analysis in Section 3: middle layers exhibit language-agnostic, convergent routing and are therefore less critical for language-specific adaptation. By contrast, experts selected in shallow and deep layers capture language-specific syntactic and semantic patterns that are essential for low-resource performance. These results confirm that the layer-aware design of RISE is non-redundant: each group plays a distinct and necessary role, and no single group alone suffices to match the full method. 
+
+5.5 Sensitivity Analysis (RQ5) 
+
+To answer RQ5, we examine the sensitivity of RISE to three key hyperparameters: the activa-tion scale factor α, the layer-group budget allocation ratio and the total number of selected training experts K. Results are presented in Figure 4. 0 1 5 10 20 50     
+
+> 51.5
+> 52.0
+> 52.5
+> 53.0
+> 53.5
+> 54.0
+> 54.5
+> 55.0
+> 55.5
+> bn F1 (%)
+> 53.65
+> 52.89
+> 53.83
+> 53.41
+> 53.69 53.70
+> Bengali F1
+> Avg. F1 (all langs)
+> 37.2
+> 37.4
+> 37.6
+> 37.8
+> 38.0
+> 38.2
+> 38.4
+> 38.6
+> bn Avg. F1 (%)
+> 37.91 37.79 37.95
+> 37.87 38.04
+> 37.95
+
+(a) Ablation on activation scale factor α.2:1:1 1:1:1 Ours   
+
+> (3:2:3)
+> 1:2:1 1:1:2
+> S : M : D Budget Ratio
+> 50
+> 51
+> 52
+> 53
+> 54
+> 55
+> 56
+> 57
+> TyDiQA Bengali F1 (%)
+> 54.1
+> 53.4
+> 54.2 54.1
+> 53.1
+
+(b) Ablation on expert budget al-location ratio. 8 16 32 64 128   
+
+> K
+> 49
+> 50
+> 51
+> 52
+> 53
+> 54
+> 55
+> 56
+> Bengali F1 (%)
+> 51.5
+> 52.2
+> 52.9
+> 53.4
+> 53.8
+> Bengali F1
+> Avg. F1 (all langs)
+> 35.5
+> 36.0
+> 36.5
+> 37.0
+> 37.5
+> 38.0
+> 38.5
+> 39.0
+> 39.5
+> 40.0
+> Avg. F1 (%)
+> 37.3 37.2
+> 37.5
+> 37.9 37.9
+
+(c) Ablation on number of train-ing experts K.
+
+Figure 4: Ablation studies for hyperparameters. (a) Effect of the activation scale factor α
+
+in the composite expert selection. (b) Effect of the expert budget allocation ratio across shallow, middle, and deep layers. (c) Effect of the total number of selected experts K.
+
+Obs. ∫ RISE is robust to hyperparameter choices within a reasonable operating range. As shown in Figure 4(a), performance is stable across a broad range of α values, with a mod-est optimum that reflects the intended balance between activation frequency and routing weight in the composite selection score. Figure 4(b) shows that concentrating the budget predominantly on shallow and deep layers yields the best results while a uniform alloca-tion underperforms, consistent with the findings in RQ4. Figure 4(c) demonstrates that performance improves as K increases up to 128, beyond which returns diminish. 
+
+6 Conclusion 
+
+In this work, we investigate how MoE language models process multilingual inputs and un-cover a striking phenomenon of language routing isolation , where MoE models naturally form distinct routing pathways for high-resource versus low-resource languages. Build-ing on this mechanistic insight, we propose RISE, an interpretable framework that identi-fies target-adaptive expert subnetworks through layer-aware selection, combining language specificity in shallow/deep layers with cross-lingual overlap in middle layers. Through se-lective training of these identified experts while freezing all other parameters, our method substantially improves low-resource language performance with minimal impact on other tasks. Extensive experiments on TyDiQA and MGSM benchmarks validate that RISE suc-cessfully adapts MoE models while avoiding catastrophic forgetting. Our work demon-strates that mechanistic interpretability of routing patterns is not merely an analytical tool, but a practical foundation for efficient and controllable multilingual adaptation. As MoE architectures continue to scale, understanding their internal routing topology will become increasingly crucial for building equitable multilingual systems. 9Preprint. Under review. 
+
+References 
+
+Marah Abdin et al. Phi-3 technical report: A highly capable language model locally on your phone. CoRR , abs/2404.14219, 2024. Lucas Bandarkar, Chenyuan Yang, Mohsen Fayyaz, Junlin Hu, and Nanyun Peng. Multilin-gual routing in mixture-of-experts. In International Conference on Learning Representations (ICLR) 2026 , 2026. URL https://openreview.net/forum?id=ZoZR0x7tTD . Accepted pa-per / OpenReview submission. Ryo Bertolissi, Jonas Hübotter, Ido Hakimi, and Andreas Krause. Local mixtures of experts: Essentially free test-time training via model merging. In Conference on Language Modeling (COLM) , 2025. URL https://openreview.net/forum?id=X2RXpFA6Vh .Nicolas Boizard, Hippolyte Gisserot-Boukhlef, Duarte Miguel Alves, Andre Martins, Ay-oub Hammal, Caio Corro, Céline Hudelot, Emmanuel Malherbe, Etienne Malaboeuf, Fanny Jourdan, Gabriel Hautreux, João Alves, Kevin El Haddad, Manuel Faysse, Maxime Peyrard, Nuno M Guerreiro, Patrick Fernandes, Ricardo Rei, and Pierre Colombo. Eu-roBERT: Scaling multilingual encoders for european languages. In Conference on Language Modeling (COLM) , 2025. URL https://openreview.net/forum?id=jdOC24msVq .Yuxin Chen, Zhengzhou Cai, Xiangtian Ji, Weixiang Zhao, An Zhang, Xiang Wang, and Tat-Seng Chua. Understanding multilingualism in mixture-of-experts llms: Routing mecha-nism, expert specialization, and layerwise steering, 2026. URL https://arxiv.org/abs/ 2601.14050 .Ikhyun Cho and Julia Hockenmaier. Analyzing multilingualism in large language models with sparse autoencoders. In Second Conference on Language Modeling , 2025. URL https: //openreview.net/forum?id=NmGSvZoU3K .Lynn Chua, Badih Ghazi, Yangsibo Huang, Pritish Kamath, Ravi Kumar, Pasin Manurangsi, Amer Sinha, Chulin Xie, and Chiyuan Zhang. Crosslingual capabilities and knowledge barriers in multilingual large language models, 2025. URL https://arxiv.org/abs/ 2406.16135 .Jonathan H. Clark, Eunsol Choi, Michael Collins, Dan Garrette, Tom Kwiatkowski, Vitaly Nikolaev, and Jennimaria Palomaki. Tydi qa: A benchmark for information-seeking ques-tion answering in typologically diverse languages, 2020. URL https://arxiv.org/abs/ 2003.05002 .DeepSeek-AI et al. Deepseek-v2: A strong, economical, and efficient mixture-of-experts language model. CoRR , abs/2405.04434, 2024a. 2024a. DeepSeek-AI et al. Deepseek-v3 technical report. CoRR , abs/2412.19437, 2024b. 2024b. Guanzhi Deng, Bo Li, Ronghao Chen, Huacan Wang, Lijie Wen, and Linqi Song. Dr-lora: Dynamic rank lora for mixture-of-experts adaptation, 2026. URL https://arxiv.org/ abs/2601.04823 .William Fedus, Barret Zoph, and Noam Shazeer. Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity, 2022. URL https://arxiv.org/ abs/2101.03961 .William Fleshman and Benjamin Van Durme. SpectR: Dynamically composing LM experts with spectral routing. In Conference on Language Modeling (COLM) , 2025. URL https: //openreview.net/forum?id=tK8GHR62EX .Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. Lora: Low-rank adaptation of large language models, 2021. URL https://arxiv.org/abs/2106.09685 .Yekyung Kim, Jenna Russell, Marzena Karpinska, and Mohit Iyyer. One ruler to measure them all: Benchmarking multilingual long-context language models. In Conference on Lan-guage Modeling (COLM) , 2025. URL https://openreview.net/forum?id=3vxxB3Ar9r .10 Preprint. Under review. Priyanshu Kumar, Devansh Jain, Akhila Yerukola, Liwei Jiang, Himanshu Beniwal, Thomas Hartvigsen, and Maarten Sap. PolyGuard: A multilingual safety moderation tool for 17 languages. In Conference on Language Modeling (COLM) , 2025. URL https://openreview. net/forum?id=wbAWKXNeQ4 .Dmitry Lepikhin, HyoukJoong Lee, Yuanzhong Xu, Dehao Chen, Orhan Firat, Yanping Huang, Maxim Krikun, Noam Shazeer, and Zhifeng Chen. Gshard: Scaling giant models with conditional computation and automatic sharding, 2020. URL https://arxiv.org/ abs/2006.16668 .Junzhuo Li, Bo Wang, Xiuze Zhou, and Xuming Hu. Dynamic expert specializa-tion: Towards catastrophic forgetting-free multi-domain MoE adaptation. In Christos Christodoulopoulos, Tanmoy Chakraborty, Carolyn Rose, and Violet Peng (eds.), Pro-ceedings of the 2025 Conference on Empirical Methods in Natural Language Processing , pp. 18478–18493, Suzhou, China, November 2025a. Association for Computational Linguis-tics. ISBN 979-8-89176-332-6. doi: 10.18653/v1/2025.emnlp-main.932. URL https: //aclanthology.org/2025.emnlp-main.932/ .Zhongyang Li, Ziyue Li, and Tianyi Zhou. C3PO: Critical-layer, core-expert, collaborative pathway optimization for test-time expert re-mixing. In Conference on Language Modeling (COLM) , 2025b. URL https://openreview.net/forum?id=lqC5J7pBP9 .Zichong Li, Chen Liang, Zixuan Zhang, Ilgee Hong, Young Jin Kim, Weizhu Chen, and Tuo Zhao. SlimMoE: Structured compression of large MoE models via expert slim-ming and distillation. In Conference on Language Modeling (COLM) , 2025c. URL https: //openreview.net/forum?id=oaCUsn391F .Guilherme Penedo, Hynek Kydlíček, Vinko Sabolčec, Bettina Messmer, Negar Foroutan, Amir Hossein Kargaran, Colin Raffel, Martin Jaggi, Leandro Von Werra, and Thomas Wolf. FineWeb2: One pipeline to scale them all — adapting pre-training data pro-cessing to every language. In Conference on Language Modeling (COLM) , 2025. URL 
+
+https://openreview.net/forum?id=jnRBe6zatP .José Pombal, Dongkeun Yoon, Patrick Fernandes, Ian Wu, Seungone Kim, Ricardo Rei, Gra-ham Neubig, and André Martins. M-Prometheus: A suite of open multilingual LLM judges. In Conference on Language Modeling (COLM) , 2025. URL https://openreview. net/forum?id=Atyk8lnIQQ .Miguel Moura Ramos, Patrick Fernandes, Sweta Agrawal, and Andre Martins. Multilingual contextualization of large language models for document-level machine translation. In 
+
+Conference on Language Modeling (COLM) , 2025. URL https://openreview.net/forum? id=Ah0U1r5Ldq .Fabian David Schmidt, Ivan Vulić, Goran Glavaš, and David Ifeoluwa Adelani. Fleurs-SLU: A massively multilingual benchmark for spoken language understanding. In Con-ference on Language Modeling (COLM) , 2025. URL https://openreview.net/forum?id= Tqj3fYqhwS .Noam Shazeer, Azalia Mirhoseini, Krzysztof Maziarz, Andy Davis, Quoc Le, Geoffrey Hin-ton, and Jeff Dean. Outrageously large neural networks: The sparsely-gated mixture-of-experts layer, 2017. URL https://arxiv.org/abs/1701.06538 .Freda Shi, Mirac Suzgun, Markus Freitag, Xuezhi Wang, Suraj Srivats, Soroush Vosoughi, Hyung Won Chung, Yi Tay, Sebastian Ruder, Denny Zhou, Dipanjan Das, and Jason Wei. Language models are multilingual chain-of-thought reasoners, 2022. URL https: //arxiv.org/abs/2210.03057 .Chenyang Song, Weilin Zhao, Xu Han, Chaojun Xiao, Yingfa Chen, Yuxuan Li, Zhiyuan Liu, and Maosong Sun. BlockFFN: Towards end-side acceleration-friendly mixture-of-experts with chunk-level activation sparsity. In Conference on Language Modeling (COLM) , 2025. URL https://openreview.net/forum?id=uLl7tSUOir .11 Preprint. Under review. Tianyi Tang, Wenyang Luo, Haoyang Huang, Dongdong Zhang, Xiaolei Wang, Xin Zhao, Furu Wei, and Ji-Rong Wen. Language-specific neurons: The key to multilingual ca-pabilities in large language models. In Lun-Wei Ku, Andre Martins, and Vivek Sriku-mar (eds.), Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pp. 5701–5715, Bangkok, Thailand, August 2024. Association for Computational Linguistics. doi: 10.18653/v1/2024.acl-long.309. URL 
+
+https://aclanthology.org/2024.acl-long.309/ .Zihan Wang, Deli Chen, Damai Dai, Runxin Xu, Zhuoshu Li, and Y. Wu. Let the expert stick to his last: Expert-specialized fine-tuning for sparse architectural large language models, 2024. URL https://arxiv.org/abs/2407.01906 .An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, Chujie Zheng, Dayiheng Liu, Fan Zhou, Fei Huang, Feng Hu, Hao Ge, Haoran Wei, Huan Lin, Jialong Tang, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jing Zhou, Jingren Zhou, Junyang Lin, Kai Dang, Keqin Bao, Kexin Yang, Le Yu, Lianghao Deng, Mei Li, Mingfeng Xue, Mingze Li, Pei Zhang, Peng Wang, Qin Zhu, Rui Men, Ruize Gao, Shixuan Liu, Shuang Luo, Tianhao Li, Tianyi Tang, Wenbiao Yin, Xingzhang Ren, Xinyu Wang, Xinyu Zhang, Xuancheng Ren, Yang Fan, Yang Su, Yichang Zhang, Yinger Zhang, Yu Wan, Yuqiong Liu, Zekun Wang, Zeyu Cui, Zhenru Zhang, Zhipeng Zhou, and Zihan Qiu. Qwen3 technical report, 2025. URL https://arxiv.org/abs/2505.09388 .Puxuan Yu, Luke Merrick, Gaurav Nuti, and Daniel F Campos. Arctic-Embed 2.0: Multi-lingual retrieval without compromise. In Conference on Language Modeling (COLM) , 2025. URL https://openreview.net/forum?id=H6so82c2Sw .12 Preprint. Under review. 
+
+Appendix 
+
+A More Related Work 13 B The Algorithm of RISE 14 C Gradient Isolation 14 
+
+C.1 Gradient Isolation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15 C.2 Exact Preservation Under Disjoint Routing . . . . . . . . . . . . . . . . . . . 16 C.3 Approximate Preservation Under Near-Orthogonal Routing . . . . . . . . . 17 C.4 Implication for RISE . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18 
+
+D Cross-Task Transfer: MGSM Results After TyDiQA Training 18 E Additional Routing Analysis 19 F RISE Selected Expert Visualization 20 G Layer Partition and Expert Selection Settings 20 H Why We Do Not Compare with LoRA 21 I Case Study 23 
+
+A More Related Work 
+
+Multilingual Language Models As large language models have gained increasing promi-nence, a growing body of research has begun to focus on both the mechanistic interpretabil-ity and practical applications of multilingual language models. Cho & Hockenmaier (2025) applied sparse autoencoders to dissect multilingual processing in LLMs, revealing how in-dividual features encode language-specific information. On the data side, Penedo et al. (2025) introduced FineWeb2, a scalable pre-training data pipeline adapted to every lan-guage, enabling the development of high-quality multilingual corpora at scale. For multilin-gual encoders, Boizard et al. (2025) proposed EuroBERT, scaling multilingual encoder mod-els across European languages, while Yu et al. (2025) presented Arctic-Embed 2.0, achiev-ing strong multilingual retrieval without sacrificing cross-lingual transfer. Benchmarking efforts have also expanded in scope: Kim et al. (2025) introduced a benchmark for multi-lingual long-context language models, and Schmidt et al. (2025) proposed Fleurs-SLU, a massively multilingual benchmark for spoken language understanding. On the evaluation and judgment side, Pombal et al. (2025) developed M-Prometheus, a suite of open multilin-gual LLM judges supporting diverse languages. For safety, Kumar et al. (2025) introduced PolyGuard, a multilingual moderation tool covering 17 languages. Regarding translation, Ramos et al. (2025) studied multilingual contextualization of LLMs for document-level ma-chine translation. Collectively, these works highlight the growing importance of multilin-gual considerations across all stages of language model development, providing important context for our analysis of multilingual routing behavior in MoE models. 
+
+Mixture-of-Experts (MoE) Mixture-of-Experts (MoE) architectures have been widely studied as a means to scale neural networks while maintaining computational effi-ciency (Shazeer et al., 2017; Lepikhin et al., 2020; Fedus et al., 2022). By activating only 13 Preprint. Under review. a subset of experts for each input token, MoE models can achieve high parameter counts without incurring proportional increases in inference cost. This design has been particu-larly influential in the development of large language models (LLMs), where MoE vari-ants have demonstrated strong performance across various natural language processing tasks (DeepSeek-AI et al., 2024a; Abdin et al., 2024; Yang et al., 2025). A key component of MoE models is the routing mechanism, which determines how input tokens are assigned to different experts. Several routing strategies have been proposed, including top-k gat-ing (Shazeer et al., 2017), learned routing networks (Lepikhin et al., 2020), and dynamic routing based on input features (Li et al., 2025a). Beyond standard routing, recent work has explored more flexible expert composition strategies: Fleshman & Durme (2025) proposed SpectR, which dynamically composes experts using spectral routing to improve model ex-pressivity, while Li et al. (2025b) introduced C3PO, a test-time expert re-mixing approach that optimizes expert pathways at critical layers without retraining. Complementary efforts have focused on efficiency and compression: Li et al. (2025c) proposed SlimMoE to com-press large MoE models via expert slimming and distillation, Song et al. (2025) introduced BlockFFN with chunk-level activation sparsity to accelerate inference on end-side devices, and Bertolissi et al. (2025) showed that local mixtures of experts can be constructed via model merging to enable essentially free test-time training. 
+
+B The Algorithm of RISE 
+
+Algorithm 1 Language-specific Expert Subnetwork Selection 
+
+Require: Routing profiles {A(l)}L−1 
+
+> l=0
+
+, target language λ∗, budget K, layer boundaries 
+
+(L1, L2), allocation ratios (ρs, ρm, ρd)
+
+Ensure: Selected expert set E 
+
+> 1:
+
+Initialize: E ← ∅ 
+
+> 2:
+
+Compute budgets: Ks ← ⌊ K · ρs⌋, Km ← ⌊ K · ρm⌋, Kd ← K − Ks − Km 
+
+> 3:
+
+// Phase 1: Select language-specific experts from shallow layers  
+
+> 4:
+
+for each layer l ∈ L shallow and expert i ∈ [N] do  
+
+> 5:
+
+Compute Spec (l, i, λ∗) using Eq. (8)  
+
+> 6:
+
+end for  
+
+> 7:
+
+E ← E ∪ TopK ({(l, i) : l ∈ L shallow }, Ks) 
+
+> 8:
+
+// Phase 2: Select cross-lingual shared experts from middle layers  
+
+> 9:
+
+for each layer l ∈ L middle and expert i ∈ [N] do  
+
+> 10:
+
+Compute Ovlp (l, i) using Eq. (8)  
+
+> 11:
+
+end for  
+
+> 12:
+
+E ← E ∪ TopK ({(l, i) : l ∈ L middle , (l, i) /∈ E } , Km) 
+
+> 13:
+
+// Phase 3: Select language-specific experts from deep layers  
+
+> 14:
+
+for each layer l ∈ L deep and expert i ∈ [N] do  
+
+> 15:
+
+Compute Spec (l, i, λ∗) using Eq. (8)  
+
+> 16:
+
+end for  
+
+> 17:
+
+E ← E ∪ TopK 
+
+(
+
+{(l, i) : l ∈ L deep , (l, i) /∈ E } , Kd
+
+) 
+
+> 18:
+
+return E
+
+C Gradient Isolation 
+
+In this appendix, we formalize why routing isolation leads to gradient isolation, and why training only the target-language expert subnetwork preserves the model’s general capa-bilities. The key point is that sparse MoE routing does not merely reduce computation: it also induces a structured partition of the parameter space. Once the routing supports of different languages are separated, gradient updates become correspondingly localized. 
+
+Setup. Consider an MoE transformer with L MoE layers and Ne experts per layer. For an input sequence x = ( x1, . . . , xT ), let h(l) 
+
+> t
+
+denote the hidden state of token t at layer l. At MoE 14 Preprint. Under review. layer l, the output is 
+
+h(l+1) 
+
+> t
+
+= U(l)(
+
+h(l)
+
+> t
+
+)
+
++
+
+> Ne
+
+# ∑
+
+> i=1
+
+g(l) 
+
+> t,i
+
+(x) F(l)
+
+> i
+
+(
+
+h(l) 
+
+> t
+
+; θl,i
+
+)
+
+, (10) where: (i) U(l) collects all frozen shared transformations at layer l (e.g., residual pathway, attention block, layer norm, and any non-expert shared modules), (ii) F(l) 
+
+> i
+
+(·; θl,i) is expert 
+
+i at layer l with parameters θl,i, and (iii) g(l) 
+
+> t,i
+
+(x) ∈ { 0, 1 } is the discrete routing indicator, with ∑Ne 
+
+> i=1
+
+g(l) 
+
+> t,i
+
+(x) = k under top-k routing. Let S = {Sl }Ll=1 denote the selected expert subnetwork, where Sl ⊆ { 1, . . . , Ne} is the set of trainable experts in layer l. During RISE training, only θS = {θl,i : i ∈ Sl } are updated; all other parameters are frozen. For a language λ, define its routing support at layer l as 
+
+R(l) 
+
+> λ
+
+=
+
+{
+
+i ∈ { 1, . . . , Ne} : Pr  
+
+> x∼D λ,t
+
+[g(l) 
+
+> t,i
+
+(x) = 1] > 0
+
+}
+
+. (11) Intuitively, R(l) 
+
+> λ
+
+contains the experts that language λ actually uses at layer l.We also define the routing overlap mass between language λ and the selected subnetwork 
+
+S:
+
+Ωλ(S) = 
+
+> L
+
+# ∑
+
+> l=1
+
+# ∑
+
+> i∈Sl
+
+p(l)
+
+> λ,i
+
+, p(l) 
+
+> λ,i
+
+= Ex∼D λ, t
+
+[g(l) 
+
+> t,i
+
+(x)]. (12) When routing isolation is strong, Ωλ(S) is small for non-target languages. 
+
+C.1 Gradient Isolation 
+
+We first state the exact gradient form for expert parameters. 
+
+Lemma 1 (Exact gradient isolation) . For any expert i at layer l, the gradient of the training loss 
+
+Lλ∗ on target-language data Dλ∗ satisfies 
+
+∇θl,i Lλ∗ = Ex∼D λ∗
+
+[ T
+
+# ∑
+
+> t=1
+
+g(l) 
+
+> t,i
+
+(x) ∇θl,i ℓt(x)
+
+]
+
+, (13) 
+
+where ℓt(x) is the token-level loss contribution. Hence, if expert i is never activated by target-language tokens, i.e., g(l) 
+
+> t,i
+
+(x) = 0 for all (x, t) from Dλ∗ , then 
+
+∇θl,i Lλ∗ = 0. (14) 
+
+Proof. From the MoE forward definition in Eq. (10), the parameter θl,i appears only in the term g(l) 
+
+> t,i
+
+(x)F(l) 
+
+> i
+
+(h(l) 
+
+> t
+
+; θl,i). Since g(l) 
+
+> t,i
+
+(x) ∈ { 0, 1 } is a multiplicative routing mask, the chain rule gives 
+
+∇θl,i ℓt(x) = g(l) 
+
+> t,i
+
+(x) ∂ℓt(x)
+
+∂F(l)
+
+> i
+
+∂F(l) 
+
+> i
+
+(h(l) 
+
+> t
+
+; θl,i)
+
+∂θ l,i
+
+. (15) Summing over tokens and taking expectation over x ∼ D λ∗ yields Eq. (13). If g(l) 
+
+> t,i
+
+(x) = 0
+
+for all target-language examples, every term vanishes identically, so the gradient is exactly zero. This lemma shows that sparse routing induces exact gradient sparsity: an expert receives gradient only from the tokens that actually traverse it. 15 Preprint. Under review. 
+
+C.2 Exact Preservation Under Disjoint Routing 
+
+We now formalize the strongest case: if the selected target-language subnetwork is disjoint from the routing support of another language, then training on the target language leaves that other language exactly unchanged .
+
+Theorem 1 (Exact invariance under disjoint routing) . Let λ∗ be the target language and let 
+
+S = {Sl }Ll=1 be the selected trainable expert subnetwork. Assume: 1. All shared parameters and all unselected experts are frozen. 2. For a non-target language λ, the selected experts are disjoint from its routing supports at every layer: 
+
+Sl ∩ R (l) 
+
+> λ
+
+= ∅, ∀l = 1, . . . , L. (16) 
+
+Then, after any number of gradient-based training steps on Dλ∗ that update only θS, the model’s forward computation on any input x ∼ D λ remains exactly unchanged: 
+
+fθ′ (x) = fθ (x), ∀x ∈ supp (Dλ), (17) 
+
+where θ denotes the initial parameters and θ′ the parameters after training. Consequently, the pre-dictive distribution, token losses, and task outputs on language λ are all unchanged. Proof. We prove the claim by induction over training steps and model layers. 
+
+Step 1: one update cannot alter the forward path of language λ. Consider one optimiza-tion step that updates only θS:
+
+θ′ 
+
+> l,i
+
+=
+
+{
+
+θl,i − η∇θl,i Lλ∗ , i ∈ Sl ,
+
+θl,i, i /∈ Sl . (18) Take any input x ∼ D λ. We show by induction on layer depth that all hidden states remain unchanged. For the first layer, the input embeddings are unchanged because they are frozen, so h(0)′ 
+
+> t
+
+=
+
+h(0) 
+
+> t
+
+.Assume h(l)′ 
+
+> t
+
+= h(l) 
+
+> t
+
+for all tokens t at layer l. Since the router and all shared modules are frozen, the router receives the same input hidden states before and after the update; therefore the routing decisions are identical: 
+
+g(l)′ 
+
+> t,i
+
+(x) = g(l) 
+
+> t,i
+
+(x), ∀i, t. (19) By the disjointness assumption in Eq. (16), if g(l) 
+
+> t,i
+
+(x) = 1, then necessarily i /∈ Sl , because no selected expert belongs to the routing support of language λ. Hence every expert actually activated by language λ at layer l remains frozen: 
+
+θ′ 
+
+> l,i
+
+= θl,i for all i such that g(l) 
+
+> t,i
+
+(x) = 1. (20) Therefore, every active expert output is unchanged, and so is the shared branch: 
+
+h(l+1)′ 
+
+> t
+
+= U(l)(h(l)′ 
+
+> t
+
+) + 
+
+> Ne
+
+# ∑
+
+> i=1
+
+g(l)′ 
+
+> t,i
+
+(x) F(l) 
+
+> i
+
+(h(l)′ 
+
+> t
+
+; θ′
+
+> l,i
+
+) (21) 
+
+= U(l)(h(l) 
+
+> t
+
+) + 
+
+> Ne
+
+# ∑
+
+> i=1
+
+g(l) 
+
+> t,i
+
+(x) F(l) 
+
+> i
+
+(h(l) 
+
+> t
+
+; θl,i) = h(l+1) 
+
+> t
+
+. (22) Thus the induction closes, giving h(l)′ 
+
+> t
+
+= h(l) 
+
+> t
+
+for all layers l and tokens t, and therefore 
+
+fθ′ (x) = fθ (x).16 Preprint. Under review. 
+
+Step 2: extension to multiple updates. The argument above applies after each gradient step individually. Since at every step only selected experts are modified, and these experts are never traversed by language λ, the forward computation for λ remains unchanged af-ter every step. By induction over optimization steps, Eq. (17) holds after arbitrary-length training. Theorem 1 gives the cleanest formal statement of the intuition: if a language never uses the updated experts, then it is mathematically impossible for its forward pass to change. 
+
+C.3 Approximate Preservation Under Near-Orthogonal Routing 
+
+In practice, routing isolation is strong but not perfectly disjoint. We therefore derive a sta-bility bound showing that cross-lingual interference is controlled by routing overlap. 
+
+Assumption 1 (Expert smoothness) . For each expert F(l) 
+
+> i
+
+, there exists a constant Ll,i > 0 such that for all relevant hidden states h and parameter perturbations ∆θl,i,
+
+∥∥∥F(l) 
+
+> i
+
+(h; θl,i + ∆θl,i) − F(l) 
+
+> i
+
+(h; θl,i)
+
+∥∥∥ ≤ Ll,i ∥∆θl,i∥. (23) 
+
+Assumption 2 (Task-head smoothness) . The mapping from final hidden states to logits/loss is 
+
+C-Lipschitz. 
+
+Theorem 2 (Cross-lingual perturbation bound) . Let ∆θ be any update supported only on the selected subnetwork S, i.e., ∆θl,i = 0 for i /∈ Sl . Assume the routing pattern of a non-target language 
+
+λ is locally stable under this small update. Then the expected output perturbation on Dλ is bounded by 
+
+Ex∼D λ
+
+[∥ fθ+∆θ (x) − fθ (x)∥] ≤ C
+
+> L
+
+# ∑
+
+> l=1
+
+# ∑
+
+> i∈Sl
+
+p(l) 
+
+> λ,i
+
+Ll,i ∥∆θl,i∥. (24) 
+
+Consequently, the expected loss change satisfies 
+
+Ex∼D λ
+
+[|ℓ(x; θ + ∆θ) − ℓ(x; θ)|] ≤ C′ L
+
+# ∑
+
+> l=1
+
+# ∑
+
+> i∈Sl
+
+p(l) 
+
+> λ,i
+
+Ll,i ∥∆θl,i∥ (25) 
+
+for some constant C′ > 0.Proof. Fix x ∼ D λ and condition on its routing pattern. Because only experts in S are up-dated, the change in the MoE contribution at layer l can only come from activated experts in Sl . Using Eq. (10) and the triangle inequality, 
+
+∥h(l+1)′ 
+
+> t
+
+− h(l+1) 
+
+> t
+
+∥ ≤ ∑
+
+> i∈Sl
+
+g(l) 
+
+> t,i
+
+(x)
+
+∥∥∥F(l) 
+
+> i
+
+(h(l) 
+
+> t
+
+; θl,i + ∆θl,i) − F(l) 
+
+> i
+
+(h(l) 
+
+> t
+
+; θl,i)
+
+∥∥∥ . (26) Applying the smoothness assumption in Eq. (23) gives 
+
+∥h(l+1)′ 
+
+> t
+
+− h(l+1) 
+
+> t
+
+∥ ≤ ∑
+
+> i∈Sl
+
+g(l) 
+
+> t,i
+
+(x) Ll,i ∥∆θl,i∥. (27) Summing across layers and propagating to the output using the C-Lipschitz property of the remaining frozen network yields 
+
+∥ fθ+∆θ (x) − fθ (x)∥ ≤ C
+
+> L
+
+# ∑
+
+> l=1
+
+# ∑
+
+> i∈Sl
+
+g(l) 
+
+> t,i
+
+(x) Ll,i ∥∆θl,i∥. (28) Taking expectation over x ∼ D λ and using E[g(l) 
+
+> t,i
+
+(x)] = p(l) 
+
+> λ,i
+
+gives Eq. (24). The loss bound in Eq. (25) follows immediately from the Lipschitz continuity of the loss with respect to logits. Theorem 2 shows that cross-lingual interference is not arbitrary: it is proportional to the extent to which a non-target language routes through the updated experts. Therefore, when routing isolation makes p(l) 
+
+> λ,i
+
+very small for i ∈ Sl , the induced perturbation on language λ
+
+is correspondingly small. 17 Preprint. Under review. 
+
+C.4 Implication for RISE 
+
+The above results justify the design principle of RISE. The method first identifies a target-language expert subnetwork using routing statistics, and then updates only that subnet-work while freezing all remaining parameters. If the selected experts align with the target language’s routing support and have little overlap with other languages, then: 1. gradients from target-language training are concentrated on the selected experts; 2. non-target languages do not backpropagate through those experts, or do so only with very small probability; 3. thus, non-target behavior is either exactly preserved (in the disjoint case) or per-turbed only by a small amount bounded by routing overlap. In this sense, routing isolation induces functional decoupling between language-specific ex-pert subnetworks, while gradient isolation turns this decoupling into optimization locality .This explains why selective expert training can improve the target language without mate-rially degrading the model’s general multilingual capabilities. 
+
+D Cross-Task Transfer: MGSM Results After TyDiQA Training                                                                                                                                                                                                       
+
+> Setting BN DE EN ES FR JA RU SW TH ZH Avg. Qwen3-30B-A3B (MGSM, Accuracy %)
+> Vanilla 46.0 88.5 96.5 91.5 82.0 83.5 92.5 48.0 87.5 86.0 80.2
+> Random (64,BN) 46.0 87.5 96.0 90.5 81.5 84.5 91.0 46.5 87.0 89.0 80.0
+> Random (128,BN) 49.0 87.5 96.0 90.0 81.5 83.0 91.0 46.0 87.0 87.0 79.8
+> LoRA (Hu et al., 2021) 65.0 88.0 97.0 89.5 79.0 82.0 90.0 41.0 87.5 88.5 80.8
+> ESFT (Wang et al., 2024) 48.0 86.5 97.0 91.0 82.0 84.0 92.5 47.5 87.0 86.0 80.2
+> RISE (128, BN) 55.0 87.5 96.5 89.5 82.5 84.5 91.0 46.5 86.0 87.5 80.7
+> RISE (128, RU) 49.0 88.5 96.0 91.5 81.0 85.0 91.0 43.0 87.5 89.0 80.2
+> RISE (128, ID) 46.5 88.5 97.5 90.5 82.0 84.5 92.0 47.0 88.0 87.0 80.4
+> Phi-3.5-MoE-Instruct (vLLM + chat template, MGSM, Accuracy %)
+> Vanilla 1.0 79.0 88.5 81.5 73.0 56.0 77.0 1.0 26.5 65.5 54.9
+> Random (16,BN) 3.0 79.5 89.5 83.0 79.0 60.0 82.0 1.5 25.0 65.5 56.8
+> Random (32,BN) 3.0 78.5 88.0 83.5 79.5 57.0 78.5 1.5 22.5 64.5 55.7
+> TopK (16,BN) 1.5 78.5 89.0 82.0 74.0 59.5 79.0 2.5 24.5 67.5 55.8
+> LoRA (Hu et al., 2021) 0.0 82.0 91.5 80.5 73.5 60.5 78.5 0.5 10.0 64.0 54.1
+> ESFT (Wang et al., 2024) 3.5 81.0 88.5 82.5 78.0 56.5 80.5 1.5 22.5 66.0 56.1
+> RISE (16, BN) 3.5 76.5 88.5 84.0 75.5 62.5 81.5 0.5 22.0 64.0 55.9
+> RISE (16, RU) 2.5 79.5 91.0 83.5 75.5 58.0 79.0 0.0 19.5 66.0 55.5
+> RISE (16, ID) 0.5 80.5 88.5 83.5 76.5 58.5 78.0 1.5 19.5 63.5 55.1
+
+Table 6: Cross-task transfer: MGSM accuracy (%) for models trained on TyDiQA. 
+
+All models are trained exclusively on TyDiQA and evaluated zero-shot on MGSM to measure cross-task interference. The table is split by backbone: Qwen3-30B-A3B and 
+
+Phi-3.5-MoE-Instruct . The colored bold value indicates the target language column (blue =BN, orange =RU, green =ID); the language code in the first column is colored ac-cordingly. To further validate that RISE does not impair the model’s capabilities on tasks beyond the training domain, we evaluate all TyDiQA-trained models on the MGSM benchmark without any MGSM-specific training. This cross-task evaluation directly tests whether the language-specific subnetworks identified by RISE are truly isolated: training on extractive QA (Ty-DiQA) should not degrade multilingual mathematical reasoning (MGSM) if the selected experts are genuinely language-specific rather than task-general. As shown in Table 6, RISE consistently preserves MGSM performance across all non-target languages, confirming that our subnetwork selection respects the functional boundaries between language-specific and task-general computation. 18 Preprint. Under review. 
+
+E Additional Routing Analysis 
+
+This section consolidates the complete layer-wise expert overlap statistics across both back-bone models and both evaluation benchmarks, extending the analysis summarized in Ta-ble 2 of the main text.                                         
+
+> Language Shal. Mid. Deep Avg.
+> Telugu (TE) 0.16 0.29 0.06 0.17 Swahili (SW) 0.14 0.30 0.07 0.17 Bengali (BN) 0.19 0.31 0.10 0.20 Korean (KO) 0.27 0.39 0.12 0.26 Finnish (FI) 0.29 0.41 0.14 0.28 Arabic (AR) 0.31 0.42 0.21 0.31 Indonesian (ID) 0.32 0.46 0.19 0.32 Russian (RU) 0.40 0.42 0.21 0.34
+> Mean 0.26 0.38 0.14 0.26
+
+Table 7: Layer-wise expert overlap with En-glish on TyDiQA (Qwen3-30B-A3B).                                         
+
+> Language Shal. Mid. Deep Avg.
+> Telugu (TE) 0.14 0.12 0.06 0.11 Bengali (BN) 0.24 0.16 0.00 0.13 Arabic (AR) 0.19 0.23 0.00 0.14 Swahili (SW) 0.19 0.19 0.11 0.16 Finnish (FI) 0.24 0.23 0.06 0.17 Korean (KO) 0.24 0.19 0.11 0.18 Indonesian (ID) 0.29 0.26 0.06 0.20 Russian (RU) 0.33 0.39 0.00 0.24
+> Mean 0.23 0.22 0.05 0.17
+
+Table 8: Layer-wise expert overlap with En-glish on TyDiQA (Phi-3.5-MoE-Instruct).                                             
+
+> Language Shal. Mid. Deep Avg.
+> Bengali (BN) 0.12 0.22 0.05 0.13 Swahili (SW) 0.04 0.19 0.04 0.09 Thai (TH) 0.25 0.33 0.12 0.23 Chinese (ZH) 0.36 0.43 0.11 0.30 Japanese (JA) 0.37 0.37 0.10 0.28 Russian (RU) 0.41 0.43 0.17 0.34 German (DE) 0.39 0.46 0.22 0.36 French (FR) 0.46 0.49 0.24 0.40 Spanish (ES) 0.52 0.51 0.25 0.43
+> Mean 0.32 0.38 0.14 0.28
+
+Table 9: Layer-wise expert overlap with En-glish on MGSM (Qwen3-30B-A3B).                                             
+
+> Language Shal. Mid. Deep Avg.
+> Swahili (SW) 0.10 0.04 0.00 0.04 Thai (TH) 0.05 0.12 0.00 0.06 Bengali (BN) 0.10 0.09 0.06 0.08 Japanese (JA) 0.19 0.30 0.22 0.24 Russian (RU) 0.29 0.40 0.11 0.27 German (DE) 0.24 0.49 0.11 0.28 French (FR) 0.33 0.49 0.06 0.29 Chinese (ZH) 0.05 0.51 0.39 0.32 Spanish (ES) 0.38 0.46 0.11 0.32
+> Mean 0.19 0.32 0.12 0.21
+
+Table 10: Layer-wise expert overlap with En-glish on MGSM (Phi-3.5-MoE-Instruct). 
+
+Qwen3-30B-A3B. Tables 7 and 9 report per-language Jaccard similarity with English at the shallow, middle, and deep layers for Qwen3-30B-A3B on TyDiQA and MGSM, respectively. Bsides, we also provide the global-level overlap hotmap of TyDiQA in Figures 5 (a), which is a supplement of the Table 1 in the main text. 
+
+Phi-3.5-MoE-Instruct. Tables 8 and 10 report the layer-wise expert overlap statistics for Phi-3.5-MoE-Instruct on TyDiQA and MGSM, respectively. Figures 5 (b) and (c) provide the corresponding global-level routing overlap analysis, serving as the Phi-side counter-parts to Figure 1 (a) in the main text. Despite the substantial architectural differences from Qwen3-30B-A3B (32 vs. 48 layers, top-2 vs. top-8 routing, 16 vs. 128 experts per layer), both the routing isolation and layerwise di-vergence phenomena observed in the main text hold consistently: low-resource languages activate a narrow, repetitive set of experts with little overlap at the global level, while the layer-wise similarity follows the same three-phase hierarchy—shallow layers showing mod-erate overlap, middle layers peaking, and deep layers dropping to near zero. These results confirm that the two core phenomena identified in our analysis are robust across model families and evaluation tasks, rather than artifacts of a specific architecture or benchmark. 19 Preprint. Under review. ar bn en fi id ko ru sw te 
+
+> Language
+> ar
+> bn
+> en
+> fi
+> id
+> ko
+> ru
+> sw
+> te
+> Language
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Jaccard similarity
+
+(a) Global-level expert activa-tion overlap of Qwen3-30B-A3B across languages in TyDiQA. bn de en es fr ja ru sw th zh 
+
+> Language
+> bn
+> de
+> en
+> es
+> fr
+> ja
+> ru
+> sw
+> th
+> zh
+> Language
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Jaccard similarity
+
+(b) Global-level expert activa-tion overlap of Phi-3.5-MoE across languages in MGSM. ar bn en fi id ko ru sw te 
+
+> Language
+> ar
+> bn
+> en
+> fi
+> id
+> ko
+> ru
+> sw
+> te
+> Language
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Jaccard similarity
+
+(c) Global-level expert activa-tion overlap of Phi-3.5-MoE across languages in TyDiQA. 
+
+Figure 5: Global-level expert activation overlap of Qwen3-30B-A3B and Phi-3.5-MoE across languages in TyDiQA and MGSM. 0 16 32 48 64 80 96 112    
+
+> Expert Index
+> 0
+> 4
+> 8
+> 12
+> 16
+> 20
+> 24
+> 28
+> 32
+> 36
+> 40
+> 44
+> Layer Index
+> Selected: 128 / 6144 (2.1%)
+> FtSE Expert Selection Qwen3-30B-A3B, Bengali (Layer-Aware, 128 experts / 6144 total)
+> Shallow (L0 L17): language-specific embedding experts
+> Middle (L18 L29): cross-lingual shared experts
+> Deep (L30 L47): language-specific output experts
+> Frozen (not fine-tuned)
+> Shallow
+> (L0 L17)
+> 44 experts
+> Middle
+> (L18 L29)
+> 32 experts
+> Deep
+> (L30 L47)
+> 52 experts
+
+Figure 6: Layer-wise expert selection heatmap for Bengali training on Qwen3-30B-A3B .Each column corresponds to a transformer layer and each row to an expert index. High-lighted cells denote experts selected by RISE for gradient updates. The selection density is highest in the middle and deep layers, consistent with the routing isolation observed for Bengali in Table 9. 
+
+F RISE Selected Expert Visualization 
+
+Figures 6 and 7 visualize the layer-wise distribution of training experts selected by RISE for Bengali on Qwen3-30B-A3B and Phi-3.5-MoE-Instruct, respectively. Each cell indicates whether a given expert in a given layer was selected for training. The heatmaps reveal that RISE concentrates its budget in the middle and deep layers—precisely the layers where Bengali routing diverges most from English (cf. Tables 9–8). This alignment confirms that the composite score in RISE successfully identifies language-specific experts rather than selecting high-activation experts indiscriminately. 
+
+G Layer Partition and Expert Selection Settings 
+
+Table 11 summarizes the layer partition boundaries and expert selection budget used in RISE for both backbone models. The three functional groups—shallow (language-specific encoding), middle (language-agnostic semantic processing), and deep (language-specific generation)—follow the 37.5%/25%/37.5% split derived from our routing divergence anal-ysis in Section 3. The expert budget K is allocated asymmetrically across groups, concen-20 Preprint. Under review. 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+
+Expert Index 
+
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> 14
+> 16
+> 18
+> 20
+> 22
+> 24
+> 26
+> 28
+> 30
+> Layer Index
+> Selected: 16 / 512 (3.1%)
+
+FtSE Expert Selection Phi-3.5-MoE-instruct, Bengali 
+
+(Layer-Aware, 16 experts / 512 total)   
+
+> Shallow (L0 L9): language-specific embedding experts
+> Middle (L10 L21): cross-lingual shared experts
+> Deep (L22 L31): language-specific output experts
+> Frozen (not fine-tuned)
+> Shallow
+> (L0 L9)
+> 6 experts
+> Middle
+> (L10 L21)
+> 4 experts
+> Deep
+> (L22 L31)
+> 6 experts
+
+Figure 7: Layer-wise expert selection heatmap for Bengali training on Phi-3.5-MoE-Instruct .Despite the architectural differences (32 layers, 16 experts, top-2 routing), RISE again tar-gets experts concentrated in the middle-to-deep range, mirroring the isolation pattern re-ported in Table 10. The sparser overall selection reflects the smaller expert count per layer relative to Qwen3-30B-A3B. trating the majority of the budget in the middle layers to capture cross-lingual shared com-putation. 
+
+H Why We Do Not Compare with LoRA 
+
+We do not compare RISE with LoRA because they operate at orthogonal levels of model adaptation and address fundamentally different questions. RISE operates at the routing level : it identifies which experts to update, based on a mech-anistic analysis of multilingual routing behavior in MoE models. LoRA operates at the 
+
+parameter-update level : it specifies how to update the weight matrices efficiently via low-rank adapters. These are orthogonal design dimensions—RISE concerns the selection scope 
+
+of adaptation, while LoRA concerns the parameterization of the update. The main contribution of this work is the discovery that multilingual MoE models exhibit structured routing isolation, from which language-specific expert subnetworks can be iden-tified in a principled manner. We intentionally train the selected experts with standard 21 Preprint. Under review. 
+
+Setting Qwen3-30B-A3B Phi-3.5-MoE 
+
+Total Layers 48 32 Experts per Layer 128 16 Total Expert Pool 6,144 512 Shallow Layers 0–17 (37.5%) 0–11 (37.5%) Middle Layers 18–29 (25%) 12–19 (25%) Deep Layers 30–47 (37.5%) 20–31 (37.5%) Selected Experts K 128 (2.1%) 16 (3.1%) Shallow budget 35% ( ≈44) 12.5% ( ≈2) Middle budget 25% ( ≈32) 68.75% ( ≈11) Deep budget 40% ( ≈52) 18.75% ( ≈3) Shallow criterion Language specificity Language specificity Middle criterion Cross-lingual overlap Cross-lingual overlap Deep criterion Language specificity Language specificity Table 11: Layer-aware expert selection settings for Qwen3-30B-A3B and Phi-3.5-MoE-Instruct. 
+
+K (Experts) Model Weights Activations Gradients Optimizer State Total 
+
+8 56.3 GB 7.9 GB 72 MB 432 MB 64.7 GB 
+
+16 56.3 GB 7.9 GB 144 MB 864 MB 65.1 GB 
+
+32 56.3 GB 7.9 GB 288 MB 1.7 GB 66.1 GB 
+
+64 56.3 GB 7.9 GB 576 MB 3.4 GB 68.1 GB 
+
+128 56.3 GB 7.9 GB 1.1 GB 6.8 GB 72.0 GB 
+
+Table 12: GPU memory usage during training for different numbers of selected experts 
+
+K on Qwen3-30B-A3B. Note that these figures represent the minimum memory footprint without any training data loaded; actual memory consumption may increase significantly with larger batch sizes. 22 Preprint. Under review. full-rank updates to isolate the contribution of expert selection itself, avoiding confounds introduced by rank constraints or adapter initialization. Importantly, RISE and LoRA are fully compatible rather than mutually exclusive. One may readily apply LoRA, QLoRA, or other PEFT techniques within the RISE-selected subnetwork—freezing all non-selected experts and attaching low-rank adapters only to the selected ones. Under this view, RISE answers which part of the MoE model to adapt, while LoRA answers how to update that part efficiently. Figure 8 illustrates this orthogonal and composable relationship. 
+
+Figure 8: RISE and LoRA are orthogonal and composable: RISE operates at the routing level (which experts to adapt), while LoRA operates at the parameter-update level (how to update them). For this reason, treating LoRA as a direct competing baseline would conflate two orthogo-nal design dimensions and blur the central contribution of this paper. We note that prior work has already explored LoRA-style adaptation within MoE training (Deng et al., 2026), further supporting the view that LoRA is a natural complement to RISE—applicable within the selected subnetwork for additional parameter efficiency—rather than an alternative to it. 
+
+I Case Study 
+
+23 Preprint. Under review. 
+
+Case 1 | Qwen3-30B-A3B / MGSM Ben-gali — Percentage Misinterpretation 
+
+Question: 
+
+েজাশ একিট বািড় িফ্লপ করার িসদ্ধান্ত িনেয়েছন। িতিন $80,000-এ একিট বািড়ক্র য় করেলন এবং $50,000 িদেয় েমরামত করেলন। এর ফেল বািড়িটর মূলঁ 150% বৃ িদ্ধ েপল। িতিন কত ডলার লাভ করেলন? 
+
+Josh bought a house for $80k, repaired it for $50k; value rose by 150%. How much profit? 
+
+Vanilla 7
+
+আসুনপ্রশ্ন িট ধীের ধীের িবেশ্লষণ কির।প্র থেম েমাট খরচ: বািড়ক্র য়: $80,000; েমরামত: $50,000 েমাট খরচ = $80,000 + $50,000 = $130,000 
+
+এরপর নতুন মূলঁ: বািড়িটর মূলঁ 150% বৃ িদ্ধ েপেয়েছ। নতুন মূলঁ = পু রােনা মূলঁ × 150% = $80,000 ×
+
+1.5 = $120,000 
+
+লাভ িনণর্য়: িবক্রয় মূ লঁ = $120,000; েমাট খরচ = $130,000 লাভ = $120,000 − $130,000 = −$10,000 েজাশ েকােনা লাভ কেরিন, বরং $10,000 েলাকসান করেলন। 
+
+RISE (Ours) 3
+
+আসুনপ্রশ্ন িট ধােপ ধােপ িবেশ্লষণ কির।প্র থম ধাপ: েমাট খরচ েজােশর েমাট খরচ: 80,000 + 50,000 = 130,000 ডলার িদ্বতীয় ধাপ: নতু ন মূলঁ বািড়িটর মূলঁ 150% বৃ িদ্ধ েপল, অথর্ াৎ: 80,000 × (1+1.5) = 80,000 × 2.5 = 200,000 ডলার তৃতীয় ধাপ: লাভ 200,000 − 130,000 = 70,000 ডলার উত্তর: 70000 
+
+Gold: $70,000 Error: “150% increase” interpreted as ×1.5  
+
+> instead of ×2.5
+
+Case 2 | Qwen3-30B-A3B / MGSM Ben-gali — Generation Truncation 
+
+Question: 
+
+জন এক সপ্তােহ 60 মাইল েদৗড়ান। িতিনপ্র িত সপ্তােহ 3 িদন েদৗড়ান। িতিনপ্র থম িদেন 3 ঘণ্টা েদৗড়ান এবং অনঁ দু িদন তার অেধর্ক েদৗড়ান। িতিন কতদ্রু ত েদৗড়ান? 
+
+60 mi/week; Day 1: 3 h, other two days: 1.5 h each. What is his speed? 
+
+Vanilla 7প্র থম িদন: সময় = 3 ঘণ্টা; দূ রত্ব = 3 ঘণ্টা × v
+
+অনঁ দু িদন:প্র িতিদন সময় = 32 = 1.5 ঘণ্টা দুিদেনর েমাট সময় = 1.5 + 1.5 = 3 ঘণ্টা; দূ রত্ব = 
+
+3v
+
+েমাট দূরত্ব: 
+
+3v + 3v = 6v; েমাট দূরত্ব = 60 মাইল 
+
+6v = 60 ⇒ v = [output truncated here]  
+
+> Evaluator extracts last number found: 60
+
+RISE (Ours) 3প্র থম িদেনর েদৗেড়র সময়: 3 ঘণ্টা অনঁ দু িদেনর সময়:প্র িত িদন 3 ঘণ্টার অেধর্ ক = 1.5 ঘণ্টা দুিদেনর েমাট সময় = 1.5 × 2 = 3 ঘণ্টা েমাট েদৗেড়র সময় (3 িদেন): 
+
+3 + 3 = 6 ঘণ্টাদ্রু িত:দ্রু িত = 60 ÷ 6 = 10 মাইল/ঘণ্টা উত্তর: 10 
+
+Gold: 10 mph Error: generation cut off; evaluator extracts 60 (distance) not 10 (speed) 
+
+Figure 9: Qualitative case study ( Cases 1–2 ) comparing Vanilla (base model) and RISE 
+
+(ours) on Bengali MGSM. Red bold marks incorrect steps; green bold marks correct rea-soning. Both cases show mathematical reasoning errors in Qwen3-30B-A3B: Case 1 mis-interprets “150% increase” as ×1.5 instead of ×2.5 ; Case 2 suffers premature generation truncation, causing the evaluator to extract the distance (60) rather than the speed (10). See Figure 10 for Cases 3–4. 24 Preprint. Under review. 
+
+Case 3 | Phi-3.5-MoE / TyDiQA Bengali — Language Coherence 
+
+Passage & Question:           
+
+> কণর্ িক্ষপ্ত হেয় অজুর্ েনর সেঙ্গ যু েদ্ধ িলপ্ত হন। ভীষণ যুদ্ধ লােগ। দু ইজন সমান েযাদ্ধা হওয়ার কারেণ েকউ কাউেক ছাড় িদিচ্ছেলন না। সবাই িনজ িনজ যুদ্ধ ভু েল অজুর্ন এবং কেণর্র যুদ্ধ েদখেত লাগেলন। কেণর্ র রেথর সারথী িছেলন শলঁ, িযিন িছেলন সম্পেকর্ পাণ্ডবেদর মামা। িতিন কণর্ েক নানা কথায় কাবু করেত লাগেলন। হঠাৎ কেণর্র রেথর চাকা মািটেত বেস েগল। […] পরশুরােমর অিভশােপ কণর্ব্রহ্ম ােস্ত্রর মন্ত্র ভু েল েগেলন। েশষ পযর্ন্ত অজুর্েনর হােত কেণর্র মৃতুঁ হল।
+
+প্রশ্ন : পু রাণ মেত কণর্ কার হােত িনহত হন? 
+
+(Karna angrily engaged in battle with Ar-juna…Karna’s chariot wheel sank in mud…Karna was finally slain by Arjuna. Q: According to mythology, at whose hand was Karna slain?) 
+
+Vanilla 7
+
+আ yes, পুরাণ মেত কণর্ কার হােত িনহত হেয়েছ। 
+
+> (“Ah yes, according to mythology Karna was slain at whose hand.”)
+
+Echoes the question verbatim; produces no an-swer. 
+
+RISE (Ours) 3
+
+অজুর্েনর হােত কণর্ মৃতুঁ হয়। 
+
+> (“Karna was killed at the hand of Arjuna.”)
+
+Gold: অজুর্েনর (Arjuna’s) Error: mixed-language non-answer; question echoed instead of answered 
+
+Case 4 | Phi-3.5-MoE / MGSM Bengali — Incoherent Multi-step Reasoning 
+
+Question: 
+
+েজমস এক সপ্তােহ 3 বার 3িট িস্প্রেন্ট েদৗড়ােনার িসদ্ধান্ত িনেয়েছন। িতিনপ্র িত িস্প্রেন্ট 60 িমটার কের েদৗড়ান। িতিন এক সপ্তােহ েমাট কত িমটার কের েদৗড়ান? 
+
+James: 3 sessions/week × 3 sprints/session ×
+
+60 m/sprint. Total meters per week? 
+
+Vanilla 7
+
+উপের উিল্লিখত সমসঁািট হল েজমস এক সপ্তােহ িস্প্রেন্ট েদৗড়ােনর েমাট িমটারগু ন িনণর্ ায়ক। পদেক্ষপ: Step 1:প্র িত িস্প্রেন্ট েদৗড়ােনর দূ রীয়তা = (3 িস্প্রেন্ট েদৗড়ান = 60 িমটার) 
+
+> [misreads 60 m/sprint as: 3 sprints total = 60 m]
+
+Step 2: েজমস এক সপ্তােহ িস্প্রেন্ট েদৗড়ােনার সম্পেকর্ জানেত চািহেয়েছ েয সপ্তােহ িতিন েদৗড়ােনা। Step 3: এক সপ্তােহ সাত িদন আেছ। 
+
+> [irrelevant; confuses sessions with days-of-week]
+
+প্র িত িস্প্রেন্ট েদৗড়ােনর দূ রীয়তা [output truncated; no answer] 
+
+RISE (Ours) 3
+
+৬০ িমটার × ৩ = ১৮০ িমটার (60 m/sprint × 3sprints = 180 m per session) 
+
+১৮০ িমটার × ৩ = ৫৪০ িমটার (180 m × 3 sessions = 540 m total) 
+
+উত্তর: ৫৪০ 
+
+Gold: 540 m Error: misreads per-sprint distance; introduces spurious 7 days/week 
+
+Figure 10: Qualitative case study ( Cases 3–4 ) comparing Vanilla (base model) and RISE 
+
+(ours) on Bengali TyDiQA and MGSM. Red bold marks incorrect steps; green bold marks correct reasoning. Both cases show incoherent or mixed-language outputs in Phi-3.5-MoE: Case 3 produces a question-echoing non-answer with mixed-language output; Case 4 mis-reads per-sprint distance and introduces a spurious 7-day/week step, with output truncated before any answer is given. RISE’s Bengali-specialized expert activation corrects both fail-ures. 25

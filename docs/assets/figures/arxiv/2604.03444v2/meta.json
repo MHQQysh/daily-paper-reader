@@ -1,0 +1,254 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-001.webp",
+      "caption": "Table 22 Architecture configurations and non-embedding parameter counts (millions). d: model dimension, h: number of attention heads, l: number of layers. Architectures at the same nominal scale can differ substantially in parameter count due to differences in layer composition.",
+      "page": 70,
+      "index": 1,
+      "width": 810,
+      "height": 757
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-002.webp",
+      "caption": "Table 2 Base model evaluations across the training pipeline for Olmo Hybrid vs. Olmo 3. After mid-training, Olmo Hybrid outperforms Olmo 3 7B across every evaluation domain. On evaluations held out from Olmo 3 development (right), Olmo Hybrid outperforms Olmo 3 on MMLU Pro and BBH but loses slightly on LBPP and DM Math. Overall, the results suggest that Olmo Hybrid 7B generally outperforms Olmo 3 7B.",
+      "page": 6,
+      "index": 2,
+      "width": 848,
+      "height": 190
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-003.webp",
+      "caption": "Table 13 Details of the post-training evaluation suite, as used in OLMo 3 (Olmo Team, 2025). We mark tasks with * to indicate new additions compared to the OLMo 2 suite (Olmo Team, 2024). All evaluation generations have thinking traces (text between <think>...</think>) stripped before passing to the answer scorer. We use zero-shot setting for all metrics.",
+      "page": 43,
+      "index": 3,
+      "width": 946,
+      "height": 388
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-004.webp",
+      "caption": "Figure 15 Extended downstream eval training curves comparing Olmo Hybrid 7B and Olmo 3 7B across 6 benchmarks, sorted by token efficiency (see Figure 1 for CE loss and MMLU training curves). Olmo Hybrid reaches Olmo 3’s final performance using 19–58% fewer tokens depending on the benchmark.",
+      "page": 53,
+      "index": 4,
+      "width": 870,
+      "height": 644
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-005.webp",
+      "caption": "Figure 11 Impact of expressivity 1− ϵ on loss under three instantiations of the expressivity-aware quantization model; both axes are log-scaled. In the first row, ∆′ < ∆, so decreasing ϵ lowers irreducible loss (Corollary 4.2) and reduces loss everywhere (Corollary 4.1), but especially for large N and D. In the second row, ∆′ = ∆, but inexpressible tasks require more parameters and tokens than expressible tasks. Thus, while increasing expressivity shifts down the scaling curve everywhere, irreducible loss remains the same, so for large enough N,D, the loss reduction diminishes. Finally, the third row incorporates both effects of expressivity. This means decreasing ϵ both causes an initial difference in loss and lowers irreducible loss, leading to a visible gap in loss as ϵ decreases across values of N and D.",
+      "page": 21,
+      "index": 5,
+      "width": 946,
+      "height": 495
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-006.webp",
+      "caption": "Figure 2 Compute-performance tradeoff of open-weight hybrid, RNN, and transformer base models on the average of OlmoBaseEval task suites. Olmo Hybrid 7B is on the Pareto frontier of open-weight dense models. Training compute was estimated using the C = 6ND heuristic from Kaplan et al. (2020), with reported token and parameter counts. Per-benchmark results are reported in Table 6. While theoretical compute for MoE-based SSMs is low, effective training efficiency can be roughly 50–80% of a dense model (Rajbhandari et al., 2022), so we draw our frontier over dense models only. For this plot, we show only models obtaining >50% average performance on OlmoBaseEval.",
+      "page": 7,
+      "index": 6,
+      "width": 571,
+      "height": 342
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-007.webp",
+      "caption": "Figure 16 Evaluation metrics vs. training FLOPs. (a) Average validation cross-entropy loss across 11 held-out corpora (C4, Dolma Books/CC/pes2o/Reddit/Stack/Wiki, ICE, M2D2 S2ORC, Pile, Wikitext-103; lower is better); this is the same loss used to fit the Chinchilla scaling laws. (b) Base Easy Suite average BPB (lower is better). (c)–(e) Per-cluster Base Easy BPB for Math, Code, and QA respectively. The thick line is the fitted compute-optimal frontier.",
+      "page": 54,
+      "index": 7,
+      "width": 967,
+      "height": 566
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-008.webp",
+      "caption": "Table 12 Details of the base evaluation suite, as used in OLMo 3 (Olmo Team, 2025). Tasks were formatted as multiple-choice (MC), rank choice (RC), short-form generative (GenQA), chain-of-thought with exact-match scoring (CoT EM), or code execution (Code Exec). We use * to indicate additions to the OLMo 2 (Olmo Team, 2024) base suite, † for tasks with few-shot examples already specified within each instance, and α for tasks with human-written few-shot examples.",
+      "page": 42,
+      "index": 8,
+      "width": 972,
+      "height": 806
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-009.webp",
+      "caption": "Table 14 Architecture hyperparameters used for synthetic evaluations.",
+      "page": 46,
+      "index": 9,
+      "width": 956,
+      "height": 352
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-010.webp",
+      "caption": "Figure 10 Projected savings factors across model scales (target loss = 2.474, selected as the minimum of all observed training losses). (a) Parameter savings (Nref/Narch) vs training tokens: fewer parameters are needed to reach the same loss at a given data budget. (b) Data savings (Dref/Darch) vs model size: fewer training tokens are needed to reach the target loss at a given model size. (c) Compute savings (Cref/Carch, C ∝ N ·D) vs target loss: for each target loss the minimum total compute is found by optimising over model size N ; harder targets (lower loss) are on the right. Dashed vertical lines mark the observed losses of our final production models. The savings factor grows with difficulty for both Pure GDN and Hybrid models. Values above 1× indicate an advantage over Transformer. Note that estimates at lower loss values (right side of the plot) involve extrapolation beyond the fitting range and are therefore less certain.",
+      "page": 18,
+      "index": 10,
+      "width": 964,
+      "height": 406
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-011.webp",
+      "caption": "Figure 12 Architecture configurations evaluated in our ablation study. We compare pure architectures (Transformer, GDN, Mamba2) against hybrid variants with different linear-to-attention ratios (1:1, 3:1, 7:1), RNN backbones (GDN vs. Mamba2 at 3:1), and placement strategies (interleaved vs. middle). The highlighted configuration (3:1 interleaved with GDN) was selected for the final Olmo Hybrid.",
+      "page": 23,
+      "index": 11,
+      "width": 901,
+      "height": 324
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-012.webp",
+      "caption": "Table 7 Post-training evaluation comparison between Olmo 3 (dense) and Olmo Hybrid (hybrid) across three training stages: Think SFT, Instruct SFT, and DPO. Ω = Omega Full. HE+ = HumanEvalPlus. IFB = IFBench. AE3 = AlpacaEval 3.",
+      "page": 28,
+      "index": 12,
+      "width": 1011,
+      "height": 286
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-013.webp",
+      "caption": "Table 8 Inference-bound scaling for async RL generation across context lengths. In async RL, each training step requires generating a full batch of rollouts before the policy update; generation throughput is the bottleneck. We measure the minimum GPU allocation needed to serve an RL batch of 1,024 rollouts concurrently and project generation wall time and total GPU-hours over 1,725,440 episodes (1,684 steps).",
+      "page": 28,
+      "index": 13,
+      "width": 818,
+      "height": 382
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-014.webp",
+      "caption": "Figure 17 Evaluation metrics vs. training FLOPs for pure architectures (Transformer, pure GDN, pure Mamba2). Panels follow the same layout as Figure 16: (a) average validation cross-entropy loss, (b) Base Easy Suite average BPB, and (c)–(e) per-cluster BPB for Math, Code, and QA. The thick line is the fitted compute-optimal frontier.",
+      "page": 55,
+      "index": 14,
+      "width": 967,
+      "height": 566
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-015.webp",
+      "caption": "Table 18 Fit Chinchilla scaling law parameters for L(N,D) = E +A/Nα +B/Dβ . 95% bootstrap CI shown below each estimate. Top: unconstrained fit where all five parameters are fit independently per architecture. Bottom: fixed-exponent fit where α = β = 0.22 (in gray cells) (approximately the mean of the unconstrained estimates) are shared across architectures; only E, A, B are refit. Equal exponents imply aopt = bopt = 0.5.",
+      "page": 50,
+      "index": 15,
+      "width": 952,
+      "height": 374
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-016.webp",
+      "caption": "Figure 3 Expressive power of transformers, linear RNNs, and hybrid models relative to circuit complexity classes. Dashed lines represent unproven but conjectured separations between classes (e.g., TC0 ≠ NC1). Notably, transformers can express recall (Section 3.1), and DeltaNet (or GDN) with negative eigenvalues can express state tracking (Section 3.2) (Grazzi et al., 2025). Hybridizing gives both capabilities, and we prove that it also unlocks state-based recall, a problem that neither model can express on its own (Section 3.3). With the addition of padding tokens, transformers can express exactly the class TC0, whereas hybrid models can capture all of NC1, which enables solving boolean formula evaluation (Section 3.4).",
+      "page": 8,
+      "index": 16,
+      "width": 714,
+      "height": 324
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-017.webp",
+      "caption": "Figure 13 SpikeScore grows throughout training for Olmo 3, but it stays more stable when training Olmo Hybrid.",
+      "page": 40,
+      "index": 17,
+      "width": 958,
+      "height": 452
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-018.webp",
+      "caption": "Table 16 Recall accuracy (varying bit-array size m).",
+      "page": 49,
+      "index": 18,
+      "width": 986,
+      "height": 211
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-019.webp",
+      "caption": "Table 17 State-based recall accuracy (varying number of swaps n, with m = n).",
+      "page": 49,
+      "index": 19,
+      "width": 986,
+      "height": 212
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-020.webp",
+      "caption": "Table 19 Compute-optimal model size (N∗, billions), dataset size (D∗, billions of tokens), and predicted loss for all three architectures. Each architecture’s fitted aopt, bopt determine its compute-optimal allocation (C = 6ND). For each loss entry: [loss CI] on the second line; [∆ CI] on the third line (loss reduction relative to the transformer). All CIs are 95% bootstrap intervals.",
+      "page": 51,
+      "index": 20,
+      "width": 886,
+      "height": 475
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-021.webp",
+      "caption": "Table 20 Projected token requirements across model scales (target loss = 2.474, selected as the minimum of all observed training losses). Savings > 1× means fewer tokens needed than the transformer. 95% bootstrap CI shown below each estimate. See also Figure 10(b).",
+      "page": 51,
+      "index": 21,
+      "width": 582,
+      "height": 368
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-022.webp",
+      "caption": "Figure 9 Scaling law coefficients E, A, B with 95% bootstrap CIs for the fixed-exponent fit (α=β=0.22 shared), which yields tight confidence intervals. The data efficiency coefficient B shows a robust advantage for Hybrid GDN over the transformer (83.7 vs. 94.9, non-overlapping CIs, marked ∗), while differences in E and A are not statistically conclusive.",
+      "page": 17,
+      "index": 22,
+      "width": 959,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-023.webp",
+      "caption": "Figure 7 Synthetic task results. (a) State tracking accuracy vs. number of updates n: linear RNN and hybrid remain near-perfect, while the transformer falls quickly. (b) Recall accuracy vs. bit-array size m: transformer and hybrid maintain perfect recall, while the linear RNN degrades for large m. (c) State-based recall accuracy vs. number of swaps n (m = n): the hybrid remains robust, while both the transformer and linear RNN degrade for large m,n.",
+      "page": 12,
+      "index": 23,
+      "width": 967,
+      "height": 326
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-024.webp",
+      "caption": "Table 11 Differences between Olmo 3 and Olmo Hybrid SFT training configurations.",
+      "page": 41,
+      "index": 24,
+      "width": 718,
+      "height": 283
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-025.webp",
+      "caption": "Table 6 Base model performance on OlmoBaseEval compared to open-weight baselines using the OlmoBaseEval suite. Olmo Hybrid outperforms the dense Olmo 3 on all OlmoBaseEval multi-task averages, and both Pure RNN baselines (Falcon Mamba and xLSTM). Olmo Hybrid is also competitive with other open-weight hybrid dense models, like Nemotron-H and Falcon H1, despite being trained on half or fewer tokens. Olmo Hybrid was not evaluated on held-out benchmarks prior to release. RULER was evaluated up to the max context window for each model.",
+      "page": 27,
+      "index": 25,
+      "width": 972,
+      "height": 976
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-026.webp",
+      "caption": "Figure 18 Evaluation metrics vs. training FLOPs for hybrid architectures (GDN hybrid with interleaved and middle placement, Mamba2 hybrid). Panels follow the same layout as Figure 16: (a) average validation cross-entropy loss, (b) Base Easy Suite average BPB, and (c)–(e) per-cluster BPB for Math, Code, and QA. The thick line is the fitted compute-optimal frontier.",
+      "page": 56,
+      "index": 26,
+      "width": 967,
+      "height": 566
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-027.webp",
+      "caption": "Figure 14 Scaling law fit diagnostics. (a) Residuals are small and unbiased for all architectures. (b) Mean absolute relative error stays below 1% across all model sizes, confirming reliable fits. Overall: Olmo 3 R2 = 0.9976; Hybrid R2 = 0.9993; Pure GDN R2 = 0.9994.",
+      "page": 52,
+      "index": 27,
+      "width": 961,
+      "height": 405
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-028.webp",
+      "caption": "Figure 1 Olmo Hybrid 7B is more efficient than OLMo 3 7B during pretraining, reaching the same Common Crawl loss in 35% fewer tokens and the same MMLU accuracy using 49% fewer tokens (and thus also 35% and 49% fewer FLOPs, respectively).",
+      "page": 5,
+      "index": 28,
+      "width": 967,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-029.webp",
+      "caption": "Table 15 State tracking accuracy (varying number of updates n).",
+      "page": 48,
+      "index": 29,
+      "width": 986,
+      "height": 211
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-030.webp",
+      "caption": "Figure 8 Scaling law fits L(N,D) = E + A/Nα + B/Dβ for all architectures. Transformer: α = 0.252, β = 0.213, R2 = 0.998. Hybrid: α = 0.226, β = 0.219, R2 = 0.999. Pure GDN: α = 0.183, β = 0.227, R2 = 0.999. (a) Loss vs. compute; points represent model checkpoints at different model sizes (shown by opacity) and the bold curve shows the fitted scaling law at the compute-optimal frontier. (b) Loss vs. parameter count; points represent checkpoints at different Chinchilla multiples (D/N ratios, shown by opacity) and the fitted curve is evaluated at the largest multiple. (c) Loss vs. data budget; points represent checkpoints at different model sizes (shown by opacity) and the fitted curve is evaluated at the largest model size. Loss axes are plotted on a logarithmic scale so that the power-law relationships appear linear.",
+      "page": 16,
+      "index": 30,
+      "width": 957,
+      "height": 338
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03444v2/fig-031.webp",
+      "caption": "Table 21 Architecture ablation results — per-domain breakdown. Per-domain OlmoBaseEval BPB for pure and hybrid architectures. Bold indicates best; underline second best; † best within section. ⋆ marks our selected architecture. Note that per-size comparisons should be interpreted with care, as architectures at the same nominal scale differ in actual parameter count (see Table 22).",
+      "page": 69,
+      "index": 31,
+      "width": 986,
+      "height": 612
+    }
+  ]
+}

@@ -1,0 +1,1499 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-12T19:44:49.501259+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 4,
+    "deep_divecandidates": 61,
+    "deep_cap": 9,
+    "deep_selected": 21,
+    "quick_candidates": 147,
+    "quick_skim_target": 14,
+    "quick_selected": 14
+  },
+  "deep_dive": [
+    {
+      "id": "2604.03785v1",
+      "source": "arxiv",
+      "title": "Decomposing Communication Gain and Delay Cost Under Cross-Timestep Delays in Cooperative Multi-Agent Reinforcement Learning",
+      "abstract": "Communication is essential for coordination in \\emph{cooperative} multi-agent reinforcement learning under partial observability, yet \\emph{cross-timestep} delays cause messages to arrive multiple timesteps after generation, inducing temporal misalignment and making information stale when consumed.   We formalize this setting as a delayed-communication partially observable Markov game (DeComm-POMG) and decompose a message's effect into \\emph{communication gain} and \\emph{delay cost}, yielding the Communication Gain and Delay Cost (CGDC) metric.   We further establish a value-loss bound showing that the degradation induced by delayed messages is upper-bounded by a discounted accumulation of an information gap between the action distributions induced by timely versus delayed messages.   Guided by CGDC, we propose \\textbf{CDCMA}, an actor--critic framework that requests messages only when predicted CGDC is positive, predicts future observations to reduce misalignment at consumption, and fuses delayed messages via CGDC-guided attention.   Experiments on no-teammate-vision variants of Cooperative Navigation and Predator Prey, and on SMAC maps across multiple delay levels show consistent improvements in performance, robustness, and generalization, with ablations validating each component.",
+      "authors": [
+        "Zihong Gao",
+        "Hongjian Liang",
+        "Lei Hao",
+        "Liangjun Ke"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.MA"
+      ],
+      "published": "2026-04-04T16:14:41+00:00",
+      "link": "https://arxiv.org/pdf/2604.03785v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "cooperative multi-agent reinforcement learning under cross-timestep delays",
+      "llm_evidence_cn": "跨时间步延迟下的协作多智能体强化学习",
+      "llm_evidence": "跨时间步延迟下的协作多智能体强化学习",
+      "canonical_evidence": "跨时间步延迟下的协作多智能体强化学习",
+      "llm_tldr_en": "Decomposes communication effects in MARL to handle delays in partially observable environments.",
+      "llm_tldr_cn": "分解MARL中的通信效应，以处理部分可观测环境中的延迟问题。",
+      "llm_tldr": "分解MARL中的通信效应，以处理部分可观测环境中的延迟问题。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04356v1",
+      "source": "arxiv",
+      "title": "REAM: Merging Improves Pruning of Experts in LLMs",
+      "abstract": "Mixture-of-Experts (MoE) large language models (LLMs) are among the top-performing architectures. The largest models, often with hundreds of billions of parameters, pose significant memory challenges for deployment. Traditional approaches to reduce memory requirements include weight pruning and quantization. Motivated by the Router-weighted Expert Activation Pruning (REAP) that prunes experts, we propose a novel method, Router-weighted Expert Activation Merging (REAM). Instead of removing experts, REAM groups them and merges their weights, better preserving original performance. We evaluate REAM against REAP and other baselines across multiple MoE LLMs on diverse multiple-choice (MC) question answering and generative (GEN) benchmarks. Our results reveal a trade-off between MC and GEN performance that depends on the mix of calibration data. By controlling the mix of general, math and coding data, we examine the Pareto frontier of this trade-off and show that REAM often outperforms the baselines and in many cases is comparable to the original uncompressed models.",
+      "authors": [
+        "Saurav Jha",
+        "Maryam Hashemzadeh",
+        "Ali Saheb Pasand",
+        "Ali Parviz",
+        "Min-Joong Lee",
+        "Boris Knyazev"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.LG",
+        "cs.PF"
+      ],
+      "published": "2026-04-06T02:08:09+00:00",
+      "link": "https://arxiv.org/pdf/2604.04356v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "keyword:MARL",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Pruning and merging experts in MoE LLMs to reduce memory",
+      "llm_evidence_cn": "MoE大模型中的专家剪枝与合并以减少内存占用",
+      "llm_evidence": "MoE大模型中的专家剪枝与合并以减少内存占用",
+      "canonical_evidence": "MoE大模型中的专家剪枝与合并以减少内存占用",
+      "llm_tldr_en": "Proposes REAM to merge rather than just prune experts in MoE LLMs, preserving performance while compressing models.",
+      "llm_tldr_cn": "提出REAM方法，通过合并而非简单剪枝MoE模型中的专家来在压缩模型的同时保持性能。",
+      "llm_tldr": "提出REAM方法，通过合并而非简单剪枝MoE模型中的专家来在压缩模型的同时保持性能。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04493v1",
+      "source": "arxiv",
+      "title": "SLaB: Sparse-Lowrank-Binary Decomposition for Efficient Large Language Models",
+      "abstract": "The rapid growth of large language models (LLMs) presents significant deployment challenges due to their massive computational and memory demands. While model compression, such as network pruning, offers potential solutions, most existing methods often fail to maintain good performance at high compression ratios. To address this, we propose SLaB, a novel framework that decomposes each linear layer weight into three complementary components: a sparse matrix, a low-rank matrix, and a binary matrix. SLaB eliminates the need for retraining and leverages activation-aware pruning scores to guide the decomposition process. Experiments on Llama-family models demonstrate that SLaB achieves state-of-the-art performance, reducing perplexity by up to 36% compared to existing methods at 50% compression and improving accuracy by up to 8.98% over the baseline on zero-shot tasks.",
+      "authors": [
+        "Ziwei Li",
+        "Yuang Ma",
+        "Yi Kang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-06T07:36:48+00:00",
+      "link": "https://arxiv.org/pdf/2604.04493v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "keyword:MARL",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Decomposes linear layer weights into sparse, low-rank, and binary components for LLM compression",
+      "llm_evidence_cn": "将线性层权重分解为稀疏、低秩和二进制分量，用于大模型压缩",
+      "llm_evidence": "将线性层权重分解为稀疏、低秩和二进制分量，用于大模型压缩",
+      "canonical_evidence": "将线性层权重分解为稀疏、低秩和二进制分量，用于大模型压缩",
+      "llm_tldr_en": "SLaB is a training-free framework that decomposes LLM weights to achieve high compression with low perplexity.",
+      "llm_tldr_cn": "SLaB 是一种无需重训的框架，通过权重分解在保持低困惑度的同时实现大模型的高比例压缩。",
+      "llm_tldr": "SLaB 是一种无需重训的框架，通过权重分解在保持低困惑度的同时实现大模型的高比例压缩。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06542v1",
+      "source": "arxiv",
+      "title": "Does a Global Perspective Help Prune Sparse MoEs Elegantly?",
+      "abstract": "Empirical scaling laws for language models have encouraged the development of ever-larger LLMs, despite their growing computational and memory costs. Sparse Mixture-of-Experts (MoEs) offer a promising alternative by activating only a subset of experts per forward pass, improving efficiency without sacrificing performance. However, the large number of expert parameters still leads to substantial memory consumption.   Existing pruning methods typically allocate budgets uniformly across layers, overlooking the heterogeneous redundancy that arises in sparse MoEs. We propose GRAPE (Global Redundancy-Aware Pruning of Experts, a global pruning strategy that dynamically allocates pruning budgets based on cross-layer redundancy. Experiments on Mixtral-8x7B, Mixtral-8x22B, DeepSeek-MoE, Qwen-MoE, and GPT-OSS show that, under the same pruning budget, GRAPE consistently achieves the best average performance. On the three main models reported in the paper, it improves average accuracy over the strongest local baseline by 1.40% on average across pruning settings, with gains of up to 2.45%.",
+      "authors": [
+        "Zeliang Zhang",
+        "Nikhil Ghosh",
+        "Jiani Liu",
+        "Bin Yu",
+        "Xiaodong Liu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-08T00:41:11+00:00",
+      "link": "https://arxiv.org/pdf/2604.06542v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "keyword:MARL",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "global pruning strategy for sparse Mixture-of-Experts LLMs",
+      "llm_evidence_cn": "稀疏混合专家大模型的全局剪枝策略",
+      "llm_evidence": "稀疏混合专家大模型的全局剪枝策略",
+      "canonical_evidence": "稀疏混合专家大模型的全局剪枝策略",
+      "llm_tldr_en": "Introduces GRAPE, a global redundancy-aware pruning strategy for efficient compression of sparse MoE models.",
+      "llm_tldr_cn": "提出GRAPE，一种全局冗余感知剪枝策略，用于高效压缩稀疏混合专家模型。",
+      "llm_tldr": "提出GRAPE，一种全局冗余感知剪枝策略，用于高效压缩稀疏混合专家模型。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06691v1",
+      "source": "arxiv",
+      "title": "KD-MARL: Resource-Aware Knowledge Distillation in Multi-Agent Reinforcement Learning",
+      "abstract": "Real world deployment of multi agent reinforcement learning MARL systems is fundamentally constrained by limited compute memory and inference time. While expert policies achieve high performance they rely on costly decision cycles and large scale models that are impractical for edge devices or embedded platforms. Knowledge distillation KD offers a promising path toward resource aware execution but existing KD methods in MARL focus narrowly on action imitation often neglecting coordination structure and assuming uniform agent capabilities. We propose resource aware Knowledge Distillation for Multi Agent Reinforcement Learning KD MARL a two stage framework that transfers coordinated behavior from a centralized expert to lightweight decentralized student agents. The student policies are trained without a critic relying instead on distilled advantage signals and structured policy supervision to preserve coordination under heterogeneous and limited observations. Our approach transfers both action level behavior and structural coordination patterns from expert policies while supporting heterogeneous student architectures allowing each agent model capacity to match its observation complexity which is crucial for efficient execution under partial or limited observability and limited onboard resources. Extensive experiments on SMAC and MPE benchmarks demonstrate that KD MARL achieves high performance retention while substantially reducing computational cost. Across standard multi agent benchmarks KD MARL retains over 90 percent of expert performance while reducing computational cost by up to 28.6 times FLOPs. The proposed approach achieves expert level coordination and preserves it through structured distillation enabling practical MARL deployment across resource constrained onboard platforms.",
+      "authors": [
+        "Monirul Islam Pavel",
+        "Siyi Hu",
+        "Muhammad Anwar Masum",
+        "Mahardhika Pratama",
+        "Ryszard Kowalczyk",
+        "Zehong Jimmy Cao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-08T05:12:40+00:00",
+      "link": "https://arxiv.org/pdf/2604.06691v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "knowledge distillation for resource-aware multi-agent reinforcement learning",
+      "llm_evidence_cn": "资源受限多智能体强化学习中的知识蒸馏",
+      "llm_evidence": "资源受限多智能体强化学习中的知识蒸馏",
+      "canonical_evidence": "资源受限多智能体强化学习中的知识蒸馏",
+      "llm_tldr_en": "Introduces KD-MARL, a framework for transferring coordinated behavior to lightweight decentralized agents.",
+      "llm_tldr_cn": "引入了KD-MARL框架，旨在将协调行为从集中式专家转移到轻量级分布式智能体。",
+      "llm_tldr": "引入了KD-MARL框架，旨在将协调行为从集中式专家转移到轻量级分布式智能体。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06914v1",
+      "source": "arxiv",
+      "title": "Equivariant Multi-agent Reinforcement Learning for Multimodal Vehicle-to-Infrastructure Systems",
+      "abstract": "In this paper, we study a vehicle-to-infrastructure (V2I) system where distributed base stations (BSs) acting as road-side units (RSUs) collect multimodal (wireless and visual) data from moving vehicles. We consider a decentralized rate maximization problem, where each RSU relies on its local observations to optimize its resources, while all RSUs must collaborate to guarantee favorable network performance. We recast this problem as a distributed multi-agent reinforcement learning (MARL) problem, by incorporating rotation symmetries in terms of vehicles' locations. To exploit these symmetries, we propose a novel self-supervised learning framework where each BS agent aligns the latent features of its multimodal observation to extract the positions of the vehicles in its local region. Equipped with this sensing data at each RSU, we train an equivariant policy network using a graph neural network (GNN) with message passing layers, such that each agent computes its policy locally, while all agents coordinate their policies via a signaling scheme that overcomes partial observability and guarantees the equivariance of the global policy. We present numerical results carried out in a simulation environment, where ray-tracing and computer graphics are used to collect wireless and visual data. Results show the generalizability of our self-supervised and multimodal sensing approach, achieving more than two-fold accuracy gains over baselines, and the efficiency of our equivariant MARL training, attaining more than 50% performance gains over standard approaches.",
+      "authors": [
+        "Charbel Bou Chaaya",
+        "Mehdi Bennis"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-08T10:13:29+00:00",
+      "link": "https://arxiv.org/pdf/2604.06914v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Distributed multi-agent reinforcement learning for vehicle-to-infrastructure systems",
+      "llm_evidence_cn": "用于车路协同系统的分布式多智能体强化学习",
+      "llm_evidence": "用于车路协同系统的分布式多智能体强化学习",
+      "canonical_evidence": "用于车路协同系统的分布式多智能体强化学习",
+      "llm_tldr_en": "Proposes an equivariant MARL framework for resource optimization in V2I networks.",
+      "llm_tldr_cn": "提出一种等变多智能体强化学习框架，用于车路协同网络中的资源优化。",
+      "llm_tldr": "提出一种等变多智能体强化学习框架，用于车路协同网络中的资源优化。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.08174v1",
+      "source": "arxiv",
+      "title": "Value-Guidance MeanFlow for Offline Multi-Agent Reinforcement Learning",
+      "abstract": "Offline multi-agent reinforcement learning (MARL) aims to learn the optimal joint policy from pre-collected datasets, requiring a trade-off between maximizing global returns and mitigating distribution shift from offline data. Recent studies use diffusion or flow generative models to capture complex joint policy behaviors among agents; however, they typically rely on multi-step iterative sampling, thereby reducing training and inference efficiency. Although further research improves sampling efficiency through methods like distillation, it remains sensitive to the behavior regularization coefficient. To address the above-mentioned issues, we propose Value Guidance Multi-agent MeanFlow Policy (VGM$^2$P), a simple yet effective flow-based policy learning framework that enables efficient action generation with coefficient-insensitive conditional behavior cloning. Specifically, VGM$^2$P uses global advantage values to guide agent collaboration, treating optimal policy learning as conditional behavior cloning. Additionally, to improve policy expressiveness and inference efficiency in multi-agent scenarios, it leverages classifier-free guidance MeanFlow for both policy training and execution. Experiments on tasks with both discrete and continuous action spaces demonstrate that, even when trained solely via conditional behavior cloning, VGM$^2$P efficiently achieves performance comparable to state-of-the-art methods.",
+      "authors": [
+        "Teng Pang",
+        "Zhiqiang Dong",
+        "Yan Zhang",
+        "Rongjian Xu",
+        "Guoqiang Wu",
+        "Yilong Yin"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-09T12:31:43+00:00",
+      "link": "https://arxiv.org/pdf/2604.08174v1",
+      "tags": [
+        "keyword:MARL",
+        "query:ATTN",
+        "query:MARL"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "offline multi-agent reinforcement learning with flow-based policy",
+      "llm_evidence_cn": "基于流策略的离线多智能体强化学习",
+      "llm_evidence": "基于流策略的离线多智能体强化学习",
+      "canonical_evidence": "基于流策略的离线多智能体强化学习",
+      "llm_tldr_en": "Proposes VGM2P, a flow-based policy learning method for efficient offline multi-agent reinforcement learning.",
+      "llm_tldr_cn": "提出VGM2P，一种基于流的策略学习方法，用于提升离线多智能体强化学习的效率。",
+      "llm_tldr": "提出VGM2P，一种基于流的策略学习方法，用于提升离线多智能体强化学习的效率。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.03998v1",
+      "source": "arxiv",
+      "title": "VA-FastNavi-MARL: Real-Time Robot Control with Multimedia-Driven Meta-Reinforcement Learning",
+      "abstract": "Interpreting dynamic, heterogeneous multimedia commands with real-time responsiveness is critical for Human-Robot Interaction. We present VA-FastNavi-MARL, a framework that aligns asynchronous audio-visual inputs into a unified latent representation. By treating diverse instructions as a distribution of navigable goals via Meta-Reinforcement Learning, our method enables rapid adaptation to unseen directives with negligible inference overhead. Unlike approaches bottlenecked by heavy sensory processing, our modality-agnostic stream ensures seamless, low-latency control. Validation on a multi-arm workspace confirms that VA-FastNavi-MARL significantly outperforms baselines in sample efficiency and maintains robust, real-time execution even under noisy multimedia streams.",
+      "authors": [
+        "Yang Zhang",
+        "Shengxi Jing",
+        "Fengxiang Wang",
+        "Yuan Feng",
+        "Hong Wang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-04-05T07:05:49+00:00",
+      "link": "https://arxiv.org/pdf/2604.03998v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:MARL",
+        "query:ATTN",
+        "query:FLATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multi-agent reinforcement learning for real-time robot control",
+      "llm_evidence_cn": "用于实时机器人控制的多智能体强化学习",
+      "llm_evidence": "用于实时机器人控制的多智能体强化学习",
+      "canonical_evidence": "用于实时机器人控制的多智能体强化学习",
+      "llm_tldr_en": "A meta-reinforcement learning framework for real-time multi-agent robot control from multimedia commands.",
+      "llm_tldr_cn": "一种基于元强化学习的框架，用于根据多媒体指令进行实时多智能体机器人控制。",
+      "llm_tldr": "一种基于元强化学习的框架，用于根据多媒体指令进行实时多智能体机器人控制。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04384v1",
+      "source": "arxiv",
+      "title": "Compressible Softmax-Attended Language under Incompressible Attention",
+      "abstract": "Across every attention head in five transformer language models (124M--7B parameters, four architecture families), the logit energy field $\\tilde{E}$ reaches 90\\% of its variance in 2--11 singular components. The \\emph{learned} interaction matrix $W_Q^\\mathrm{T} W_K$ needs 38--75 components for the same threshold out of $d_h \\in \\{64, 128\\}$. The spectral gap is $5$--$25\\times$ in effective rank. The attention mechanism allocates capacity uniformly across all $d_h$ dimensions, but language concentrates the actual interaction into a few. The compressibility of softmax-attended language is a property of the data, not the frame that analyzes it.",
+      "authors": [
+        "Wonsuk Lee"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-04-06T03:18:27+00:00",
+      "link": "https://arxiv.org/pdf/2604.04384v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:FLATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Analyzes compressibility of softmax-attended language in transformer models",
+      "llm_evidence_cn": "分析 Transformer 模型中 Softmax 注意力语言的可压缩性",
+      "llm_evidence": "分析 Transformer 模型中 Softmax 注意力语言的可压缩性",
+      "canonical_evidence": "分析 Transformer 模型中 Softmax 注意力语言的可压缩性",
+      "llm_tldr_en": "This paper reveals that language interactions concentrate in a few singular components despite uniform capacity allocation.",
+      "llm_tldr_cn": "该论文揭示了尽管注意力机制均匀分配容量，但语言交互实际上集中在少数奇异分量中。",
+      "llm_tldr": "该论文揭示了尽管注意力机制均匀分配容量，但语言交互实际上集中在少数奇异分量中。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04442v1",
+      "source": "arxiv",
+      "title": "Explainable Autonomous Cyber Defense using Adversarial Multi-Agent Reinforcement Learning",
+      "abstract": "Autonomous agents are increasingly deployed in both offensive and defensive cyber operations, creating high-speed, closed-loop interactions in critical infrastructure environments. Advanced Persistent Threat (APT) actors exploit \"Living off the Land\" techniques and targeted telemetry perturbations to induce ambiguity in monitoring systems, causing automated defenses to overreact or misclassify benign behavior as malicious activity. Existing monolithic and multi-agent defense pipelines largely operate on correlation-based signals, lack structural constraints on response actions, and are vulnerable to reasoning drift under ambiguous or adversarial inputs. We present the Causal Multi-Agent Decision Framework (C-MADF), a structurally constrained architecture for autonomous cyber defense that integrates causal modeling with adversarial dual-policy control. C-MADF first learns a Structural Causal Model (SCM) from historical telemetry and compiles it into an investigation-level Directed Acyclic Graph (DAG) that defines admissible response transitions. This roadmap is formalized as a Markov Decision Process (MDP) whose action space is explicitly restricted to causally consistent transitions. Decision-making within this constrained space is performed by a dual-agent reinforcement learning system in which a threat-optimizing Blue-Team policy is counterbalanced by a conservatively shaped Red-Team policy. Inter-policy disagreement is quantified through a Policy Divergence Score and exposed via a human-in-the-loop interface equipped with an Explainability-Transparency Score that serves as an escalation signal under uncertainty. On the real-world CICIoT2023 dataset, C-MADF reduces the false-positive rate from 11.2%, 9.7%, and 8.4% in three cutting-edge literature baselines to 1.8%, while achieving 0.997 precision, 0.961 recall, and 0.979 F1-score.",
+      "authors": [
+        "Yiyao Zhang",
+        "Diksha Goel",
+        "Hussain Ahmad"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.LG",
+        "cs.MA"
+      ],
+      "published": "2026-04-06T05:40:43+00:00",
+      "link": "https://arxiv.org/pdf/2604.04442v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Adversarial Multi-Agent Reinforcement Learning for cyber defense",
+      "llm_evidence_cn": "用于网络防御的对抗性多智能体强化学习",
+      "llm_evidence": "用于网络防御的对抗性多智能体强化学习",
+      "canonical_evidence": "用于网络防御的对抗性多智能体强化学习",
+      "llm_tldr_en": "Presents a causal multi-agent decision framework using MARL for autonomous and explainable cyber defense.",
+      "llm_tldr_cn": "提出一种因果多智能体决策框架，利用MARL实现自主且可解释的网络防御。",
+      "llm_tldr": "提出一种因果多智能体决策框架，利用MARL实现自主且可解释的网络防御。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04972v1",
+      "source": "arxiv",
+      "title": "RCP: Representation Consistency Pruner for Mitigating Distribution Shift in Large Vision-Language Models",
+      "abstract": "Large Vision-Language Models (LVLMs) suffer from prohibitive inference costs due to the massive number of visual tokens processed by the language decoder. Existing pruning methods often lead to significant performance degradation because the irreversible removal of visual tokens causes a distribution shift in the hidden states that deviates from the pre-trained full-token regime. To address this, we propose Representation Consistency Pruner, which we refer to as RCP, as a novel framework that integrates cumulative visual token pruning with a delayed repair mechanism. Specifically, we introduce a cross-attention pruner that leverages the intrinsic attention of the LLM as a baseline to predict cumulative masks, ensuring consistent and monotonic token reduction across layers. To compensate for the resulting information loss, we design a delayed repair adapter denoted as DRA, which caches the essence of pruned tokens and applies FiLM-based modulation specifically to the answer generation tokens. We employ a repair loss to match the first and second-order statistics of the pruned representations with a full-token teacher. RCP is highly efficient because it trains only lightweight plug-in modules while allowing for physical token discarding at inference. Extensive experiments on LVLM benchmarks demonstrate that RCP removes up to 88.9\\% of visual tokens and reduces FLOPs by up to 85.7\\% with only a marginal average accuracy drop, and outperforms prior methods that avoid fine-tuning the original model on several widely used benchmarks.",
+      "authors": [
+        "Jianwei Zhang",
+        "Chaoning Zhang",
+        "Sihan Cao",
+        "Wang Liu",
+        "Pengcheng Zheng",
+        "Jiaxin Huang",
+        "Caiyan Qin",
+        "Yalan Ye",
+        "Wei Dong",
+        "Yang Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-04T13:31:45+00:00",
+      "link": "https://arxiv.org/pdf/2604.04972v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "visual token pruning for LVLMs",
+      "llm_evidence_cn": "视觉语言模型的视觉标记剪枝",
+      "llm_evidence": "视觉语言模型的视觉标记剪枝",
+      "canonical_evidence": "视觉语言模型的视觉标记剪枝",
+      "llm_tldr_en": "Proposes a representation consistency pruner to reduce inference costs in vision-language models.",
+      "llm_tldr_cn": "提出表示一致性剪枝器，通过累积视觉标记剪枝降低视觉语言模型的推理成本。",
+      "llm_tldr": "提出表示一致性剪枝器，通过累积视觉标记剪枝降低视觉语言模型的推理成本。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04988v1",
+      "source": "arxiv",
+      "title": "Prune-Quantize-Distill: An Ordered Pipeline for Efficient Neural Network Compression",
+      "abstract": "Modern deployment often requires trading accuracy for efficiency under tight CPU and memory constraints, yet common compression proxies such as parameter count or FLOPs do not reliably predict wall-clock inference time. In particular, unstructured sparsity can reduce model storage while failing to accelerate (and sometimes slightly slowing down) standard CPU execution due to irregular memory access and sparse kernel overhead. Motivated by this gap between compression and acceleration, we study a practical, ordered pipeline that targets measured latency by combining three widely used techniques: unstructured pruning, INT8 quantization-aware training (QAT), and knowledge distillation (KD). Empirically, INT8 QAT provides the dominant runtime benefit, while pruning mainly acts as a capacity-reduction pre-conditioner that improves the robustness of subsequent low-precision optimization; KD, applied last, recovers accuracy within the already constrained sparse INT8 regime without changing the deployment form. We evaluate on CIFAR-10/100 using three backbones (ResNet-18, WRN-28-10, and VGG-16-BN). Across all settings, the ordered pipeline achieves a stronger accuracy-size-latency frontier than any single technique alone, reaching 0.99-1.42 ms CPU latency with competitive accuracy and compact checkpoints. Controlled ordering ablations with a fixed 20/40/40 epoch allocation further confirm that stage order is consequential, with the proposed ordering generally performing best among the tested permutations. Overall, our results provide a simple guideline for edge deployment: evaluate compression choices in the joint accuracy-size-latency space using measured runtime, rather than proxy metrics alone.",
+      "authors": [
+        "Longsheng Zhou",
+        "Yu Shen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-05T06:13:47+00:00",
+      "link": "https://arxiv.org/pdf/2604.04988v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "unstructured pruning in an ordered compression pipeline",
+      "llm_evidence_cn": "有序压缩流水线中的非结构化剪枝",
+      "llm_evidence": "有序压缩流水线中的非结构化剪枝",
+      "canonical_evidence": "有序压缩流水线中的非结构化剪枝",
+      "llm_tldr_en": "Studies a pipeline combining unstructured pruning, quantization, and distillation to optimize neural network latency.",
+      "llm_tldr_cn": "研究结合非结构化剪枝、量化和蒸馏的流水线，以优化神经网络推理延迟。",
+      "llm_tldr": "研究结合非结构化剪枝、量化和蒸馏的流水线，以优化神经网络推理延迟。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Unstructured pruning and weight sparsity in deep learning",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05887v1",
+      "source": "arxiv",
+      "title": "HybridKV: Hybrid KV Cache Compression for Efficient Multimodal Large Language Model Inference",
+      "abstract": "Multimodal Large Language Models (MLLMs) have advanced unified reasoning over text, images, and videos, but their inference is hindered by the rapid growth of key-value (KV) caches. Each visual input expands into thousands of tokens, causing caches to scale linearly with context length and remain resident in GPU memory throughout decoding, which leads to prohibitive memory overhead and latency even on high-end GPUs. A common solution is to compress caches under a fixed allocated budget at different granularities: token-level uniformly discards less important tokens, layer-level varies retention across layers, and head-level redistributes budgets across heads. Yet these approaches stop at allocation and overlook the heterogeneous behaviors of attention heads that require distinct compression strategies. We propose HybridKV, a hybrid KV cache compression framework that integrates complementary strategies in three stages: heads are first classified into static or dynamic types using text-centric attention; then a top-down budget allocation scheme hierarchically assigns KV budgets; finally, static heads are compressed by text-prior pruning and dynamic heads by chunk-wise retrieval. Experiments on 11 multimodal benchmarks with Qwen2.5-VL-7B show that HybridKV reduces KV cache memory by up to $7.9\\times$ and achieves $1.52\\times$ faster decoding, with almost no performance drop or even higher relative to the full-cache MLLM.",
+      "authors": [
+        "Bowen Zeng",
+        "Feiyang Ren",
+        "Jun Zhang",
+        "Xiaoling Gu",
+        "Ke Chen",
+        "Lidan Shou",
+        "Huan Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-07T13:51:07+00:00",
+      "link": "https://arxiv.org/pdf/2604.05887v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression for efficient MLLM inference",
+      "llm_evidence_cn": "用于高效多模态大模型推理的KV缓存压缩",
+      "llm_evidence": "用于高效多模态大模型推理的KV缓存压缩",
+      "canonical_evidence": "用于高效多模态大模型推理的KV缓存压缩",
+      "llm_tldr_en": "Introduces HybridKV for multi-granularity KV cache compression to reduce memory overhead in MLLM inference.",
+      "llm_tldr_cn": "引入HybridKV进行多粒度KV缓存压缩，以减少多模态大模型推理的内存开销。",
+      "llm_tldr": "引入HybridKV进行多粒度KV缓存压缩，以减少多模态大模型推理的内存开销。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05906v1",
+      "source": "arxiv",
+      "title": "Selective Aggregation of Attention Maps Improves Diffusion-Based Visual Interpretation",
+      "abstract": "Numerous studies on text-to-image (T2I) generative models have utilized cross-attention maps to boost application performance and interpret model behavior. However, the distinct characteristics of attention maps from different attention heads remain relatively underexplored. In this study, we show that selectively aggregating cross-attention maps from heads most relevant to a target concept can improve visual interpretability. Compared to the diffusion-based segmentation method DAAM, our approach achieves higher mean IoU scores. We also find that the most relevant heads capture concept-specific features more accurately than the least relevant ones, and that selective aggregation helps diagnose prompt misinterpretations. These findings suggest that attention head selection offers a promising direction for improving the interpretability and controllability of T2I generation.",
+      "authors": [
+        "Jungwon Park",
+        "Jungmin Ko",
+        "Dongnam Byun",
+        "Wonjong Rhee"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-04-07T14:09:00+00:00",
+      "link": "https://arxiv.org/pdf/2604.05906v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "query:ATTN",
+        "query:FLATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "interpreting model behavior through cross-attention maps",
+      "llm_evidence_cn": "通过交叉注意力图解释模型行为",
+      "llm_evidence": "通过交叉注意力图解释模型行为",
+      "canonical_evidence": "通过交叉注意力图解释模型行为",
+      "llm_tldr_en": "Improves visual interpretability by selectively aggregating cross-attention maps from relevant heads.",
+      "llm_tldr_cn": "通过选择性聚合相关头部的交叉注意力图，提高了视觉可解释性。",
+      "llm_tldr": "通过选择性聚合相关头部的交叉注意力图，提高了视觉可解释性。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-29",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06481v1",
+      "source": "arxiv",
+      "title": "Hybrid ResNet-1D-BiGRU with Multi-Head Attention for Cyberattack Detection in Industrial IoT Environments",
+      "abstract": "This study introduces a hybrid deep learning model for intrusion detection in Industrial IoT (IIoT) systems, combining ResNet-1D, BiGRU, and Multi-Head Attention (MHA) for effective spatial-temporal feature extraction and attention-based feature weighting. To address class imbalance, SMOTE was applied during training on the EdgeHoTset dataset. The model achieved 98.71% accuracy, a loss of 0.0417%, and low inference latency (0.0001 sec /instance), demonstrating strong real-time capability. To assess generalizability, the model was also tested on the CICIoV2024 dataset, where it reached 99.99% accuracy and F1-score, with a loss of 0.0028, 0 % FPR, and 0.00014 sec/instance inference time. Across all metrics and datasets, the proposed model outperformed existing methods, confirming its robustness and effectiveness for real-time IoT intrusion detection.",
+      "authors": [
+        "Afrah Gueriani",
+        "Hamza Kheddar",
+        "Ahmed Cherif Mazari"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CR"
+      ],
+      "published": "2026-04-07T21:32:03+00:00",
+      "link": "https://arxiv.org/pdf/2604.06481v1",
+      "tags": [
+        "keyword:ATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "combining ResNet-1D, BiGRU, and Multi-Head Attention (MHA)",
+      "llm_evidence_cn": "结合ResNet-1D、BiGRU和多头注意力机制(MHA)",
+      "llm_evidence": "结合ResNet-1D、BiGRU和多头注意力机制(MHA)",
+      "canonical_evidence": "结合ResNet-1D、BiGRU和多头注意力机制(MHA)",
+      "llm_tldr_en": "A hybrid model using multi-head attention for cyberattack detection in Industrial IoT environments.",
+      "llm_tldr_cn": "一种利用多头注意力机制进行工业物联网网络攻击检测的混合模型。",
+      "llm_tldr": "一种利用多头注意力机制进行工业物联网网络攻击检测的混合模型。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "multi-head attention mechanism implementation",
+      "matched_requirement_id": "req-26",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.06627v1",
+      "source": "arxiv",
+      "title": "DiffuMask: Diffusion Language Model for Token-level Prompt Pruning",
+      "abstract": "In-Context Learning and Chain-of-Thought prompting improve reasoning in large language models (LLMs). These typically come at the cost of longer, more expensive prompts that may contain redundant information. Prompt compression based on pruning offers a practical solution, yet existing methods rely on sequential token removal which is computationally intensive. We present DiffuMask, a diffusion-based framework integrating hierarchical shot-level and token-level pruning signals, that enables rapid and parallel prompt pruning via iterative mask prediction. DiffuMask substantially accelerates the compression process via masking multiple tokens in each denoising step. It offers tunable control over retained content, preserving essential reasoning context and achieving up to 80\\% prompt length reduction. Meanwhile, it maintains or improves accuracy across in-domain, out-of-domain, and cross-model settings. Our results show that DiffuMask provides a generalizable and controllable framework for prompt compression, facilitating faster and more reliable in-context reasoning in LLMs.",
+      "authors": [
+        "Caleb Zheng",
+        "Jyotika Singh",
+        "Fang Tu",
+        "Weiyi Sun",
+        "Sujeeth Bharadwaj",
+        "Yassine Benajiba",
+        "Sujith Ravi",
+        "Eli Shlizerman",
+        "Dan Roth"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-08T03:08:18+00:00",
+      "link": "https://arxiv.org/pdf/2604.06627v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "keyword:MARL",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Token-level prompt pruning for large language models",
+      "llm_evidence_cn": "大语言模型的标记级提示词剪枝",
+      "llm_evidence": "大语言模型的标记级提示词剪枝",
+      "canonical_evidence": "大语言模型的标记级提示词剪枝",
+      "llm_tldr_en": "Introduces DiffuMask, a diffusion-based framework for rapid and parallel prompt pruning in LLMs.",
+      "llm_tldr_cn": "介绍了 DiffuMask，一个基于扩散的大模型提示词快速并行剪枝框架。",
+      "llm_tldr": "介绍了 DiffuMask，一个基于扩散的大模型提示词快速并行剪枝框架。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Large language model pruning techniques and methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07133v1",
+      "source": "arxiv",
+      "title": "Energy Saving for Cell-Free Massive MIMO Networks: A Multi-Agent Deep Reinforcement Learning Approach",
+      "abstract": "This paper focuses on energy savings in downlink operation of cell-free massive MIMO (CF mMIMO) networks under dynamic traffic conditions. We propose a multi-agent deep reinforcement learning (MADRL) algorithm that enables each access point (AP) to autonomously control antenna re-configuration and advanced sleep mode (ASM) selection. After the training process, the proposed framework operates in a fully distributed manner, eliminating the need for centralized control and allowing each AP to dynamically adjust to real-time traffic fluctuations. Simulation results show that the proposed algorithm reduces power consumption (PC) by 56.23% compared to systems without any energy-saving scheme and by 30.12% relative to a non-learning mechanism that only utilizes the lightest sleep mode, with only a slight increase in drop ratio. Moreover, compared to the widely used deep Q-network (DQN) algorithm, it achieves a similar PC level but with a significantly lower drop ratio.",
+      "authors": [
+        "Qichen Wang",
+        "Keyu Li",
+        "Ozan Alp Topal",
+        "Özlem Tugfe Demir",
+        "Mustafa Ozger",
+        "Cicek Cavdar"
+      ],
+      "primary_category": "cs.IT",
+      "categories": [
+        "cs.IT",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-04-08T14:27:00+00:00",
+      "link": "https://arxiv.org/pdf/2604.07133v1",
+      "tags": [
+        "keyword:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multi-agent deep reinforcement learning for energy saving",
+      "llm_evidence_cn": "用于节能的多智能体深度强化学习",
+      "llm_evidence": "用于节能的多智能体深度强化学习",
+      "canonical_evidence": "用于节能的多智能体深度强化学习",
+      "llm_tldr_en": "A MADRL algorithm for autonomous energy saving in cell-free massive MIMO networks through distributed control.",
+      "llm_tldr_cn": "一种用于无小区大规模MIMO网络自主节能的分布式多智能体深度强化学习算法。",
+      "llm_tldr": "一种用于无小区大规模MIMO网络自主节能的分布式多智能体深度强化学习算法。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07165v1",
+      "source": "arxiv",
+      "title": "Reason in Chains, Learn in Trees: Self-Rectification and Grafting for Multi-turn Agent Policy Optimization",
+      "abstract": "Reinforcement learning for Large Language Model agents is often hindered by sparse rewards in multi-step reasoning tasks. Existing approaches like Group Relative Policy Optimization treat sampled trajectories as independent chains, assigning uniform credit to all steps in each chain and ignoring the existence of critical steps that may disproportionally impact reasoning outcome. In this paper, we propose T-STAR(Tree-structured Self-Taught Agent Rectification), a framework that recovers the latent correlated reward structure across seemingly independent trajectories. Specifically, we consolidate trajectories into a unified Cognitive Tree by identifying and merging functionally similar steps/nodes. It enables an Introspective Valuation mechanism that back-propagates trajectory-level rewards through the tree to obtain a new notion of variance-reduced relative advantage at step-level. Using the Cognitive Tree, we also develop In-Context Thought Grafting to synthesize corrective reasoning by contrasting successful and failed branches at critical divergence points/steps. Our proposed Surgical Policy Optimization then capitalizes on the rich policy gradient information concentrated at these critical points/steps through a Bradley-Terry type of surgical loss. Extensive experiments across embodied, interactive, reasoning, and planning benchmarks demonstrate that T-STAR achieves consistent improvements over strong baselines, with gains most pronounced on tasks requiring extended reasoning chains.",
+      "authors": [
+        "Yu Li",
+        "Sizhe Tang",
+        "Tian Lan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-04-08T14:55:29+00:00",
+      "link": "https://arxiv.org/pdf/2604.07165v1",
+      "tags": [
+        "keyword:MARL",
+        "query:ATTN",
+        "query:MARL"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "credit assignment in multi-step reasoning tasks",
+      "llm_evidence_cn": "多步推理任务中的信用分配",
+      "llm_evidence": "多步推理任务中的信用分配",
+      "canonical_evidence": "多步推理任务中的信用分配",
+      "llm_tldr_en": "Proposes T-STAR to address credit assignment in multi-step agent reasoning via tree-structured rectification.",
+      "llm_tldr_cn": "提出T-STAR框架，通过树状结构纠正解决智能体多步推理中的信用分配问题。",
+      "llm_tldr": "提出T-STAR框架，通过树状结构纠正解决智能体多步推理中的信用分配问题。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Challenges and solutions for multi agent credit assignment",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07394v1",
+      "source": "arxiv",
+      "title": "Flux Attention: Context-Aware Hybrid Attention for Efficient LLMs Inference",
+      "abstract": "The quadratic computational complexity of standard attention mechanisms presents a severe scalability bottleneck for LLMs in long-context scenarios. While hybrid attention mechanisms combining Full Attention (FA) and Sparse Attention (SA) offer a potential solution, existing methods typically rely on static allocation ratios that fail to accommodate the variable retrieval demands of different tasks. Furthermore, head-level dynamic sparsity often introduces severe computational load imbalance and synchronization long-tails, which hinder hardware acceleration during autoregressive decoding. To bridge this gap, we introduce Flux Attention, a context-aware framework that dynamically optimizes attention computation at the layer level. By integrating a lightweight Layer Router into frozen pretrained LLMs, the proposed method adaptively routes each layer to FA or SA based on the input context. This layer-wise routing preserves high-fidelity information retrieval while ensuring contiguous memory access, translating theoretical computational reductions into practical wall-clock speedups. As a parameter-efficient approach, our framework requires only 12 hours of training on 8$\\times$A800 GPUs. Extensive experiments across multiple long-context and mathematical reasoning benchmarks demonstrate that Flux Attention achieves a superior trade-off between performance and inference speed compared with baseline models, with speed improvements of up to $2.8\\times$ and $2.0\\times$ in the prefill and decode stages.",
+      "authors": [
+        "Quantong Qiu",
+        "Zhiyi Hong",
+        "Yi Yang",
+        "Haitian Wang",
+        "Kebin Liu",
+        "Qingqing Dang",
+        "Juntao Li",
+        "Min Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-04-08T07:36:17+00:00",
+      "link": "https://arxiv.org/pdf/2604.07394v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:FLATTN"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Hybrid attention combining Full and Sparse Attention for efficient LLM inference",
+      "llm_evidence_cn": "结合全注意力与稀疏注意力的混合注意力机制以优化推理",
+      "llm_evidence": "结合全注意力与稀疏注意力的混合注意力机制以优化推理",
+      "canonical_evidence": "结合全注意力与稀疏注意力的混合注意力机制以优化推理",
+      "llm_tldr_en": "Proposes Flux Attention, a context-aware hybrid mechanism to optimize attention efficiency in LLMs.",
+      "llm_tldr_cn": "提出 Flux Attention，一种上下文感知的混合机制，旨在优化大模型的注意力计算效率。",
+      "llm_tldr": "提出 Flux Attention，一种上下文感知的混合机制，旨在优化大模型的注意力计算效率。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07812v1",
+      "source": "arxiv",
+      "title": "HAWK: Head Importance-Aware Visual Token Pruning in Multimodal Models",
+      "abstract": "In multimodal large language models (MLLMs), the surge of visual tokens significantly increases the inference time and computational overhead, making them impractical for real-time or resource-constrained applications. Visual token pruning is a promising strategy for reducing the cost of MLLM inference by removing redundant visual tokens. Existing research usually assumes that all attention heads contribute equally to the visual interpretation. However, our study reveals that different heads may capture distinct visual semantics and inherently play distinct roles in visual processing. In light of this observation, we propose HAWK, a head importance-aware visual token pruning method that perceives the varying importance of attention heads in visual tasks to maximize the retention of crucial tokens. By leveraging head importance weights and text-guided attention to assess visual token significance, HAWK effectively retains task-relevant visual tokens while removing redundant ones. The proposed HAWK is entirely training-free and can be seamlessly applied to various MLLMs. Extensive experiments on multiple mainstream vision-language benchmarks demonstrate that HAWK achieves state-of-the-art accuracy. When applied to Qwen2.5-VL, HAWK retains 96.0% of the original accuracy after pruning 80.2% of the visual tokens. Additionally, it reduces end-to-end latency to 74.4% of the original and further decreases GPU memory usage across the tested models. The code is available at https://github.com/peppery77/HAWK.git.",
+      "authors": [
+        "Qihui Zhu",
+        "Tao Zhang",
+        "Yuchen Wang",
+        "Zijian Wen",
+        "Mengjie Zhang",
+        "Shuangwu Chen",
+        "Xiaobin Tan",
+        "Jian Yang",
+        "Yang Liu",
+        "Zhenhua Dong",
+        "Xianzhi Yu",
+        "Yinfei Pan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-09T05:09:22+00:00",
+      "link": "https://arxiv.org/pdf/2604.07812v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "visual token pruning in multimodal large language models based on head importance",
+      "llm_evidence_cn": "基于多头重要性的多模态大模型视觉标记剪枝",
+      "llm_evidence": "基于多头重要性的多模态大模型视觉标记剪枝",
+      "canonical_evidence": "基于多头重要性的多模态大模型视觉标记剪枝",
+      "llm_tldr_en": "Proposes HAWK, a method to prune redundant visual tokens in MLLMs by evaluating attention head importance.",
+      "llm_tldr_cn": "提出HAWK方法，通过感知注意力头的重要性来剪枝多模态大模型中的冗余视觉标记。",
+      "llm_tldr": "提出HAWK方法，通过感知注意力头的重要性来剪枝多模态大模型中的冗余视觉标记。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07925v1",
+      "source": "arxiv",
+      "title": "Sinkhorn doubly stochastic attention rank decay analysis",
+      "abstract": "The self-attention mechanism is central to the success of Transformer architectures. However, standard row-stochastic attention has been shown to suffer from significant signal degradation across layers. In particular, it can induce rank collapse, resulting in increasingly uniform token representations, as well as entropy collapse, characterized by highly concentrated attention distributions. Recent work has highlighted the benefits of doubly stochastic attention as a form of entropy regularization, promoting a more balanced attention distribution and leading to improved empirical performance. In this paper, we study rank collapse across network depth and show that doubly stochastic attention matrices normalized with Sinkhorn algorithm preserve rank more effectively than standard Softmax row-stochastic ones. As previously shown for Softmax, skip connections are crucial to mitigate rank collapse. We empirically validate this phenomenon on both sentiment analysis and image classification tasks. Moreover, we derive a theoretical bound for the pure self-attention rank decay when using Sinkhorn normalization and find that rank decays to one doubly exponentially with depth, a phenomenon that has already been shown for Softmax.",
+      "authors": [
+        "Michela Lapenna",
+        "Rita Fioresi",
+        "Bahman Gharesifard"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "math.OC"
+      ],
+      "published": "2026-04-09T07:46:18+00:00",
+      "link": "https://arxiv.org/pdf/2604.07925v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "analysis of rank collapse in self-attention mechanisms",
+      "llm_evidence_cn": "自注意力机制中秩崩溃现象的分析",
+      "llm_evidence": "自注意力机制中秩崩溃现象的分析",
+      "canonical_evidence": "自注意力机制中秩崩溃现象的分析",
+      "llm_tldr_en": "Analyzes how doubly stochastic attention normalized with Sinkhorn algorithm prevents rank collapse in Transformers.",
+      "llm_tldr_cn": "分析了使用 Sinkhorn 算法归一化的双随机注意力如何防止 Transformer 中的秩崩溃。",
+      "llm_tldr": "分析了使用 Sinkhorn 算法归一化的双随机注意力如何防止 Transformer 中的秩崩溃。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "how does the attention mechanism work in deep learning",
+      "matched_requirement_id": "req-30",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2604.03430v1",
+      "source": "arxiv",
+      "title": "Scaling Multi-agent Systems: A Smart Middleware for Improving Agent Interactions",
+      "abstract": "As Large Language Model (LLM) based Multi-Agent Systems (MAS) evolve from experimental pilots to complex, persistent ecosystems, the limitations of direct agent-to-agent communication have become increasingly apparent. Current architectures suffer from fragmented context, stochastic hallucinations, rigid security boundaries, and inefficient topology management. This paper introduces Cognitive Fabric Nodes (CFN), a novel middleware layer that creates an omnipresent \"Cognitive Fabric\" between agents. Unlike traditional message queues or service meshes, CFNs are not merely pass-through mechanisms; they are active, intelligent intermediaries.   Central to this architecture is the elevation of Memory from simple storage to an active functional substrate that informs four other critical capabilities: Topology Selection, Semantic Grounding, Security Policy Enforcement, and Prompt Transformation. We propose that each of these functions be governed by learning modules utilizing Reinforcement Learning (RL) and optimization algorithms to improve system performance dynamically. By intercepting, analyzing, and rewriting inter-agent communication, the Cognitive Fabric ensures that individual agents remain lightweight while the ecosystem achieves coherence, safety, and semantic alignment.   We evaluate the effectiveness of the CFN on the HotPotQA and MuSiQue datasets in a multi-agent environment and demonstrate that the CFN improves performance by more than 10\\% on both datasets over direct agent to agent communication.",
+      "authors": [
+        "Charles Fleming",
+        "Ramana Kompella",
+        "Peter Bosch",
+        "Vijoy Pandey"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.NI"
+      ],
+      "published": "2026-04-03T19:58:01+00:00",
+      "link": "https://arxiv.org/pdf/2604.03430v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Middleware architecture for LLM-based multi-agent systems",
+      "llm_evidence_cn": "基于大语言模型的多智能体系统中间件架构",
+      "llm_evidence": "基于大语言模型的多智能体系统中间件架构",
+      "canonical_evidence": "基于大语言模型的多智能体系统中间件架构",
+      "llm_tldr_en": "Introduces Cognitive Fabric Nodes as a middleware to improve communication and memory in multi-agent systems.",
+      "llm_tldr_cn": "引入认知织网节点作为中间件，旨在改善多智能体系统中的通信与记忆管理。",
+      "llm_tldr": "引入认知织网节点作为中间件，旨在改善多智能体系统中的通信与记忆管理。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03444v1",
+      "source": "arxiv",
+      "title": "Olmo Hybrid: From Theory to Practice and Back",
+      "abstract": "Recent work has demonstrated the potential of non-transformer language models, especially linear recurrent neural networks (RNNs) and hybrid models that mix recurrence and attention. Yet there is no consensus on whether the potential benefits of these new architectures justify the risk and effort of scaling them up. To address this, we provide evidence for the advantages of hybrid models over pure transformers on several fronts. First, theoretically, we show that hybrid models do not merely inherit the expressivity of transformers and linear RNNs, but can express tasks beyond both, such as code execution. Putting this theory to practice, we train Olmo Hybrid, a 7B-parameter model largely comparable to Olmo 3 7B but with the sliding window layers replaced by Gated DeltaNet layers. We show that Olmo Hybrid outperforms Olmo 3 across standard pretraining and mid-training evaluations, demonstrating the benefit of hybrid models in a controlled, large-scale setting. We find that the hybrid model scales significantly more efficiently than the transformer, explaining its higher performance. However, its unclear why greater expressivity on specific formal problems should result in better scaling or superior performance on downstream tasks unrelated to those problems. To explain this apparent gap, we return to theory and argue why increased expressivity should translate to better scaling efficiency, completing the loop. Overall, our results suggest that hybrid models mixing attention and recurrent layers are a powerful extension to the language modeling paradigm: not merely to reduce memory during inference, but as a fundamental way to obtain more expressive models that scale better during pretraining.",
+      "authors": [
+        "William Merrill",
+        "Yanhong Li",
+        "Tyler Romero",
+        "Anej Svete",
+        "Caia Costello",
+        "Pradeep Dasigi",
+        "Dirk Groeneveld",
+        "David Heineman",
+        "Bailey Kuehl",
+        "Nathan Lambert",
+        "Jacob Morrison",
+        "Luca Soldaini",
+        "Finbarr Timbers",
+        "Pete Walsh",
+        "Noah A. Smith",
+        "Hannaneh Hajishirzi",
+        "Ashish Sabharwal"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-04-03T20:36:34+00:00",
+      "link": "https://arxiv.org/pdf/2604.03444v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:LLM剪枝",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "hybrid models mixing recurrence and attention mechanisms",
+      "llm_evidence_cn": "混合循环与注意力机制的混合模型",
+      "llm_evidence": "混合循环与注意力机制的混合模型",
+      "canonical_evidence": "混合循环与注意力机制的混合模型",
+      "llm_tldr_en": "Evaluates hybrid models combining attention and recurrence, showing advantages over pure transformers.",
+      "llm_tldr_cn": "评估结合了注意力和循环的混合模型，展示了其优于纯 Transformer 的优势。",
+      "llm_tldr": "评估结合了注意力和循环的混合模型，展示了其优于纯 Transformer 的优势。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "comparison of different types of attention mechanisms",
+      "matched_requirement_id": "req-31",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.03444v2",
+      "source": "arxiv",
+      "title": "Olmo Hybrid: From Theory to Practice and Back",
+      "abstract": "Recent work has demonstrated the potential of non-transformer language models, especially linear recurrent neural networks (RNNs) and hybrid models that mix recurrence and attention. Yet there is no consensus on whether the potential benefits of these new architectures justify the risk and effort of scaling them up. To address this, we provide evidence for the advantages of hybrid models over pure transformers on several fronts. First, theoretically, we show that hybrid models do not merely inherit the expressivity of transformers and linear RNNs, but can express tasks beyond both, such as code execution. Putting this theory to practice, we train Olmo Hybrid, a 7B-parameter model largely comparable to Olmo 3 7B but with the sliding window layers replaced by Gated DeltaNet layers. We show that Olmo Hybrid outperforms Olmo 3 across standard pretraining and mid-training evaluations, demonstrating the benefit of hybrid models in a controlled, large-scale setting. We find that the hybrid model scales significantly more efficiently than the transformer, explaining its higher performance. However, its unclear why greater expressivity on specific formal problems should result in better scaling or superior performance on downstream tasks unrelated to those problems. To explain this apparent gap, we return to theory and argue why increased expressivity should translate to better scaling efficiency, completing the loop. Overall, our results suggest that hybrid models mixing attention and recurrent layers are a powerful extension to the language modeling paradigm: not merely to reduce memory during inference, but as a fundamental way to obtain more expressive models that scale better during pretraining.",
+      "authors": [
+        "William Merrill",
+        "Yanhong Li",
+        "Tyler Romero",
+        "Anej Svete",
+        "Caia Costello",
+        "Pradeep Dasigi",
+        "Dirk Groeneveld",
+        "David Heineman",
+        "Bailey Kuehl",
+        "Nathan Lambert",
+        "Chuan Li",
+        "Kyle Lo",
+        "Saumya Malik",
+        "DJ Matusz",
+        "Benjamin Minixhofer",
+        "Jacob Morrison",
+        "Luca Soldaini",
+        "Finbarr Timbers",
+        "Pete Walsh",
+        "Noah A. Smith",
+        "Hannaneh Hajishirzi",
+        "Ashish Sabharwal"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-04-03T20:36:34+00:00",
+      "link": "https://arxiv.org/pdf/2604.03444v2",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:LLM剪枝",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "hybrid models mixing recurrence and attention mechanisms",
+      "llm_evidence_cn": "混合循环和注意力机制的模型",
+      "llm_evidence": "混合循环和注意力机制的模型",
+      "canonical_evidence": "混合循环和注意力机制的模型",
+      "llm_tldr_en": "Explores hybrid models combining attention and linear RNNs to surpass pure transformer expressivity.",
+      "llm_tldr_cn": "探索结合注意力和线性RNN的混合模型，证明其在表达能力上优于纯Transformer。",
+      "llm_tldr": "探索结合注意力和线性RNN的混合模型，证明其在表达能力上优于纯Transformer。",
+      "llm_tags": [
+        "query:attn:composite"
+      ],
+      "matched_query_tag": "query:attn:composite",
+      "matched_query_text": "Papers central to attention, especially work that connects or combines: neural network attention mechanism architecture; self-attention layers in transformer models; multi-head attention mechanism implementation; transformer architecture and attention layers; encoder-decoder cross-attention mechanism; interpreting and visualizing attention weights; how does the attention mechanism work in deep learning; comparison of different types of attention mechanisms; applications of attention in natural language processing and vision.",
+      "matched_requirement_id": "req-composite-attn",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.03556v1",
+      "source": "arxiv",
+      "title": "Focus Matters: Phase-Aware Suppression for Hallucination in Vision-Language Models",
+      "abstract": "Large Vision-Language Models (LVLMs) have achieved impressive progress in multimodal reasoning, yet they remain prone to object hallucinations, generating descriptions of objects that are not present in the input image. Recent approaches attempt to mitigate hallucinations by suppressing unreliable visual signals in the vision encoder, but many rely on iterative optimization for each input, resulting in substantial inference latency. In this work, we investigate the internal attention dynamics of vision encoders in LVLMs and identify a consistent three-phase structure of visual information processing: diffusion, focus, and rediffusion. Our analysis reveals that hallucination behavior is particularly sensitive to tokens receiving low attention during the focus phase. Motivated by this observation, we propose a lightweight inference-time intervention that selectively suppresses such tokens during the focus phase. The method operates in a training-free manner using statistics from a single forward pass and employs a Determinantal Point Process (DPP) to preserve diverse visual cues while filtering redundant tokens. Extensive experiments across multiple LVLM backbones and decoding strategies demonstrate that the proposed approach consistently reduces hallucination metrics while maintaining competitive caption quality. Moreover, compared to adversarial uncertainty estimation methods, our approach achieves comparable hallucination mitigation with negligible additional inference latency.",
+      "authors": [
+        "Sohyeon Kim",
+        "Sang Yeon Yoon",
+        "Kyeongbo Kong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-04T02:46:58+00:00",
+      "link": "https://arxiv.org/pdf/2604.03556v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "query:ATTN",
+        "query:FLATTN"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "investigating internal attention dynamics and phase-aware suppression",
+      "llm_evidence_cn": "研究内部注意力动态和相位感知抑制",
+      "llm_evidence": "研究内部注意力动态和相位感知抑制",
+      "canonical_evidence": "研究内部注意力动态和相位感知抑制",
+      "llm_tldr_en": "Analyzes attention dynamics in vision encoders to mitigate hallucinations in vision-language models.",
+      "llm_tldr_cn": "分析视觉编码器中的注意力动态，以减轻视觉语言模型中的幻觉问题。",
+      "llm_tldr": "分析视觉编码器中的注意力动态，以减轻视觉语言模型中的幻觉问题。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "interpreting and visualizing attention weights",
+      "matched_requirement_id": "req-29",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03522v1",
+      "source": "arxiv",
+      "title": "Physics-Informed Transformer for Real-Time High-Fidelity Topology Optimization",
+      "abstract": "Topology optimization is used for the design of high-performance structures but remains fundamentally limited by its iterative nature, requiring repeated finite element analyses that prevent real-time deployment and large-scale design exploration. In this work, we introduce a physics-informed transformer architecture that directly learns a non-iterative mapping from boundary conditions, loading configurations, and derived physical fields to optimized structural topologies. By leveraging global self-attention, the proposed model captures long-range mechanical interactions that govern structural response, overcoming the locality limitations of convolutional architectures. A conditioning-token mechanism embeds global problem parameters, while spatially distributed stress and strain energy fields are encoded as patch tokens within a Vision Transformer framework. To ensure physical realism and manufacturability, we incorporate auxiliary loss functions that enforce volume constraints, load adherence, and structural connectivity through a differentiable formulation. The framework is further extended to dynamic loading scenarios using frequency-domain encoding and transfer learning, enabling efficient generalization from static to time-dependent problems. Comprehensive benchmarking demonstrates that the proposed model achieves fidelity beyond that of diffusion models, while requiring only a single forward pass, thereby eliminating iterative inference entirely. This establishes topology optimization as a real-time operator-learning problem, enabling high-fidelity structural design with significant reductions in computational cost.",
+      "authors": [
+        "Aaron Lutheran",
+        "Srijan Das",
+        "Alireza Tabarraei"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE"
+      ],
+      "published": "2026-04-04T00:03:54+00:00",
+      "link": "https://arxiv.org/pdf/2604.03522v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:LLM剪枝",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "transformer architecture leveraging global self-attention for structural response",
+      "llm_evidence_cn": "利用全局自注意力捕获结构响应的 Transformer 架构",
+      "llm_evidence": "利用全局自注意力捕获结构响应的 Transformer 架构",
+      "canonical_evidence": "利用全局自注意力捕获结构响应的 Transformer 架构",
+      "llm_tldr_en": "Introduces a physics-informed transformer using self-attention for real-time topology optimization.",
+      "llm_tldr_cn": "引入一种利用自注意力机制进行实时拓扑优化的物理告知 Transformer 架构。",
+      "llm_tldr": "引入一种利用自注意力机制进行实时拓扑优化的物理告知 Transformer 架构。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "transformer architecture and attention layers",
+      "matched_requirement_id": "req-27",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.03592v1",
+      "source": "arxiv",
+      "title": "Unveiling Language Routing Isolation in Multilingual MoE Models for Interpretable Subnetwork Adaptation",
+      "abstract": "Mixture-of-Experts (MoE) models exhibit striking performance disparities across languages, yet the internal mechanisms driving these gaps remain poorly understood. In this work, we conduct a systematic analysis of expert routing patterns in MoE models, revealing a phenomenon we term Language Routing Isolation, in which high- and low-resource languages tend to activate largely disjoint expert sets. Through layer-stratified analysis, we further show that routing patterns exhibit a layer-wise convergence-divergence pattern across model depth. Building on these findings, we propose RISE (Routing Isolation-guided Subnetwork Enhancement), a framework that exploits routing isolation to identify and adapt language-specific expert subnetworks. RISE applies a tripartite selection strategy, using specificity scores to identify language-specific experts in shallow and deep layers and overlap scores to select universal experts in middle layers. By training only the selected subnetwork while freezing all other parameters, RISE substantially improves low-resource language performance while preserving capabilities in other languages. Experiments on 10 languages demonstrate that RISE achieves target-language F1 gains of up to 10.85% with minimal cross-lingual degradation.",
+      "authors": [
+        "Kening Zheng",
+        "Wei-Chieh Huang",
+        "Jiahao Huo",
+        "Zhonghao Li",
+        "Henry Peng Zou",
+        "Yibo Yan",
+        "Xin Zou",
+        "Jungang Li",
+        "Junzhuo Li",
+        "Hanrong Zhang",
+        "Xuming Hu",
+        "Philip S. Yu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-04-04T04:56:35+00:00",
+      "link": "https://arxiv.org/pdf/2604.03592v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "interpretable subnetwork adaptation in MoE models",
+      "llm_evidence_cn": "MoE模型中可解释的子网络适配",
+      "llm_evidence": "MoE模型中可解释的子网络适配",
+      "canonical_evidence": "MoE模型中可解释的子网络适配",
+      "llm_tldr_en": "Analyzes routing isolation in MoE models to identify and adapt language-specific subnetworks.",
+      "llm_tldr_cn": "分析MoE模型中的路由隔离现象，通过识别并适配特定语言的子网络来提升模型性能。",
+      "llm_tldr": "分析MoE模型中的路由隔离现象，通过识别并适配特定语言的子网络来提升模型性能。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.03605v1",
+      "source": "arxiv",
+      "title": "Multi-Robot Multi-Queue Control via Exhaustive Assignment Actor-Critic Learning",
+      "abstract": "We study online task allocation for multi-robot, multi-queue systems with asymmetric stochastic arrivals and switching delays. We formulate the problem in discrete time: each location can host at most one robot per slot, servicing a task consumes one slot, switching between locations incurs a one-slot travel delay, and arrivals at locations are independent Bernoulli processes with heterogeneous rates. Building on our previous structural result that optimal policies are of exhaustive type, we formulate a discounted-cost Markov decision process and develop an exhaustive-assignment actor-critic policy architecture that enforces exhaustive service by construction and learns only the next-queue allocation for idle robots. Unlike the exhaustive-serve-longest (ESL) queue rule, whose optimality is known only under symmetry, the proposed policy adapts to asymmetry in arrival rates. Across different server-location ratios, loads, and asymmetric arrival profiles, the proposed policy consistently achieves lower discounted holding cost and smaller mean queue length than the ESL baseline, while remaining near-optimal on instances where an optimal benchmark is available. These results show that structure-aware actor-critic methods provide an effective approach for real-time multi-robot scheduling.",
+      "authors": [
+        "Mohammad Merati",
+        "H. M. Sabbir Ahmad",
+        "Wenchao Li",
+        "David Castañón"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY",
+        "cs.AI",
+        "math.OC"
+      ],
+      "published": "2026-04-04T06:32:35+00:00",
+      "link": "https://arxiv.org/pdf/2604.03605v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-robot task allocation using actor-critic reinforcement learning",
+      "llm_evidence_cn": "使用 Actor-Critic 强化学习的多机器人任务分配",
+      "llm_evidence": "使用 Actor-Critic 强化学习的多机器人任务分配",
+      "canonical_evidence": "使用 Actor-Critic 强化学习的多机器人任务分配",
+      "llm_tldr_en": "Develops an actor-critic architecture for online task allocation in multi-robot multi-queue systems.",
+      "llm_tldr_cn": "为多机器人多队列系统中的在线任务分配开发了一种 Actor-Critic 架构。",
+      "llm_tldr": "为多机器人多队列系统中的在线任务分配开发了一种 Actor-Critic 架构。",
+      "llm_tags": [
+        "query:marl:composite"
+      ],
+      "matched_query_tag": "query:marl:composite",
+      "matched_query_text": "Papers central to 多智能体强化学习, especially work that connects or combines: Fundamental concepts and algorithms of multi-agent reinforcement learning; MARL architectures and frameworks; Competitive multi-agent reinforcement learning and zero-sum games; CTDE framework in multi-agent reinforcement learning; Value decomposition methods in MARL like QMIX and VDN; Policy gradient methods for multi-agent environments; Challenges and solutions for multi agent credit assignment.",
+      "matched_requirement_id": "req-composite-marl",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03532v1",
+      "source": "arxiv",
+      "title": "LangFIR: Discovering Sparse Language-Specific Features from Monolingual Data for Language Steering",
+      "abstract": "Large language models (LLMs) show strong multilingual capabilities, yet reliably controlling the language of their outputs remains difficult. Representation-level steering addresses this by adding language-specific vectors to model activations at inference time, but identifying language-specific directions in the residual stream often relies on multilingual or parallel data that can be expensive to obtain. Sparse autoencoders (SAEs) decompose residual activations into interpretable, sparse feature directions and offer a natural basis for this search, yet existing SAE-based approaches face the same data constraint. We introduce LangFIR (Language Feature Identification via Random-token Filtering), a method that discovers language-specific SAE features using only a small amount of monolingual data and random-token sequences. Many SAE features consistently activated by target-language inputs do not encode language identity. Random-token sequences surface these language-agnostic features, allowing LangFIR to filter them out and isolate a sparse set of language-specific features. We show that these features are extremely sparse, highly selective for their target language, and causally important: directional ablation increases cross-entropy loss only for the corresponding language. Using these features to construct steering vectors for multilingual generation control, LangFIR achieves the best average accuracy BLEU across three models (Gemma 3 1B, Gemma 3 4B, and Llama 3.1 8B), three datasets, and twelve target languages, outperforming the strongest monolingual baseline by up to and surpassing methods that rely on parallel data. Our results suggest that language identity in multilingual LLMs is localized in a sparse set of feature directions discoverable with monolingual data. Code is available at https://anonymous.4open.science/r/LangFIR-C0F5/.",
+      "authors": [
+        "Sing Hieng Wong",
+        "Hassan Sajjad",
+        "A. B. Siddique"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-04-04T00:56:13+00:00",
+      "link": "https://arxiv.org/pdf/2604.03532v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Sparse autoencoders for identifying sparse feature directions in LLMs",
+      "llm_evidence_cn": "使用稀疏自编码器识别大模型中的稀疏特征方向",
+      "llm_evidence": "使用稀疏自编码器识别大模型中的稀疏特征方向",
+      "canonical_evidence": "使用稀疏自编码器识别大模型中的稀疏特征方向",
+      "llm_tldr_en": "Introduces LangFIR to discover sparse language-specific features in LLMs using monolingual data.",
+      "llm_tldr_cn": "引入 LangFIR 方法，利用单语数据发现大语言模型中的稀疏语言特定特征。",
+      "llm_tldr": "引入 LangFIR 方法，利用单语数据发现大语言模型中的稀疏语言特定特征。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.03953v1",
+      "source": "arxiv",
+      "title": "Multimodal Structure Learning: Disentangling Shared and Specific Topology via Cross-Modal Graphical Lasso",
+      "abstract": "Learning interpretable multimodal representations inherently relies on uncovering the conditional dependencies between heterogeneous features. However, sparse graph estimation techniques, such as Graphical Lasso (GLasso), to visual-linguistic domains is severely bottlenecked by high-dimensional noise, modality misalignment, and the confounding of shared versus category-specific topologies. In this paper, we propose Cross-Modal Graphical Lasso (CM-GLasso) that overcomes these fundamental limitations. By coupling a novel text-visualization strategy with a unified vision-language encoder, we strictly align multimodal features into a shared latent space. We introduce a cross-attention distillation mechanism that condenses high-dimensional patches into explicit semantic nodes, naturally extracting spatial-aware cross-modal priors. Furthermore, we unify tailored GLasso estimation and Common-Specific Structure Learning (CSSL) into a joint objective optimized via the Alternating Direction Method of Multiplier (ADMM). This formulation guarantees the simultaneous disentanglement of invariant and class-specific precision matrices without multi-step error accumulation. Extensive experiments across eight benchmarks covering both natural and medical domains demonstrate that CM-GLasso establishes a new state-of-the-art in generative classification and dense semantic segmentation tasks.",
+      "authors": [
+        "Fei Wang",
+        "Yutong Zhang",
+        "Xiong Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-04-05T04:07:59+00:00",
+      "link": "https://arxiv.org/pdf/2604.03953v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "cross-attention distillation mechanism",
+      "llm_evidence_cn": "交叉注意力蒸馏机制",
+      "llm_evidence": "交叉注意力蒸馏机制",
+      "canonical_evidence": "交叉注意力蒸馏机制",
+      "llm_tldr_en": "Proposes CM-GLasso with cross-attention distillation to learn interpretable multimodal representations.",
+      "llm_tldr_cn": "提出CM-GLasso，通过交叉注意力蒸馏学习可解释的多模态表示。",
+      "llm_tldr": "提出CM-GLasso，通过交叉注意力蒸馏学习可解释的多模态表示。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "encoder-decoder cross-attention mechanism",
+      "matched_requirement_id": "req-28",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.03803v1",
+      "source": "arxiv",
+      "title": "Rényi Attention Entropy for Patch Pruning",
+      "abstract": "Transformers are strong baselines in both vision and language because self-attention captures long-range dependencies across tokens. However, the cost of self-attention grows quadratically with the number of tokens. Patch pruning mitigates this cost by estimating per-patch importance and removing redundant patches. To identify informative patches for pruning, we introduce a criterion based on the Shannon entropy of the attention distribution. Low-entropy patches, which receive selective and concentrated attention, are kept as important, while high-entropy patches with attention spread across many locations are treated as redundant. We also extend the criterion from Shannon to Rényi entropy, which emphasizes sharp attention peaks and supports pruning strategies that adapt to task needs and computational limits. In experiments on fine-grained image recognition, where patch selection is critical, our method reduced computation while preserving accuracy. Moreover, adjusting the pruning policy through the Rényi entropy measure yields further gains and improves the trade-off between accuracy and computation.",
+      "authors": [
+        "Hiroaki Aizawa",
+        "Yuki Igaue"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-04-04T17:10:17+00:00",
+      "link": "https://arxiv.org/pdf/2604.03803v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Entropy-based importance estimation for patch pruning in Transformers",
+      "llm_evidence_cn": "基于熵的Transformer补丁剪枝重要性评估",
+      "llm_evidence": "基于熵的Transformer补丁剪枝重要性评估",
+      "canonical_evidence": "基于熵的Transformer补丁剪枝重要性评估",
+      "llm_tldr_en": "Uses Rényi attention entropy to identify and prune redundant patches in Transformer models to improve efficiency.",
+      "llm_tldr_cn": "利用Rényi注意力熵来识别并剪掉Transformer模型中的冗余补丁，从而提高效率。",
+      "llm_tldr": "利用Rényi注意力熵来识别并剪掉Transformer模型中的冗余补丁，从而提高效率。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Gradient-based importance estimation for pruning",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03674v1",
+      "source": "arxiv",
+      "title": "DiffSparse: Accelerating Diffusion Transformers with Learned Token Sparsity",
+      "abstract": "Diffusion models demonstrate outstanding performance in image generation, but their multi-step inference mechanism requires immense computational cost. Previous works accelerate inference by leveraging layer or token cache techniques to reduce computational cost. However, these methods fail to achieve superior acceleration performance in few-step diffusion transformer models due to inefficient feature caching strategies, manually designed sparsity allocation, and the practice of retaining complete forward computations in several steps in these token cache methods. To tackle these challenges, we propose a differentiable layer-wise sparsity optimization framework for diffusion transformer models, leveraging token caching to reduce token computation costs and enhance acceleration. Our method optimizes layer-wise sparsity allocation in an end-to-end manner through a learnable network combined with a dynamic programming solver. Additionally, our proposed two-stage training strategy eliminates the need for full-step processing in existing methods, further improving efficiency. We conducted extensive experiments on a range of diffusion-transformer models, including DiT-XL/2, PixArt-$α$, FLUX, and Wan2.1. Across these architectures, our method consistently improves efficiency without degrading sample quality. For example, on PixArt-$α$ with 20 sampling steps, we reduce computational cost by $54\\%$ while achieving generation metrics that surpass those of the original model, substantially outperforming prior approaches. These results demonstrate that our method delivers large efficiency gains while often improving generation quality.",
+      "authors": [
+        "Haowei Zhu",
+        "Ji Liu",
+        "Ziqiong Liu",
+        "Dong Li",
+        "Junhai Yong",
+        "Bin Wang",
+        "Emad Barsoum"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-04T10:16:18+00:00",
+      "link": "https://arxiv.org/pdf/2604.03674v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:FLATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "differentiable layer-wise sparsity optimization for diffusion transformers",
+      "llm_evidence_cn": "扩散Transformer的可微分层级稀疏优化",
+      "llm_evidence": "扩散Transformer的可微分层级稀疏优化",
+      "canonical_evidence": "扩散Transformer的可微分层级稀疏优化",
+      "llm_tldr_en": "DiffSparse uses learned token sparsity to accelerate diffusion transformer inference with reduced computation.",
+      "llm_tldr_cn": "DiffSparse通过学习令牌稀疏性来加速扩散Transformer的推理，降低计算成本。",
+      "llm_tldr": "DiffSparse通过学习令牌稀疏性来加速扩散Transformer的推理，降低计算成本。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.04383v1",
+      "source": "arxiv",
+      "title": "Optimizing Service Operations via LLM-Powered Multi-Agent Simulation",
+      "abstract": "Service system performance depends on how participants respond to design choices, but modeling these responses is hard due to the complexity of human behavior. We introduce an LLM-powered multi-agent simulation (LLM-MAS) framework for optimizing service operations. We pose the problem as stochastic optimization with decision-dependent uncertainty: design choices are embedded in prompts and shape the distribution of outcomes from interacting LLM-powered agents. By embedding key numerical information in prompts and extracting it from LLM-generated text, we model this uncertainty as a controlled Markov chain. We develop an on-trajectory learning algorithm that, on a single simulation run, simultaneously constructs zeroth-order gradient estimates and updates design parameters to optimize steady-state performance. We also incorporate variance reduction techniques. In a sustainable supply chain application, our method outperforms benchmarks, including blackbox optimization and using LLMs as numerical solvers or as role-playing system designers. A case study on optimal contest design with real behavioral data shows that LLM-MAS is both as a cost-effective evaluator of known designs and an exploratory tool that can uncover strong designs overlooked by traditional approaches.",
+      "authors": [
+        "Yanyuan Wang",
+        "Xiaowei Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.MA",
+        "math.OC"
+      ],
+      "published": "2026-04-06T03:14:33+00:00",
+      "link": "https://arxiv.org/pdf/2604.04383v1",
+      "tags": [
+        "keyword:MARL",
+        "query:MARL"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LLM-powered multi-agent simulation framework",
+      "llm_evidence_cn": "大模型驱动的多智能体仿真框架",
+      "llm_evidence": "大模型驱动的多智能体仿真框架",
+      "canonical_evidence": "大模型驱动的多智能体仿真框架",
+      "llm_tldr_en": "Introduces an LLM-powered multi-agent simulation framework for optimizing service operations via stochastic optimization.",
+      "llm_tldr_cn": "引入大模型驱动的多智能体仿真框架，通过随机优化改进服务运营。",
+      "llm_tldr": "引入大模型驱动的多智能体仿真框架，通过随机优化改进服务运营。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "MARL architectures and frameworks",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.03815v2",
+      "source": "arxiv",
+      "title": "k-Maximum Inner Product Attention for Graph Transformers and the Expressive Power of GraphGPS",
+      "abstract": "Graph transformers have shown promise in overcoming limitations of traditional graph neural networks, such as oversquashing and difficulties in modeling long-range dependencies. However, their application to large-scale graphs is hindered by the quadratic memory and computational complexity of the all-to-all attention mechanism. Although alternatives such as linearized attention and restricted attention patterns have been proposed, these often degrade performance or limit expressive power. To better balance efficiency and effectiveness, we introduce k-Maximum Inner Product (k-MIP) attention for graph transformers. k-MIP attention selects the most relevant key nodes per query via a top-k operation, yielding a sparse yet flexible attention pattern. Combined with an attention score computation based on symbolic matrices, this results in linear memory complexity and practical speedups of up to an order of magnitude compared to all-to-all attention, enabling the processing of graphs with over 500k nodes on a single A100 GPU. We provide a theoretical analysis of expressive power, showing that k-MIP attention does not compromise the expressiveness of graph transformers: specifically, we prove that k-MIP transformers can approximate any full-attention transformer to arbitrary precision. In addition, we analyze the expressive power of the GraphGPS framework, in which we integrate our attention mechanism, and establish an upper bound on its graph distinguishing capability in terms of the S-SEG-WL test. Finally, we validate our approach on the Long Range Graph Benchmark, the City-Networks benchmark, and two custom large-scale inductive point cloud datasets, consistently ranking among the top-performing scalable graph transformers.",
+      "authors": [
+        "Jonas De Schouwer",
+        "Haitz Sáez de Ocáriz Borde",
+        "Xiaowen Dong"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-04T17:45:50+00:00",
+      "link": "https://arxiv.org/pdf/2604.03815v2",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:FLATTN",
+        "keyword:LLM剪枝",
+        "query:ATTN",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "k-Maximum Inner Product attention for graph transformers",
+      "llm_evidence_cn": "图Transformer中的k-最大内积注意力机制",
+      "llm_evidence": "图Transformer中的k-最大内积注意力机制",
+      "canonical_evidence": "图Transformer中的k-最大内积注意力机制",
+      "llm_tldr_en": "Introduces k-MIP attention to balance efficiency and expressive power in large-scale graph transformers.",
+      "llm_tldr_cn": "引入k-MIP注意力机制，在保持表达能力的同时提升大规模图Transformer的效率。",
+      "llm_tldr": "引入k-MIP注意力机制，在保持表达能力的同时提升大规模图Transformer的效率。",
+      "llm_tags": [
+        "query:attn"
+      ],
+      "matched_query_tag": "query:attn",
+      "matched_query_text": "comparison of different types of attention mechanisms",
+      "matched_requirement_id": "req-31",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.03675v1",
+      "source": "arxiv",
+      "title": "PRAISE: Prefix-Based Rollout Reuse in Agentic Search Training",
+      "abstract": "In agentic search, large language models (LLMs) are trained to perform multi-turn retrieval and reasoning for complex tasks such as multi-hop question answering (QA). However, current search-based Reinforcement Learning (RL) methods suffer from two core limitations: expensive long-horizon rollouts are under-utilized during training, and supervision is typically available only at the final answer, resulting in severe reward sparsity. We present Prefix-based Rollout reuse for Agentic search with Intermediate Step rEwards (PRAISE), a framework for improving both data efficiency and credit assignment in agentic search training. Given a complete search trajectory, PRAISE extracts prefix states at different search turns, elicits intermediate answers from them, and uses these prefixes both to construct additional training trajectories and to derive step-level rewards from performance differences across prefixes. Our method uses a single shared model for both search policy learning and prefix answer evaluation, enabling joint optimization without extra human annotations or a separate reward model. Experiments on multi-hop QA benchmarks show that PRAISE consistently improves performance over strong baselines.",
+      "authors": [
+        "Erhan Zhang",
+        "Yiqun Chen",
+        "Zechun Niu",
+        "Wei Yang",
+        "Xiaochi Wei",
+        "Yan Gao",
+        "Yi Wu",
+        "Yao Hu",
+        "Jiaxin Mao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-04T10:23:46+00:00",
+      "link": "https://arxiv.org/pdf/2604.03675v1",
+      "tags": [
+        "keyword:ATTN",
+        "keyword:LLM剪枝",
+        "keyword:MARL",
+        "query:ATTN",
+        "query:LLM剪枝",
+        "query:MARL"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "improving credit assignment in agentic search training",
+      "llm_evidence_cn": "改进代理搜索训练中的信用分配",
+      "llm_evidence": "改进代理搜索训练中的信用分配",
+      "canonical_evidence": "改进代理搜索训练中的信用分配",
+      "llm_tldr_en": "A framework to improve data efficiency and credit assignment in LLM-based agentic search using intermediate rewards.",
+      "llm_tldr_cn": "一种通过中间奖励改进大模型代理搜索训练中数据效率和信用分配的框架。",
+      "llm_tldr": "一种通过中间奖励改进大模型代理搜索训练中数据效率和信用分配的框架。",
+      "llm_tags": [
+        "query:marl"
+      ],
+      "matched_query_tag": "query:marl",
+      "matched_query_text": "Challenges and solutions for multi agent credit assignment",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

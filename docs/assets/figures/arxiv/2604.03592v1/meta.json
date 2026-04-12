@@ -1,0 +1,110 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-001.webp",
+      "caption": "Figure 10: Qualitative case study (Cases 3–4) comparing Vanilla (base model) and RISE (ours) on Bengali TyDiQA and MGSM. Red bold marks incorrect steps; green bold marks correct reasoning. Both cases show incoherent or mixed-language outputs in Phi-3.5-MoE: Case 3 produces a question-echoing non-answer with mixed-language output; Case 4 misreads per-sprint distance and introduces a spurious 7-day/week step, with output truncated before any answer is given. RISE’s Bengali-specialized expert activation corrects both failures.",
+      "page": 25,
+      "index": 1,
+      "width": 829,
+      "height": 758
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-002.webp",
+      "caption": "Figure 7: Layer-wise expert selection heatmap for Bengali training on Phi-3.5-MoE-Instruct. Despite the architectural differences (32 layers, 16 experts, top-2 routing), RISE again targets experts concentrated in the middle-to-deep range, mirroring the isolation pattern reported in Table 10. The sparser overall selection reflects the smaller expert count per layer relative to Qwen3-30B-A3B.",
+      "page": 21,
+      "index": 2,
+      "width": 806,
+      "height": 691
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-003.webp",
+      "caption": "Table 3: TyDiQA-GoldP multilingual QA performance (F1, %). Each row corresponds to a training setting; notation (budget, lang) denotes the number of experts selected by RISE and the target language, e.g., (128, BN) selects 128 experts routed by Bengali and trains only those experts on Bengali data. The colored bold value indicates the target language column for each training setting (blue=BN, orange=RU, green=ID); the language code in the first column is colored accordingly.",
+      "page": 7,
+      "index": 3,
+      "width": 814,
+      "height": 456
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-004.webp",
+      "caption": "Table 11: Layer-aware expert selection settings for Qwen3-30B-A3B and Phi-3.5-MoEInstruct.",
+      "page": 22,
+      "index": 4,
+      "width": 827,
+      "height": 620
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-005.webp",
+      "caption": "Figure 1: Comprehensive routing analysis of Qwen3-30B-A3B: global-level (left) expert activation overlap and layer-wise (right) routing similarity with English.",
+      "page": 3,
+      "index": 5,
+      "width": 809,
+      "height": 307
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-006.webp",
+      "caption": "Table 6: Cross-task transfer: MGSM accuracy (%) for models trained on TyDiQA. All models are trained exclusively on TyDiQA and evaluated zero-shot on MGSM to measure cross-task interference. The table is split by backbone: Qwen3-30B-A3B and Phi-3.5-MoE-Instruct. The colored bold value indicates the target language column (blue=BN, orange=RU, green=ID); the language code in the first column is colored accordingly.",
+      "page": 18,
+      "index": 6,
+      "width": 786,
+      "height": 477
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-007.webp",
+      "caption": "Figure 8: RISE and LoRA are orthogonal and composable: RISE operates at the routing level (which experts to adapt), while LoRA operates at the parameter-update level (how to update them).",
+      "page": 23,
+      "index": 7,
+      "width": 622,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-008.webp",
+      "caption": "Table 5: The performance comparison between RISE and its pruned version.",
+      "page": 8,
+      "index": 8,
+      "width": 822,
+      "height": 198
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-009.webp",
+      "caption": "Figure 9: Qualitative case study (Cases 1–2) comparing Vanilla (base model) and RISE (ours) on Bengali MGSM. Red bold marks incorrect steps; green bold marks correct reasoning. Both cases show mathematical reasoning errors in Qwen3-30B-A3B: Case 1 misinterprets “150% increase” as ×1.5 instead of ×2.5; Case 2 suffers premature generation truncation, causing the evaluator to extract the distance (60) rather than the speed (10). See Figure 10 for Cases 3–4.",
+      "page": 24,
+      "index": 9,
+      "width": 829,
+      "height": 977
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-010.webp",
+      "caption": "Figure 4: Ablation studies for hyperparameters. (a) Effect of the activation scale factor α in the composite expert selection. (b) Effect of the expert budget allocation ratio across shallow, middle, and deep layers. (c) Effect of the total number of selected experts K.",
+      "page": 9,
+      "index": 10,
+      "width": 831,
+      "height": 226
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-011.webp",
+      "caption": "Figure 5: Global-level expert activation overlap of Qwen3-30B-A3B and Phi-3.5-MoE across languages in TyDiQA and MGSM.",
+      "page": 20,
+      "index": 11,
+      "width": 831,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-012.webp",
+      "caption": "Figure 6: Layer-wise expert selection heatmap for Bengali training on Qwen3-30B-A3B. Each column corresponds to a transformer layer and each row to an expert index. Highlighted cells denote experts selected by RISE for gradient updates. The selection density is highest in the middle and deep layers, consistent with the routing isolation observed for Bengali in Table 9.",
+      "page": 20,
+      "index": 12,
+      "width": 816,
+      "height": 358
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03592v1/fig-013.webp",
+      "caption": "Figure 2: Overview of RISE. (a) We first collect routing statistics across multiple languages. (b) Based on layer-aware analysis, we select language-specific experts in shallow/deep layers and cross-lingual shared experts in middle layers. (c) Only the selected experts are trained while keeping all other parameters frozen.",
+      "page": 5,
+      "index": 13,
+      "width": 829,
+      "height": 379
+    }
+  ]
+}
