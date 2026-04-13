@@ -1,0 +1,182 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-001.webp",
+      "caption": "Figure 4: SAE training convergence. Layer 8 (blue) encodes a denser feature set; deeper layers 12 (orange) and 16 (green) show sparser, more selective representations with more feature death.",
+      "page": 6,
+      "index": 1,
+      "width": 979,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-002.webp",
+      "caption": "Figure 3: Predicted vs. actual floor (log-log, 140 points). Left: Refined formula with g(α) (Pearson r = 0.93, MAPE = 93.9%). Right: Naive formula assuming one feature/dim (R2 = −0.04). Color = sparsity.",
+      "page": 6,
+      "index": 2,
+      "width": 979,
+      "height": 454
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-003.webp",
+      "caption": "Figure 14: Training curves at different widths for six configurations. Dashed = predicted floors. Rapid convergence confirms geometric origin.",
+      "page": 15,
+      "index": 3,
+      "width": 976,
+      "height": 573
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-004.webp",
+      "caption": "Figure 13: Normalized floor vs. dS/d ∗ S. All configurations collapse: floor drops sharply at dS = d∗S (dashed). This universal scaling confirms the phase transition.",
+      "page": 15,
+      "index": 4,
+      "width": 640,
+      "height": 476
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-005.webp",
+      "caption": "Figure 5: (a) Feature importance follows a power law: the top ∼20 features dominate, with a cliff near rank ∼3,000 where thousands reach ∼10−7. This heavy tail is why compression works. (b) Predicted floor vs. width at layers 8, 12, 16. All layers agree (d∗S ∈ [1065, 1186]), converging near zero at dS = 1024.",
+      "page": 7,
+      "index": 5,
+      "width": 979,
+      "height": 367
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-006.webp",
+      "caption": "Figure 8: Linear probe results. (a) Heatmap: all concepts survive compression. (b) ±3 pp shifts reflect reallocation. (c) All above chance (50%).",
+      "page": 10,
+      "index": 6,
+      "width": 970,
+      "height": 230
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-007.webp",
+      "caption": "Figure 7: Two-component decomposition. (a) Linear fit (R2 = −1.982) fails. (b) Affine fit (R2 = 0.993): observed = 8.97× predicted + 0.623. Baseline B = 0.623: architectural floor; slope C = 8.97: amplification through transformer layers.",
+      "page": 10,
+      "index": 7,
+      "width": 860,
+      "height": 338
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-008.webp",
+      "caption": "Figure 12: Zipf importance. Left: Linear scale. Right: Log-log confirms power law.",
+      "page": 14,
+      "index": 8,
+      "width": 976,
+      "height": 375
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-009.webp",
+      "caption": "Figure 11: Accuracy heatmap (refined). Rows: α; cols: dT; panels: n. Green = > 99%.",
+      "page": 14,
+      "index": 9,
+      "width": 976,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-010.webp",
+      "caption": "Figure 1: Capacity function and critical width. Left: g(α) grows exponentially with sparsity; colored dots mark our toy model sparsity levels. Right: Critical width d∗S = F/g(α) shrinks as sparsity increases, since sparser features need fewer dimensions.",
+      "page": 3,
+      "index": 10,
+      "width": 976,
+      "height": 349
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-011.webp",
+      "caption": "Figure 18: Distillation summary. Top left: eval curves with floor estimates. Top right: per-token KL floor vs. width. Bottom left: normalized observed vs. predicted floors. Bottom right: seed variance at dS = 128.",
+      "page": 18,
+      "index": 11,
+      "width": 976,
+      "height": 734
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-012.webp",
+      "caption": "Figure 9: Effect of α on floor at dT = 5 for n ∈ {10, 20, 40}. Higher sparsity (more features/dim) yields lower floors. Solid = actual; dashed = predicted.",
+      "page": 13,
+      "index": 12,
+      "width": 976,
+      "height": 292
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-013.webp",
+      "caption": "Figure 10: Prediction error by sparsity. Refined (colored): median > 90% accuracy; naive (gray): degrades at high α.",
+      "page": 13,
+      "index": 13,
+      "width": 976,
+      "height": 765
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-014.webp",
+      "caption": "Table 3: Distillation loss floors. Raw KL summed across 512 positions ×T 2 = 4. Per-token KL = raw/2048. Normalized relative to dS = 128.",
+      "page": 8,
+      "index": 14,
+      "width": 602,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-015.webp",
+      "caption": "Figure 16: (a) Training loss for all widths. (b) Two seeds at dS = 128: floors differ by ∆ = 6.4 (0.24%), confirming the floor is deterministic.",
+      "page": 17,
+      "index": 15,
+      "width": 976,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-016.webp",
+      "caption": "Figure 17: Normalized predicted (SAE, dashed gray) vs. observed (distillation, solid red) floors. Both decrease monotonically; the widening gap reflects the constant baseline B dominating at larger widths (see Table 5).",
+      "page": 17,
+      "index": 16,
+      "width": 640,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-017.webp",
+      "caption": "Table 7: Reference values for g(α).",
+      "page": 12,
+      "index": 17,
+      "width": 418,
+      "height": 306
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-018.webp",
+      "caption": "Figure 6: Distillation results. (a) Eval loss for all widths; narrower students plateau higher. (b) Floor decreases from 1.320 to 0.586 nats. Dotted line marks d∗S ≈ 1065.",
+      "page": 9,
+      "index": 18,
+      "width": 976,
+      "height": 353
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-019.webp",
+      "caption": "Table 6: Linear probe accuracy (%) at layer 12. All concepts stay far above chance (50%).",
+      "page": 9,
+      "index": 19,
+      "width": 644,
+      "height": 246
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-020.webp",
+      "caption": "Figure 2: Loss floor vs. student width across 48 configurations (rows: n; columns: α). Solid = actual (mean ± std, 20 seeds); dashed = formula (Eq. 2); dotted = d∗S. The formula captures both magnitude and shape.",
+      "page": 5,
+      "index": 20,
+      "width": 976,
+      "height": 819
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-021.webp",
+      "caption": "Figure 15: Per-layer SAE curves: layers 8 (top), 12 (mid), 16 (bottom). Layer 8 has lower recon loss, higher L0, near-zero feature death.",
+      "page": 16,
+      "index": 21,
+      "width": 979,
+      "height": 621
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04037v1/fig-022.webp",
+      "caption": "Table 8: Student architectures. All share teacher’s depth (24), vocabulary (50,304), and positional encoding.",
+      "page": 16,
+      "index": 22,
+      "width": 594,
+      "height": 213
+    }
+  ]
+}

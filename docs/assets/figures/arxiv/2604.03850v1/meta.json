@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03850v1/fig-001.webp",
+      "caption": "Table 4: Paradigm 1 results: text readout with frozen BERT (ε = 0.05). ACC = clustering accuracy (Hungarian); NMI = normalised mutual information; ARI = adjusted Rand index; best epoch reported.",
+      "page": 21,
+      "index": 1,
+      "width": 564,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03850v1/fig-002.webp",
+      "caption": "Table 1: Structural comparison of prototype based attention mechanisms.",
+      "page": 7,
+      "index": 2,
+      "width": 594,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03850v1/fig-003.webp",
+      "caption": "Figure 4: Exp 2: DDCL-Attention soft VQ on CIFAR-10 (K = 64, 50 epochs). Left: training dynamics (loss decomposition, V ≥ 0, codebook utilisation). Right: codebook utilisation over epochs for DDCL-Attention vs. hard VQ-VAE; DDCL-Attention achieves 100% from epoch 1 while VQ-VAE requires 26 epochs.",
+      "page": 22,
+      "index": 3,
+      "width": 703,
+      "height": 200
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03850v1/fig-004.webp",
+      "caption": "Table 2: Five application paradigms for DDCL-Attention. ✓ = validated in this paper.",
+      "page": 9,
+      "index": 4,
+      "width": 664,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03850v1/fig-005.webp",
+      "caption": "Figure 2: Exp 1: training dynamics for SST-2 (top), IMDB (middle), and 20 Newsgroups (bottom). Each row shows the loss decomposition Lq = LOLS + V (top left), variance term V ≥ 0 (top centre), prototype separation S(P) (top right), assignment entropy H(Q) (bottom left), clustering quality ACC/NMI/ARI (bottom centre), and phase portrait (V/N,S(P)) (bottom right).",
+      "page": 20,
+      "index": 5,
+      "width": 449,
+      "height": 543
+    }
+  ]
+}

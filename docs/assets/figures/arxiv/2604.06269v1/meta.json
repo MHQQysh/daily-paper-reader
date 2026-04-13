@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06269v1/fig-001.webp",
+      "caption": "Table 2. Cross-species performance comparison under the open candidate setting. This evaluation follows the Cell-o1 protocol and assesses generalization across three species (Human, Mouse, and Monkey). For each species, results are reported under three input configurations: Both (HEGs + DEGs), DEG-only, and HEG-only, reflecting different signal-to-noise conditions. All values are reported as mean± standard deviation (rounded to three decimals) over multiple runs. Different backbone models are listed to highlight model-dependent variations. The best and second-best results in each column are highlighted in bold and underlined, respectively. For MAT-Cell (use RAG), distillation details are omitted from the table for clarity: models with the suffix “-c” denote RAG-specific students distilled within the same backbone family, while the remaining RAG variants are distilled from Gemini-3.",
+      "page": 6,
+      "index": 1,
+      "width": 991,
+      "height": 536
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06269v1/fig-002.webp",
+      "caption": "Table 14. Top monkey cell types by frequency",
+      "page": 25,
+      "index": 2,
+      "width": 652,
+      "height": 298
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06269v1/fig-003.webp",
+      "caption": "Table 16. Hyperparameters for MAT-Cell",
+      "page": 26,
+      "index": 3,
+      "width": 1002,
+      "height": 432
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06269v1/fig-004.webp",
+      "caption": "Table 7. Top Brain cell types by frequency",
+      "page": 22,
+      "index": 4,
+      "width": 550,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06269v1/fig-005.webp",
+      "caption": "Table 10. Top human cell types by frequency",
+      "page": 23,
+      "index": 5,
+      "width": 994,
+      "height": 554
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06269v1/fig-006.webp",
+      "caption": "Figure 4. Sensitivity analysis of hyperparameters on Brain and Liver datasets. (a) Impact of the number of agents K on reasoning accuracy. (b) Impact of the number of rounds T on reasoning stability.",
+      "page": 8,
+      "index": 6,
+      "width": 466,
+      "height": 461
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06269v1/fig-007.webp",
+      "caption": "Figure 2. The MAT-Cell Framework. (Stage 1) Inductive Anchoring filters housekeeping noise by constructing a Syllogistic Input Card xi from statistically validated DEGs. (Stage 2) Dialectic Verification employs a multi-agent debate to construct a Syllogistic Derivation Tree (SDT), minimizing Semantic Divergence Score δcon to ensure logical consistency. (Stage 3) Contextual Synthesis resolves ambiguity via a Decision Agent, yielding a hybrid assembly of auto-verified and adjudicated annotations.",
+      "page": 4,
+      "index": 7,
+      "width": 960,
+      "height": 487
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06269v1/fig-008.webp",
+      "caption": "Table 1. Main results under the open candidate (no oracle labels) setting. This setting follows the scPilot protocol and simulates realistic annotation scenarios where no candidate cell-type labels are provided a priori. All methods must infer cell types directly from cluster-level marker information without access to oracle candidates. Results are reported as accuracy (mean ± std) across five scRNA-seq datasets (PBMC3K, Liver, Retina, Brain, and Heart). Different language model backbones are listed to reflect model-dependent variations. For MAT-Cell variants, the suffix “-c” denotes the use of retrieval-augmented grounding; Qwen-based “-c” models are distilled within the same backbone family, while other “-c” variants are distilled from Gemini-3. The best and second-best results are highlighted in bold and underlined, respectively.",
+      "page": 5,
+      "index": 8,
+      "width": 1006,
+      "height": 633
+    }
+  ]
+}

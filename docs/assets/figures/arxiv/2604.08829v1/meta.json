@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08829v1/fig-001.webp",
+      "caption": "Figure 2: Experiment 1 (top) and kurtosis analysis (bottom). Top left: validation accuracy vs. epoch. Top right: comparison with same-setting MHA baseline and contextual LRA figures (Tay et al., 2021). Bottom left: 𝜅𝑙 vs. epoch (ceiling ≈ 286). Bottom right: 𝜅𝑙 vs. 𝑑model post-training.",
+      "page": 11,
+      "index": 1,
+      "width": 957,
+      "height": 626
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08829v1/fig-002.webp",
+      "caption": "Table 7 Wall-clock time and memory, A100 GPU (𝐵 = 16, 𝑑 = 128, 𝐿 = 3).",
+      "page": 15,
+      "index": 2,
+      "width": 737,
+      "height": 297
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08829v1/fig-003.webp",
+      "caption": "Figure 1: Architecture of the Hierarchical Kernel Transformer (HKT) for 𝐿 = 3 levels and stride 𝑠 = 2. The input sequence 𝑋(0) is processed at three resolutions via causal downsampling (𝜙1, 𝜙2◦𝜙1). At each level 𝑙, a score matrix 𝑆(𝑙) = 𝑋(𝑙)𝑀 (𝑙)𝑋(𝑙)⊤∕ √ 𝑑(𝑙)𝑘 is computed, where 𝑀 (𝑙) = 𝑀 (𝑙) 𝑠 + 𝑀 (𝑙) 𝑎 decomposes into a symmetric component (controlling reciprocal attention) and an antisymmetric component (controlling directional attention). The level scores are upsampled and fused via learned convex weights 𝜆𝑙 (softmax-normalised), then passed through standard softmax attention and FFN layers. Total overhead: 4 3 (1 − 4−𝐿) = 1.3125× for 𝐿 = 3.",
+      "page": 4,
+      "index": 3,
+      "width": 890,
+      "height": 457
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08829v1/fig-004.webp",
+      "caption": "Figure 3: Evolution of 𝜅𝑙 during training (𝑑 = 128, 30 epochs). Top: training loss/accuracy and 𝑏2,𝑝 vs. epoch. Centre: p-values for kurtosis and skewness. Bottom: QQ-plot of the first principal component of 𝑆 (0) and heatmap of final p-values.",
+      "page": 19,
+      "index": 4,
+      "width": 958,
+      "height": 678
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08829v1/fig-005.webp",
+      "caption": "Table 1 Validation accuracy and computational overhead. HKT and MHA-Retrained: same synthetic task (𝑇 = 512, same training setup), mean ± std over 3 seeds. LRA figures from Tay et al. (2021) (𝑇 = 2,048) — contextual reference only.",
+      "page": 12,
+      "index": 5,
+      "width": 529,
+      "height": 288
+    }
+  ]
+}

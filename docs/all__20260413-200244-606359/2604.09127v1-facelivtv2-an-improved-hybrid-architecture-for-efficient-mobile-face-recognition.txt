@@ -1,0 +1,652 @@
+Title: FaceLiVTv2: An Improved Hybrid Architecture for Efficient Mobile Face Recognition
+
+URL Source: https://arxiv.org/pdf/2604.09127v1
+
+Published Time: Mon, 13 Apr 2026 01:07:56 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 1
+
+# FaceLiVTv2: An Improved Hybrid Architecture for Efficient Mobile Face Recognition 
+
+Novendra Setyawan, Student Member, IEEE , Chi-Chia Sun, Member, IEEE ,Mao-Hsiu Hsu, Member, IEEE , Wen-Kai Kuo, Member, IEEE , Jun-Wei Hsieh Senior Member, IEEE 
+
+✦
+
+Abstract —Lightweight face recognition is increasingly important for deployment on edge and mobile devices, where strict constraints on latency, memory, and energy consumption must be met alongside re-liable accuracy. Although recent hybrid CNN-Transformer architectures have advanced global context modeling, striking an effective balance between recognition performance and computational efficiency remains an open challenge. In this work, we present FaceLiVTv2, an improved version of our FaceLiVT hybrid architecture designed for efficient global– local feature interaction in mobile face recognition. At its core is Lite MHLA, a lightweight global token interaction module that replaces the original multi-layer attention design with multi-head linear token pro-jections and affine rescale transformations, reducing redundancy while preserving representational diversity across heads. We further integrate Lite MHLA into a unified RepMix block that coordinates local and global feature interactions and adopts global depthwise convolution for adaptive spatial aggregation in the embedding stage. Under our ex-perimental setup, results on LFW, CA-LFW, CP-LFW, CFP-FP, AgeDB-30, and IJB show that FaceLiVTv2 consistently improves the accuracy-efficiency trade-off over existing lightweight methods. Notably, Face-LiVTv2 reduces mobile inference latency by 22% relative to FaceLiVTv1, achieves speedups of up to 30.8% over GhostFaceNets on mobile devices, and delivers 20-41% latency improvements over EdgeFace and KANFace across platforms while maintaining higher recognition accuracy. These results demonstrate that FaceLiVTv2 offers a practical and deployable solution for real-time face recognition. Code is available at https://github.com/novendrastywn/FaceLiVT .
+
+Index Terms —Face Recognition, Mobile Face Recognition, Lightweight Transformer, Linear Attention. 
+
+1 INTRODUCTION 
+
+Face recognition (FR) has become one of the most widely adopted biometric technologies, powering a variety of ap-plications ranging from smartphone authentication and fi-nancial transactions to public security and access control [1], [2]. In mobile and embedded scenarios, face verification is often performed locally without relying on cloud services, 
+
+Novendra Setyawan, Mao-Hsiu Hsu and Wen-Kai Kuo are with Department of Electro-Optics, National Formosa University, Taiwan; Novendra Setyawan also with Department of Electrical Engineering Uni-versity of Muhammadiyah Malang, Indonesia; Chi-Chia Sun is with Department of Electrical Engineering, National Taipei University, Taiwan; Jun-Wei Hsieh is with College of Artificial Intelligence and Green Energy, National Yang Ming Chiao Tung University, Taiwan; Corresponding Author is Chi-Chia Sun (E-mail: chichia-sun@gm.ntpu.edu.tw) 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 
+
+> Mobile latency (ms)
+> 94.5
+> 95.0
+> 95.5
+> 96.0
+> 96.5
+> 97.0
+> Mean accuracy (%)
+> FaceLiVTv2-L
+> FaceLiVTv2-M
+> FaceLiVTv2-S
+> FaceLiVTv2-XS
+> FaceLiVTv1-M
+> FaceLiVTv1-S
+> GhostFaceNetV1-1
+> GhostFaceNetV2-2
+> GhostFaceNetV1-2
+> PocketNetS128
+> PocketNetS256
+> ShuffleFaceNet-1.5
+> MobileFaceNet
+> VarGFaceNet
+> SwiftFaceFormer-L1
+> SwiftFaceFormer-S
+> SwiftFaceFormer-XS
+> Model Family
+> FaceLiVTv2
+> FaceLiVTv1
+> GhostFaceNet
+> PocketNet
+> ShuffleFaceNet
+> MobileFaceNet
+> VarGFaceNet
+> SwiftFaceFormer
+
+Fig. 1: Comparison of our proposed FaceLiVTv2 with other lightweight FR models, including EdgeFace [3], SwiftFace-Former [4], and KANFace [5]. Mean accuracy of Face Bench-mark v.s. Mobile Latency (iPhone 15 Pro). The upper-left region of the plot represents the most desirable operating point, where high accuracy is achieved with minimal la-tency. which imposes strict requirements on computational effi-ciency, memory footprint, and energy consumption. Thus, designing accurate yet lightweight FR models has emerged as a key challenge in the field of computer vision. In the last decade, deep convolutional neural net-works (CNNs) have significantly advanced FR performance, achieving near-human accuracy on unconstrained bench-marks. However, this progress has come at the expense of increasingly complex architectures with tens of mil-lions of parameters and billions of floating-point opera-tions (FLOPs), such as ResNet50-ArcFace [17], [18], mak-ing direct deployment on edge devices impractical. To address this, researchers have developed compact CNN-based architectures optimized for mobile deployment. No-table examples include MobileFaceNet [6], ShuffleFaceNet [19], VarGFaceNet [20], MixFaceNet [21], and GhostFaceNet [8], each of which adopts different design strategies to reduce parameters as well as computational complexity while maintaining high levels of accuracy. These lightweight CNNs have demonstrated impressive speed-accuracy trade-offs, but their limited receptive fields often hinder their  
+
+> arXiv:2604.09127v1 [cs.CV] 10 Apr 2026 IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 2
+
+TABLE 1: Key architectural properties of representative lightweight face recognition models                                                                   
+
+> Methods Context Low High Fast Inference Approach Global Local Comp. Acc. Edge Mobile
+> MobileFaceNet [6] ✗✓✓✗✓✓Lightweight CNN optimized for mobile face recognition using depthwise separable convolutions [7]. GhostFaceNet [8] ✗✓✓✗✓✓CNN-based face recognition model leveraging ghost modules [9] to reduce redundancy. TransFace [10] ✓✗✗✓✗✗Vanilla Vision Transformer [11] for face recognition with patch-level data augmentation. EdgeFace [3] ✓✓✓✓✓✗EdgeNext [12]-based architecture with low-rank linear layer. KANFace [5] ✓✓✓✓✓✗Hybrid EdgeFace-based [3] architecture incorporating Kolmogorov–Arnold Networks [13] for enhanced representation. SwiftFaceFormer [4] ✓✓✓✗✓✓SwiftFormer [14]-based, Hybrid CNN–Transformer model with additive atten-tion and knowledge distillation. FaceLiVTv1 [15], [16] ✓✓✓✗✓✓Hybrid CNN-Transformer with reparameterized local token mixing and Multi Head Linear Attention (MHLA), the multi MLP-style token interaction
+> FaceLiVTv2 (Ours) ✓✓✓✓✓✓
+> Co-design architecture based on FaceLiVTv1 [15], [16] by integrating repa-rameterized local token mixing with a lightweight MHLA (Lite MHLA) and adaptive spatial aggregation head for efficient joint global–local feature learning.
+
+ability to capture long-range facial dependencies. In parallel, Vision Transformers (ViTs) [11] have emerged as powerful alternatives for computer vision tasks, of-fering global receptive fields and superior capabilities in modeling long-range relationships. Early explorations such as Face Transformer [22] and TransFace [10] showed that transformer-based FR models could rival state-of-the-art CNNs in accuracy. However, their computational complex-ity regarding the attention mechanism makes them pro-hibitively expensive for mobile applications, with parameter counts exceeding hundreds of millions and latencies far beyond real-time constraints. To mitigate these drawbacks, several hybrid CNN–Transformer architectures have been introduced. EdgeFace [3] and SwiftFaceFormer [4], for ex-ample, adapt the EdgeNeXt [12] and SwiftFormer [14] back-bones, striking a balance between contextual modeling and linear complexity. KANFace [5] proposed a hybrid model with Kolmogorov-Arnold Networks to balance model ca-pacity and feature discriminability. These works highlight the potential of hybrid designs, but they often face trade-offs between model compactness, discriminative ability, and inference efficiency. Recently, FaceLiVT [15], [16] introduced a hybrid CNN-Transformer architecture that combines structural reparam-eterization with Multi-Head Linear Attention (MHLA) to reduce computational complexity while maintaining com-petitive accuracy. However, several aspects of its design leave room for improvement. The first-generation MHLA adopts an MLP-style two-layer linear design with a non-linear activation, which introduces additional overhead. The integration of local and global token interactions remains suboptimal, and the embedding head relies on uniform global pooling, which limits adaptive spatial aggregation. These observations motivate a re-examination of global token interaction, local-global feature integration, and em-bedding design. In this paper, we revisit FaceLiVT [15], [16] (hereafter referred to as FaceLiVTv1) and propose FaceLiVTv2, amore accurate and efficient architecture tailored for real-time FR on mobile and embedded platforms. FaceLiVTv2 co-designs three complementary components: reparameter-ized local token mixing (RepMix) to strengthen local-global feature interaction while preserving efficient inference; a lightweight multi-head linear global modeling module to capture long-range dependencies with lower complexity than its predecessor; and an adaptive spatial aggregation head to replace uniform global pooling. At the core of these improvements, we have redesigned the global modeling module as Lite MHLA, a streamlined multi-head token interaction formulated as a single linear mapping with an affine rescaling transformation that reduces parameter redundancy and stabilizes optimization while preserving representational diversity across heads. All architectural choices are guided by the efficiency constraints of edge and mobile face recognition. The main contributions of this work are as follows: 1) We revisit the MHLA module and propose Lite MHLA, an optimized formulation that reduces redundancy while improving global context modeling over the orig-inal FaceLiVT design. 2) We present FaceLiVTv2, a co-designed architecture in-tegrating a refined embedding head, reparameterized convolutional mixers, and the Lite MHLA module, yielding a better balance between accuracy and infer-ence latency. 3) We conducted extensive experiments on multiple chal-lenging FR benchmarks (LFW, CA-LFW, CP-LFW, CFP-FP, AgeDB-30, IJB-B, IJB-C, TinyFace), demonstrating that FaceLiVTv2 outperforms both its predecessor and recent lightweight state-of-the-art models. 4) We validate that our models maintain edge and mobile-friendliness by profiling latency on widely used edge and mobile devices, as depicted in Fig 1. This paper is organized as follows. Section II reviews related work on lightweight CNNs, transformers, and hy-brid based FR. Section III presents the proposed FaceLiVTv2 architecture in detail. Section IV describes the experimental setup, benchmark datasets, evaluation results, and ablation studies. Section V concludes the paper and outlines future directions. For clarity, the following abbreviations are used throughout this paper: IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 3
+
+Fig. 2: FaceLiVTv2 architecture with Lite MHLA and structural reparameterization. Stages 1 and 2 use RepMix and the last stage combines RepMix with Lite MHLA as spatial mixer.          
+
+> CNN :Convolutional Neural Network.
+> FR :Face Recognition
+> FFN :Feed Forward Network
+> GDConv :Global Depthwise Convolution
+> MHSA :Multi-Head Self-Attention
+> MHLA :Multi-Head Linear Attention
+> MLP :Multi Layer Perceptron
+> RepMix :Reparameterize Token Mixer
+> SOTA :State-of-The-Art
+
+2 RELATED WORKS 
+
+Over the past decade, deep learning–based FR has achieved remarkable progress, driven by advances in network archi-tectures, large-scale datasets, and discriminative loss func-tions such as ArcFace [17], CosFace [23], MagFace [24], Elas-ticFace [25], AdaFace [26], and TopoFR [27]. Beyond loss de-sign, recent studies have explored complementary strategies to improve FR robustness in unconstrained settings. AR-Face [28] introduces reinforcement learning-based attention regularization that dynamically focuses on informative fa-cial regions, while CATFace [29] proposes a cross-attribute-guided transformer with self-attention distillation, leverag-ing soft biometric attributes to enhance recognition in low-quality and surveillance scenarios. Addressing degraded in-puts from a different angle, Zhang et al. [18] employ texture-guided transfer learning to bridge the domain gap between high- and low-quality face images, while Khalid et al. [30] tackle resolution mismatch through a distillation framework that learns resolution-invariant embeddings. However, as FR systems move from cloud deployment to mobile and embedded platforms, researchers have increasingly focused on designing lightweight models that provide a favorable trade-off between accuracy and efficiency. In this section, we review related efforts in three directions: lightweight CNN, Vision Transformer–based FR, and hybrid architectures, along with attribute-guided and regularization approaches that improve robustness in unconstrained scenarios. 
+
+2.1 Lightweight CNNs for Face Recognition 
+
+The development of lightweight CNN architectures has been a major strategy for enabling real-time face recognition (FR) on mobile and embedded platforms. These models are typically derived from efficient convolutional backbones originally designed for general-purpose vision tasks, with modifications to improve their discriminative power for FR. MobileFaceNet [6] adapts MobileNetV2 with architectural adjustments to achieve mobile level FR, significantly reduc-ing model size while achieving competitive performance on the Labeled Faces in the Wild (LFW) [31] and AgeDB-30 [32] benchmarks. ShuffleFaceNet [33] extends ShuffleNetV2 with channel shuffling and efficient downsampling to reduce computational costs. VarGFaceNet [20] leverages variable group convolutions to enhance feature diversity while main-taining compactness, and MixFaceNets [21] incorporate mixed depthwise kernels and channel shuffle operations for improved efficiency. More recently, GhostFaceNets [8] exploit inexpensive operations to generate redundant fea-ture maps, achieving strong performance with fewer FLOPs. These lightweight CNNs consistently provide accurate re-sults on standard benchmarks, often with parameter counts in the range of 0.5M–7M. However, their limited receptive fields and inability to model long-range dependencies re-strict their effectiveness in challenging scenarios, such as large pose variations, occlusions, or poor illumination. 
+
+2.2 Lightweight Transformers for Face Recognition 
+
+Transformers have recently been applied to FR due to their ability to capture long-range dependencies through global self-attention. However, the higher complexity of standard MHSA poses challenges for resource-limited deployment. IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 4
+
+Fig. 3: Architecture comparison of (a) LiteMHLA in FaceLiVTv2 and (b) MHLA in FaceLiVTv1, (c) FaceLiVTv2 Block and (d) FaceLiVT Block. C, H and W denotes as the number of channel, height and width of feature map, h denotes as the number of head on the MHLA. To address this, several lightweight or efficient Transformer-based FR approaches have been proposed. Face Transformer [22] was the first to apply ViT to FR, introducing a sliding-patch design to better capture inter-patch relationships. TransFace [10], [34] calibrated trans-former training from a data-centric perspective, improving stability and generalization across large-scale benchmarks. Other variants have integrated efficient attention mecha-nisms or token reduction strategies to reduce computational overhead. For instance, MobileFaceFormer [35] combines CNN and Transformer branches with convolutional token initialization for more efficient local-global feature extrac-tion, while EdgeFace [3] incorporates a low-rank linear (LoRaLin) module to approximate attention and reduce costs. SwiftFaceFormer [4] further explored additive at-tention with linear complexity, demonstrating competitive accuracy with reduced latency. KANsFace [5] integrated Kolmogorov-Arnold Networks (KANs) into face recogni-tion architectures by replacing the conventional MLP-based head with a KANs module in the EdgeFace-based model. Overall, lightweight ViTs and hybrid CNN–Transformer models demonstrate that efficient global context modeling is possible, but existing designs still face trade-offs between discriminative capacity and strict resource constraints. This motivates further refinement of lightweight attention mech-anisms, such as the MHLA adopted in our FaceLiVTv1 framework [15], [16], and its improved variant in Face-LiVTv2. As summarized in Table 1, the extracted properties from effective face recognition architectures serve as design principles for constructing models to achieve a favorable trade-off between accuracy, efficiency, and scalability in cross-platform and low-computation scenarios. 
+
+3 PROPOSED METHOD 
+
+FaceLiVTv1 demonstrated competitive performance among lightweight Transformer-based face recognition models. However, several limitations affected its scalability and ro-bustness in unconstrained scenarios. First, although com-putationally efficient, the original MHLA formulation intro-duced redundant linear token projections across heads and provided limited cross-token interaction, which constrained its ability to model fine-grained dependencies arising from complex variations in pose, illumination, and occlusion. Second, the embedding head relied on global average pool-ing, resulting in uniform spatial aggregation that weak-ened discriminative local cues important for open-set face recognition. Third, the separate branch design of RepMix blocks limited their integration with global token interac-tion, reducing overall architectural coherence and efficiency. To address these limitations, we propose FaceLiVTv2, an improved variant that incorporates three key architectural refinements: (1) a redesigned MHLA module (called Lite MHLA ) with simplified linear token interaction and affine feature rescale transformation for more efficient global de-pendency modeling, (2) a GDConv embedding head that en-ables adaptive spatial aggregation for more discriminative feature representations, and (3) a unified RepMix–Lite MHLA structure that strengthens local–global feature integration while maintaining inference efficiency. 
+
+3.1 Architecture 
+
+The next iteration of the FaceLiVT macro-design continues to adopt a feature pyramid architecture [36], [37] to bal-ance multi-scale representation and efficiency. Unlike Face-LiVTv1, which applies the same spatial and channel mixing modules across all stages, FaceLiVTv2 introduces a stage-specific block design, as illustrated in Fig. 2. Specifically, the first two stages employ a combination of RepMix and FFN blocks, while the final two stages adopt three stacked residual blocks consisting of RepMix, Lite MHLA, and FFN. This design reflects the observation that early-stage fea-tures mainly capture low-level spatial patterns, where global IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 5
+
+token interaction offers limited benefits and introduces un-necessary overhead. In contrast, higher-level features benefit more from global modeling; therefore, RepMix is followed by Lite MHLA in the later stages to jointly capture local structural information and long-range token interactions. More precisely, let Xi ∈ RHi×Wi×Ci denote the feature map at stage i with spatial resolution Hi × Wi and Ci
+
+channels. The detailed formulation of each block and its associated operators is provided in Eq. (1). 
+
+Xi = RepM ix (Xi),Xi = Xi + LiteM HLA (Xi),Xi = Xi + F F N (Xi).
+
+(1) The FFN layer is composed of two linearly point-wise convolution layers and a single activation function that can be expressed in Eq. (2) as follows: 
+
+F F N (Xi) = BN 
+
+
+
+σ BN (Xi ∗ We) ∗ Wr
+
+
+
+, (2) where We ∈ RCi×rC i×1×1 and Wr ∈ R(rC i)×Ci×1×1 are the weights of the FFN layer, with a default expansion ratio value of r = 2 . GELU (.) is chosen as the activation function (σ) in the middle of the FFN. 
+
+3.2 Global Depth-wise Convolution (GDConv) Head 
+
+Although global token interaction is performed prior to aggregation, the uniform Global Average Pooling (GAP) commonly used as the embedding head in Transformer-based [10], [34] and hybrid CNN–Transformer face recog-nition models [3], [12], [14], including FaceLiVT [15], treats all spatial locations equally and overlooks channel-specific spatial relevance. Such uniform aggregation may suppress discriminative local cues that are critical for open-set face recognition. In FaceLiVTv2, we refine the embedding head by replacing GAP with a GDConv layer, enabling adaptive spatial feature aggregation. GDConv complements global token interaction by learning channel-wise spatial weight-ing, allowing the model to emphasize discriminative regions after token mixing. GDConv applies a depthwise convolu-tion over the entire feature map, enabling each channel to capture spatial importance with a small number of parame-ters while maintaining low computational overhead. More specifically, in the embedding head, following the final encoding stage of FaceLiVTv2, the output feature map is first expanded to a 1284-channel representation using an efficient 1 × 1 point-wise convolution. Subsequently, a GD-Conv layer with a kernel size matching the spatial resolution of the feature map ( 4×4) aggregates spatial information and reduces the feature map to a single vector representation. Finally, a linear projection aligns the resulting feature vector with the target 512-dimensional embedding space, as sum-marized in Table 3. This design enables the GDConv head to learn adaptive, channel-wise spatial weighting while preserving the compactness and computational efficiency of the model, leading to more discriminative face embeddings compared to GAP-based aggregation. 
+
+3.3 Reparameterized Token Mixer (RepMix) 
+
+Following FaceLiVTv1 [15], FaceLiVTv2 adopts the RepMix block for local feature extraction. RepMix is a lightweight 
+
+Fig. 4: Structural Reparameterization on RepMix Block. This visualization illustrate the process of merging DW 3×3,
+
+DW 1×1, residual connection, and BN into single DW 3×3.The residual connection is substituted by the identity weight with the dimension similar like DW 1×1 weight. convolutional token mixer designed to capture local spatial dependencies while remaining efficient. It combines a stan-dard depthwise 3 × 3 convolution with an additional 1 × 1
+
+depthwise convolution, followed by Batch Normalization (BN). During training, both branches contribute to feature learning. However, in the post-training process, they can be structurally reparameterized into a single equivalent convolution, thereby reducing latency without sacrificing accuracy. Formally, given input Xi, RepMix computes the output feature in the training step as described in Eq. (3). 
+
+Xi = Xi + {BN (DW 3×3(Xi) + DW 1×1(Xi)) } . (3) As illustrated in Fig. 4, to reparameterize Eq. (3) in the deployment step, the 1 × 1 depth-wise convolution and identity kernel weight, as a substitution for the residual connection, will be transformed into 3 × 3 weight size through zero padding. Then it can be summed into a single 
+
+3×3 weight convolution followed by BN, as described in Eq. (4) , with μ, σ, γ, and β denoting mean, standard deviation, feature scale, and bias. 
+
+BN (DW 3×3(Xi)) = γ (W ∗ Xi + b) − μσ + β. (4) In the final step, Eq. (4) can be merged into a convolution layer only, as represented by Eq. (5): 
+
+RepM ix (Xi) = W ′ ∗ Xi + b′, (5) where the transformed weight is W ′ = W γσ and the ad-justed bias is b′ = ( b − μ) γσ + β. This simple yet effective design enriches local representation while enabling fast deployment on mobile devices. Hence, in the FaceLiVTv2, we extend RepMix in all stages and unify it with the Lite MHLA in the last two stages. 
+
+3.4 Lite Multi Head Linear Attention (Lite MHLA) 
+
+In FaceLiVTv1 [15], [16], MHLA was proposed as alightweight alternative to MHSA by replacing query–key interaction with linear projections. Given an input Xi ∈
+
+RB×C×H×W , it is reshaped into Xi ∈ RB×C×N with 
+
+N = H × W , divided into h heads, and computed as: MHLA (Xi) = Concat (LA 0, . . . , LA He ), (6) IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 6
+
+where each head is defined as in Eq. 7: 
+
+LA He (XHe ) = Wo (σ(XHe · Wi)) , (7) with Wi ∈ RN ×N r and Wo ∈ RN r ×N as learnable weight projections, where N r = N × r denotes the projected di-mension scaled by the r ratio [15], [16]. Despite its efficiency, the original MHLA introduced redundant linear projections across heads, while the two-layer MLP-style design (Linear-GELU-Linear) per head doubled the token interaction cost. Moreover, as demonstrated by [38], token-mixing can re-main purely a linear layer without sacrificing representa-tional power. Building on this principle, we introduce Lite MHLA, a simple activation-free linear mapping formulation that performs cross-token communication independently across multiple heads. As shown in Fig. 3, Lite MHLA replaces the LayerNorm in MHLA with a single affine rescale transformation applied before head splitting. Since the input has already been normalized by the BN layer in the preceding RepMix block, a full re-normalization with mean and variance recompu-tation is redundant. A lightweight affine feature rescaling suffices to recalibrate the feature distribution and is par-ticularly beneficial in mobile runtime, where normalization layers are disproportionately memory-bound (see Fig. 6). This design demonstrates that a learnable affine feature rescaling operator stabilizes training in linear token-mixing architectures without sacrificing representational capacity (ablation in Sec. IV-E confirms this empirically). Formally, the affine feature rescale transformation is defined as: Aff (Xi) = α ⊙ Xi + β, (8) with α, β ∈ RC×1 as learnable scale and bias parameters. It was applied both before and after the linear layer token interaction as channel-wise feature rescaling. Each of the four heads, by default (see Sec.4.5.5), per-forms a single linear token interaction: LiteMHLA (Xi) = Concat (Llite  
+
+> 0
+
+, . . . , L lite He ), (9) 
+
+Llite He (XHe ) = Aff (XHe ) · Wi + Bi, (10) where Wi ∈ RN ×N , Bi ∈ RN ×1, and Aff (·) are the affine transformations. Fig. 5 shows the PyTorch implementation of Eq. (9) and Eq. (10). 
+
+Remark on Complexity. As summarized in Table 2, al-though Eq. 10 incurs O(N 2) cost per head per channel group, this remains practical because Lite MHLA eliminates the Q/K/V and output projections ( 4N C 2), the attention product ( N 2C), and the softmax normalization that MHSA requires, reducing the total complexity to N 2C +ϵ per block. Moreover, Lite MHLA operates exclusively at the small spa-tial resolutions of 7×7 (N =49 ) at stages 3 and 4×4 (N =16 )at stages 4, where N 2 is inherently small and dominated by C dimension. At stage 3 with C=192 (FaceLiVTv2-S), for example, the token interaction amounts to only ≈0.46 MMAdds per block, which is negligible compared to the FFN (4N C 2 ≈7.23 M). In practice, Lite MHLA balances memory-bound and compute-bound operations by eliminating redundant Linear-Activation layer pairs and zero-feature normaliza-tion from merged BN and affine transformations. As shown TABLE 2: Complexity comparison of MHSA, MHLA, and Lite MHLA                                                                                     
+
+> Component MHSA MHLA (v1) Lite MHLA (v2)
+> Q,K,V + Out Proj. 4N C 2––Token Interaction 2N2C2( N rN )CN2C
+> (QK Tand Attn ·V)(MLP) (Linear Proj.) Nonlinearity softmax GELU -Normalization LayerNorm LayerNorm Affine Transf.
+> Total 4N C 2+ 2 N2C2( N rN )C≈N2C+ϵ
+> *ϵ: affine rescale transformation overhead
+> class LiteMHLA(torch.nn.Module): def __init__(self, dim, resolution): super().__init__() self.n_head =4self.res=resolution**2 self.dim=dim linear=[] self.norm =Affine(dim) for iin range(self.n_head): lin =nn.Linear(self.res, self.res) linear.append(lin) self.lin =torch.nn.ModuleList(linear) ls_init =torch.ones(dim).unsqueeze(-1) ls_init =ls_init.unsqueeze(-1) self.ls =nn.Parameter(1e-5 *ls_init) def forward(self, x): B,C,H,W =x.shape x=x.reshape(-1, self.dim, self.res) x=self.norm(x) x=list(x.chunk(self.n_head, dim=1)) for iin range(self.n_head): x[i] =self.lin[i](x[i]) x=torch.cat(x, dim=1) x=self.ls *x.reshape(B,C,H,W) return x
+
+Fig. 5: Pytorch style code of Lite MHLA. TABLE 3: Architecture Details of FaceLiVTv2 Variants.                                                                                                           
+
+> Stage Layer Res. Kernel nFaceLiVTv2 Channels Size XS SML
+> Input Image 112 2-1----Stem Conv 56 23×3116 24 28 32 Conv 28 23×3132 48 56 64 Stage-1 RepMix Enc. 28 23×3332 48 56 64 Downsampling 14 23×3164 96 112 128 Stage-2 RepMix Enc. 14 23×3364 96 112 128 Downsampling 723×31128 192 224 256 Stage-3 LiteMHLA Enc. 723×39128 192 224 256 Downsampling 423×31256 384 448 512 Stage-4 LiteMHLA Enc. 423×33256 384 448 512 Conv 421×111284 Head GDConv 124×411284 Linear 12-1512
+> Model MAdds 90 179 258 309
+> Model Parameters (M) 2.9 4.62 7.04 8.52
+
+in Fig. 6, FaceLiVTv2 achieves nearly similar memory op-eration efficiency to GhostFaceNetV2-1 [8], with signifi-cantly lower memory overhead than TransFace-S [10] and KANFace-0.5 [5]. IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 7
+
+TABLE 4: Comparison of FaceLiVTv2 variant with SOTA on FR benchmarks. Mobile latency are measured on iPhone 15 Pro. 
+
+Model Year Param FLOPs Training LFW ↑ CA- CP- CFP Age Mean IJB (FAR@ 10 −4)↑ Latency (M) ↓ (M) ↓ Dataset LFW ↑ LFW ↑ -FP ↑ DB30 ↑ Acc(%) ↑ B C (ms )↓
+
+Large-Scale FR Models (FLOPs ≥ 1G) 
+
+ResNet200-TopoFR [27] ’24 118.8 23.5G Glint360K 99.87 - - 99.45 98.82 - 97.84 96.56 12.24 TransFace-L [10], [34] ’25 271.6 25.4G Glint360K 99.85 - - 99.37 98.66 - 96.73 97.85 OOM TransFace-B [10], [34] ’25 124.5 11.5G Glint360K 99.85 - - 99.24 98.62 - 96.46 97.59 18.20 TransFace-S [10], [34] ’25 86.7 5.8G Glint360K 99.85 - - 98.96 98.56 - 96.12 97.45 14.31 ResNet50-ArcFace [17] ’22 43.6 6.3G Glint360K 99.78 - - 98.77 98.28 - 95.30 96.81 3.76 SwiftFaceFormer-L3 [4] ’24 28.0 2.0G MS1MV3 99.75 96.03 90.70 97.80 97.55 96.36 92.92 94.70 2.59 VarGFaceNet [20] ’19 5.0 1.0G MS1MV3 99.85 95.15 88.55 98.50 98.15 96.04 92.90 94.70 0.83 PocketNetM256 [39] ’22 1.75 1.1G CASIA-WF 99.58 95.63 90.03 95.66 97.17 95.61 90.74 92.70 0.98 PocketNetM128 [39] ’22 1.68 1.1G CASIA-WF 99.65 95.67 90.00 95.07 96.78 95.43 90.63 92.63 0.98 
+
+Lightweight FR Models (FLOPs < 1G) 
+
+KANFace-0.5 [5] ’25 6.80 397 WebFace12M 99.82 95.48 92.65 98.31 96.90 96.63 93.69 95.64 9.98 KANFace-0.5 † [5] ’25 6.80 397 Glint360K 99.75 95.52 91.90 97.35 97.21 96.35 93.26 94.34 9.98 FaceLiVTv1-M [15] ’25 9.8 386 Glint360K 99.70 95.76 90.97 97.20 97.60 96.25 93.70 95.70 0.67 EdgeFace-S [3] ’24 3.6 306 WebFace12M 99.78 95.71 92.56 95.81 96.93 96.16 93.59 95.63 9.89 EdgeFace-S † [3] ’24 3.6 306 Glint360K 99.75 95.95 91.63 96.13 97.48 96.19 93.03 94.66 9.89 SwiftFaceFormer-L1 [4] ’24 11.8 805 MS1MV3 99.68 95.80 90.10 96.61 96.95 95.83 91.81 93.82 1.20 SwiftFaceFormer-S [4] ’24 6.0 485 MS1MV3 99.60 95.78 90.00 96.49 96.83 95.74 91.56 93.54 0.65 MobileFaceNet [6], [19] ’21 0.99 440 MS1MV2 99.70 95.20 89.22 96.90 97.60 95.72 92.83 94.70 0.77 ShuffleFaceNet-1.5 [33] ’21 2.6 577 MS1MV2 99.67 95.05 88.50 97.26 97.32 95.56 92.30 94.30 0.69 PocketNetS128 [39] ’22 0.92 587 CASIA-WF 99.58 95.48 88.63 94.21 96.10 94.80 89.44 91.62 0.88 PocketNetS256 [39] ’22 0.99 587 CASIA-WF 99.66 95.50 88.93 93.34 96.36 94.76 89.31 91.33 0.88 MixFaceNets-M [21] ’21 3.9 626 MS1MV2 99.68 - - - 97.05 - 91.55 93.42 0.70 GhostFaceNetV1-1 [8] ’23 4.1 216 MS1MV3 99.73 95.93 91.93 96.83 98.00 96.48 93.12 94.94 0.78 KANFace-0.6 [5] ’25 4.74 240 WebFace12M 99.65 95.32 91.47 97.17 95.52 95.83 92.95 94.75 6.52 FaceLiVTv1-S [15] ’25 5.89 237 Glint360K 99.70 95.63 90.70 95.10 96.60 95.55 91.20 92.70 0.47 EdgeFace-XS [3] ’24 1.77 154 WebFace12M 99.73 95.28 91.82 94.37 96.00 95.44 92.67 94.85 5.82 SwiftFaceFormer-XS [4] ’24 3.4 294 MS1MV3 99.60 95.47 88.65 95.35 96.35 95.08 90.20 92.32 0.59 GhostFaceNetV2-2 [8] ’23 6.8 77 MS1MV3 99.68 95.73 90.17 94.29 96.83 95.34 91.89 93.16 0.67 GhostFaceNetV1-2 [8] ’23 4.1 60 MS1MV3 99.68 95.60 90.07 93.31 96.92 95.12 91.25 93.45 0.60 ShuffleFaceNet-0.5 [33] ’21 1.4 67 MS1MV2 99.20 - - 92.60 93.20 - - - 0.45 FaceLiVTv2-L - 8.52 309 Glint360K 99.80 96.00 93.07 98.26 98.02 97.03 (+0.40) 95.18 (+1.49) 96.59 (+0.95) 0.71 (14.0 × ↓ )
+
+FaceLiVTv2-M - 7.02 258 Glint360K 99.78 96.12 92.92 97.93 98.10 96.97 (+0.49) 95.02 (+1.90) 96.42 (+1.48) 0.65 (16.7% ↓)
+
+FaceLiVTv2-S - 4.62 179 Glint360K 99.78 95.93 92.45 97.47 97.82 96.69 (+0.21) 94.51 (+1.39) 95.99 (+1.05) 0.54 (30.8% ↓)
+
+FaceLiVTv2-XS - 2.9 90 Glint360K 99.63 95.58 90.38 95.23 96.68 95.50 (+0.16) 90.67 (-1.22) 91.25 (-1.91) 0.43 (35.8% ↓)
+
+† retrained from scratch using their official released PyTorch code under our experimental setup 
+
+4 EXPERIMENTS 
+
+4.1 Experiments Setup 
+
+4.1.1 Training 
+
+We employed Glint360K [40], a large-scale public FR dataset that provides diverse and high-quality samples for robust model generalization. Glint360K is a recent and significantly larger dataset, comprising around 17 million face images from 360,232 unique identities. The dataset includes images from various demographics and capture conditions, making it suitable for training high-capacity models that generalize across unconstrained environments. For the low resolution face benchmark, we finetune the model with the Tiny-Face [41] dataset. TinyFace [41] comprises 169,403 native low-resolution images of 5,139 identities, with a training subset containing 7,804 images of 2,570 identities. The proposed FaceLiVTv2 was trained on both pre-aligned 112 × 112 resolution facial image datasets. They were transformed into tensors and normalized between -1 and 1. Training was performed over 50 epochs with a total batch size of 1026 on three Nvidia RTX A6000 GPUs in a distributed setting. The AdamW optimizer with a polyno-mial decay learning rate scheduler was used, with an initial learning rate of 6e−3 during the training process. We used l2 regularization with l2 = 1 e−2 to prevent overfitting. We also evaluated the model using two different loss functions: CosFace [23] and ArcFace [17], with a 512-dimensional em-bedding size. For TinyFace [41], we fine-tuned the model for 40 epochs with a batch size of 8 using the AdamW optimizer with an initial learning rate of 2e−4, without any distillation or restoration. 
+
+4.1.2 Test 
+
+The performance of the FaceLiVTv2 model proposed in this study was assessed using eight distinct benchmark datasets. These datasets, chosen for evaluation purposes, in-clude Labeled Faces in the Wild (LFW) [31], Cross-age LFW (CA-LFW) [42], Cross Pose LFW (CP-LFW) [43], Celebri-ties in Frontal-Profile in the Wild (CFP-FP) [44], AgeDB-30 [32], IARPA Janus Benchmark-B (IJB-B) [45], IARPA Janus Benchmark-C (IJB-C) [46], and TinyFace [41] for low-resolution face test protocol. We further assessed model efficiency not only in terms of FLOPs but also through an evaluation of inference speed. The inference speed test was carried out on various computing devices, such as iPhone 15 Pro for mobile, Jetson AGX Orin for the edge platform, Intel i5-12500 with 64 GB of RAM for consumer-grade CPU, and RTX-5090 for GPU. For the mobile latency evaluation, all models were converted to Core ML using coremltools based on the official implementations, and latency was measured on the iPhone 15 Pro running iOS 26. For the edge device, CPU, and GPU, all models were benchmarked IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 8
+
+Fig. 6: Model in CoreML runtime breakdown. Operations highlighted in the redbox represent memory-bound opera-tions, where memory access dominates execution time over computation. using ONNX Runtime as an open standard for machine learning interoperability. The detailed conversion process from PyTorch to Core ML and ONNX is provided in code and the supplementary material. 
+
+4.2 Comparison With SOTA 
+
+Table 4 shows the comparison of our new FaceLiVTv2 with SOTA lightweight face recognition models in the literature across different benchmarking datasets. We categorize the model based on FLOPs into under 100 MFLOPs, 100 ≤
+
+MFLOPs < 300 , 300 ≤ MFLOPs < 1024 , and ≥ 1024 ; then we sort it by mean accuracy among LFW, CA-LFW, CP-LFW, CFP-FP, and AgeDB-30. Starting from the most compact configuration under 100 MFLOPs, FaceLiVTv2-XS demon-strates that meaningful FR performance can be achieved under extremely tight computational constraints. With only 2.9 M parameters and 90 MFLOPs, FaceLiVTv2-XS attains 0.16% higher average accuracy across 5 benchmarks while delivering a 35.8% reduction in mobile latency compared with GhostFaceNetV2-2 [8]. Although its accuracy on IJB-B and IJB-C is 1.22% to 1.91% lower, the substantial latency savings make FaceLiVTv2-XS particularly suitable for ultra-edge and always-on mobile scenarios where responsiveness and energy efficiency are prioritized over absolute peak accuracy. Moving to MFLOPs ranging from 100 to 300, FaceLiVTv2-S achieves a favorable balance between recog-nition accuracy and computational efficiency relative to recent lightweight and hybrid face-recognition networks. Although the proposed model contains only 4.62 M pa-rameters and 179 MFLOPs, it consistently delivers superior results across diverse benchmarks, with strong cross-age robustness of 97.82% on AgeDB-30, cross-pose robustness of 92.45% on CP-LFW, and high template-based verification accuracy of 94.51% on IJB-B and 95.99% on IJB-C. Compared with CNN-based models, such as GhostFaceNetV2-2 [8], FaceLiVTv2-S achieves higher accuracy with mean accuracy increases of 0.21 while maintaining 30.8% faster mobile inference. It demonstrates strong generalization capability, which is critical for real-world deployments. As model capacity increases, FaceLiVTv2-M contin-ues this trend by outperforming lightweight FR mod-TABLE 5: Cross-Platform Latency Comparison of Face-LiVTv2 with SOTA                                                                                           
+
+> Model Mean ONNX Latency (ms) ↓
+> Acc(%) ↑GPU CPU Jetson-(GPU/CPU) KANFace-0.5 [5] 96.63 1.96 6.19 7.12 / 20.47 FaceLiVTv1-M [15], [16] 96.25 1.83 3.61 7.04 / 13.65 EdgeFace-S [3] 96.16 1.84 2.90 6.85 / 11.16 SwiftFaceFormer-L1 [4] 95.83 1.36 4.51 5.53 / 10.85 SwiftFaceFormer-S [4] 95.74 1.28 2.53 5.28 / 8.18 GhostFaceNetV1-1 [8] 96.48 1.12 4.53 5.08 / 19.68 KANFace-0.6 [5] 95.83 1.92 4.01 6.60 / 14.37 FaceLiVTv1-S [15], [16] 95.55 1.73 2.10 6.40 / 8.02 EdgeFace-XS [3] 95.44 1.83 2.12 6.42 / 8.04 SwiftFaceFormer-XS [4] 95.08 1.17 1.82 4.54 / 6.20 GhostFaceNetV2-2 [8] 95.34 1.49 2.80 6.89 / 12.02 GhostFaceNetV1-2 [8] 95.12 1.03 2.21 4.96 / 8.32 FaceLiVTv2-L 97.03 1.29 2.40 5.45 / 8.80
+> (+0.40) (34%) ↓(47%) ↓(21%) ↓/(57%) ↓
+> FaceLiVTv2-M 96.97 1.27 2.08 5.39 / 7.61
+> (+0.49) (12%) ↑(23%) ↓(2%) ↓/(60%) ↓
+> FaceLiVTv2-S 96.69 1.25 1.64 5.35 / 6.42
+> (+0.21) (10%) ↑(66%) ↓(4%) ↓/(67%) ↓
+> FaceLiVTv2-XS 95.50 1.23 1.24 5.08 / 4.57
+> (+0.16) (17%) ↓(43%) ↓(25%) ↓/(62%) ↓
+
+els in the 100–300 MFLOPs range across all benchmarks, achieving a mean accuracy of 96.97% on 5 FR bench-marks, 95.02% on IJB-B, and 96.42% on IJB-C. Despite its higher representational capacity, FaceLiVTv2-M maintains a favorable efficiency profile, remaining 16.7% faster than GhostFaceNetV1-1 [8] and consistently surpassing the Edge-Face–KANFace line of lightweight hybrid models [3], [5] in terms of both recognition accuracy and inference latency. At the highest model size, FaceLiVTv2-L reaches the strongest overall performance, achieving a mean accuracy of 97.03% with 95.18% on IJB-B and 96.59% on IJB-C while pre-serving low mobile inference latency. Compared with SOTA models with FLOPs ranging from 300M to 1G, FaceLiVTv2-L consistently outperforms its predecessor FaceLiVTv1-M [15] with a similar inference latency. Moreover, it achieves a mean accuracy that is 0.4 to 0.84 higher than KANFace-0.5 [5] and EdgeFace-S [3] on most benchmarks, which were trained on the WebFace12M and Glint360K datasets with 
+
+≈14 × faster mobile inference. Compared with large scale FR models that were trained on similar datasets such as ResNet200-TopoFR [27] and TransFace variants [34], FaceLiVTv2-L narrows the mean accuracy gap on LFW, CFP-FP, and AgeDB-30 to only 0.69% while requiring 13 .9× fewer parameters and 76 .1×
+
+fewer FLOPs than ResNet200-TopoFR [27]. Remarkably, FaceLiVTv2-L marginally surpasses ResNet200-TopoFR by 0.03% on IJB-C, demonstrating competitive open-set verifi-cation capability. Against TransFace-L [34] as the strongest Transformer-based model, FaceLiVTv2-L achieves a mean accuracy gap of only 0.60% on LFW, CFP-FP, and AgeDB-30, while using 31 .9× fewer parameters and 82 .2× fewer FLOPs. Compared with large scale mobile FR models, FaceLiVTv2-L remains 3.65 × faster than SwiftFaceFormer-L3 [4], 14% faster than VarGFaceNet [20] while achieving higher accuracy. This demonstrates that FaceLiVTv2-L offers a compelling alternative to heavier architectures, combining strong generalization with deployment-friendly efficiency. IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 9
+
+TABLE 6: Comparison of FaceLiVTv2 Variant with SOTA on TinyFace 
+
+Model FLOP Rank (M) ↓ 1 5 20 50 VGGFace [30] - 30.4 - 40.4 42.7 CenterFace [30] - 32.1 - 44.5 48.4 MobileFaceNet [19] from [18] 440 42.3 44.6 47.1 50.2 ShuffleFaceNet-1.5 [19], [33] from [18] 577 50.2 52.4 54.5 55.3 VarGFaceNet [20] from [18] 1022 52.8 54.1 56.3 58.2 ResNet34 [18] 8G 56.1 56.9 59.0 63.8 CSRI [47] - 44.8 - 60.4 65.1 ResNet50 [18] 12G 61.2 63.7 65.9 68.2 RI-ResNet34 [30] 8G 70.4 - 82.2 85.4 FaceLiVTv2-XS 90 46.1 52.7 58.0 61.7 FaceLiVTv2-S 179 47.8 55.5 60.5 64.0 FaceLiVTv2-M 258 49.6 56.3 60.8 64.2 FaceLiVTv2-L 309 49.5 56.3 61.7 65.0 
+
+4.3 Cross-Platform Inference Latency Analysis 
+
+Across all evaluated platforms in Table 5, FaceLiVTv2 demonstrates a strong accuracy–latency trade-off, indicat-ing robust inference generalization. On Jetson AGX Orin, FaceLiVTv2-S and FaceLiVTv2-M achieve 2% to 4% lower latency than GhostFaceNetV1-1, while FaceLiVTv2-XS is 25% faster than GhostFaceNetV2-2. FaceLiVTv2-L is 21% faster than KANFace-0.5, with a 0.40 improvement in mean accuracy. On Jetson CPU, FaceLiVTv2 delivers 57–67% faster inference than competing models within the same MFLOPs range, underscoring its suitability for real-time edge deploy-ment. On the CPU and GPU platforms, FaceLiVTv2 con-tinues to exhibit favorable efficiency characteristics. On CPU, FaceLiVTv2-S and FaceLiVTv2-M reduce inference latency by 66% to 23%, respectively, compared with GhostFaceNetV1-1 [8], while FaceLiVTv2-L consistently outperforms KANFace [5] and EdgeFace [3] in both ac-curacy and runtime, as shown in Fig. 7. On GPU, Face-LiVTv2 variants maintain competitive lower inference la-tency times over other lightweight transformer models such as EdgeFace [3], KANFace [5], and SwiftFaceFormer [4], although they are 13–20% slower than the pure CNN GhostFaceNetV1 [8], which is highly optimized for GPU execution. 
+
+4.4 Low-Resolution Face Benchmark Analysis 
+
+Table 6 evaluates FaceLiVTv2 on the low-resolution Tiny-Face [41] benchmark, which is widely regarded as a chal-lenging testbed for surveillance-style FR due to severe res-olution degradation, blur, and noise. Despite its compact design, FaceLiVTv2-XS achieves 46.1% Rank-1 and 61.7% Rank-50 accuracy with only 90 MFLOPs, outperforming MobileFaceNet [19] and several classical baselines while operating at substantially lower computational costs. As model capacity increases, FaceLiVTv2 exhibits a clear and consistent performance gain: FaceLiVTv2-S improves Rank-1 accuracy to 47.8%, while FaceLiVTv2-M and FaceLiVTv2-L further raise Rank-1 accuracy to 49.6% and 49.5%, re-spectively. Notably, FaceLiVTv2-L achieves a Rank-50 ac-curacy of 65.0%, surpassing ShuffleFaceNet-1.5 [19], [33], VarGFaceNet [20], and ResNet34 [18], while requiring or-ders of magnitude fewer FLOPs. These results demonstrate 0 200 400 600 800 1000      
+
+> FLOPs (M)
+> 94.5
+> 95.0
+> 95.5
+> 96.0
+> 96.5
+> 97.0
+> Mean accuracy (%)
+> FaceLiVTv2-L
+> FaceLiVTv2-M
+> FaceLiVTv2-S
+> FaceLiVTv2-XS
+> FaceLiVTv1-M
+> FaceLiVTv1-S
+> GhostFaceNetV1-1
+> GhostFaceNetV2-2
+> GhostFaceNetV1-2
+> PocketNetS128
+> PocketNetS256
+> KANFace-0.5
+> KANFace-0.6
+> EdgeFace-S
+> EdgeFace-XS
+> ShuffleFaceNet-1.5
+> MobileFaceNet
+> VarGFaceNet
+> SwiftFaceFormer-L1
+> SwiftFaceFormer-S
+> SwiftFaceFormer-XS
+> Model Family
+> FaceLiVTv2
+> FaceLiVTv1
+> GhostFaceNet
+> PocketNet
+> KANFace
+> EdgeFace
+> ShuffleFaceNet
+> MobileFaceNet
+> VarGFaceNet
+> SwiftFaceFormer 123456
+> CPU latency (ms)
+> 94.5
+> 95.0
+> 95.5
+> 96.0
+> 96.5
+> 97.0
+> Mean accuracy (%)
+> FaceLiVTv2-L
+> FaceLiVTv2-M
+> FaceLiVTv2-S
+> FaceLiVTv2-XS
+> FaceLiVTv1-M
+> FaceLiVTv1-S
+> GhostFaceNetV1-1
+> GhostFaceNetV2-2
+> GhostFaceNetV1-2
+> KANFace-0.5
+> KANFace-0.6
+> EdgeFace-S
+> EdgeFace-XS
+> SwiftFaceFormer-L1
+> SwiftFaceFormer-S
+> SwiftFaceFormer-XS
+> Model Family
+> FaceLiVTv2
+> FaceLiVTv1
+> GhostFaceNet
+> PocketNet
+> KANFace
+> EdgeFace
+> ShuffleFaceNet
+> MobileFaceNet
+> VarGFaceNet
+> SwiftFaceFormer
+
+Fig. 7: Comparison of our proposed FaceLiVTv2 with other lightweight FR models on mean accuracy of FR benchmark dataset v.s. FLOPs and mean accuracy v.s i5-12500 CPU Latency. that FaceLiVTv2 maintains robust recognition performance under extremely low-resolution conditions with only fine-tuning, without any special techniques such as distillation or image restoration [18], [30], indicating improved general-ization to surveillance and cross-resolution scenarios despite its lightweight architecture. 
+
+4.5 Ablation Study 
+
+We conducted several ablation studies, including the Rep-Mix design, loss function, Lite MHLA design, and overall architectural changes. We used Glint360K with a similar training setup across all ablations. 
+
+4.5.1 Ablation on Overall Impact of Architectural Change 
+
+Table 7 presents the cumulative impact of each architectural change on FaceLiVTv2-S, starting from the FaceLiVTv1-S baseline trained on Glint360K. Adjusting the stage dimen-sions from [40 , 80 , 120 , 320] to [48 , 96 , 192 , 320] and depths from [2 , 4, 6, 2] to [3 , 3, 9, 3] with an MLP expansion ratio from 3 to 2 yields a 42% latency increase (from 0.47 ms to 0.67 ms) but provides meaningful accuracy gains across all benchmarks, most notably +0.83% on CP-LFW and +0.45% on AgeDB-30, establishing a stronger feature backbone for subsequent modifications. Replacing global average pooling IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 10 
+
+TABLE 7: Ablation On The Overall Impact Of Components On FaceLiVTv2-S Variant with Glint360K as a Training Dataset                                                                                        
+
+> Architectural Param FLOPs LFW CA-LFW CP-LFW CFP-FP AgeDB-30 Mean Acc Latency Ablation (M) ↓(M) ↓(%) ↑(%) ↑(%) ↑(%) ↑(%) ↑(%) ↑(ms) ↓
+> FaceLiVTv1-S (Baseline) 5.9 237 99.70 95.63 90.70 95.10 96.60 95.55 0.47 Adjust Dim ↑, Depth ↑, & MLP ↓6.5 (10%) ↑203 (14%) ↓99.70 (+0.00) 95.63 (+0.00) 91.53 (+0.83) 95.73 (+0.63) 97.05 (+0.45) 95.92 (+0.37) 0.67 (42%) ↑
+> GAP →GDConv Recog. Head 7.4 (25%) ↑210 (11%) ↓99.72 (+0.02) 95.75 (+0.12) 91.20 (+0.50) 96.12 (+1.02) 97.03 (+0.43) 95.96 (+0.40) 0.73 (55%) ↑
+> Separate →Combined RepMix 7.4 (25%) ↑211 (11%) ↓99.73 (+0.03) 95.87 (+0.24) 91.22 (+0.52) 96.15 (+1.05) 97.23 (+0.63) 96.00 (+0.45) 0.74 (57%) ↑
+> MHLA →LiteMHLA 4.6 (22%) ↓179 (24%) ↓99.78 (+0.08) 95.93 (+0.30) 92.45 (+1.75) 97.47 (+2.37) 97.82 (+1.22) 96.69 (+1.14) 0.52 (10%) ↑
+> FaceLiVTv1-M 9.8 386 99.70 95.76 90.97 97.20 97.60 96.25 0.67 FaceLiVTv2-S 4.6 (53%) ↓179 (53%) ↓99.78 (+0.08) 95.93 (+0.27) 92.45 (+1.48) 97.47 (+0.27) 97.82 (+0.22) 96.69 (+0.44) 0.52 (22%) ↓
+
+TABLE 8: Block Configurations Ablation of FaceLiVTv2-S                                        
+
+> Block Config. Param FLOPs LFW CA CP CFP Age Lat [4-Stages] (M) (M) LFW LFW FP DB30 (ms) [R, R, R, R] 4.52 175 99.73 95.88 92.07 97.19 97.67 0.50 [R, R, RL, RL] 4.62 179 99.78 95.93 92.45 97.47 97.82 0.54 [RL, RL, RL, RL] 12.47 279 99.80 95.99 92.54 97.57 97.83 1.36
+
+with a global depthwise convolution recognition head fur-ther improves accuracy–particularly on CFP-FP and AgeDB-30–while only marginally increasing latency to 0.73 ms, confirming that adaptive spatial aggregation captures more discriminative information than uniform pooling. Transi-tioning from separate RepMix and global mixer stages to the combined RepMix block yields a mean accuracy gain of 0.45 from the baseline, with a similar latency cost pro-file, indicating that tighter local-global coordination benefits representation quality. The most impactful change is the replacement of MHLA with Lite MHLA. This change reduces the number of param-eters by 22% and FLOPs by 24% from the baseline while si-multaneously achieving the largest accuracy improvements across all benchmarks: +1.75% on CP-LFW, +2.37% on CFP-FP, +1.22% on AgeDB-30, and +1.14% on the overall mean. The latency also drops sharply from 0.74 ms to 0.52 ms when compared with the previous version of MHLA. This con-firms that the static linear token interaction in Lite MHLA is not only more parameter-efficient but also more effective than the two-layer MLP design in the original MHLA, as eliminating the intermediate nonlinearity and redundant projections allows the network to learn cleaner token-to-token relationships. The final FaceLiVTv2-S configuration achieves 96.69% mean accuracy with only 4.6 M parameters and 0.52 ms la-tency, outperforming the significantly larger FaceLiVTv1-M (53% larger than FaceLiVTv2-S) on every benchmark while being 22% faster. This demonstrates that the architectural refinements in FaceLiVTv2 are complementary and collec-tively yield a model that is both smaller and more accurate than its predecessor, validating the co-design of Lite MHLA, combined RepMix, and adaptive spatial aggregation as an effective strategy for mobile FR. 
+
+Block Configuration Analysis. Table 8 examines how plac-ing Lite MHLA across stages affects the accuracy-efficiency trade-off, where R and RL denote RepMix-only and com-bined RepMix-Lite MHLA stages, respectively. Using Rep-Mix alone ([R, R, R, R]) yields the most compact model but lags on challenging benchmarks like CFP-FP and CP-LFW, where global context is essential for handling large pose and age variations. Adding Lite MHLA in the last two stages ([R, TABLE 9: Loss Function Ablation of FaceLiVTv2-S                   
+
+> Loss Function LFW CA CP CFP Age LFW LFW FP DB30 ArcFace [17] 99.75 95.75 91.63 96.63 97.65 CosFace [23] 99.78 95.93 92.45 97.47 97.82
+
+R, RL, RL]) costs only 0.10 M extra parameters and 0.04 ms latency, yet it improves CFP-FP by +0.28% and CP-LFW by +0.38%, confirming that global token interaction is most beneficial at later stages where spatial resolution is small and the computational cost of Lite MHLA is negligible. Con-versely, applying Lite MHLA at every stage nearly triples the parameters to 12.47 M and increases latency by 2.5 ×
+
+for only marginal accuracy gains, indicating that early high-resolution stages mainly capture low-level spatial patterns, where global token interaction offers limited benefits and introduces unnecessary overhead. The [R, R, RL, RL] config-uration thus represents the optimal trade-off, concentrating global modeling where it matters most. 
+
+4.5.2 Ablation of Loss Function 
+
+To examine the influence of different margin-based loss functions on the discriminative capacity of FaceLiVTv2, we evaluated two widely used angular-margin formulations; specifically, we trained the FaceLiVTv2-S variant with Ar-cFace [17] and CosFace [23]. As shown in Table 9, both loss functions yield strong performance across all benchmarks, demonstrating the robustness of the proposed architecture to the choice of supervision strategy. When trained with ArcFace, the model achieves 99.75% on LFW and 97.63% on AgeDB-30, confirming stable intra-class compactness and inter-class separability. However, CosFace provides a consistent improvement across nearly all datasets, notably on CP-LFW and CFP-FP, where accuracy gains are from 91.63% to 92.45% and from 96.63% to 97.47%, respectively. The superior performance of CosFace can be attributed to its additive cosine-margin formulation, which enforces a constant angular margin in the normalized feature space, promoting clearer class boundaries and faster convergence. In contrast, ArcFace applies an additive angular margin, which slightly increases the decision boundary curvature and may require more careful margin scaling. Overall, CosFace proves to be more stable for training lightweight architectures such as FaceLiVTv2-S, providing improved generalization and better alignment between feature embed-dings and classification weights. IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 11 
+
+TABLE 10: RepMix Block Ablations of FaceLiVTv2-S                                                
+
+> Ablations Param FLOPs LFW CA CP CFP Age Lat (M) (M) LFW LFW FP DB30 (ms) Baseline 4.62 179 99.78 95.93 92.45 97.47 97.82 0.54 w/o Res Rep 4.62 179 99.78 95.93 92.45 97.47 97.82 0.63 w/o fused BN 4.65 183 99.78 95.93 92.45 97.47 97.82 0.62 w/o DW 1×14.62 179 99.72 95.65 92.23 97.40 97.68 0.54
+
+TABLE 11: Lite MHLA Ablations of FaceLiVTv2-S                                                               
+
+> Ablations Param FLOPs LFW CA CP CFP Age Lat (M) (M) LFW LFW FP DB30 (ms) Normalization Layer Norm 4.58 179 99.68 95.70 90.90 95.75 97.05 0.55 Affine 4.62 179 99.78 95.93 92.45 97.47 97.82 0.54 Activation Function GELU 4.62 179 99.76 95.90 92.38 97.44 97.79 0.55 None 4.62 179 99.78 95.93 92.45 97.47 97.82 0.54 Token Interaction Additive Attn [4] 7.09 260 99.77 96.08 92.68 97.84 97.95 0.71 Lite MHLA 4.62 179 99.78 95.93 92.45 97.47 97.82 0.54
+
+4.5.3 Ablation of RepMix 
+
+To evaluate the effectiveness of RepMix, we conduct an ab-lation study by removing the residual and BN reparameter-ization components. In addition, we analyze the multiscale kernel contribution of the DW 1×1 block in supporting the main DW 3×3 operation. Table 10 summarizes the effects of these design changes. The results indicate that both residual and BN reparameterization significantly influence latency. Specifically, removing residual reparameterization increases latency from 0.54 ms to 0.63 ms, primarily due to the additional memory access introduced by the residual path. Similarly, not fusing BN leads to a latency increase from 0.54 ms to 0.62 ms, accompanied by a rise in FLOPs. Fur-thermore, the DW 1×1 block plays a crucial role in stabilizing training by providing an additional gradient propagation path. Eliminating this block results in a noticeable reduction in accuracy across nearly all benchmark tests. 
+
+4.5.4 Ablation on Lite MHLA Configuration 
+
+We conducted a series of ablation studies to examine the impact of different normalization strategies, activation func-tions, and token interaction mechanisms to further investi-gate the effectiveness of the Lite MHLA design, as summa-rized in Table 11. All experiments were performed using the FaceLiVTv2-S variant, trained on Glint360K to ensure a consistent comparison. 
+
+Normalization . Replacing the standard Layer Normaliza-tion (LN) with an affine transformation slightly improves overall accuracy while reducing latency. Specifically, the affine transformation variant achieves 99.77% on LFW and 97.45% on AgeDB-30 with a latency of 0.53 ms, compared to 99.72% and 96.92% obtained with LN. The affine transfor-mation enhances numerical stability and feature calibration without introducing additional parameters, which is partic-ularly beneficial in low-latency attention modules. 
+
+Non-linearity function . We compared GELU against a lin-ear formulation (no activation). Interestingly, removing the non-linearity leads to a small but consistent improvement across all test sets, suggesting that Lite MHLA benefits from a purely linear mapping in its token transformation stage. The absence of a non-linear activation likely reduces TABLE 12: Number of Head Ablations of Lite MHLA On FaceLiVTv2-S                                                                                         
+
+> Num Param FLOPs LFW CA CP CFP Age Lat Head (M) (M) LFW LFW FP DB30 (ms) 14.55 179 99.70 95.87 91.88 97.20 97.75 0.49 24.58 179 99.75 95.77 92.07 97.36 97.72 0.52
+> (+0.05) (-0.10) (+0.19) (+0.16) (-0.03) (6% ↑)34.59 179 99.75 95.80 92.77 97.36 97.97 0.53
+> (+0.05) (-0.07) (+0.89) (+0.16) (+0.22) (8% ↑)99.78 95.93 92.45 97.47 97.82 0.54 44.62 179 (+0.08) (+0.06) (+0.57) (+0.27) (+0.07) (10% ↑)54.64 179 99.75 95.75 92.90 97.33 97.85 0.55
+> (+0.05) (-0.12) (+1.02) (+0.13) (+0.10) (12% ↑)64.67 179 99.73 95.85 92.23 97.26 97.60 0.56
+> (+0.03) (-0.02) (+0.35) (+0.06) (-0.15) (14% ↑)
+
+redundant feature distortion, allowing for smoother gradi-ent flow and more stable optimization. Consequently, the linear variant achieves the highest performance, reaching 99.77% on LFW and 97.45% on AgeDB-30 while maintaining a minimal latency of 0.53 ms on the iPhone 15 Pro. 
+
+Token Interaction . We evaluated linear projection against additive attention from SwiftFaceFormer [4], [14]. While ad-ditive attention achieves marginally higher accuracy on CP-LFW and CFP-FP, it requires 53.4% more parameters, 45.3% more FLOPs, and incurs 31.5% slower inference than Lite MHLA. Critically, FaceLiVTv2-M with an equivalent com-putational budget outperforms additive attention on nearly all benchmarks, demonstrating that resources are better al-located to network scaling than complex token interactions. Lite MHLA’s linear, activation-free formulation optimally balances accuracy and efficiency by reducing parameter redundancy and enhancing memory access patterns, which are critical for memory-bound mobile hardware. 
+
+4.5.5 Effect on the Number of Lite MHLA Heads 
+
+We further investigate the effect of the number of Lite MHLA heads by varying the head count from one to six, using Glint360K as the training dataset. Table 12 re-ports the recognition accuracy together with the relative improvement over the single-head baseline. Increasing the number of heads consistently improves performance across most benchmarks, with particularly notable gains on CP-LFW and CFP-FP, indicating enhanced robustness to pose variation. When the number of heads is increased to three to five, accuracy improves on most benchmarks, while the inference latency increases only marginally from 0.49 ms to 0.55 ms. These results suggest that the multi-head formulation is more effective than a single linear token interaction, such as that adopted in ResMLP [38], especially for challenging cross-pose and frontal–profile verification tasks. However, the performance gains saturate beyond five heads, with no further improvement observed. This trend can be attributed to the reduction in per-head feature dimensionality as the number of heads increases, which may weaken discrimi-native capacity under a fixed embedding size. In our ex-periments, four heads provide a favorable balance between interaction diversity, per-head expressiveness, recognition accuracy, and computational efficiency, while additional heads introduce redundancy without yielding further per-formance gains. IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 12 10 6 10 5 10 4 10 3 10 2 10 1           
+
+> False Positive Rate
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> True Positive Rate
+> ROC on IJBB
+> 1head
+> 2head
+> 3head
+> 4head
+> 5head
+> 6head 10 610 510 410 310 210 1
+> False Positive Rate
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> True Positive Rate
+> ROC on IJBC
+> 1head
+> 2head
+> 3head
+> 4head
+> 5head
+> 6head
+
+Fig. 8: Performance evolution for FaceLiVTv2-S across dif-ferent number of head configuration on IJBB and IJBC Dataset TABLE 13: Performance evolution of FaceLiVTv2-S with different numbers of Lite MHLA heads on the IJB-B and IJB-C Test                               
+
+> Num IJB-B IJB-C Head FAR@ 10 −6FAR@ 10 −4FAR@ 10 −6FAR@ 10 −4
+> 138.38 93.62 59.31 94.89 238.10 (-0.28) 93.89 (+0.27) 70.96 (+11.65) 95.50 (+0.61) 341.76 (+3.38) 93.96 (+0.34) 75.45 (+16.14) 95.56 (+0.67) 441.97 (+3.59) 94.51 (+0.89) 80.22 (+20.91) 95.99 (+1.10)
+> 539.53 (+1.15) 94.26 (+0.64) 62.97 (+3.66) 95.67 (+0.78) 641.69 (+3.31) 94.10 (+0.48) 69.40 (+10.09) 95.40 (+0.51)
+
+The verification and identification performance on the IJB-B and IJB-C datasets further validate these findings, as shown in Table 13. Increasing the number of heads enhances the model’s ability to capture discriminative global context, improving the true-accept rate (TAR) at very low false-accept rates (FAR). The four-head configuration achieves the best verification accuracy on IJB-B with 41.97% TAR@ 10 −6
+
+and 94.51% TAR@ 10 −4, while on IJB-C it obtains 80.22% TAR@ 10 −6 and 95.99% TAR@ 10 −4. As illustrated in Fig. 8, the ROC curves confirm that the four-head configurations deliver the highest operating-point performance with min-imal overhead. This test shows the advantages of the de-signed multi-head model in achieving performance robust-ness under real-world and unconstrained conditions. Overall, these results demonstrate that Lite MHLA ben-efits from multiple heads up to an optimal point, where additional heads no longer improve accuracy but linearly increase computation. Consequently, the four-head Lite MHLA configuration is adopted as the default setting in FaceLiVTv2, providing the best trade-off between global modeling capability, computational efficiency, and verifica-tion robustness on large-scale IJB benchmarks. 
+
+4.6 Limitations and Future Work 
+
+While FaceLiVTv2 demonstrates strong generalization across diverse benchmarks—including CA-LFW, CP-LFW, AgeDB-30, IJB-B/C, and the low-resolution TinyFace dataset—several limitations remain. The current study does not explicitly assess robustness under extreme occlusions, such as heavy facial masking or severe truncation, nor does it analyze cross-ethnicity generalization and demographic bias due to the lack of fine-grained race and gender annota-tions in the employed benchmarks. Future work will address these gaps by incorporating occlusion-focused benchmarks and demographically anno-tated datasets for systematic fairness evaluation. We also plan to explore diffusion-based face restoration combined with knowledge distillation to build a unified lightweight pipeline for low-resolution FR on mobile devices, motivated by our TinyFace results suggesting that explicitly recovering fine-grained facial details through generative priors could further complement Lite MHLA’s global modeling capacity. 
+
+5 CONCLUSION 
+
+In this paper, we present FaceLiVTv2, an enhanced lightweight transformer-based architecture for efficient face recognition on limited-resource devices, especially mobile platforms. Building upon the original FaceLiVT, the pro-posed model co-designs three key improvements: a Lite MHLA module for efficient global dependency model-ing, a GDConv-based adaptive spatial aggregation head, and a unified RepMix-Lite MHLA structure that reinforces local-global feature interaction while maintaining computa-tional efficiency. Extensive evaluations across eight bench-marks, including LFW, AgeDB-30, CFP-FP, IJB-B, IJB-C, and the low-resolution TinyFace, confirm that FaceLiVTv2 consistently outperforms both its predecessor and recent lightweight alternatives, achieving higher accuracy with fewer parameters and lower on-device latency. We hope that FaceLiVTv2 serves as a useful reference for designing effi-cient and deployable face recognition systems on resource-constrained platforms. IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 13 
+
+6 ACKNOWLEDGMENT 
+
+This research was supported by the National Science and Technology Council, Taiwan, through Grant Number NSTC-113-2221-E-305-018-MY3. The authors are grateful for the support in this research. 
+
+REFERENCES 
+
+[1] H. L. Gururaj, B. C. Soundarya, S. Priya, J. Shreyas, and F. Flam-mini, “A comprehensive review of face recognition techniques, trends, and challenges,” IEEE Access , vol. 12, pp. 107903–107926, 2024. [2] Y. Feng, S. Yu, H. Peng, Y.-R. Li, and J. Zhang, “Detect faces efficiently: A survey and evaluations,” IEEE Trans. Biom. Behav. Identity Sci. , vol. 4, no. 1, pp. 1–18, 2022. [3] A. George, C. Ecabert, H. O. Shahreza, K. Kotwal, and S. Marcel, “Edgeface: Efficient face recognition model for edge devices,” 
+
+IEEE Trans. Biom. Behav. Identity Sci. , 2024. [4] L. S. Luevano, Y. Mart´ ınez-D´ ıaz, H. M´ endez-V´ azquez, M. Gonz´ alez-Mendoza, and D. Frey, “Swiftfaceformer: An efficient and lightweight hybrid architecture for accurate face recognition applications,” in Int. Conf. Pattern Recognit. (ICPR) ,pp. 244–258, Springer, 2024. [5] H. Pham, B. Dao, P. N. Tran, T. Nguyen, and C. Do, “Kanface: A novel approach to face recognition using kolmogorov-arnold net-works,” in Int. Symp. Neural Netw. (ISNN) , pp. 149–160, Springer, 2025. [6] S. Chen, Y. Liu, X. Gao, and Z. Han, “Mobilefacenets: Efficient cnns for accurate real-time face verification on mobile devices,” in Chin. Conf. Biometric Recognit. (CCBR) , pp. 428–438, Springer, 2018. [7] A. G. Howard, M. Zhu, B. Chen, D. Kalenichenko, W. Wang, T. Weyand, M. Andreetto, and H. Adam, “Mobilenets: Efficient convolutional neural networks for mobile vision applications,” 
+
+arXiv preprint arXiv:1704.04861 , 2017. [8] M. Alansari, O. A. Hay, S. Javed, A. Shoufan, Y. Zweiri, and N. Werghi, “Ghostfacenets: Lightweight face recognition model from cheap operations,” IEEE Access , vol. 11, pp. 35429–35446, 2023. [9] K. Han, Y. Wang, Q. Tian, J. Guo, C. Xu, and C. Xu, “Ghostnet: More features from cheap operations,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , pp. 1580–1589, 2020. [10] J. Dan, Y. Liu, H. Xie, J. Deng, H. Xie, X. Xie, and B. Sun, “Transface: Calibrating transformer training for face recognition from a data-centric perspective,” in Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV) , pp. 20642–20653, 2023. [11] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, 
+
+et al. , “An image is worth 16x16 words: Transformers for image recognition at scale,” Int. Conf. Learn. Represent. (ICLR) , 2021. [12] M. Maaz, A. Shaker, H. Cholakkal, S. Khan, S. W. Zamir, R. M. Anwer, and F. Shahbaz Khan, “Edgenext: efficiently amalgamated cnn-transformer architecture for mobile vision applications,” in 
+
+Eur. Conf. Comput. Vis. (ECCV) , pp. 3–20, Springer, 2022. [13] Z. Liu, Y. Wang, S. Vaidya, F. Ruehle, J. Halverson, M. Soljaˇ ci´ c, T. Y. Hou, and M. Tegmark, “Kan: Kolmogorov-arnold networks,” Int. Conf. Learn. Represent. (ICLR) , vol. 1, no. 2, p. 3, 2025. [14] A. Shaker, M. Maaz, H. Rasheed, S. Khan, M.-H. Yang, and F. S. Khan, “Swiftformer: Efficient additive attention for transformer-based real-time mobile vision applications,” in Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV) , pp. 17425–17436, 2023. [15] N. Setyawan, C.-C. Sun, M.-H. Hsu, W.-K. Kuo, and J.-W. Hsieh, “Facelivt: Face recognition using linear vision transformer with structural reparameterization for mobile device,” in Proc. IEEE Int. Conf. Image Process. (ICIP) , pp. 1720–1725, 2025. [16] N. Setyawan, J.-X. Gu, C.-C. Sun, M.-H. Hsu, W.-K. Kuo, C.-A. Shen, and J.-W. Hsieh, “Facelivt: Energy efficient face recognition with linear vision transformer for limited resource device,” in Proc. IEEE Asia Pacific Conf. Circuits Syst. (APCCAS) , pp. 1–5, IEEE, 2025. [17] J. Deng, J. Guo, N. Xue, and S. Zafeiriou, “Arcface: Additive angular margin loss for deep face recognition,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , pp. 4690–4699, 2019. [18] M. Zhang, R. Liu, D. Deguchi, and H. Murase, “Texture-guided transfer learning for low-quality face recognition,” IEEE Trans. Image Process. , vol. 33, pp. 95–107, 2023. [19] Y. Martinez-Diaz et al. , “Benchmarking lightweight face archi-tectures on specific face recognition scenarios,” Artif. Intell. Rev. ,vol. 54, no. 8, pp. 6201–6244, 2021. [20] M. Yan, M. Zhao, Z. Xu, Q. Zhang, G. Wang, and Z. Su, “Vargfacenet: An efficient variable group convolutional neural network for lightweight face recognition,” in Proc. IEEE/CVF Int. Conf. Comput. Vis. Workshops (ICCVW) , pp. 0–0, 2019. [21] F. Boutros, N. Damer, M. Fang, F. Kirchbuchner, and A. Kuijper, “Mixfacenets: Extremely efficient face recognition networks,” in 
+
+IEEE Int. Joint Conf. Biometrics (IJCB) , pp. 1–8, IEEE, 2021. [22] Y. Zhong and W. Deng, “Face transformer for recognition,” arXiv preprint arXiv:2103.14803 , 2021. [23] H. Wang, Y. Wang, Z. Zhou, X. Ji, D. Gong, J. Zhou, Z. Li, and W. Liu, “Cosface: Large margin cosine loss for deep face recognition,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , pp. 5265–5274, 2018. [24] Q. Meng, S. Zhao, Z. Huang, and F. Zhou, “Magface: A univer-sal representation for face recognition and quality assessment,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) ,pp. 14225–14234, 2021. [25] F. Boutros, N. Damer, F. Kirchbuchner, and A. Kuijper, “Elasticface: Elastic margin loss for deep face recognition,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , pp. 1578–1587, 2022. [26] M. Kim, A. K. Jain, and X. Liu, “Adaface: Quality adaptive margin for face recognition,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , pp. 18750–18759, 2022. [27] J. Dan, Y. Liu, J. Deng, H. Xie, S. Li, B. Sun, and S. Luo, “Topofr: A closer look at topology alignment on face recognition,” Adv. Neural Inf. Process. Syst. (NeurIPS) , vol. 37, pp. 37213–37240, 2024. [28] L. Zhang, L. Sun, L. Yu, X. Dong, J. Chen, W. Cai, C. Wang, and X. Ning, “Arface: Attention-aware and regularization for face recognition with reinforcement learning,” IEEE Trans. Biom. Behav. Identity Sci. , vol. 4, no. 1, pp. 30–42, 2022. [29] N. Alipour Talemi, H. Kashiani, and N. M. Nasrabadi, “Catface: Cross-attribute-guided transformer with self-attention distillation for low-quality face recognition,” IEEE Trans. Biom. Behav. Identity Sci. , vol. 6, no. 1, pp. 132–146, 2024. [30] S. S. Khalid, M. Awais, Z.-H. Feng, C.-H. Chan, A. Farooq, A. Ak-bari, and J. Kittler, “Resolution invariant face recognition using a distillation approach,” IEEE Trans. Biom. Behav. Identity Sci. , vol. 2, no. 4, pp. 410–420, 2020. [31] G. B. Huang, M. Mattar, T. Berg, and E. Learned-Miller, “Labeled faces in the wild: A database for studying face recognition in unconstrained environments,” in Workshop Faces Real-Life Images: Detection, Alignment, Recognit. , 2008. [32] S. Moschoglou, A. Papaioannou, C. Sagonas, J. Deng, I. Kotsia, and S. Zafeiriou, “Agedb: the first manually collected, in-the-wild age database,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. Workshops (CVPRW) , pp. 51–59, 2017. [33] Y. M.-D., L. S. Luevano, H. Me., M. N.-D., L. Chang, and M. G.-M., “Shufflefacenet: A lightweight face architecture for efficient and highly-accurate face recognition,” in Proc. IEEE/CVF Int. Conf. Comput. Vis. Workshops (ICCVW) , pp. 0–0, 2019. [34] J. Dan, Y. Liu, B. Sun, J. Deng, and S. Luo, “Transface++: Re-thinking the face recognition paradigm with a focus on accuracy, efficiency, and security,” IEEE Trans. Pattern Anal. Mach. Intell. ,2025. [35] J. Li, L. Zhou, and J. Chen, “Mobilefaceformer: a lightweight face recognition model against face variations,” Multimed. Tools Appl. ,vol. 83, no. 5, pp. 12669–12685, 2024. [36] X. Liu, H. Peng, N. Zheng, Y. Yang, H. Hu, and Y. Yuan, “Effi-cientvit: Memory efficient vision transformer with cascaded group attention,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , pp. 14420–14430, 2023. [37] J. Pan, A. Bulat, F. Tan, X. Zhu, L. Dudziak, H. Li, G. Tzimiropou-los, and B. Martinez, “Edgevits: Competing light-weight cnns on mobile devices with vision transformers,” in Eur. Conf. Comput. Vis. (ECCV) , pp. 294–311, Springer, 2022. [38] H. Touvron, P. Bojanowski, M. Caron, M. Cord, A. El-Nouby, E. Grave, G. Izacard, A. Joulin, G. Synnaeve, J. Verbeek, et al. ,“Resmlp: Feedforward networks for image classification with data-efficient training,” IEEE Trans. Pattern Anal. Mach. Intell. ,vol. 45, no. 4, pp. 5314–5321, 2022. [39] F. Boutros, P. Siebke, M. Klemt, N. Damer, F. Kirchbuchner, and A. Kuijper, “Pocketnet: Extreme lightweight face recognition net-work using neural architecture search and multistep knowledge distillation,” IEEE Access , vol. 10, pp. 46823–46833, 2022. IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 14 
+
+[40] X. An et al. , “Partial fc: Training 10 million identities on a sin-gle machine,” in Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV) ,pp. 1445–1449, 2021. [41] Z. Cheng, X. Zhu, and S. Gong, “Low-resolution face recognition,” in Asian Conf. Comput. Vis. (ACCV) , pp. 605–621, Springer, 2018. [42] T. Zheng, W. Deng, and J. Hu, “Cross-age lfw: A database for studying cross-age face recognition in unconstrained environ-ments,” arXiv preprint arXiv:1708.08197 , 2017. [43] T. Zheng and W. Deng, “Cross-pose lfw: A database for study-ing cross-pose face recognition in unconstrained environments,” 
+
+Beijing Univ. Posts Telecommun., Tech. Rep , vol. 5, no. 7, p. 5, 2018. [44] S. Sengupta, J.-C. Chen, C. Castillo, V. M. Patel, R. Chellappa, and D. W. Jacobs, “Frontal to profile face verification in the wild,” in 
+
+Proc. IEEE Winter Conf. Appl. Comput. Vis. (WACV) , pp. 1–9, IEEE, 2016. [45] C. Whitelam et al. , “Iarpa janus benchmark-b face dataset,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. Workshops (CVPRW) ,pp. 90–98, 2017. [46] B. Maze, J. Adams, J. A. Duncan, N. Kalka, T. Miller, C. Otto, A. K. Jain, W. T. Niggel, J. Anderson, J. Cheney, et al. , “Iarpa janus benchmark-c: Face dataset and protocol,” in Int. Conf. Biometrics (ICB) , pp. 158–165, IEEE, 2018. [47] S. Kolouri and G. K. Rohde, “Transport-based single frame super resolution of very low resolution face images,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , pp. 4876–4884, 2015. 
+
+Novendra Setyawan (Student Member, IEEE) 
+
+received the B.Eng. degree in Electrical Engi-neering from the University of Muhammadiyah Malang, Indonesia, in 2015, and the M.Eng. de-gree in Electronic Engineering from the Institut Teknologi Sepuluh Nopember (ITS), Surabaya, Indonesia, in 2017. He is currently pursuing the Ph.D. degree in the Department of Electro-Optics Engineering, National Formosa Univer-sity, Taiwan. He is also a Lecturer in the De-partment of Electrical Engineering, University of Muhammadiyah Malang, Indonesia. His research has been published in IEEE APCCAS, IEEE ISCAS, IEEE ICIP, and other international venues. His research interests include deep learning based image processing, computer vision, and efficient model design for resource-constrained platforms. 
+
+Chi-Chia Sun (Member, IEEE) received the B.S. degree in computer science and engineer-ing from National Taiwan Ocean University, Tai-wan, in 2004, the M.S. degree in electronic en-gineering from the National Taiwan University of Science and Technology, Taipei, Taiwan, in 2006, and the Dr.-Ing. degree (with Federal Re-public of Germany DAAD Full Scholarship) from Dortmund University of Technology, Dortmund, Germany, in 2011. He was a Principle Engineer with TSMC, specializing in standard cell design. He is currently a Full Professor with the Department of Electrical Engi-neering, National Taipei University, Taipei. His research interests include image processing, system integration, and VLSI/FPGA design. He is a member of IEEE CASS VSA-TC. 
+
+Mao-Hsiu Hsu (Member, IEEE) obtained his Ph.D. in electronic and computer engineering from National Taiwan University of Science and Technology in 2005. His career began in 1997 at Motorola, working on crystal filter and oscillator design. He joined Foxconn in California from 2007 to 2012, and in 2013, he was the Inpaq USA Site Country Manager. From 2014 to 2019, he was a Senior Manager at Primax Taiwan. He is currently an Associate Professor in Electro-Optical Engineering at National Formosa Univer-sity, having previously served as an Assistant Professor in the same department from 2023 to 2025. He possesses extensive expertise in sensor and optical signal processing and deep learning algorithms for fingerprint and facial recognition sensor IC systems, with over 100 tech-nical publications and patents. His current research focuses on sensing systems for Diffusion face ID, fingerprint detection under DeepFake GAN machine learning, and high-speed SerDes re-timer and Tiny ML IC design. 
+
+Wen-Kai Kuo (Member, IEEE) received the Ph.D. degree in electronic engineering from Na-tional Chiao Tung University, Hsin-Chu, Taiwan, in 2000. He is currently a Professor in the Department of Electro-Optics Engineering, Na-tional Formosa University, Huwei, Yunlin, Tai-wan, where he has been a faculty member since 2000. He is a member of the Phi-Tau-Phi Honorary Scholar Society. His research inter-ests include optical sensors, optical signal pro-cessing and analysis with artificial intelligence approaches, and optical systems. He has been involved in multiple research projects supported by the National Science and Technology Council (NSTC), Taiwan, with contributions spanning optical measure-ment systems and AI-based optical analysis. 
+
+Jun-Wei Hsieh (Senior Member, IEEE) re-ceived the Ph.D. degree in computer engineer-ing from the National Central University, Chung-Li, Taiwan, in 1995. He was an Associate Pro-fessor with the Department of Electrical Engi-neering, YuanZe University, and a Visiting Re-searcher with the MIT AI Laboratory. Since Au-gust 2009, he had been a Professor and the Dean of the Department of Computer Engineer-ing, National Taiwan Ocean University. After Au-gust 2019, he has been a Professor with the College of AI, National Yang-Ming Chiao-Tung University. He hosted or co-hosted a lot of large-scale AI projects from different companies and governments in the past. He has a lot of successful experiences in industrial-academic cooperation and technology transferring, especially in ITS. His research interests include AI, deep learning, smart farming, video surveillance, intelligent transportation systems, image and video processing, object recognition, machine learning, 3D printing, medical image analysis, and computer vision. In May 2019, he received the First Prize of the Ministry of Science and Technology Best Display Award and the Third Place of the AI Investment Potential Award. Due to his contributions in traffic flow estimation, he helped the Elan company received the Gold Award from Taipei International Computer Show, in 2019. He and his students received the Silver Medal of 2019 National College Software Creation Competition, the Silver Medal of 2018 Na-tional Microcomputer Competition, the Best Paper awards of Information Technology and Applications in Outlying Islands Conference, in 2013, 2014, 2016, 2017, 2018, 2021, and 2022, respectively, the Best Paper Award of Tanet 2017, the Best Paper Awards of NCWIA 2020, 2021, and 2022, respectively, and the Best Paper Awards of IS3C 2020. He also received the Best Paper Award of CVGIP Conference, in 1999, 2003, 2005, 2007, 2014, 2017-2018, and 2022-2024, the Best Paper Award of DMS Conference, in 2011, the Best Paper Award of IIHMSP 2010, and the Best Patent Award of Institute of Industrial Technology Research, in 2009 and 2010, respectively. Dr. Hsieh serves as Program Chair of Conference on Multimedia Modeling 2011, and Program Chair of the IEEE Advanced Video and Signal-based Surveillance (AVSS) 2019 and 2025. He has authored more than 150 peer-reviewed journal and conference publications, and 20 US/Taiwan patents. IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 15 
+
+# FaceLiVTv2: An Improved Hybrid Architecture for Efficient Mobile Face Recognition —— Supplementary Material —— 
+
+In this supplementary material, we present implemen-tation details and additional quality comparisons to further demonstrate the effectiveness and quality of our proposed method in comparison to other existing approaches. By including these extended evaluations, we aim to provide a more comprehensive analysis and highlight the advantages of our method over alternative techniques. 
+
+IMPLEMENTATION DETAILS OF FACE LIVT V2
+
+The advantages of FaceLiVTv2 are using RepMixer, which can be reparameterized while inferring the model to speed up. Below is the implementation of RepMixer in PyTorch-like code: 
+
+class RepMix(nn.Module): def __init__(self, c1, c2, ks=1, s=1, p=0, g=1): super().__init__() self.cv = nn.Conv2d(c1, c2, ks, s, p, groups=g) p = p//2; ks = ks//2 self.rcv = nn.Conv2d(c1, c2, ks, s, p, groups=g) self.bn = nn.BatchNorm2d(ouc) def forward(self, x): xr = self.cv(x) + self.rcv(x) return self.bn(xr) def forward_deploy(self, x): return self.cv(x) @torch.no_grad() def reparam(self): cv = self.cv rcv=self.rcv; self.__delattr__(’rcv’) kw = (cv.weight.shape[2]-rcv.weight.shape[2])//2 kh = (cv.weight.shape[3]-rcv.weight.shape[3])//2 rcv_w = F.pad(rcv.weight, [kh,kh,kw,kw]) rcv_b = rcv.bias final_cv_w = cv.weight + rcv_w final_cv_b = cv.bias + rcv_b cv.weight.data.copy_(final_cv_w) cv.bias.data.copy_(final_cv_b) bn = self.bn w = bn.weight / (bn.running_var + bn.eps)**0.5 w = cv.weight * w[:, None, None, None] b = bn.bias + (cv.bias - bn.running_mean) *bn.weight / (bn.running_var + bn.eps)**0.5 cv.weight.data.copy_(w) cv.bias.data.copy_(b) self.__delattr__(’bn’) self.forward = self.forward_deploy self.cv = cv return self 
+
+The other advantages of FaceLiVTv2 are using Lite Multi-Head Linear Attention (Lite MHLA), which is an improved version of the previous MHLA in FaceLiVTv1. Below is the implementation of Lite MHLA in PyTorch-like code: 
+
+class LiteMHLA(torch.nn.Module): def __init__(self, dim, resolution): super().__init__() self.n_head = 4self.res=resolution**2 self.dim=dim linear=[] self.norm = Affine(dim) for i in range(self.n_head): lin = nn.Linear(self.res, self.res) linear.append(lin) self.lin = torch.nn.ModuleList(linear) ls_init = torch.ones(dim).unsqueeze(-1) ls_init = ls_init.unsqueeze(-1) self.ls = nn.Parameter(1e-5 * ls_init) def forward(self, x): B,C,H,W = x.shape x = x.reshape(-1, self.dim, self.res) x = self.norm(x) x = list(x.chunk(self.n_head, dim=1)) for i in range(self.n_head): x[i] = self.lin[i](x[i]) x = torch.cat(x, dim=1) x = self.ls * x.reshape(B,C,H,W) return x
+
+We employ a similar training methodology as [3], [19], [33] on Glint360K [40]. The AdamW optimizer and a polyno-mial decay learning rate schedule are utilized. The starting learning rate is 6 × 10 −3 with a minimum of 1 × 10 −5. The batch size is 342 on each 3× NVIDIA RTX-A6000 GPU, and the weight decay is 1 × 10 −4. The model is trained for 50 epochs with a pre-processing resolution of (112 × 112) .TABLE 14: FaceLiVT Training Hyperparameters and Aug-mentation on Glint360K datasets 
+
+Hyperparameters Config optimizer AdamW learning rate 0.006 image resolution 112 ×112 batch size 384 LR schedule polynomial warmup epochs 0training epochs 50 weight decay 0.01 embedding size 512 loss function CosFace loss hyperparam [1, 0.4] random flip 0.5 normalization mean [0.5, 0.5, 0.5] normalization std [0.5, 0.5, 0.5] IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 16 
+
+TABLE 15: Comparison of FaceLiVTv2 Variant with State-Of-The-Art on IJB-B and IJB-C Benchmark Dataset.                                                                          
+
+> Model IJB-B IJB-C
+> 1e−51e−41e−31e−51e−41e−3
+> MobileFaceNet [19] 87.9 92.8 95.6 92.2 94.7 96.6 ShuffleFaceNet-1.5 [19] 86.5 92.3 95.2 91.3 94.3 96.3 EdgeFace-S(0.5) [3] -93.6 --95.6 -ResNet50-ArcFace [17] 80.5 89.9 94.5 86.1 92.1 96.0 EdgeFace-XS(0.6) [3] -92.7 --94.8 -FaceLiVT-S -91.2 --92.7 -FaceLiVT-M -93.7 --95.7 -FaceLiVTv2-XS 72.38 90.67 95.38 75.27 91.25 96.29 FaceLiVTv2-S 87.94 94.51 96.41 93.04 95.99 97.37 FaceLiVTv2-M 88.92 95.02 96.59 93.59 96.42 97.62 FaceLiVTv2-L 91.09 95.18 96.57 94.52 96.59 97.55
+
+DETAILED RESULT ON IJB-B AND IJB-C ROBUST -
+
+NESS TEST 
+
+Table 15 and Fig. 9 present a comprehensive comparison of the proposed FaceLiVTv2 variants with state-of-the-art lightweight and standard face recognition models on the IJB-B and IJB-C benchmark datasets. The results clearly demonstrate the effectiveness and scalability of the pro-posed architecture across model sizes (XS → L). 
+
+COMPARISON WITH EXISTING LIGHTWEIGHT MOD -
+
+ELS 
+
+Compared with MobileFaceNet, ShuffleFaceNet-1.5, and EdgeFace variants, all FaceLiVTv2 models achieve substan-tially higher true positive rates, especially at stringent false positive rates of 10 −5 and 10 −4. For instance, FaceLiVTv2-S reaches 94.51% on IJB-B and 95.99% on IJB-C at 10 −4,outperforming ShuffleFaceNet-1.5 by +2.2% and +1.6%, re-spectively. This performance gain highlights the advantage of the proposed Lite Multi-Head Linear Attention (Lite-MHLA) 
+
+and Global Depthwise Convolution (GDConv) modules in pre-serving discriminative features under low false acceptance thresholds. 
+
+SCALING BEHAVIOR WITHIN FACE LIVT V2 F AMILY 
+
+The ROC curves in Fig. 9 show a consistent upward trend from FaceLiVTv2-XS to FaceLiVTv2-L , indicating that model scaling directly enhances representation power with-out sacrificing inference stability. The XS variant already surpasses most existing lightweight baselines, while the Lmodel achieves near-saturation accuracy of 95.18% (IJB-B) and 96.59% (IJB-C) at 10 −4. The S and M variants provide the best trade-off between accuracy and efficiency, making them suitable for deployment on mobile or edge devices. 
+
+ROC C URVE INSIGHTS 
+
+As depicted in Fig. 9, the ROC curves of FaceLiVTv2 mod-els consistently lie above those of previous FaceLiVT and baseline networks. The sharper rise in true positive rate at very low false positive regions ( 10 −6 ≤ FPR ≤ 10 −4)confirms that the attention reparameterization and spatial aggregation modules effectively enhance robustness to pose and illumination variations. The performance gap between 10 6 10 5 10 4 10 3 10 2 10 1           
+
+> False Positive Rate
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> True Positive Rate
+> ROC on IJBB
+> facelivtv2_xs
+> facelivtv2_s
+> facelivtv2_m
+> facelivtv2_l 10 610 510 410 310 210 1
+> False Positive Rate
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> True Positive Rate
+> ROC on IJBC
+> facelivtv2_xs
+> facelivtv2_s
+> facelivtv2_m
+> facelivtv2_l
+
+Fig. 9: Receiver Operating Characteristic of FaceLiVTv2 on IJBB and IJBC Dataset XS and S variants narrows at higher FPR values, suggesting diminishing returns for larger models once feature discrim-inability reaches saturation. Overall, FaceLiVTv2 demonstrates clear superiority over CNN-based approaches (MobileFaceNet, ShuffleFaceNet) and hybrid (EdgeFace) baselines, achieving accuracy gains of up to +4% at 10 −5 on IJB-B. These results validate the design goal of achieving both compactness and high accuracy, making FaceLiVTv2 highly adaptable for real-time and low-power applications on mobile and edge platforms. 
+
+LATENCY EVALUATION SETUP 
+
+The inference latency of all FaceLiVTv2 variants was mea-sured using an iPhone 15 Pro (A17 Pro chip, 128-GB) run-ning iOS-26.0.1. Each model was first trained in the PyTorch framework, exported to ONNX, and then converted to Ap-ple’s CoreML format using the coremltools library. The IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 17 
+
+conversion was performed with the mlmodel specification and executed on all available compute units to ensure compatibility with Apple’s Neural Engine. The following Python command was used to perform the conversion:        
+
+> import torch, coremltools as ct inp = torch.rand(1, 3, res, res) traced_model = torch.jit.trace(model, torch.Tensor(inp)) out = traced_model(inp) model = ct.convert(traced_model, convert_to="neuralnetwork", inputs=[ct.ImageType(shape=inp.shape)]) model.save(f"./{args.model}_{res}.mlmodel")
+
+The converted Core ML models were deployed on-device using a lightweight iOS inference application devel-oped in Xcode-16.0 . Each model received a normalized 112 ×112 RGB input tensor, and the inference latency was measured using the Core ML Performance Template 
+
+available in Xcode Instruments . The profiling environ-ment was configured to execute exclusively on the Neural Engine to evaluate on-device hardware acceleration perfor-mance. The profiler automatically reported three latency components: (1) prediction time (per-image inference du-ration), (2) model load time (initialization and memory allocation overhead), and (3) compilation time (graph op-timization and hardware binding). All tests were conducted under identical conditions, with the device thermally stabilized and isolated from back-ground processes to ensure consistent measurements. Each result represents the median value from 100 inference runs recorded by Xcode Instruments. As summarized in Fig. 10, the FaceLiVTv2 models achieved prediction latencies of 0.43 ms, 0.54 ms, 0.65 ms, and 0.71 ms for the XS, S, M, and L variants, respectively. These results demonstrate that 
+
+FaceLiVTv2 maintains excellent runtime scalability across model sizes while achieving sub-millisecond inference per-formance on Apple’s Neural Engine. 
+
+RUNTIME OPERATION BREAKDOWN ANALYSIS 
+
+To analyze the computational characteristics of each model, a runtime operation breakdown was conducted based on the Core ML model profiling data. Each FaceLiVTv2 and baseline model (TransF-S, KANF-0.5, GhostFv1-1, and FaceLiVTv2-S) was first converted from the PyTorch frame-work into Core ML format using coremltools . The resulting .mlmodel models were then profiled using 
+
+Xcode Instruments on an iPhone 15 Pro (A17 Pro chip) running iOS 26.0.1 . During profiling, all inference op-erations were executed exclusively on the Neural Engine, and the per-layer statistics were automatically logged by the Core ML runtime analyzer. The Layer Distribution panel in Xcode was used to extract the frequency of each operator type, such as convolution , InnerProduct , Add , GELU ,and ReshapeStatic . These counts were exported into CSV format and grouped into high-level categories of computational cost, including matrix multiplication (Tensor MatMul ), convolution, pooling, activation, and memory-related operations (elementwise, normalization, 
+
+(1) 
+
+(2) 
+
+(3) 
+
+(4) Fig. 10: Latency test of (1) FaceLiVTv2-XS, (2) FaceLiVTv2-S, (3) FaceLiVTv2-M, (4). FaceLiVTv2-L with XCode using iPhone 15 pro. All model is cverted from pytorch framework to coremltols. and copy/reshape). Each operation count was normalized to obtain its relative contribution percentage with respect to the total number of layers in the model. We visualize the runtime composition in Fig. 6 us-ing the aggregated percentages of operation types from Fig. 11. Compute-bound operations (Tensor MatMul ,
+
+convolution , Pooling , and Activation ) are shown in blue and orange tones, while memory-bound opera-tions ( Elementwise , Normalization , Copy/Reshape )IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 18 
+
+TABLE 16: Operations Category by Runtime Type 
+
+Category Operation Type Description and Runtime Characteristic Compute Operations 
+
+Tensor MatMul Linear projections and matrix multipli-cations Dominated by arithmetic FLOPs and executed on Tensor Cores or ALUs. These operations are highly compute-bound and critical in attention and fully connected layers. convolution fully, depthwise and pointwise convolu-tions Performs spatial feature extraction using high multiply–accumulate (MAC) operations. Generally compute-intensive but cache-friendly and efficient on GPUs or NPUs. Pooling Global or average pooling operations Aggregates spatial information into compact representations. Has moderate compute cost with minimal memory overhead. Activation Non-linear activation or attention weighting (GELU, ReLU, Softmax) Introduces non-linearity or attention weighting in neural modules. Arithmetic-dominated and often fused into preceding compute kernels for efficiency. 
+
+Memory Operations 
+
+Elementwise Per-tensor arithmetic and residual con-nections (Add, Multiply, Broadcast) Lightweight arithmetic with frequent tensor reads and writes. These operations have low arithmetic intensity and are typically memory bandwidth limited. Normalization Mean–variance normalization across features (BN, LN, MVN) Applies scaling and centering to feature maps. Requires global memory access and synchronization, resulting in latency dominated by memory operations. Copy/Reshape Tensor layout changes and data move-ment (Reshape, Transpose, Concat, Split) Reorders, copies, or merges tensor data without significant computation. Memory-limited and responsible for large data transfer overheads, increasing runtime latency. 
+
+Fig. 11: Layer distribution provided by XCode. are displayed in lighter colors for contrast. The final figure summarizes the proportion of compute versus memory operations for each model, allowing direct comparison of architectural efficiency across Transformer-based and con-volutional designs. 
+
+ONNX L ATENCY EVALUATION SETUP 
+
+The inference latency of all FaceLiVTv2 variants was mea-sured using RTX-5090 GPU, Intel i5-12500 with 64 GB of RAM, Jetson AGX Orin running with ONNX runtime with-out any quantization (FP32). Each model was first trained in the PyTorch framework and exported to ONNX using the 
+
+pytorch onnx library. The following Python command was used to perform the conversion: 
+
+model.to(’cpu’) model = model.eval() # batch size 1 for latency test inp = torch.randn(1, 3, res, res, device=’cpu’) torch.onnx.export(model, inp, f"./{name}_{1}.onnx", verbose = False, opset_version=12) print("Finish...") 
+
+The converted ONNX models were deployed on-device with Linux based OS. Each model received a normalized 112 ×112 RGB input tensor based on their specific input resolution, and the inference latency were measured using the ONNX runtime with CUDA core as the executor for GPU and Jetson AGX Orin GPU/CPU (MAX Power Mode = 50 Watt) with repetition 1000 image using this code: 
+
+inp = np.random.rand(1, 3, res, res).astype(’float32’) timing = [] # warm-up start = time.perf_counter() while time.perf_counter() - start < T0: ort_inp = {model_ort.get_inputs()[0].name: inp} _ = model_ort.run([], ort_inp) for i in range(repetition): start = time.perf_counter() ort_inp = {model_ort.get_inputs()[0].name: inp} _ = model_ort.run([], ort_inp) timing.append((time.perf_counter()-start) *1000.0)# ms total_time_s = np.sum(timing)/1000.0 # smean_lat_ms = float(np.mean(timing)) std_lat_ms = float(np.std(timing)) return {"model": name, "mean_lat": mean_lat, "std_lat_ms": std_lat, "total_time": total_time }
+
+All tests were conducted under identical conditions, with the device thermally stabilized and isolated from back-ground processes to ensure consistent measurements. Each result represents the mean value from inference runs for the latency test and a warm-up of 10 seconds (T0=10) for stability. As summarized in Table V of the main paper, the FaceLiVTv2 models achieved lower latency than the SOTA. These results demonstrate that FaceLiVTv2 maintains ex-IEEE TRANSACTIONS ON BIOMETRICS, BEHAVIOR, AND IDENTITY SCIENCE 19 
+
+TABLE 17: Performance gap between lightweight FaceLiVTv2 variants and large-scale SOTA FR models. Mean Acc denotes the mean accuracy over LFW, CFP-FP, and AgeDB-30. FLOPs and mobile latency are measured at 112 ×112 input on iPhone 15 Pro.                                                                                                                        
+
+> Model Year Param FLOPs Training LFW ↑CFP Age Mean IJB (FAR@ 10 −4)↑Latency (M) (M) Dataset -FP ↑DB30 ↑Acc(%) ↑BC(ms )↓
+> Large-Scale FR Models (FLOPs ≥1G)
+> ResNet200-TopoFR [27] ’24 118.8 23.5G Glint360K 99.87 99.45 98.82 99.38 97.84 96.56 12.24 TransFace-L [34] ’25 271.6 25.4G Glint360K 99.85 99.37 98.66 99.29 96.73 97.85 OOM TransFace-B [34] ’25 124.5 11.5G Glint360K 99.85 99.24 98.62 99.24 96.46 97.59 18.20 TransFace-S [10] ’23 86.7 5.8G Glint360K 99.85 98.91 98.50 99.09 96.05 97.33 14.31 ResNet50-ArcFace [17] ’22 43.6 6.3G Glint360K 99.78 98.77 98.28 98.94 95.30 96.81 3.76
+> Lightweight FR Models
+> FaceLiVTv2-L -8.52 309 Glint360K 99.80 (-0.07) 98.26 (-1.19) 98.02 (-0.80) 98.69 (-0.69) 95.18 (-2.66) 96.59 (+0.03) 0.71 (17.2 × ↓ )
+> FaceLiVTv2-M -7.02 258 Glint360K 99.78 (-0.09) 97.93 (-1.52) 98.10 (-0.72) 98.60 (-0.78) 95.02 (-2.82) 96.42 (-0.14) 0.65(18.8 × ↓ )FaceLiVTv2-S -4.62 179 Glint360K 99.78 (-0.09) 97.47 (-1.98) 97.82 (-1.00) 98.36 (-1.02) 94.51 (-3.33) 95.99 (-0.57) 0.54(22.7 × ↓ )FaceLiVTv2-XS -2.9 90 Glint360K 99.63 (-0.24) 95.23 (-4.22) 96.68 (-2.14) 97.18 (-2.20) 90.67 (-7.17) 91.25 (-5.31) 0.43(28.5 × ↓ )
+
+cellent runtime while achieving accuracy-latency efficiency across all devices. 
+
+PERFORMANCE GAP ANALYSIS : L IGHTWEIGHT VS .LARGE -S CALE MODELS 
+
+To provide broader context for evaluating FaceLiVTv2, we compare its performance against large-scale SOTA face recognition models that are impractical for mobile and edge deployment due to their substantial computational demands. As summarized in Table 17, we include five large-scale models — ResNet200-TopoFR [27], TransFace-L [34], TransFace-B [34], TransFace-S [34], and ResNet50-ArcFace [17] — alongside the FaceLiVTv2 variants. 
+
+ACCURACY GAP 
+
+FaceLiVTv2-L demonstrates the most compelling accuracy-efficiency trade-off among the evaluated lightweight mod-els. Against ResNet200-TopoFR, FaceLiVTv2-L narrows the mean accuracy gap to only 0.69 % while requiring 
+
+13 .9× fewer parameters and 76 .1× fewer FLOPs. Remark-ably, FaceLiVTv2-L achieves 96.59% on IJB-C, marginally 
+
+surpassing ResNet200-TopoFR by +0.03 %, demonstrat-ing competitive open-set verification capability despite its lightweight design. Against TransFace-L as the strongest Transformer-based model, FaceLiVTv2-L achieves a mean accuracy gap of only 0.60 %, while using 31 .9× fewer parameters and 82 .2× fewer FLOPs. On IJB-C, FaceLiVTv2-L trails TransFace-L by only 1.26% , further confirming its strong open-set recognition capability at a fraction of the computational cost. These results collectively demonstrate that FaceLiVTv2-L effectively bridges the performance gap between lightweight and large-scale face recognition archi-tectures. 
+
+LATENCY AND DEPLOYABILITY GAP 
+
+Beyond accuracy, the deployability gap between large-scale and lightweight models is equally critical. ResNet200-TopoFR requires 12.24 ms mobile inference latency, TransFace-S requires 14.31 ms, and TransFace-B requires 18.20 ms on iPhone 15 Pro, while TransFace-L exceeds available memory entirely (OOM), rendering it completely infeasible for mobile deployment. In contrast, FaceLiVTv2-L achieves 0.71 ms mobile latency, a speedup of 17 .2×
+
+over ResNet200-TopoFR, while FaceLiVTv2-M, FaceLiVTv2-S, and FaceLiVTv2-XS further reduce latency to 0.65 ms, 0.54 ms, and 0.43 ms, respectively, representing speedups of 18 .8×, 22 .7×, and 28 .5× over ResNet200-TopoFR. Com-pared to TransFace-L, which fails to run on mobile hardware due to memory constraints, all FaceLiVTv2 variants operate comfortably in real-time, highlighting the fundamental de-ployability advantage of the proposed architecture.

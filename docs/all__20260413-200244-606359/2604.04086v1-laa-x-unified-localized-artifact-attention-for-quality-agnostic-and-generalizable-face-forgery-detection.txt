@@ -1,0 +1,812 @@
+Title: LAA-X: Unified Localized Artifact Attention for Quality-Agnostic and Generalizable Face Forgery Detection
+
+URL Source: https://arxiv.org/pdf/2604.04086v1
+
+Published Time: Tue, 07 Apr 2026 01:12:42 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 1
+
+# LAA-X: Unified Localized Artifact Attention for Quality-Agnostic and Generalizable Face Forgery Detection 
+
+Dat NGUYEN ∗, Enjie GHORBEL, Anis KACEM, Member, IEEE , Marcella ASTRID †, Member, IEEE , Djamila AOUADA, Senior Member, IEEE 
+
+Abstract —In this paper, we propose Localized Artifact Atten-tion X (LAA-X), a novel deepfake detection framework that is both robust to high-quality forgeries and capable of generalizing to unseen manipulations. Existing approaches typically rely on binary classifiers coupled with implicit attention mechanisms, which often fail to generalize beyond known manipulations. In contrast, LAA-X introduces an explicit attention strategy based on a multi-task learning framework combined with blending-based data synthesis. Auxiliary tasks are designed to guide the model toward localized, artifact-prone (i.e., vulnerable) regions. The proposed framework is compatible with both CNN and trans-former backbones, resulting in two different versions, namely, LAA-Net and LAA-Former, respectively. Despite being trained only on real and pseudo-fake samples, LAA-X competes with state-of-the-art methods across multiple benchmarks. Code and pre-trained weights for LAA-Net 1 and LAA-Former 2 are publicly available. 
+
+Index Terms —Deepfake Detection, Vulnerability-Aware Learn-ing, Explicit Attention, Generalization, Robustness. 
+
+I. I NTRODUCTION 
+
+Advances in generative modeling have significantly simpli-fied the automated creation of photorealistic facial forgeries, commonly known as deepfakes. While this technology sup-ports creative and educational applications, its misuse poses serious political and societal threats [1], [2]. Unfortunately, detecting forged images with the naked eye is becoming extremely challenging, particularly when encountering the most realistic ones, often referred to as High-Quality (HQ) deepfakes. As a result, there is a pressing need to introduce methods that can automatically spot deepfakes, including HQ samples. Earlier deepfake detectors [3]–[12] typically make use of Deep Neural Networks (DNNs) under a binary classification setting. Despite being promising, these approaches exhibit two fundamental weaknesses, namely: 
+
+(∗ Corresponding author: Dat NGUYEN) 
+
+Dat NGUYEN, Anis KACEM, and Djamila AOUADA are with the CVI 2, SnT, University of Luxembourg, Luxembourg (emails: dat.nguyen@uni.lu; anis.kacem@uni.lu; djamila.aouada@uni.lu). Enjie GHORBEL has a double affiliation. She is with CRISTAL laboratory, ENSI, University of Manouba, Tunisia and SnT, University of Luxembourg, Luxembourg (email: enjie.ghorbel@ensi-uma.tn). 
+
+† This work was done while Marcella ASTRID was a Postdoctoral Researcher at CVI 2, SnT, University of Luxembourg, Luxembourg. (email: marcella.astrid@gmail.com) 
+
+> 1
+
+https://github.com/10Ring/LAA-Net 
+
+> 2
+
+https://github.com/10Ring/LAA-Former 0.6-0.8 0.8-0.9 0.9-0.925 0.925-0.95 0.95-0.97 0.97-1.0 
+
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1
+> Mask SSIM Range
+> AUC
+
+(a) 0.5   
+
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1
+> Tested Methods
+> AUC
+> 0.738
+> 0.832
+> 0.591
+> 0.631
+> 0.841
+> 0.860
+> 0.930 0.939
+> 0.952 0.960
+
+(b) 
+
+Fig. 1: Comparison of LAA-Net( •), LAA-Former( •), and LAA-Swin( •) with respect to existing methods, namely, Multi-attentional( •) [13], SBI( •) [14], Xception( •) [3], RECCE( •) [15], CADDM( •) [16], FAViT( •) [17], Forensic-sAdapter( •) [18] using (a) the AUC performance with respect to different ranges of Mask-SSIM, and (b) its associated boxplots. *The results were obtained using the official source codes pretrained on FF+ [3] and testing on Celeb-DFv2 [19]. Figure best viewed in colors. 
+
+(1) Limited generalization - As highlighted in numerous studies [14], [16], [18], [20]–[24], standard deep binary classi- 
+
+> arXiv:2604.04086v1 [cs.CV] 5 Apr 2026 JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 2
+
+fiers tend to overfit the manipulation-specific traces present in the training set, failing to generalize to unseen forgery artifacts. 
+
+(2) Limited robustness to HQ deepfakes - Most previous works employ vanilla CNN and/or ViT backbones for feature extraction. CNN-based architectures such as EfficientNet [25], XceptionNet [26], and ResNet [27] are known to progressively dilute local information through successive convolutions [13], [23], [28]. ViTs [29], [30], while effective at modeling long-range dependencies, lack dedicated mechanisms to capture fine-grained, spatially localized features [31]–[34]. As a result, these methods show poor robustness to HQ deepfakes, which are typically characterized by subtle artifacts. Recently, tremendous efforts have been made to mitigate generalization issues [14], [15], [20]–[22], [24], [35], [36]. Diverse approaches have been proposed in the literature, such as multi-task learning [15], [35], data synthesis [14], [20]–[22], [24], [36], or adaptation from large pre-trained models [18], [37], [38]. Although promising, these methods usually rely on the aforementioned standard backbones, which tend to overlook local representations, resulting in limited performance when dealing with HQ forgeries. On the other hand, some attempts have been made to improve the robustness to HQ deepfakes [13], [28], [39] by imposing the extraction of local features through appropri-ate attention mechanisms. However, these mechanisms are 
+
+implicit , with no guarantee of modeling genuinely localized yet artifact-relevant features. Moreover, these models typi-cally rely on standard binary classifiers trained with real and deepfake images, showing inevitably degraded generalization capabilities to unseen manipulations. Hence, our goal is to address the detection of high-quality deepfakes and, at the same time, improve the generalization performance. We posit that both objectives can be achieved by introducing an explicit fine-grained attention mechanism within a multi-task learning framework, supervised by ap-propriate pseudo-labels to support generalization. Herein, this paper introduces an explicit fine-grained framework for deep-fake detection, called Localized Artifact Attention X (LAA-X), that is generic to unseen manipulations yet robust to HQ deepfakes. LAA-X proposes a multi-task learning framework with auxiliary tasks that enable focusing on vulnerable re-gions 3. By vulnerable regions, we mean small image portions that are most likely to carry blending artifacts resulting from face manipulations. The proposed framework is compatible with both CNN and transformer backbones, showing improved performance on several well-known benchmarks. This paper is an extended version of our previous work, termed LAA-Net [23], where a CNN-based multi-task learning framework for deepfake detection has been proposed. The initial version of LAA-Net, proposed in [23], primarily models local de-pendencies as it relies on a CNN architecture. As a result, it has limited capabilities for reasoning over spatially distant regions, which are often interrelated in facial images. To address this, we generalize our framework to the transformer architecture, resulting in LAA-Former , which combines global context modeling with explicit local attention. Transformers 
+
+> 3A more formal definition is given in Section III-A
+
+excel at capturing global dependencies [29], [31]–[34] but often overlook fine-grained artifacts due to their broad re-ceptive fields and patch-level abstraction. To overcome this, we introduce a lightweight and plug-and-play Learning-based Local Attention (L2-Att) module that generalizes the vulner-ability concept from pixels to patches, enabling transformers to explicitly attend to vulnerable areas while preserving their ability to capture long-range relationships. This integration unifies explicit local supervision and global relational reason-ing within a single framework. As such, LAA-Net and LAA-Former together form two different versions of the proposed 
+
+LAA-X framework, where X refers to the nature of the architecture. As reflected in Figure 1, LAA-X achieves better and more stable AUC performance on Celeb-DF dataset [19] with respect to existing methods [3], [13]–[18], especially when facing high-quality deepfakes. Specifically, we quantify the quality of deepfakes using the well-known Mask Structural SIMilarity (Mask-SSIM 4). Additional experiments on several benchmarks [19], [42]–[47] also demonstrate that LAA-X outperforms the state-of-the-art (SOTA). In summary, the contributions of this extended version as compared to [23] are the following: 1) A unified deepfake detection framework (LAA-X) that is generic yet robust to HQ facial forgeries. LAA-X is compatible with both CNN and Transformer architec-tures and is trained using real data only. 2) An extension of the proposed explicit attention to transformer backbones termed L2-Att that generalizes vulnerability-driven modeling from pixels to patches, enabling complementary local-global reasoning. 3) Deeper and more extensive experiments showing consis-tent state-of-the-art performance and robustness on eight challenging benchmarks, namely FF++ [3], CDF2 [19], DFD [42], DFW [43], DFDCP [44], DFDC [45], DF40 [46], and DiffSwap [47] for both LAA-Net and LAA-Fomer. 
+
+Paper Organization. The remainder of the paper is organized as follows: Section II reviews related works. Section III for-malizes the vulnerability concept and introduces the LAA-X framework, including LAA-Net and LAA-Former. Section IV reports the experiments and discusses the results. Finally, Sec-tion V concludes this work and suggests future investigations. II. R ELATED WORKS ON DEEPFAKE DETECTION 
+
+In this section, we present an overview of previous works on deepfake detection. Specifically, we categorize them according to the type of neural architecture on which they rely, namely CNN-based and ViT-based methods. 
+
+A. CNN-based Deepfake Detection 
+
+Earlier methods generally formulate deepfake detection as a purely binary classification [3]–[7] using a CNN back-bone, leading to poor generalization capabilities. To address  
+
+> 4The Mask-SSIM [19], [40] is computed by calculating the similarity in the head region between the fake image and its original version using the SSIM score introduced in [41]. Hence, a higher Mask-SSIM score corresponds to a deepfake of higher quality. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 3
+
+this challenge, a wide range of strategies has been investi-gated [14]–[16], [21], [35], [48], [49] such as disentanglement learning [15], [35], multi-task learning [20], [22], [23], [50], [51], pseudo-fake synthesis either in the spatial domain [14], [21], [22], [36] or in the frequency domain [52], [53]. Despite their great potential, the aforementioned models are less robust when considering HQ deepfakes. Indeed, these SOTA methods mainly employ traditional DNN backbones such as ResNet [27], XceptionNet [26], and EfficientNet [25]. Hence, through their successive convolutional layers, they implicitly generate global semantic features. As a result, low-level cues that can be highly informative might be uninten-tionally ignored, leading to poor detection performance of HQ deepfakes. It is, therefore, crucial to design adequate strategies for modeling more localized artifacts. Alternatively, some attention-based methods such as [13], [28] have been proposed. Specifically, they have made attempts to integrate attention modules to implicitly focus on low-level artifacts [13], [28]. Unfortunately, the two aforementioned methods make use of a unique binary classifier trained with both real and fake images. This means that they do not consider any generalization strategy, such as pseudo-fake gen-eration or multi-task learning. Consequently, as demonstrated experimentally, they do not generalize well to unseen datasets in comparison to other recent techniques [14], [16], [22], [54]. 
+
+B. Transformer-based Deepfake Detection 
+
+Plain ViTs [29], [30] have recently attracted significant interest from the research community, demonstrating strong performance across various computer vision tasks [29], [30], [55]–[57], including the general topic of image classification. Inspired by their success, numerous transformer-based deep-fake detection methods [9]–[11], [17], [39], [58]–[66] have been introduced in the literature. A representative line of work [8]–[11], [58]–[60], [65] designs hybrid architectures that combine CNNs and ViTs simultaneously. While the CNN extracts high-level local feature maps, the ViT models long-range correlations for authenticity classification. Despite their proven performance under in-dataset evaluation settings, they typically overfit specific artifact types present in the training set, as they rely solely on vanilla binary supervision using a fixed dataset. Consequently, their generalizability to unseen manipulations remains unsatisfactory. To alleviate this issue, many studies have employed strategies to encourage the network to learn more generic feature representations, such as data synthesis [62], adaptive learning [17], [18], [37], [38], [67] based on large pretrained foundation models [68], [69], and/or large-scale training datasets [70]. Despite demon-strating improved generalization, these transformer-based ap-proaches still suffer from their patch-based architecture, which emphasizes global reasoning. Hence, they usually fail to model subtle artifacts typically characterizing HQ deepfakes [13], [23], [28], [71]. To enforce the extraction of forgery artifacts at different scales while using a transformer architecture, a recent work termed DFDT [39] has extracted multi-scale representations via multi-stream ViTs coupled with an implicit re-attention strategy. However, DFTD is still trained as a I) Training: Vulnerability         
+
+> Map
+> Vulnerability-
+> Aware
+> Augmentor
+> Real Pseudo-Fake
+> @Vulnerable Regions
+> 11 Inference:
+> Vulnerability-Aware Explicit Attention
+> Task-specific GT Generation Task-specific Supervision Classification Supervision
+> Task nTask 2
+
+oO  
+
+> Real Fake
+
+©O 8  
+
+> Real Fake
+
+Fig. 2: Overview of the proposed LAA-X framework. LAA-X is a multi-task learning framework that incorporates an explicit attention mechanism to vulnerable regions through the integration of generic auxiliary tasks. This strategy enables LAA-X to adequately attend to fine-grained artifact-prone areas. Particularly, these additional tasks can be removed at inference, reducing computational cost at test time. binary classifier using both real and deepfake images; hence, showing poor generalization capability to unseen forgeries. III. LAA-X: A U NIFIED LOCALIZED ARTIFACT -A WARE 
+
+ATTENTION LEARNING FRAMEWORK 
+
+Our goal is to introduce a method that is robust to high-quality deepfakes yet capable of handling unseen manipu-lations. In this section, we present a novel framework for fine-grained deepfake detection, called “Localized Artifact Attention X (LAA-X) ”. The main idea behind LAA-X is to enforce the model to focus on a few artifact-prone vulnerable regions in deepfakes by incorporating an explicit attention strategy through the integration of auxiliary tasks in a multi-task learning framework. By vulnerable regions, we mean the areas that are most likely to exhibit blending artifact cues. Such localized cues: (1) are common across numerous manipulation techniques; and (2) might be imperceptible to the naked eye yet present in high-quality deepfakes. As a result, detecting these vulnerable regions through an appropri-ate fine-grained attention mechanism simultaneously improves generalization to unseen manipulations and robustness to HQ deepfake detection. To avoid relying on specific types of deepfakes during training, compatible blending-based data synthesis strategies are proposed. Moreover, it is interesting to note that the parallel auxiliary branches are required only during training and can be removed at inference. Thus, they do not induce any additional computational cost during inference. The overview of the general LAA-X framework is shown in Figure 2. LAA-X is architecture-agnostic as it can be adapted to both CNN and transformer backbones, yielding JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 4Real  Fake   
+
+> Ground truth
+> generation
+> Vulnerable points
+> detection
+> Classification
+> Heatmap
+> regression
+> Self-consistency
+> regression
+> Set of vulnerable points
+> Real data
+> Pseudo-fake data
+> 2
+> 1
+> Pseudo-fake
+> E-FPN
+> OR
+> Image OR
+> OR
+> OR
+> Consistency masks
+> Heatmaps
+> Real Pseudo-fake
+> Blending masks
+> OR
+> Real
+> OR
+> Class labels
+
+Fig. 3: Overview of the proposed LAA-Net approach. It is formed by two main components, namely, (1) an explicit attention mechanism based on a multi-task learning framework composed of three branches, i.e., the binary classification branch, the heatmap branch, and the self-consistency branch. The heatmap and self-consistency ground-truth data are generated based on the detected vulnerable points, and (2) an Enhanced Feature Pyramid Networks (E-FPN) that aggregates multi-scale features. two different deepfake detector families. We instantiate two versions of LAA-X, including a CNN-based and a transformer-based architecture, introducing LAA-Net and LAA-Former, respectively. In Section III-A, we start by defining the notion of vulnerable regions and describing their estimation within the used blending-based data synthesis techniques [14], [21]. Then, Section III-B and Section III-C depict, respectively, LAA-Net and LAA-Former. 
+
+A. Estimation of Vulnerable Regions 
+
+As discussed in the previous section and illustrated in Figure 2, LAA-X enforces attention to a few specific regions through additional auxiliary tasks in addition to the standard classification branch. Our hypothesis is that deepfake detection can be formulated as a fine-grained classification. Therefore, giving more attention to vulnerable regions should be an ef-fective solution for detecting HQ deepfakes. For that purpose, we start by defining the notion of vulnerable regions. 
+
+Definition 1. Vulnerable regions in a deepfake image are the areas that are more likely to carry blending artifacts. 
+
+Depending on the architecture that is used, it is necessary to refine and extend the definition of vulnerable regions. In particular, we consider the smallest entities processed in CNN and transformer architectures, namely, pixels and patches, respectively, resulting in the following definitions. 
+
+Definition 1.1. Vulnerable points in a deepfake image are the pixels that are more likely to carry blending artifacts. 
+
+Definition 1.2. Vulnerable patches in a deepfake image are the patches that are more likely to carry blending artifacts. 
+
+As highlighted in [4], [72], most deepfake generation ap-proaches involve a blending operation for mixing the back-ground and the foreground of two different images, IB and 
+
+IF , respectively. This implies the presence of blending artifacts regardless of the blending-based generation approach that is used. Thus, we posit that the vulnerable regions can be seen as the areas belonging to the blending locations with the most equivalent contributions from both IB and IF .In this paper, we assume that we only have access to real data during training. Hence, a blending-based data synthesis is leveraged to simulate pseudo-fakes that carry blending arti-facts; hence, incorporating vulnerable regions. Such a strategy has two main advantages: (1) it avoids overfitting to specific manipulation methods seen during training, as demonstrated in several references [14], [21]; (2) it allows automating the estimation of ground-truth vulnerable regions to train the proposed multi-task learning framework, enabling explicit attention to those areas. Specifically, given a foreground image and a background image denoted by IF and IB, respectively, we adopt the blending-based synthesis method used in [14], [21] that produces a manipulated face image denoted by IM as follows, 
+
+IM = M ⊙ IF + (1 − M) ⊙ IB , (1) where M is the deformed Convex Hull mask with values varying between 0 and 1, and ⊙ denotes the element-wise multiplication operator. Inspired from [21], a blending bound-ary mask B = (bij )i,j ∈[[1 ,D ]] is then computed as follows, 
+
+B = 4 . M ⊙ (1 − M) , (2) with 1 being an all-one matrix, D the height and width of B,and bij its value at the position (i, j ). It can be observed from Eq. (1) that the contributions of IF and IB to the pseudo-fake 
+
+IM are described by the two matrices M and (1 − M). Hence, the more balanced the values of M and (1 − M) are at a pixel (i, j ), the higher the value of bij is, indicating a higher impact from the blending operation, and vice versa. Note that if an input image is real, B should be set to 0. As such, the JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 51 1 1 1 1                                          
+
+> 10.75 0.5 0.25 1
+> 10.8 00.5 1
+> 10.85 0.5 0.2 1
+> 11111
+> +
+> 00000
+> 00.25 0.5 0.75 0
+> 00.2 10.5 0
+> 00.15 0.5 0.8 0
+> 00000
+> ×=
+> 𝐈 𝐵 𝟏 −𝐌
+> ×=
+> 𝐈 𝐹 𝐌
+> 𝐈 𝑀
+
+Fig. 4: Extraction of the vulnerable points. ⊕   
+
+> ⊕
+> ⊕
+> ⊙
+> ⊙
+> ⊕
+> E⁽⁴⁾
+> E⁽³⁾
+> E⁽²⁾
+> F' ⁽⁴⁾
+> F' ⁽³⁾
+> ⊙
+> F' ⁽²⁾
+> ⊕
+> ⊙
+> (a) (a) (a)
+> 1 – Sigmoid(.)
+> Convolution 5 ×5 Block
+> Convolution 3 ×3 Block
+> Max Pooling
+> Convolution 1 ×1 Block
+> Transpose Convolution Block
+> Element-wise Multiplication
+> Result of Multi-Layer Fusion
+> Concatenation
+> (a) Multi-layer Fusion
+> F⁽⁰⁾
+> F⁽¹⁾
+> F⁽²⁾
+> F⁽³⁾
+> F⁽⁴⁾
+> F⁽⁵⁾
+> F⁽⁶⁾
+> ⊕
+> ⊙
+> (a)
+> F' ⁽⁵⁾
+> E (5)
+
+Fig. 5: Architecture of the proposed Enhanced Feature Pyramid Network (E-FPN). 
+
+blending mask B is used for estimating the set of vulnerable regions denoted by P as follows, 
+
+P = argmax  
+
+> (i,j )∈[[1 ,D f]] 2
+
+(f (B)) , (3) where f defines a sampling-aggregation strategy that is used to fit the type of architecture being considered, Df the height and the width of f (B), and [[ ]] an integer interval. Note that P can include more than one region, since f (B) can be maximal at several locations. We detail below how f is defined for retrieving specifically vulnerable points and vulnerable patches. 
+
+Vulnerable Points: As discussed earlier, these points are compatible with CNN architectures that operate at the pixel level. Hence, it will be used in LAA-Net in the next section. To extract vulnerable points from the blending mask B, the function f in Eq. (3) is defined as the identity function f (B) = 
+
+B, as no sampling or aggregation is needed. As a result, the variable Df is equal to D in this context. Figure 4 illustrates the extraction of vulnerable points (represented as purple cells with yellow borders). 
+
+Vulnerable Patches: As mentioned previously, vulnerable patches are suitable for transformer architectures that work at the patch level. Hence, f is defined as the composition of two functions f1 and f2, as f = f2 ◦ f1. Specifically, we apply to 
+
+B, the patching function f1 that extracts N non-overlapping patches denoted as ˜B = ( ˜Blm )l,m ∈[[1 ,√N ]] of dimension P ×P
+
+such that ˜B = f1(B). Finally, a maxpooling operation denoted 
+
+f2 is employed for aggregating the information within one patch. The variable Df is therefore equal to √N in this case. Note that other aggregation operations are considered for f2
+
+in Section IV. This process is illustrated in Figure 8-III. Even though we focus only on blending-based deepfakes, our experiments (Section IV) demonstrate that our models are capable of detecting various types of deepfakes, including diffusion-based ones. Extending the notion of vulnerability to non-blending artifacts is a promising direction that we will explore in future works. In the following, we describe how the notion of vulnerable points and vulnerable patches is used within two different types of architectures, including CNNs and transformers, respectively. 
+
+B. CNN-based LAA-X: LAA-Net 
+
+In this section, we describe the proposed CNN-based LAA-X, namely LAA-Net. An overview of LAA-Net is provided in Figure 3. It incorporates: (1) an explicit attention mechanism 
+
+and (2) a new architecture based on an enhanced FPN ,called E-FPN . First, the proposed attention mechanism aims to explicitly focus on artifact-prone pixels referred to as vul-nerable points (a formal definition is given in Section III-A). Specifically, a multi-task learning framework composed of three simultaneously parallel optimized branches, namely (a) classification, (b) heatmap regression, and (c) self-consistency regression, is introduced, as depicted in Figure 3. The clas-sification branch predicts whether the input image is fake or real, while the two other branches aim to give attention to vulnerable pixels. Second, E-FPN allows extracting multi-scale features without injecting redundancy. This enables mod-eling low-level features, which can better discriminate subtle inconsistencies. 
+
+1) Explicit Attention to Vulnerable Points: In the following, we describe the proposed explicit attention mechanism guided by the two auxiliary branches, namely, the heatmap and the self-consistency branches, and explain how vulnerable points are utilized for training those branches. 
+
+a) Heatmap Branch: In general, forgery artifacts not only appear in a single pixel but also affect its surroundings. Hence, considering vulnerable points as well as their neigh-borhoods is more appropriate for effectively discriminating deepfakes, especially in the presence of images with local irregularities caused by noise or illumination changes. To model that, we propose to use a heatmap representation that encodes at the same time the information of both vulnerable points as well as their neighbor points. More specifically, ground-truth heatmaps are generated by fitting an Unnormalized Gaussian Distribution for each pixel 
+
+pk = ( pkx, p ky ) ∈ P . The pixel pk is considered as the center of the Gaussian Mask Gk. To take into account the neighborhood information of pk, the standard deviation of Gk is adaptively computed. In particular, inspired by the work of [73], the standard deviation σk of pk is computed based on the width and the height of the blending boundary mask B with respect to the point pk. Similar to [73], a radius rk is computed based on the size of the set of virtual objects that overlap the mask centered at pk with an Intersection over Union (IoU) greater than a threshold t. In all our experiments, we set t to 0.7 and we assume that σk = 13 rk. Hence, Gk = (gkij )i,j ∈[[1 ,D ]] is computed as follows, JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 6
+
+gkij = e− (i−pkx)2+( j−pky )22σ2 
+
+> k
+
+, (4) where i and j refer to the pixel position. The ground-truth heatmap H is finally constructed by superimposing the set G =
+
+{Gk}k∈[[1 ,card (P)]] . A figure depicting the heatmap generation process is provided in the supplementary materials. For optimizing the heatmap branch, the following focal loss [74] is used, 
+
+LH =
+
+> D
+
+X
+
+> i,j
+
+−(1 − ˜hij )γ log ˜hij , (5) such that, 
+
+˜hij =
+
+(ˆhij if hij = 1 ,
+
+1 − ˆhij otherwise , (6) with ˆhij and hij being the value of the predicted heatmap ˆH
+
+and the ground-truth H at the pixel location (i, j ), respectively. The hyperparameter γ is used to stabilize the adaptive loss weights. 
+
+b) Self-consistency Branch: To enhance the proposed attention mechanism, the idea of learning self-consistency proposed in [22] is revisited to fit our context. Instead of computing the consistency values for each pixel of the mask, we consider only the vulnerable location. Since the set P
+
+might include more than one pixel (the blending mask can include several pixels with equal maximum values), we ran-domly choose one of them, which we denote by ps, for generating the self-consistency ground-truth matrix. Hence, the generated matrices denoted by C are 2-dimensional and not 
+
+4-dimensional as in the original method. Given the randomly selected vulnerable point ps = ( u, v ), the self-consistency C
+
+matrix is computed as, 
+
+C = 1 − | buv .1 − B| , (7) where |.| refers to the element wise modulus and 1 is an all-one matrix. This refinement allows for reducing the model size and, consequently, the computational cost. It can also be noted that even though our method is inspired by [22], our self-consistency branch is inherently different. In [22], the consis-tency is calculated between the foreground and background, whereas we measure the consistency between the vulnerable point and the other pixels of the blended mask. The self-consistency loss LC is then computed as a binary cross entropy loss between C and the predicted self-consistency ˆC.
+
+c) Training Strategy: The LAA-Net is optimized using the following loss, 
+
+L = LBCE + λ1LH + λ2LC , (8) where LBCE denotes the binary cross-entropy classification loss. LH and LC are weighted by the hyperparameters λ1 and 
+
+λ2, respectively. Note that only real and pseudo-fakes are used during training. 
+
+2) Enhanced Feature Pyramid Network (E-FPN): Feature Pyramid Networks (FPN) are widely adopted feature extractors capable of complementing global representations with multi-scale low-level features captured at different resolutions [75]. This makes them ideal candidates for implicitly supporting the heatmap and self-consistency branches towards fine-grained deepfake detection. Although some attempts have been made to exploit multi-scale features [16], no previous works have considered FPN in the context of deepfake detection. Over the last years, several FPN variants have been proposed for numerous computer vision tasks [74]–[77]. Nevertheless, these FPN-based methods usually lead to the generation of redundant features, which might, in turn, lead to the overfitting of the model [78]. Moreover, as described in Section I, small discrepancies are gradually eliminated through the successive convolution blocks [13], going from high-resolution low-level to low-resolution high-level features. Consequently, the last block outputs usually contain global features where local artifact-sensitive features might be discarded. To overcome this issue, we introduce a new alternative referred to as Enhanced Feature Pyramid Network (E-FPN) that is integrated in the proposed LAA-Net architecture. The E-FPN goal is to propagate relevant information from high to low-resolution feature representations. As shown in Figure 5, we denote the output shape of the 
+
+N − 1 latest layers by (n(l), D (l), D (l)) with l ∈ [[2 , N ]] . For the sake of simplicity, we assume that the shape of the feature maps is square. For a given layer l, n(l), D (l) and F(l) cor-respond, respectively, to its feature dimension, its height and width, and its output features. For strengthening the textural information in the ultimate layer F(N ), we propose to take advantage of the features generated by previous layers F(l)
+
+with l ∈ [[2 , N −1]] . Concretely, for each layer l, a convolution followed by a transpose convolution is applied to F(l+1) . The obtained features are denoted by E(l) and have the same shape as F(l). Then, a sigmoid function is applied to E(l) returning probabilities. The latter indicates the pixels that contributed to the final decision. For enriching F(l+1) while avoiding redundancy related to the most contributing pixels, the features 
+
+F(l) are filtered by computing (1 − sigmoid (E(l))) γw resulting in a weighted mask. The latter is concatenated along the same axis with E(l) for obtaining the final features. This operation is iterated for all the layers l ∈ [[2 , N − 1]] . In summary, the final representation F′(l) is obtained as follows, 
+
+F′(l) = ( F(l) ⊙ (1 − sigmoid( E(l))) γw ⊕ E(l)) , (9) where E(l) = T(f (F′(l+1) ) with F′(l+1) = F(l+1) if l =
+
+N − 1, such that f and T, are respectively the convolu-tion and transpose convolution operators, and ⊕ refer to the concatenation operator. The hyper-parameter γw is set to 1 in all our experiments. The relevance of E-FPN in the context of deepfake detection is experimentally demonstrated in Section IV, as compared to the traditional FPN. 
+
+C. Transformer-based LAA-X: LAA-Former 
+
+As discussed in Section I, LAA-Net primarily captures local dependencies with limited capabilities for reasoning over JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 70.6-0.8 0.8-0.9 0.9-0.925 0.925-0.95 0.95-0.97 0.97-1.0        
+
+> 0.75
+> 0.8
+> 0.85
+> 0.9
+> 0.95
+> 1
+> Mask SSIM ranges
+> AUC
+> (a) Deepfakes FaceSwap
+> Face2Face NeuralTextures
+> ViT112p16 ViT112p8 ViT224p8 Xception EfficientNet-B4 (b)
+
+Fig. 6: Experiments to analyze the capability of transformer-based networks in deepfake detection. (a) Generalization performance comparison of baseline classifiers (ViT [29]+SBI [14]( •), Swin [32]+SBI [14]( •)) with two specialized transformer-based (FAViT [17]( •), ForensicsAdapter [18]( •)) and four CNN-based methods (LAA-Net [23]+SBI [14]( •), CADDM [16]( •), EfficientNet [25]+SBI [14]( •), Xception [26]+SBI [14]( •)) across different ranges of Mask-SSIM [40]. All methods adopt FF++ [3] for the training and are tested cross-dataset on CDF2 [19]. More details are described in Section III-C1a. 
+
+(b) Evolution of the training loss of ViT under different configurations (variation of input resolution and patch size), Xception and EfficientNet, across four types of deepfakes in FF++ [3]. spatially distant regions, which are often interrelated in facial images. While extracting localized features is crucial [13], [28], [71], modeling the relationship between different regions can provide complementary information for more accurate detection. Therefore, we propose to generalize the explicit attention mechanisms driven by vulnerable regions to trans-formers, resulting in LAA-Former. An overview of the pro-posed approach is illustrated in Figure 8-I, consisting of a plain ViT coupled with a lightweight module that enforces the model to predict the locations of vulnerable patches. Hence, this module, called “Learning-based Local Attention (L2-Att)”, complements the well-defined implicit self-attention mechanism of the ViT. It is noted that we refer to the trans-former backbone as ViT for the sake of simplicity. However, our method is also compatible with other transformer-based architectures, such as Swin transformers [32], as demonstrated in Section IV. Similar to LAA-Net, LAA-Former is trained using only real and pseudo-fake data. In the following, we first investigate the specific challenges associated with the use of plain ViTs in deepfake detec-tion (Section III-C1 ). Accordingly, we present the proposed explicit attention module L2-Att that aims to improve the performance of ViT in the context of deepfake detection (Section III-C2 ). 
+
+1) ViT and Deepfake Detection: Where is the Gap?: We start by introducing our primary hypothesis: unlike CNNs, ViTs focus more on global representations [29], [31]–[33], [79], given their patch-based architecture. Consequently, they struggle to effectively capture local features [31], [33] that are crucial for identifying subtle artifacts in HQ deepfakes [13], [28], [71]. The plausibility of this assumption is investigated by conducting the following experiments described below. 
+
+a) Generalization performance with respect to the quality of deepfakes: Here, our goal is to quantify the detection capabilities of ViTs as compared to CNNs with respect to the quality of the encountered deepfakes. To that aim, we compare in Figure 6a the performance of conventional transformers (plain ViT [29] and Swin [32]), transformer-based methods specifically tailored for deepfake detection (FAViT [17], Foren-siscAdapter [18]) and vanilla CNN architectures (Efficient-Net [25], Xception [26]) and CNN-based methods specialized in deepfake detection (LAA-Net [23], CADDM [16]) across different ranges of Mask-SSIM [40] on the CDF2 [19] dataset. All methods rely on FF++ [3] for training and testing on CDF2 [19], following the standard cross-dataset protocol [20]– [22], [28]. For a fair comparison, we clarify that we train ViT, Swin, EfficientNet, and Xception with the same data synthesis method, i.e., SBI [14] which is also used in SBI [14] 5 while CADDM and ForensicsAdapter are trained with their data synthesis algorithms. The performance of CADDM, Forensic-sAdapter, and FAViT is reproduced using the official pretrained weights. It can be observed from Figure 6a that the performance of ViT is relatively good for low Mask-SSIM values, but drops more importantly at higher values as compared to other methods. The performance of Swin, on the other hand, does not deteriorate as much, potentially due to its ability to extract low-level local features through its local window design; however, it still shows less stability than LAA-Net and ForensicsAdapter. Notably, FAViT, which combines ViT with a CNN via an implicit local-attention scheme, exhibits better capabilities than standard CNNs, ViT, and even the specialized CNN-based CADDM at higher SSIM ranges. However, since the method relies on specific deepfakes during training, it tends to achieve poor generalization when encountering unseen generation methods (i.e., from FF++ → CDF2). As such, these observations support our hypothesis.      
+
+> 5LAA-Net, CADDM, and SBI use EfficientNet-B4 as the default back-bone. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 8Real Deepfakes FaceSwap Face2Face NeuralTextures
+
+Fig. 7: Examples are randomly selected to illustrate four types of deepfakes in the common FF++ [3] dataset. It includes Deepfakes (DF) [80], FaceSwap (FS) [81], Face2Face (F2F) [82], and NeuralTextures (NT) [83]. 
+
+b) Performance of ViTs with respect to the patch size and the type of deepfakes: We further investigate whether there exists a correlation between the patch size and the performance of ViT in deepfake detection. Specifically, we anticipate that smaller patch sizes would help capture more localized artifacts. For that purpose, we train a plain ViT with several configurations by varying both the patch size and the input resolution. Figure 6b depicts the evolution of the training loss through epochs. The notation ViT XpY in Figure 6b denotes an input resolution of X with a patch size of Y . We also compare ViT to two widely-adopted CNNs, i.e., Xception and EfficientNet in this study. Both ViT and CNNs are trained on four types of deepfakes in FF++ [3]: Deepfakes (DF) [80], FaceSwap (FS) [81], Face2Face (F2F) [82], and NeuralTextures (NT) [83] as shown in Figure 7. For the training setups, following the conventional splits [3], we train all models for 50 epochs, using 128 and 32 frames uniformly extracted from each video for training and validation, respec-tively. Hence, there are a total of 460800 and 22400 frames for each corresponding task. More details, e.g., optimizer, learning-rate scheduler, etc., are provided in the supplementary materials. As F2F and NT correspond to face reenactment manipula-tions while FS and DF represent face-swap approaches, it is more likely to observe more subtle artifacts in F2F and NT. When comparing ViT 112 p16 and ViT 112 p8, it can be seen that a ViT with smaller patches exhibits faster convergence compared to those with larger ones. Moreover, increasing the input resolution while conserving the same patch size (see ViT 112 p8 and ViT 224 p8) contributes to the amplification of the local information encoded in each patch, also resulting in faster convergence. In both cases, this convergence gap is even more pronounced for more subtle deepfake types such as F2F and NT, indicating the importance of locality in detecting deepfakes with subtle inconsistencies. However, reducing the patch size leads to a quadratically increasing complexity (i.e., the FLOPs are 2.2G, 8.4G, and 33 .6G for ViT 112 p16 ,ViT 112 p8, and ViT 224 p8, respectively). Moreover, it is worth noting that CNNs converge more rapidly compared to ViTs under different setups (i.e., even with the smallest patch size). This also highlights the fact that CNNs can extract local features more effectively, supporting further our hypothesis. Hence, we posit that by proposing a mechanism that allows focusing on subtle artifact-prone regions, we can enhance the performance of ViT for the task of deepfake detection. While some attempts have been made to introduce local ViTs such as Swin [32], we argue that this remains insufficient for effec-tively detecting deepfakes. As demonstrated for CNNs [23], implicitly incorporating local features does not guarantee that artifact-prone regions are effectively considered, highlighting the need to introduce attention strategies for explicitly focusing on localized artifacts. 
+
+2) Explicit Attention to Vulnerable Patches: In light of the observations made in Section III-C1, we propose to inject a lightweight local attention head that we call L2-Att within ViT, resulting in LAA-Former. The latter aims to enforce the model to focus vulnerable patches. In what follows, we depict the different components of FakeFormer. 
+
+a) Vision Transformer (ViT): Given an image X ∈
+
+RC×H×W as input, we first reshape it into a sequence of non-overlapping flattened 2D patches, denoted as {xi ∈
+
+RC.P 2
+
+with i ∈ [[1 , N ]] }, where (H, W ) represents the input resolution, C denotes the number of channels, P ×P indicates the size of an image patch, and N = H×WP 2 denotes the number of patches. The ViT linearly maps each xi into a patch embedding z0 
+
+> i
+
+∈ RD using a learnable matrix E ∈ R(C.P 2)×D .Subsequently, a learnable embedding xcls ∈ RD is prepended at the zero-index of embeddings z0 for the classification. Additionally, we use a learnable positional embedding Epos 
+
+to incorporate the position information of patches. The afore-mentioned process is described as follows, 
+
+z0 = [ xcls ; x1E; x2E; · · · ; xN E] + Epos , (10) where Epos ∈ R(N +1) ×D and z0 ∈ R(N +1) ×D . Afterward, 
+
+z0 is fed into several transformer encoder blocks. Similar to ViT [29], LAA-Former has L blocks, each one containing a multi-head self-attention (MHSA), Layernorm (LN), and a multi-layer perceptron (MLP). The feature extraction process is described as follows, 
+
+zl = MHSA(LN( zl−1)) + zl−1, (11) 
+
+zl′
+
+= MLP(LN( zl)) + zl,
+
+with l ∈ [[1 , L ]] and zl, zl′
+
+∈ R(N +1) ×D . The extracted feature from the classification embedding zL′ 
+
+> 0
+
+is processed by a classification head composed of an MLP, resulting in the predicted category output ˆy. In the task of deepfake detection, the categories consist of real or fake .
+
+b) Learning-based Local Attention Module (L2-Att): Our hypothesis is that since the patch size can be too large relative to the area of artifacts, the features encoded within a patch embedding may hold insufficient information about them. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 9wm 4ey            
+
+> Vulnerable Patches Generation L@Position Embedding Zz
+> IClass Token 20
+> Patch Embedding 7BFake A> ey
+
+Las Lau 4 a2 
+
+> BG
+
+Cls. 4 oe        
+
+> Head Learning-based Local Attention module (L2-Att) aa
+
+t f f t f t f t t
+
+# T IIA IAD IPA SA ut tot of tf tof of ot tae   
+
+> Transformer Encoders B
+
+# DDDDD BYOY t t *  
+
+> Embed to Tokens
+
++ + + +ty  out 
+
+> EN  » SS,
+> ~ UE
+> yoog
+> uonnjoauog
+> piowBbis
+> B ASIMIUIOg wn
+
+# f Ss 
+
+# IGS Zoom-in View     
+
+> (for Visualization) ™Vulnerable Patches P
+
+Fig. 8: The proposed Transformer-based LAA-X method. (I) The overall LAA-Former framework, (II) the L2-Att module, and (III) the ground-truth generation of vulnerable patches. Consequently, the implicit SA mechanism might overlook or miss important patches, as those containing forgeries can appear too analogous to those without. As also highlighted in previous work [18], the blending boundary forgery only occupy a small portion of the image, naively training using standard classification loss can easily be influenced by the non-boundary areas, leading to suboptimal results. Therefore, we propose an explicit attention mechanism to ensure that the model pays more attention to these critical patches. To this end, by enforcing the model to predict the locations of vulnerable patches, L2-Att can play a complementary role to the SA, strengthening the detection capability of the whole framework. 
+
+Ground-Truth Generation for L2-Att. To obtain the ground-truth to be compared to the output of L2-Att denoted as S, we generate a weighted map Sq for each element 
+
+pq = (pqx, p qy ) ∈ P (Eq. (3)). To take into account the neighborhood patches beneficial to consolidate the network detection, we use an unnormalized Gaussian distribution to calculate Sq as follows, 
+
+Sq (l, m ) = e− (l−pqx)2+( m−pqy )22σ2 , (12) where (l, m ) ∈ [[1 , √N ]] represents the spatial position, and the standard deviation σ is fixed to 1 by default. We obtain S
+
+by overlaying {Sq }q∈[[1 ,card (P)]] . The ground truth generation process is also illustrated in Figure 8-III. It can be noted that, for real data, S is set to a zero matrix. 
+
+Architecture Design. To predict the locations of vulnerable patches, L2-Att first takes the patch embeddings zL′ 
+
+> ¬0
+
+∈ RN ×D
+
+as input and processes them to produce spatial features as follows, 
+
+F = Permute( zL′
+
+> ¬0
+
+), F ∈ RD×N , (13) 
+
+Fout = Reshape( F), Fout ∈ RD×√N ×√N ,
+
+After that, Fout is fed into a convolution block (ConvBlock) with a kernel size of ( 3 × 3), followed by a pointwise convo-lution [84] and a sigmoid activation. The predicted weighted heatmap denoted as ˆS describing the presence probability of vulnerable patches is obtained as follows, 
+
+ˆS = σ(PointWise(ConvBlock 3×3(Fout ))) , (14) where ˆS ∈ R1×√N ×√N . A detailed illustration of the L2-Att module can be seen in Figure 8-II. 
+
+c) Training Objective: To train the network, we optimize two losses, namely the Binary Cross Entropy (BCE) loss for classification denoted as Lcls (ˆ y, y), and the regression loss related to the prediction of vulnerable patches locations, denoted as Latt (ˆS, S). Therefore, the total loss L is defined as follows, 
+
+L = Lcls + λatt Latt , (15) where λatt is a balancing factor between the two losses. Similarly in LAA-Net, we employ the focal loss [74] to compute Latt (ˆS, S).IV. E XPERIMENTS 
+
+In this section, we start by presenting the experimental settings. Then, we compare the performance of LAA-X to SOTA methods, both qualitatively and quantitatively. Finally, we conduct an ablation study to validate the different compo-nents of LAA-X. 
+
+A. Experimental Settings 
+
+Datasets. The FF++ [3] dataset is used for training and validation. In our experiments, we follow the standard splitting protocol of [3]. This dataset contains 1000 original videos and 4000 fake videos generated by four different manipulation methods, namely, Deepfakes (DF) [80], Face2Face (F2F) [82], FaceSwap (FS) [81], and NeuralTextures (NT) [83]. In the training process, we utilize only real images to dynamically generate pseudo-fakes, as discussed in Section III. To evaluate the generalization capability of the proposed approach as well as its robustness to high-quality deepfakes, we follow JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 10 
+
+TABLE I: In-dataset and Cross-dataset evaluation in terms of AUC (%) and AP (%) at the video-level on multiple deepfake datasets. Results for comparison are directly extracted from the original papers. ∗ indicates our reproduced results using official pre-trained weights. Bold and Underlined highlight the best and the second-best performance, respectively. 
+
+Method Venue Training set Test set Real Fake FF++ CDF2 DFW DFD DFDCP DFDC AUC AUC AP AUC AP AUC AP AUC AP AUC AP Xception ∗ [3] ICCV’19 ✓ ✓ 93.60 61.18 66.93 65.29 55.37 89.75 85.48 69.90 91.98 58.98 55.32 FaceXRay (w/ BI) [21] CVPR’20 ✓ ✓ 99.20 79.50 - - - 95.40 93.34 65.50 - - -Multi-attentional ∗ [13] CVPR’21 ✓ ✓ 95.32 68.26 75.25 73.56 73.79 92.95 96.51 83.81 96.52 70.05 67.11 PCL+I2G [22] ICCV’21 ✓ × 99.11 90.03 - - - 99.07 - 74.27 - 67.52 -RECCE ∗ [15] CVPR’22 ✓ ✓ 99.56 70.93 70.35 68.16 54.41 98.26 79.42 80.98 92.75 71.19 68.97 SBI ∗ [14] CVPR’22 ✓ × 98.23 85.55 77.81 67.47 55.87 96.04 92.79 82.22 93.24 69.77 72.25 DFDT [39] Appl.Sci.’22 ✓ ✓ 97.9 88.3 - - - - - 76.1 - - -SFDG [28] CVPR’23 ✓ ✓ 99.53 75.83 - 69.27 - 88.00 - 73.63 - - -CADDM ∗ [16] CVPR’23 ✓ ✓ 99.26 80.70 87.72 76.31 79.19 99.03 99.59 71.00 95.60 70.33 70.01 AUNet [54] CVPR’23 ✓ × 99.46 92.77 - - - 99.22 - 86.16 - 73.82 -LSDA [85] CVPR’24 ✓ ✓ 95.8 89.8 - 75.6 - 95.6 - 81.2 - 73.5 -FA-ViT [17] TCSVT’24 ✓ ✓ 99.6 93.83 - 84.32 - 94.88 - 85.41 - 78.32 -UDD [38] AAAI’25 ✓ ✓ - 93.1 - - - 95.5 - 88.1 - - -FreqDebias [52] CVPR’25 ✓ ✓ - 89.6 - - - - - - - 77.8 -AltFreezing [86] CVPR’23 ✓ ✓ 98.60 89.50 - - - 98.50 - 70.84 - 71.74 -ISTVT [66] TIFS’23 ✓ ✓ 99.0 84.1 - - - - - 74.2 - - -TALL-Swin [64] ICCV’23 ✓ ✓ 99.87 90.79 - - - - - 76.78 - - -FakeSTormer [24] ICCV’25 ✓ × 98.4 92.4 - 74.2 - 98.5 - 90.0 - 74.6 -LAA-Net (Ours w/ BI) CVPR’24 ✓ × 99.95 86.28 91.93 57.13 56.89 99.51 99.80 69.69 93.67 71.36 73.02 LAA-Former (Ours w/ BI) - ✓ × 99.23 90.34 94.90 72.62 75.98 93.42 97.49 78.71 96.23 76.84 80.82 
+
+LAA-Net (Ours w/ SBI) CVPR’24 ✓ × 99.96 95.40 97.64 80.03 81.08 98.43 99.40 86.94 97.70 72.43 74.46 LAA-Former (Ours w/ SBI) - ✓ × 97.67 94.45 97.15 81.74 83.72 96.12 98.31 96.30 99.50 78.91 80.01 
+
+TABLE II: Comparison in terms of AUC (%) at the 
+
+frame-level with cross-dataset evaluation on CDF2 [19], DFDCP [44], and DiffSwap [47].                                                                    
+
+> Method Venue Training set Cross-dataset Real Fake CDF DFDCP DiffSwap SBI [14] CVPR’22 ✓×78.59 78.05 75.20 CADDM [16] CVPR’23 ✓✓73.16 65.19 75.58 LSDA [85] CVPR’24 ✓✓83.0 81.5 -DiffusionFake (EFN-B4) [49] NeurIPS’24 ✓✓83.17 77.35 82.02 DiffusionFake (ViT-B) [49] NeurIPS’24 ✓✓80.46 80.95 86.98 LAA-Net [23] CVPR’24 ✓×86.28 81.12 90.15 LAA-Former-S -✓×88.23 91.58 90.99 LAA-Former-B -✓×90.93 90.52 91.29 LAA-Swin-S -✓×88.30 90.31 92.57 LAA-Swin-B -✓×89.39 89.81 93.73
+
+the cross-dataset setting on seven challenging datasets in-corporating different quality of deepfakes, namely, Celeb-DFv2 [19] (CDF2), Google DeepFake Detection [42] (DFD), 
+
+DeepFake Detection Challenge [45] (DFDC) and its preview version (i.e., DeepFake Detection Challenge Preview [44] (DFDCP)), WildDeepfake [43] (DFW), a diffusion-based test set DiffSwap [47], and DF40 [46]. To assess the quality of the considered datasets, we compute the Mask-SSIM 4 for each benchmark. In particular, CDF2 [19] is formed by the most realistic deepfakes with an average Mask-SSIM [19], [40] value of 0.92 , followed by DFD, DF40, DFDC, and DFDCP with an average Mask-SSIM of 0.88 , 0.87 , 0.84 and 0.84 ,respectively. We note that computing the Mask-SSIM for DFW and DiffSwap was not possible since real and fake images are not paired. Further details on these considered datasets are provided in supplementary materials. 
+
+Evaluation Metrics. To compare the performance of LAA-X with SOTA methods, we report the common Area Under the Curve (AUC) and the Average Precision (AP) as in [14], TABLE III: Comparison in terms of numbers of parameters (#Para.) and AUC (%) at the video-level using cross-manipulation evaluation on five subsets of DF40 [46]. For the sake of clarity, we note that we report the (#Para.) for the entire model, including all auxiliary branches. These branches can be removed at the inference for more efficient computation as discussed in Section III.                                                                  
+
+> Method Venue #Para. Cross-manipulation E4S FOMM BlendFace FSGAN MobileSwap SBI ∗[14] CVPR’22 19M 52.80 79.56 86.50 85.36 86.64 FAViT ∗[17] TCSVT’24 128M 74.70 76.99 88.43 96.96 83.96 StA+VB [67] CVPR’25 353M --90.6 96.4 94.6 LAA-Net [23] CVPR’24 27M 81.70 88.29 91.28 97.52 97.15 LAA-Former-S -23M 88.89 82.34 91.07 95.45 93.40 LAA-Former-B -91M 86.19 84.11 93.23 94.18 95.92 LAA-Swin-S -55M 90.79 80.43 93.52 94.98 97.87
+> LAA-Swin-B -91M 91.42 81.82 91.77 95.77 96.96
+
+[16], [21], [22]. More metrics, namely, Average Recall (AR), and mean F1-score (mF1), are provided in supplementary materials. 
+
+Data Pre-processing. Following the splitting convention of [3], we extract 128 , 32 , and 32 frames from each video for training, validation, and testing, respectively. RetinaNet [87] is used to crop faces with a conservative enlargement (by a factor of 1.25 ) around the face center. Note that all the cropped images are then resized to 384 × 384 for LAA-Net, 
+
+112 ×112 for LAA-Former-S, and 224 ×224 for LAA-Former-B. In addition, we utilize Dlib [88] to extract and store 68 
+
+and 81 facial landmarks for each frame. Finally, the preserved landmark keypoints are leveraged to dynamically generate pseudo-fakes during each training iteration. 
+
+Implementation Details. We applied different training strate-gies to the two versions of LAA-X. For 1) LAA-Net: it is JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 11 
+
+trained for 100 epochs with the SAM optimizer [89], a weight decay of 10 −4, and a batch size of 16 . We apply a learning rate scheduler that increases from 5.10 −5 to 2.10 −4 in the first quarter of the training and then decays to zero in the remaining quarters. The backbone is initialized with pretrained weights on ImageNet [90]. During training, we freeze the backbone for a warm-up at the first 6 epochs and only train the remaining layers. The parameters λ1 and λ2, defined in Eq. (8), are set to 
+
+10 and 100 , respectively. All experiments are carried out using a GPU Tesla V-100 . Regarding 2) LAA-Former: We train the model for 200 epochs using the AdamW [91] optimizer with a weight decay of 10 −4 and a batch size of 32 . The weights are initialized using pretrained DINO [92] on ImageNet [90]. The learning rate is maintained at 5 × 10 −5 during the first quarter of iterations, then gradually decays to zero over the remaining epochs. We freeze the backbone (i.e., ViT without the head) for the first 6 epochs, before training all layers. The 
+
+λatt in Eq. (15) is empirically set to 10 . All experiments are conducted on 4 NVIDIA A100 GPUs. For data augmentation, we apply horizontal flipping, ran-dom cropping, random scaling, random erasing [93], color jit-tering, Gaussian noise, blurring, and JPEG compression. Fur-thermore, label smoothing [94] is utilized and integrated into the loss function as a regularizer. To generate pseudo-fakes, two blending synthesis techniques are considered, namely, Blended Images (BI) [21] and Self-Blended Images (SBI) [14]. During training, in each epoch, for each video in the batch data, we dynamically randomize only k frames, with k = 8 
+
+or k = 16 when using SBI [14] or BI [21], respectively. 
+
+Architecture Choices. We adopt the B 4 variant (EFN-B4) of the EfficientNet [25] as the backbone for LAA-Net. Re-garding LAA-Former, we employ two variants that we call LAA-Former-S and LAA-Former-B. By default , we use the lightweight LAA-Former-S where H = W = 112 and P = 8 ,while utilizing H = W = 224 and P = 16 for LAA-Former-B. LAA-Former is based on a vanilla vision transformer, i.e., ViT [29]. Although LAA-Former is based on ViT, we also assess its applicability using another transformer architecture, namely LAA-Swin , which is based on Swin [32]. Similarly to LAA-Former, we consider two variants: LAA-Swin-S and LAA-Swin-B. Additional architectural details are provided in the supplementary materials. 
+
+B. Comparison with State-of-the-art Methods 
+
+Generalization to Unseen Datasets. To assess the generaliza-tion capabilities of our method, we evaluate LAA-X under the challenging cross-dataset setup [14]–[17], [24], [28], [49], [54], [85]. Table I and Table II report the results obtained on multiple unseen datasets, i.e., CDF2 [19], DFW [43], DFD [42], DFDCP [44], DFDC [45], and DiffSwap [47] at the video-level and the frame-level, respectively. It can be observed that LAA-X achieves state-of-the-art results on most considered benchmarks, especially on the large-scale DFDC dataset, the unknown in-the-wild DFW, and the recent diffusion-based DiffSwap. Although LAA-X builds on the blending assumption, this suggests that explicitly focusing on vulnerabilities rather than directly estimating TABLE IV: Robustness to unseen perturbations.                                                                                  
+
+> Method Training set Perturbation set Real Fake Saturation Contrast Block Noise Pixel Avg. Xception [26] ✓✓99.3 98.6 99.7 53.8 74.2 85.12 FaceXray [21] ✓✓97.6 88.5 99.1 49.8 88.6 84.72 CNN-aug [95] ✓✓99.3 99.1 95.2 54.7 91.2 87.90 LipForensics [96] ✓✓99.9 99.6 87.4 73.8 95.6 91.26 SBI [14] ✓×92.0 92.3 92.2 62.2 79.1 83.56 LSDA [85] ✓✓98.7 94.4 98.3 66.4 90.7 89.70 LAA-Net [23] ✓×99.96 99.96 99.96 53.90 99.80 90.72 LAA-Former ✓×98.04 95.96 97.02 75.28 91.14 91.49 LAA-Swin ✓×99.79 99.77 99.92 81.60 94.88 95.19
+
+blending masks allows better detecting non-blending-based face-swaps, demonstrating its generalizability and robustness to different qualities of deepfakes. Particularly, LAA-Net clearly outperforms other attention-based approaches such as Multi-attentional [13] and SFDG [28] by a considerable margin of 27 .14 % and 19 .57 % in terms of AUC and AP on CDF2, respectively. The best performance is reached when using SBI as a data synthesis, confirming the importance of modeling generic and subtle artifacts. An exception is that the performance of LAA-Net (w/ BI) is slightly superior to LAA-Net (w/ SBI) only on DFD, with an improvement of 
+
+1.08 % and 0.4% of AUC and AP, respectively. A plausible explanation could be the fact that deepfake artifacts in DFD are less challenging to detect or possibly similar to those in FF++. In fact, numerous methods report AUC and AP scores exceeding 98 %. Furthermore, despite its simplicity, the compromise between the implicit SA and the explicit local attention (L2-Att) to artifact-prone vulnerable patches allows LAA-Former to improve the average performance by 2.85% (w/ SBI) and 5.6% 
+
+(w/ BI) as compared to LAA-Net in Table I. This suggests the importance of modeling both local features and global semantics modeling. It is also noted that scaling the model leads to a decent increase in overall performance (Table II). 
+
+In-dataset Evaluation. We compare the performance of LAA-X to existing methods under the in-dataset protocol as in [14], [16], [22], [28], [54], [86]. The first column in Table I reports the obtained results on the testing set of FF++. It can be seen that all methods achieve competitive performance on the forgeries of the FF++ dataset. Our method, combined with SBI, outperforms all methods with an AUC of 99 .96 %, while using only real data for training. Furthermore, we report in Table III the generalization per-formance of LAA-Net and several variants of LAA-Former under a cross-manipulation evaluation setting on five subsets of the recent large-scale DF40 [46] dataset. Our method achieves notably higher AUC scores than other methods across all subsets, highlighting its strong generalization capability under diverse ranges of unseen manipulation techniques. 
+
+Robustness to Unseen Perturbations. Since deepfakes can be easily spread and altered on various social platforms, the robustness of LAA-X against some unseen common perturbations is investigated. Following the settings of [97], we evaluate the robustness of LAA-X across five unseen corruptions. The results are reported in Table IV, using models trained on FF++. As LAA-Net focuses on vulnerable points, it can be seen that color-related changes, such as Saturation JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 12 
+
+TABLE V: Traditional FPN versus E-FPN using the SBI data synthesis under the cross-dataset evaluation protocol. We report the results when integrating features F(i) from different layers.                                                                                     
+
+> EFN-B4 Test Set AUC (%) E-FPN Integration CDF2 DFD DFW DFDCP
+> F(6) F(5) F(4) F(3) F(2) FPN E-FPN FPN E-FPN FPN E-FPN FPN E-FPN (a) ✓91.56 98.27 73.02 78.35 (b) ✓✓93.42 91.79 98.59 97.12 73.78 71.39 78.40 75.80 (c) ✓✓✓88.72 92.86 97.96 98.95 69.40 74.93 71.91 83.97 (d) ✓✓✓✓88.35 95.40 98.89 98.43 70.94 80.03 79.02 86.94
+> (e) ✓✓✓✓✓92.16 94.22 96.58 97.31 65.17 72.54 74.31 82.90 Avg. 90.84 93.16 ↑(2.32) 98.06 98.02 ↓(0.04) 70.46 74.38 ↑(3.92) 76.40 81.59 ↑(5.19) Original SBI Xception MAT LAA-Net
+> DF
+> F2F
+> FS
+> NT
+> REAL
+> LAA-Former
+
+Fig. 9: Visualization of saliency maps on different types of manipulation from FF++ [3]. LAA-Net and LAA-Former is compared to SBI [14], Xception [3], and MAT [13]. and Contrast, do not impact the performance. However, the proposed method is extremely sensitive to structural pertur-bations such as Gaussian Noise. One possible reason is due to the introduction of noise that elevates the difficulty of detecting the vulnerable points. To confirm that, we report in the supplementary materials the inference output of the heatmap before and after applying a Gaussian Noise on a facial image. On the other side, thanks to vulnerable patches, LAA-Former and LAA-Swin show substantially improved robust-ness to noise. Although they are slightly more affected by some distortions than LAA-Net, both transformer-based ar-chitectures do improve the overall performance. 
+
+Qualitative Results. We provide Grad-CAMs [98] in Figure 9, to visualize the image regions in deepfakes that are activated by LAA-Net, LAA-Former, SBI [14], Xception [3], and Multi-attentional (MAT) [13] on FF++ [3]. Generally, attention-based methods such as MAT [13], LAA-Net, and LAA-Former focus more on localized regions. However, in some cases, MAT [13] concentrates on irrelevant regions such as the background or the inner face areas, even on real data. Conversely, LAA-X consistently identifies blending artifacts and shows interesting capabilities on expression-manipulated Neural Textures (NT). Input  w/o E-FPN  w/o H  w/o C  Ours 
+
+Fig. 10: Visualization of saliency maps of different com-ponents in LAA-Net w/o E-FPN, w/o H, and w/o C refer to ablating E-FPN, heatmap branch, and self-consistency branch, respectively. TABLE VI: Ablation study of LAA-Net’s components 
+
+including the Consistency branch (C), Heatmap branch (H), and E-FPN.                                                               
+
+> CHE-FPN Test set AUC (%) CDF2 DFD DFDCP DFW Avg.
+> ×××74.54 92.24 70.81 59.81 74.35
+> ×✓×80.89 94.53 77.93 67.12 80.12 ↑(5.77)
+> ××✓84.21 95.03 80.68 65.47 81.35 ↑(7.00)
+> ×✓✓95.56 98.54 82.21 74.98 87.82 ↑(13.47)
+> ✓×✓79.87 94.60 71.70 72.47 79.66 ↑(5.31)
+> ✓✓×91.56 98.27 78.35 73.02 85.30 ↑(10.95)
+> ✓✓✓95.40 98.43 86.94 80.03 90.20 ↑(15.85)
+
+C. E-FPN versus Traditional FPN 
+
+To assess the effectiveness of the low-level features injected by E-FPN into the final feature representation, we combine different feature levels and compare the results of E-FPN and traditional FPN [74], [75] in Table V. It can be seen that in general E-FPN outperforms FPN except for F(5) . This confirms the relevance of employing multi-scale features and the need for reducing their redundancy in the context of deepfake detection. 
+
+D. Additional Discussions on CNN-based LAA-X: LAA-Net 
+
+Ablation Study of the LAA-Net’s Components. Table VI reports the cross-dataset performance of LAA-Net when dis-carding the following components: E-FPN, the consistency branch denoted by C and the heatmap branch denoted by H. The best performance is reached when all the components are integrated. It can be seen that the proposed explicit attention mechanism through the heatmap branch contributes more to improving the result. A qualitative example visualizing Grad-CAMs [98] with different components of LAA-Net is also given in Figure 10. The illustration clearly shows that by combining the three components, the network activates more precisely the blending region. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 13 
+
+TABLE VII: Sensitivity analysis. The impact of the hyperpa-rameters λ1 and λ2 using the cross-dataset protocol on three datasets in terms of AUC. 
+
+λ1 λ2 Test Set AUC (%) CDF2 DFDCP DFW Avg. 1 1 90.69 78.12 70.98 79.93 10 10 95.73 85.87 73.56 85.05 100 100 93.72 78.60 75.25 82.52 100 10 93.05 83.86 76.72 84.54 10 100 95.40 86.94 80.03 87.46 
+
+Sensitivity Analysis. In this subsection, we analyze the impact of the two hyperparameters λ1 and λ2 given in Eq. (8). Table VII shows the experimental results for different values of 
+
+λ1 and λ2. It can be noted that our model is robust to different hyperparameter values, with the best average performance obtained with λ1 = 10 and λ2 = 100 .
+
+Qualitative Results: E-FPN versus FPN. A qualitative comparison between the proposed E-FPN and the traditional FPN with different fusion settings is reported in Figure 11. Using EFN-B4 as our backbone, the F(6) refers to the features extracted from the last convolution block in the backbone. In other words, this means that no FPN design is integrated. By gradually aggregating features from lower to higher resolution layers, we can observe the improvement of the forgery local-ization ability for both E-FPN and FPN. More notably, E-FPN produces more precise activations on the blending boundaries as compared to FPN. This can be explained by the fact that the E-FPN integrates a filtering mechanism for learning less noise. In contrast, FPN seems to consider regions outside the blending boundary, which results in lower performance as previously shown in Table V. Input  F F F F
+
+F   
+
+> FPN E-FPN
+> (6)
+> (5) (4) (3) (2)
+
+Fig. 11: Visualization of saliency maps using E-FPN and 
+
+FPN with different integration of multi-scale layers. We can see that E-FPN can focus better on artifacts as compared to FPN. The setup details are provided in Table V. 
+
+E. Additional Discussions on Transformer-based LAA-X: LAA-Former 
+
+Effect of Patch Size. As shown in Figure 6b, patch size has a clear effect on ViT’s learning capability under different train-ing configurations. In this section, we further investigate the impact of patch size on generalization performance by varying the input resolution and patch size of LAA-Former trained on FF++ [3] and tested on unseen deepfakes. Table VIII presents the cross-dataset evaluation results across several datasets [19], [42]–[45]. We observe that either reducing the patch size or TABLE VIII: Effect of input resolution and patch size. 
+
+Res. & Pat. Test set AUC (%) FF++ CDF2 DFD DFW DFDCP DFDC Avg. 
+
+112 P16 81.83 85.26 73.56 76.87 93.28 72.53 80.56 
+
+112 P8 97.67 94.45 96.12 81.74 96.30 78.91 90.87 
+
+224 P8 99.93 96.84 99.54 82.11 96.99 79.01 92.40 
+
+TABLE IX: Ablation study of LAA-Former’s components.                                                                                                                                  
+
+> Model Lr L2-Att Test set AUC (%) FF++ CDF2 DFD DFDC Avg. ViT [29] (w/ SBI) 1×10 −3×68.86 67.29 60.58 61.32 64.51 LAA-Former ✓73.52 71.78 65.34 62.51 68.29 ( ↑3.78) ViT [29] (w/ SBI) 5×10 −4×75.68 72.99 57.19 62.38 67.06 LAA-Former ✓80.08 87.45 65.62 71.04 76.05 ( ↑8.99)
+> ViT [29] (w/ SBI) 1×10 −4×95.99 89.27 89.71 78.50 88.36 LAA-Former ✓96.14 95.20 91.14 78.85 90.33 ( ↑1.97) ViT [29] (w/ SBI) 5×10 −5×97.48 92.62 95.72 77.35 90.79 LAA-Former ✓97.67 94.45 96.12 78.91 91.79 (↑1.00) Swin [32] (w/ SBI) 1×10 −3×99.48 81.37 96.05 66.69 85.89 LAA-Swin ✓99.88 94.91 97.17 74.33 91.57 ( ↑5.68 )Swin [32] (w/ SBI) 5×10 −4×99.98 89.00 98.94 71.15 89.76 LAA-Swin ✓99.97 95.43 99.58 74.97 92.49 ( ↑2.73) Swin [32] (w/ SBI) 1×10 −4×99.89 90.18 99.54 73.38 90.74 LAA-Swin ✓99.98 93.87 99.62 77.92 92.85 ( ↑2.11) Swin [32] (w/ SBI) 5×10 −5×99.75 90.89 99.59 74.20 91.11 LAA-Swin ✓99.89 94.48 99.68 77.47 92.88 (↑1.77)
+
+increasing the input resolution improves model performance, confirming the importance of patch size in transformer-based architectures for extracting localized features in deepfake detection. 
+
+Ablation study of LAA-Former’s components. The plug-and-play L2-Att plays a crucial role in explicitly guiding ViT [29]/Swin [32] to attend to artifact-prone vulnerable patches. To validate its impact in our proposed architectures, we compare the baseline models (w/o L2-Att) with LAA-Former (ViT+L2-Att)/LAA-Swin (Swin+L2-Att). All models are trained with SBI [14]. The results on several datasets [3], [19], [42], [45] are presented in Table IX. As shown, L2-Att consistently contributes to the enhancement of both ViT and Swin, confirming the relevance of the proposed explicit attention mechanism. 
+
+Vulnerable Points versus Vulnerable Patches. To demon-strate the compatibility of vulnerable patches (VPatch) as compared to vulnerable points (Vpoint) with transformers, we report in Table X the obtained results when replacing TABLE X: Vulnerable Patches (V-Patch) vs. Vulnerable Points (V-Point).                                  
+
+> Model Target #Para. FLOPs Test set AUC(%) CDF2 DFD DFDC Avg. LAA-Former V-Point 23.61M 9.4G 93.39 93.70 77.71 88.26 V-Patch 22.77M 8.9G 94.45 96.12 78.91 89.83( ↑1.67)
+> LAA-Swin V-Point 57.25M 8.1G 94.25 99.30 74.99 89.51 V-Patch 54.89M 6.5G 94.48 99.68 77.47 90.54( ↑1.03)
+
+TABLE XI: Selection of f2.
+
+f2 Test set AUC (%) CDF2 DFD DFW DFDC Avg. mean 94.16 95.03 81.02 78.28 87.12 max 94.45 96.12 81.74 78.91 87.81( ↑0.69) JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 14 
+
+TABLE XII: Impact of loss balancing factor λatt (Eq. (15) .                
+
+> λatt Test set AUC (%) CDF2 DFD DFDC Avg. 193.67 94.62 77.91 88.73 10 94.45 96.12 78.91 89.83
+> 100 94.96 94.88 78.58 89.47
+
+VPatch with VPoint within LAA-Former and LAA-Swin. It can be observed that the use of VPatch not only results in better performance but also maintains a relatively lower computational cost as compared to VPoint. We note that the higher number of parameters and FLOPs associated with using VPoint is caused by a decoder designed to locate these points. Meanwhile, VPatch does not incur any decoders, making it more computationally efficient. 
+
+Selection of f2. Table XI compares two aggregation functions 
+
+f2 defined in Section III-A coupled with LAA-Former: mean 
+
+and max operations. In both cases, the stability of the results can be seen. By default, we select the max operation as it gives slightly better results. In future works, we plan to investigate further selections of f2, e.g., learnable alternatives. 
+
+Learning Rate Sensitivity. In addition to the variations of patch size analyzed in Section IV-E and Section III-C1, we hypothesize that the learning rate (Lr) may also affect the learning capability of transformer architectures, especially when training with HQ pseudo-fakes such as SBI [14], which enclose subtle forgeries. To analyze this, we keep the training protocol fixed and vary Lr values for LAA-Former, LAA-Swin, and their plain counterparts. The evaluation results on four datasets [3], [19], [42], [45] are reported in Table IX. We observe that, for larger Lr values, the plain ViTs struggle to learn robust representations, leading to poor cross-dataset generalization. By contrast, the hierarchical design of Swin allows it to capture localized features more effectively and thus maintain relatively stable performance across all four datasets. Interestingly, integrating L2-Att consistently improves the generalizability of both ViT and Swin across all tested Lr values, with the gains being particularly noticeable at higher learning rates. This further highlights the impact of L2-Att in the context of deepfake detection. 
+
+Impact of Loss Balancing Factor λatt . The weight λatt 
+
+defined in Eq. (15) is set empirically to 10 as it yields the best performance on average. We report the results using different values of λatt within LAA-Former in Table XII. It can be observed that the generalization across four testing benchmarks remains robust regardless of the value of λatt .V. C ONCLUSION 
+
+This paper introduces a unified, localized, artifact-aware attention learning framework called LAA-X for fine-grained deepfake detection. It aims at detecting HQ deepfakes while ensuring generalizability to unseen manipulations. The main idea represents the introduction of a multi-task learning frame-work that incorporates auxiliary tasks, enforcing explicit at-tention to artifact-prone fine regions referred to as vulnerable regions. The latter are defined as the areas that are the most impacted by blending artifacts and are estimated by leveraging blending-based data synthesis techniques. We demonstrate that the proposed framework is architecture-agnostic and can be generalized to both CNN and Transformer architectures with small adaptations, resulting in two families, including LAA-Net and LAA-Former, respectively. Extensive evaluation and discussion on several challenging benchmarks demonstrate the superior performance of LAA-X as compared to SOTA meth-ods. In future work, we will investigate strategies to extend the vulnerability concept to forgeries that do not necessarily exhibit blending artifacts, as well as to videos, to better capture spatio-temporal artifacts. 
+
+Acknowledgment 
+
+This work is supported by the Luxem-bourg National Research Fund, under the BRIDGES2021/IS/16353350/FaKeDeTeR and UNFAKE, ref.16763798 projects, and by POST Luxembourg. Experiments were performed on the Luxembourg national supercomputer MeluXina. The authors gratefully acknowledge the LuxProvide teams for their expert support. REFERENCES [1] J. Wakefield, “Deepfake presidents used in Russia-Ukraine war,” https: //www.bbc.com/news/technology-60780142, 2022, [Online; accessed 7-March-2023]. [2] S. Cahlan, “How misinformation helped spark an attempted coup in Gabon,” https://wapo.st/3KZARDF, 2020, [Online; accessed 7-March-2023]. [3] A. R¨ ossler, D. Cozzolino, L. Verdoliva, C. Riess, J. Thies, and M. Nießner, “FaceForensics++: Learning to detect manipulated facial images,” in International Conference on Computer Vision (ICCV) , 2019. [4] D. Afchar, V. Nozick, J. Yamagishi, and I. Echizen, “Mesonet: a compact facial video forgery detection network,” CoRR , vol. abs/1809.00888, 2018. [Online]. Available: http://arxiv.org/abs/1809.00888 [5] R. Wang, L. Ma, F. Juefei-Xu, X. Xie, J. Wang, and Y. Liu, “Fakespotter: A simple baseline for spotting ai-synthesized fake faces,” CoRR , vol. abs/1909.06122, 2019. [Online]. Available: http: //arxiv.org/abs/1909.06122 [6] Y. Qian, G. Yin, L. Sheng, Z. Chen, and J. Shao, “Thinking in frequency: Face forgery detection by mining frequency-aware clues,” in European conference on computer vision . Springer, 2020, pp. 86–103. [7] H. H. Nguyen, J. Yamagishi, and I. Echizen, “Capsule-forensics: Using capsule networks to detect forged images and videos,” CoRR , vol. abs/1810.11215, 2018. [Online]. Available: http://arxiv.org/abs/1810. 11215 [8] B. Kaddar, S. A. Fezza, Z. Akhtar, W. Hamidouche, A. Hadid, and J. Serra-Sagrist` a, “Deepfake detection using spatiotemporal trans-former,” ACM Transactions on Multimedia Computing, Communications and Applications , vol. 20, no. 11, pp. 1–21, 2024. [9] D. A. Coccomini, N. Messina, C. Gennaro, and F. Falchi, “Combining efficientnet and vision transformers for video deepfake detection,” in            
+
+> Image Analysis and Processing – ICIAP 2022 , S. Sclaroff, C. Distante, M. Leo, G. M. Farinella, and F. Tombari, Eds. Cham: Springer International Publishing, 2022, pp. 219–229. [10] H. Jeon, Y. Bang, and S. S. Woo, “Fdftnet: Facing off fake images using fake detection fine-tuning network,” in IFIP international conference on ICT systems security and privacy protection .Springer, 2020, pp. 416– 430. [11] T. Wang, H. Cheng, K. P. Chow, and L. Nie, “Deep convolutional pooling transformer for deepfake detection,” ACM Trans. Multimedia Comput. Commun. Appl. , vol. 19, no. 6, 2023. [12] D. Zhang, F. Lin, Y. Hua, P. Wang, D. Zeng, and S. Ge, “Deepfake video detection with spatiotemporal dropout transformer,” in Proceedings of the 30th ACM international conference on multimedia , 2022, pp. 5833– 5841. [13] H. Zhao, W. Zhou, D. Chen, T. Wei, W. Zhang, and N. Yu, “Multi-attentional deepfake detection,” in Proceedings of the IEEE/CVF confer-ence on computer vision and pattern recognition , 2021, pp. 2185–2194. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 15
+
+[14] K. Shiohara and T. Yamasaki, “Detecting deepfakes with self-blended images,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 18 720–18 729. [15] J. Cao, C. Ma, T. Yao, S. Chen, S. Ding, and X. Yang, “End-to-end reconstruction-classification learning for face forgery detection,” in 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022, pp. 4103–4112. [16] S. Dong, J. Wang, R. Ji, J. Liang, H. Fan, and Z. Ge, “Implicit identity leakage: The stumbling block to improving deepfake detection gener-alization,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2023, pp. 3994–4004. [17] A. Luo, R. Cai, C. Kong, Y. Ju, X. Kang, J. Huang, and A. C. K. Life, “Forgery-aware adaptive learning with vision transformer for generalized face forgery detection,” IEEE Transactions on Circuits and Systems for Video Technology , 2024. [18] X. Cui, Y. Li, A. Luo, J. Zhou, and J. Dong, “Forensics adapter: Adapting clip for generalizable face forgery detection,” in Proceedings of the Computer Vision and Pattern Recognition Conference , 2025, pp. 19 207–19 217. [19] Y. Li, X. Yang, P. Sun, H. Qi, and S. Lyu, “Celeb-df: A large-scale challenging dataset for deepfake forensics,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2020. [20] L. Chen, Y. Zhang, Y. Song, L. Liu, and J. Wang, “Self-supervised learn-ing of adversarial example: Towards good generalizations for deepfake detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2022, pp. 18 710–18 719. [21] L. Li, J. Bao, T. Zhang, H. Yang, D. Chen, F. Wen, and B. Guo, “Face x-ray for more general face forgery detection,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2020. [22] E. Zhao, X. Xu, M. Xu, H. Ding, Y. Xiong, and W. Xia, “Learning self-consistency for deepfake detection,” in ICCV 2021 ,2021. [Online]. Available: https://www.amazon.science/publications/ learning-self-consistency-for-deepfake-detection [23] D. Nguyen, N. Mejri, I. P. Singh, P. Kuleshova, M. Astrid, A. Kacem, E. Ghorbel, and D. Aouada, “Laa-net: Localized artifact attention network for quality-agnostic and generalizable deepfake detection,” in 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2024, pp. 17 395–17 405. [24] D. Nguyen, M. Astrid, A. Kacem, E. Ghorbel, and D. Aouada, “Vulnerability-aware spatio-temporal learning for generalizable deepfake video detection,” in Proceedings of the IEEE/CVF International Con-ference on Computer Vision (ICCV) , October 2025, pp. 10 786–10 796. [25] M. Tan and Q. V. Le, “Efficientnet: Rethinking model scaling for convolutional neural networks,” CoRR , vol. abs/1905.11946, 2019. [Online]. Available: http://arxiv.org/abs/1905.11946 [26] F. Chollet, “Xception: Deep learning with depthwise separable convolu-tions,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2017, pp. 1251–1258. [27] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” CoRR , vol. abs/1512.03385, 2015. [Online]. Available: http://arxiv.org/abs/1512.03385 [28] Y. Wang, K. Yu, C. Chen, X. Hu, and S. Peng, “Dynamic graph learning with content-guided spatial-frequency relation reasoning for deepfake detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2023, pp. 7278–7287. [29] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, J. Uszkoreit, and N. Houlsby, “An image is worth 16x16 words: Trans-formers for image recognition at scale,” CoRR , vol. abs/2010.11929, 2020. [30] H. Touvron, M. Cord, M. Douze, F. Massa, A. Sablayrolles, and H. J´ egou, “Training data-efficient image transformers & distillation through attention,” CoRR , vol. abs/2012.12877, 2020. [31] X. Chu, Z. Tian, Y. Wang, B. Zhang, H. Ren, X. Wei, H. Xia, and C. Shen, “Twins: Revisiting the design of spatial attention in vision transformers,” in Neural Information Processing Systems ,2021. [Online]. Available: https://api.semanticscholar.org/CorpusID: 234364557 [32] Z. Liu, Y. Lin, Y. Cao, H. Hu, Y. Wei, Z. Zhang, S. Lin, and B. Guo, “Swin transformer: Hierarchical vision transformer using shifted windows,” CoRR , vol. abs/2103.14030, 2021. [33] A. Hassani, S. Walton, J. Li, S. Li, and H. Shi, “Neighborhood attention transformer,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2023, pp. 6185–6194. [34] S. Abnar and W. Zuidema, “Quantifying attention flow in transformers,” in Annual Meeting of the Association for Computational Linguistics ,2020. [Online]. Available: https://api.semanticscholar.org/CorpusID: 218487351 [35] Z. Yan, Y. Zhang, Y. Fan, and B. Wu, “Ucf: Uncovering common features for generalizable deepfake detection,” in Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , Oc-tober 2023, pp. 22 412–22 423. [36] L. Chen, Y. Zhang, Y. Song, J. Wang, and L. Liu, “Ost: Improving generalization of deepfake detection via one-shot test-time training,” in Advances in Neural Information Processing Systems , S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh, Eds., vol. 35. Curran Associates, Inc., 2022, pp. 24 597–24 610. [Online]. Available: https://proceedings.neurips.cc/paper files/paper/ 2022/file/9bf0810a4a1597a36d27ceea58667d92-Paper-Conference.pdf [37] K. Lin, Y. Lin, W. Li, T. Yao, and B. Li, “Standing on the shoulders of giants: Reprogramming visual-language model for general deepfake detection,” in Proceedings of the AAAI Conference on Artificial Intelli-gence , vol. 39, no. 5, 2025, pp. 5262–5270. [38] X. Fu, Z. Yan, T. Yao, S. Chen, and X. Li, “Exploring unbiased deepfake detection via token-level shuffling and mixing,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 39, no. 3, 2025, pp. 3040–3048. [39] A. Khormali and J.-S. Yuan, “Dfdt: An end-to-end deepfake detection framework using vision transformer,” Applied Sciences , 2022. [Online]. Available: https://api.semanticscholar.org/CorpusID:247495859 [40] L. Ma, X. Jia, Q. Sun, B. Schiele, T. Tuytelaars, and L. Van Gool, “Pose guided person image generation,” Advances in neural information processing systems , vol. 30, 2017. [41] Z. Wang, A. Bovik, H. Sheikh, and E. Simoncelli, “Image quality assess-ment: from error visibility to structural similarity,” IEEE Transactions on Image Processing , vol. 13, no. 4, pp. 600–612, 2004. [42] N. Dufour and A. Gully, “Contributing data to deepfake detection research,” https://ai.googleblog.com/2019/09/ contributing-data-to-deepfake-detection.html, 2019. [43] B. Zi, M. Chang, J. Chen, X. Ma, and Y.-G. Jiang, “Wilddeepfake: A challenging real-world dataset for deepfake detection,” Proceedings of the 28th ACM International Conference on Multimedia , 2020. [44] B. Dolhansky, R. Howes, B. Pflaum, N. Baram, and C. Canton-Ferrer, “The deepfake detection challenge (DFDC) preview dataset,” CoRR ,vol. abs/1910.08854, 2019. [Online]. Available: http://arxiv.org/abs/ 1910.08854 [45] B. Dolhansky, J. Bitton, B. Pflaum, J. Lu, R. Howes, M. Wang, and C. Canton-Ferrer, “The deepfake detection challenge dataset,” CoRR ,vol. abs/2006.07397, 2020. [Online]. Available: https://arxiv.org/abs/ 2006.07397 [46] Z. Yan, T. Yao, S. Chen, Y. Zhao, X. Fu, J. Zhu, D. Luo, C. Wang, S. Ding, Y. Wu et al. , “Df40: Toward next-generation deepfake detec-tion,” Advances in Neural Information Processing Systems , vol. 37, pp. 29 387–29 434, 2024. [47] Z. Chen, K. Sun, Z. Zhou, X. Lin, X. Sun, L. Cao, and R. Ji, “Diffusionface: Towards a comprehensive dataset for diffusion-based face forgery analysis,” arXiv preprint arXiv:2403.18471 , 2024. [48] B. M. Le and S. S. Woo, “Quality-agnostic deepfake detection with intra-model collaborative learning,” in Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , October 2023, pp. 22 378–22 389. [49] S. Chen, T. Yao, H. Liu, X. Sun, S. Ding, R. Ji et al. , “Diffusionfake: Enhancing generalization in deepfake detection via guided stable diffu-sion,” Advances in Neural Information Processing Systems , vol. 37, pp. 101 474–101 497, 2024. [50] S. Chen, T. Yao, Y. Chen, S. Ding, J. Li, and R. Ji, “Local relation learning for face forgery detection,” in AAAI Conference on Artificial Intelligence , 2021. [51] J. Liang, H. Shi, and W. Deng, “Exploring disentangled content infor-mation for face forgery detection,” in European conference on computer vision . Springer, 2022, pp. 128–145. [52] H. Kashiani, N. A. Talemi, and F. Afghah, “Freqdebias: Towards generalizable deepfake detection via consistency-driven frequency debi-asing,” in Proceedings of the Computer Vision and Pattern Recognition Conference (CVPR) , June 2025, pp. 8775–8785. [53] H. Li, J. Zhou, Y. Li, B. Wu, B. Li, and J. Dong, “Freqblender: Enhancing deepfake detection by blending frequency knowledge,” in 
+
+Advances in Neural Information Processing Systems , A. Globerson, L. Mackey, D. Belgrave, A. Fan, U. Paquet, J. Tomczak, and C. Zhang, Eds., vol. 37. Curran Associates, Inc., 2024, pp. 44 965–44 988. [Online]. Available: https://proceedings.neurips.cc/paper files/paper/ 2024/file/4f92d2f498b88f1bd43732312272967a-Paper-Conference.pdf JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 16 
+
+[54] W. Bai, Y. Liu, Z. Zhang, B. Li, and W. Hu, “Aunet: Learning relations between action units for face forgery detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2023, pp. 24 709–24 719. [55] N. Carion, F. Massa, G. Synnaeve, N. Usunier, A. Kirillov, and S. Zagoruyko, “End-to-end object detection with transformers,” CoRR ,vol. abs/2005.12872, 2020. [56] Y. Xu, J. Zhang, Q. Zhang, and D. Tao, “ViTPose: Simple vision transformer baselines for human pose estimation,” in Advances in Neural Information Processing Systems , 2022. [57] K. He, X. Chen, S. Xie, Y. Li, P. Doll´ ar, and R. Girshick, “Masked au-toencoders are scalable vision learners,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2022, pp. 16 000–16 009. [58] Y.-J. Heo, W.-H. Yeo, and B.-G. Kim, “Deepfake detection algorithm based on improved vision transformer,” Applied Intelligence , vol. 53, no. 7, pp. 7512–7527, 2023. [59] D. Wodajo and S. Atnafu, “Deepfake video detection using convolutional vision transformer,” arXiv preprint arXiv:2102.11126 , 2021. [60] S. A. Khan and H. Dai, “Video transformer for deepfake detection with incremental learning,” in Proceedings of the 29th ACM international conference on multimedia , 2021, pp. 1821–1828. [61] J. Wang, Z. Wu, W. Ouyang, X. Han, J. Chen, Y.-G. Jiang, and S.-N. Li, “M2tr: Multi-modal multi-scale transformers for deepfake detection,” in Proceedings of the 2022 international conference on multimedia retrieval , 2022, pp. 615–623. [62] X. Dong, J. Bao, D. Chen, T. Zhang, W. Zhang, N. Yu, D. Chen, F. Wen, and B. Guo, “Protecting celebrities from deepfake with identity consistency transformer,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2022, pp. 9468–9478. [63] S. Usmani, S. Kumar, and D. Sadhya, “Efficient deepfake detection using shallow vision transformer,” Multimedia Tools and Applications , vol. 83, no. 4, pp. 12 339–12 362, 2024. [64] Y. Xu, J. Liang, G. Jia, Z. Yang, Y. Zhang, and R. He, “Tall: Thumbnail layout for deepfake video detection,” in Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , October 2023, pp. 22 658–22 668. [65] H. Zhao, W. Zhou, D. Chen, W. Zhang, and N. Yu, “Self-supervised transformer for deepfake detection,” arXiv preprint arXiv:2203.01265 ,2022. [66] C. Zhao, C. Wang, G. Hu, H. Chen, C. Liu, and J. Tang, “Istvt: interpretable spatial-temporal video transformer for deepfake detection,” 
+
+IEEE Transactions on Information Forensics and Security , vol. 18, pp. 1335–1348, 2023. [67] Z. Yan, Y. Zhao, S. Chen, M. Guo, X. Fu, T. Yao, S. Ding, Y. Wu, and L. Yuan, “Generalizing deepfake video detection with plug-and-play: Video-level blending and spatiotemporal adapter tuning,” in Proceedings of the Computer Vision and Pattern Recognition Conference , 2025, pp. 12 615–12 625. [68] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark et al. , “Learning transferable visual models from natural language supervision,” in International conference on machine learning . PmLR, 2021, pp. 8748–8763. [69] E. J. Hu, Y. Shen, P. Wallis, Z. Allen-Zhu, Y. Li, S. Wang, L. Wang, W. Chen et al. , “Lora: Low-rank adaptation of large language models.” 
+
+ICLR , vol. 1, no. 2, p. 3, 2022. [70] Y. Guo, L. Zhang, Y. Hu, X. He, and J. Gao, “Ms-celeb-1m: A dataset and benchmark for large-scale face recognition,” in 
+
+European Conference on Computer Vision , 2016. [Online]. Available: https://api.semanticscholar.org/CorpusID:2908606 [71] Z. Gu, Y. Chen, T. Yao, S. Ding, J. Li, and L. Ma, “Delving into the local: Dynamic inconsistency learning for deepfake video detection,” in 
+
+Proceedings of the AAAI conference on artificial intelligence , vol. 36, no. 1, 2022, pp. 744–752. [72] Y. Li and S. Lyu, “Exposing deepfake videos by detecting face warping artifacts,” in IEEE Conference on Computer Vision and Pattern Recog-nition Workshops (CVPRW) , 2019. [73] H. Law and J. Deng, “Cornernet: Detecting objects as paired keypoints,” 
+
+International Journal of Computer Vision , vol. 128, pp. 642–656, 2018. [74] T. Lin, P. Goyal, R. B. Girshick, K. He, and P. Doll´ ar, “Focal loss for dense object detection,” CoRR , vol. abs/1708.02002, 2017. [Online]. Available: http://arxiv.org/abs/1708.02002 [75] T.-Y. Lin, P. Doll´ ar, R. Girshick, K. He, B. Hariharan, and S. Belongie, “Feature pyramid networks for object detection,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2017, pp. 2117–2125. [76] Z. Tian, C. Shen, H. Chen, and T. He, “FCOS: fully convolutional one-stage object detection,” CoRR , vol. abs/1904.01355, 2019. [Online]. Available: http://arxiv.org/abs/1904.01355 [77] S. S. Seferbekov, V. I. Iglovikov, A. V. Buslaev, and A. A. Shvets, “Feature pyramid network for multi-class land segmentation,” CoRR ,vol. abs/1806.03510, 2018. [Online]. Available: http://arxiv.org/abs/ 1806.03510 [78] B. O. Ayinde, T. Inanc, and J. M. Zurada, “Regularizing deep neural net-works by enhancing diversity in feature extraction,” IEEE transactions on neural networks and learning systems , vol. 30, no. 9, pp. 2650–2661, 2019. [79] W. Wang, E. Xie, X. Li, D.-P. Fan, K. Song, D. Liang, T. Lu, P. Luo, and L. Shao, “Pyramid vision transformer: A versatile backbone for dense prediction without convolutions,” 2021 IEEE/CVF International Conference on Computer Vision (ICCV) , pp. 548–558, 2021. [Online]. Available: https://api.semanticscholar.org/CorpusID:232035922 [80] Deepfakes, “Faceswapdevs,” https://github.com/deepfakes/faceswap, 2019. [81] M. Kowalski, “Faceswap,” https://github.com/MarekKowalski/ FaceSwap, 2018. [82] J. Thies, M. Zollh¨ ofer, M. Stamminger, C. Theobalt, and M. Nießner, “Face2face: Real-time face capture and reenactment of RGB videos,” 
+
+CoRR , vol. abs/2007.14808, 2020. [Online]. Available: https://arxiv.org/ abs/2007.14808 [83] J. Thies, M. Zollh¨ ofer, and M. Nießner, “Deferred neural rendering: Image synthesis using neural textures,” CoRR , vol. abs/1904.12356, 2019. [Online]. Available: http://arxiv.org/abs/1904.12356 [84] B.-S. Hua, M.-K. Tran, and S.-K. Yeung, “Pointwise convolutional neural networks,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2018, pp. 984–993. [85] Z. Yan, Y. Luo, S. Lyu, Q. Liu, and B. Wu, “Transcending forgery specificity with latent space augmentation for generalizable deepfake detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2024, pp. 8984–8994. [86] Z. Wang, J. Bao, W. Zhou, W. Wang, and H. Li, “Altfreezing for more general video face forgery detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2023, pp. 4129–4138. [87] J. Deng, J. Guo, Y. Zhou, J. Yu, I. Kotsia, and S. Zafeiriou, “Reti-naface: Single-stage dense face localisation in the wild,” CoRR , vol. abs/1905.00641, 2019. [88] D. E. King, “Dlib-ml: A machine learning toolkit,” J. Mach. Learn. Res. ,vol. 10, p. 1755–1758, dec 2009. [89] P. Foret, A. Kleiner, H. Mobahi, and B. Neyshabur, “Sharpness-aware minimization for efficiently improving generalization,” CoRR , vol. abs/2010.01412, 2020. [Online]. Available: https://arxiv.org/abs/2010. 01412 [90] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei, “Imagenet: A large-scale hierarchical image database,” 2009 IEEE Conference on Computer Vision and Pattern Recognition , pp. 248–255, 2009. [91] I. Loshchilov and F. Hutter, “Decoupled weight decay regularization,” in 
+
+International Conference on Learning Representations , 2017. [Online]. Available: https://api.semanticscholar.org/CorpusID:53592270 [92] M. Caron, H. Touvron, I. Misra, H. J´ egou, J. Mairal, P. Bojanowski, and A. Joulin, “Emerging properties in self-supervised vision transformers,” in Proceedings of the IEEE/CVF international conference on computer vision , 2021, pp. 9650–9660. [93] Z. Zhong, L. Zheng, G. Kang, S. Li, and Y. Yang, “Random erasing data augmentation,” in Proceedings of the AAAI conference on artificial intelligence , vol. 34, no. 07, 2020, pp. 13 001–13 008. [94] R. M¨ uller, S. Kornblith, and G. E. Hinton, “When does label smoothing help?” Advances in neural information processing systems , vol. 32, 2019. [95] S.-Y. Wang, O. Wang, R. Zhang, A. Owens, and A. A. Efros, “Cnn-generated images are surprisingly easy to spot... for now,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,2020, pp. 8695–8704. [96] A. Haliassos, K. Vougioukas, S. Petridis, and M. Pantic, “Lips don’t lie: A generalisable and robust approach to face forgery detection,” CoRR ,vol. abs/2012.07657, 2020. [97] L. Jiang, R. Li, W. Wu, C. Qian, and C. C. Loy, “DeeperForensics-1.0: A large-scale dataset for real-world face forgery detection,” in CVPR ,2020. [98] R. R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, and D. Batra, “Grad-cam: Visual explanations from deep networks via gradient-based localization,” in Proceedings of the IEEE international conference on computer vision , 2017, pp. 618–626. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 17 
+
+Dat NGUYEN received the Engineer’s Degree in software engineering from the Military Technical Academy (MTA), Hanoi, Vietnam, and the MSc degree in computer science from the Vietnam Na-tional University (VNU), Hanoi, Vietnam. He is currently working toward the PhD degree at the Computer Vision, Imaging and Machine Intelligence (CVI2) Research Group, Interdisciplinary Centre for Security, Reliability and Trust (SnT), University of Luxembourg, Luxembourg. Prior to his PhD stud-ies, he was a Senior Research Engineer at VinAI Research (now Qualcomm AI Research Vietnam), where he worked on AI perception models for autonomous driving. His research interests include computer vision, pattern recognition, and machine learning. He has authored papers at premier venues, including CVPR, ICCV, etc, and has served as a reviewer for these conferences. 
+
+Enjie GHORBEL is an Assistant Professor at ENSI, University of Manouba, and a member of the CRISTAL laboratory. She is also a Research Fellow with the CVI2 research group at the Interdisciplinary Centre for Security, Reliability and Trust (SnT), University of Luxembourg. Prior to this role, she served as a Research Scientist at CVI2, SnT, Uni-versity of Luxembourg until 2023. She obtained her HDR in 2025 and her PhD in Computer Science in 2017, both from the University of Rouen Normandie, as well as an engineering diploma from ENISO, University of Sousse, in 2014. Throughout her career, she has contributed to the acquisition and implementation of several national, international, and industrial research projects. Her research interests lie in computer vision and pattern recognition, with applications including human action recognition, deepfake detection, and pose estimation. 
+
+Anis KACEM is a permanent Research Scientist in Computer Vision, Imaging, and Machine Intel-ligence (CVI2) at the Interdisciplinary Centre for Security, Reliability and Trust (SnT), University of Luxembourg, and serves as Deputy Head of CVI2 research group. He holds a Computer Science Engineering degree from the National Institute of Applied Sciences and Technology (INSAT), Tunisia, obtained in 2014, and received his Ph.D. in Com-puter Science from the University of Lille, France, in 2018, with a thesis focused on geometric approaches for human behavior understanding from visual data. His research interests span computer vision and machine learning, with particular emphasis on 3D perception. He leads numerous research activities in close collaboration with industrial partners, fostering the transfer of advanced research into real-world applications. He has been a co-organizer of four editions of the SHARP workshop series, held in conjunction with ECCV 2020, CVPR 2021, CVPR 2022, and ICCV 2023, and has served on the technical program committees of several international workshops, including ManLearn (ICCV 2017), 3DHU (ICPR 2020), AI4Space (ECCV 2022 and CVPR 2024), and LFA (FG 2023). He regularly serves as a reviewer for top-tier AI and computer vision venues, including NeurIPS, CVPR, ECCV, and ICCV. 
+
+Marcella ASTRID received her BEng in Computer Engineering from Multimedia Nusantara University, Tangerang, Indonesia, in 2015. She obtained her MEng in Computer Software and her PhD in Ar-tificial Intelligence from the University of Science and Technology (UST), Daejeon, Korea, in 2017 and 2023, respectively. She was subsequently affiliated with the University of Luxembourg as a Postdoc-toral Researcher from 2023 to 2025, where this research was conducted. She is currently affiliated with Helmholtz AI at Helmholtz Center Munich, Germany, as a health-focused AI consultant. Her current research interests include anomaly detection and computer vision. 
+
+Djamila AOUADA is Deputy Director at the Uni-versity of Luxembourg’s Interdisciplinary Centre for Security, Reliability, and Trust (SnT). She is founder and head of the Computer Vision, Imaging and Ma-chine Intelligence (CVI2) Research Group. She also heads the SnT Computer Vision Laboratory and co-heads the SnT Zero-G Laboratory. Having received her engineering degree in electronics from the ´ Ecole Nationale Polytechnique (ENP), Algiers, Algeria, and the Ph.D. degree in computer vision from North Carolina State University (NCSU), Raleigh, NC, USA, Djamila took up the challenge to come to Luxembourg to establish a leading research program in the field of computer vision at the newly founded SnT. Today her research group numbers some 30 researchers. She regularly serves the research community as a reviewer, Editor, Associate Editor, Chair, Area or Program Chair. She is the founder of the SHARP Workshop and chair of its four editions at ECCV 2020, CVPR 2021, CVPR 2022, and ICCV 2023. She has worked as a consultant for multiple renowned laboratories (Los Alamos National Laboratory, Alcatel Lucent Bell Labs., and Mitsubishi Electric Research Labs.). She co-authored over 150 scientific publications, has 4 patents and is the recipient of four IEEE best paper awards. She is a Senior member of the IEEE. Djamila is passionate about public outreach, particularly in promoting and encouraging women in STEAM. She served as the Chair of the IEEE Benelux Women in Engineering Affinity Group from 2014 to 2016, and has joined the Board of Directors of the Asteroid Foundation since April 2024. Since 2023, she has been appointed as member of the Algerian AI Board and the UK ART AI Board at the University of Bath for Accountable, Responsible and Transparent AI, further contributing to the advancement of AI initiatives. She served as awards chair in the last edition of EUVIP. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 18 
+
+SUPPLEMENTARY MATERIAL 
+
+A. Self-Consistency Loss 
+
+To clarify the calculation of the self-consistency loss, we show Figure 12, which illustrates the generation process of the predicted and the ground-truth, ˆC and C, respectively. The self-consistency loss is a binary cross entropy loss between ˆC
+
+and C.…
+
+…
+
+…    
+
+> …
+> Similarity function
+> Feature map Self -consistency prediction
+> ෠𝐂
+> Randomly select 1
+> vulnerable point
+> at 𝐩 𝑠
+> Self -consistency GT
+> 𝐂
+> Similarity function (Eq. (8))
+> TODO: change this figure to
+> match with reality
+> Blending mask
+> 𝐁
+
+Fig. 12: In order to generate the consistency map prediction 
+
+ˆC as well as the associated ground truth C, we first randomly select a vulnerable point located at ps ∈ P . For computing 
+
+ˆC, we measure the similarity between the feature at ps (red block) and the features generated from every point. Namely, we use the similarity function in [22]. As for C, we measure the consistency values between the pixel at the ps and all pixels in B, as also described in Eq. (7) of the manuscript. 
+
+B. Ground Truth Generation of Heatmaps 
+
+In this section, we provide more details regarding the generation of ground-truth heatmaps, described in Section III-B1-a of the main paper. Firstly, a k-th vulnerable point, denoted as pk, is selected, as shown in Figure 13 (i). Secondly, we measure the height and the width of the blending mask 
+
+B at the point pk shown as orange lines in Figure 13 (ii). Using the calculated distances, a virtual bounding box is created, indicated by the blue box in Figure 13 (iii). Then, we identify overlapping boxes, illustrated by dashed-line green boxes in Figure 13 (iv), with the Intersection over Union (IoU) greater than a threshold ( t = 0 .7) compared to the virtual bounding box. A radius rk (solid purple line in Figure 13 (v)) is calculated by forming a tight circle encompassing all these boxes. Finally, an Unnormalized Gaussian Distribution ,shown as a red circle in Figure 13 (vi), is generated with a standard deviation σk = 13 rk (Eq. (4) of the manuscript). The steps are repeated for every vulnerable point k ∈ [[1 , card (P)]] .The final H is the superimposition of all gkij .
+
+C. Additional Results 
+
+In addition to AUC, we provide results using additional metrics, namely, Average Precision (AP), Average Recall (AR), Accuracy (ACC), and mean F1-score (mF1). Table XIV and Table XIII report the results under the in-dataset and the cross-dataset settings, respectively. Overall, it can be seen that LAA-Net and LAA-Former achieve better performance than other state-of-the-art methods. 
+
+1) Qualitative Results - Gaussian Noise: In Table IV of the main manuscript, the performance of LAA-Net declined significantly when encountering Gaussian Noise perturbations. One possible reason is that the introduction of noise elevates the difficulty of detecting the vulnerable points. To confirm that, we report the inference of the heatmap before and after applying a Gaussian Noise on a facial image in Figure 14. As it can be observed, the detection of vulnerable points is highly impacted by the introduction of a Gaussian noise. 
+
+2) Robustness to Compression: To assess the robustness of LAA-Net to compression, we test LAA-Net on the c23 version of FF++, and the overall AUC is equal to 89 .30 %. 
+
+D. More Details regarding the training Setup in Section III-C1 
+
+In this section, we present more details related to the experimental settings in Section III-C1 of the main paper. In Figure 6-b, all models, including CNNs and variants of ViTs are trained on FF++ [3] with both real and fake data for 
+
+50 epochs. Following conventional spitting [3], we uniformly extract 128 and 32 frames of each video for training and validation, respectively. Hence, there are in total of 460800 
+
+and 22400 frames for the corresponding task. The weights of models are initialized by pretrained on ImageNet [90]. We employ different optimizers as Adam is often used with CNNs [13], [16], [20], [21], [28], [36] and AdamW with ViTs [30]–[32], [79]. The learning rate is initially set to 10 −4
+
+and linearly decays to 0 at the end of the training period. All experiments are carried out using a NVIDIA A100 GPU. 
+
+E. Architecture Details 
+
+We describe in detail the hyperparameters of the two con-sidered LAA-Former variants as follows:  
+
+> •
+
+LAA-Former-S: H = W = 112 , P = 8 , L = 12 , D =384 , MLP size = 1536 , No. Heads = 6 , Params = 23 M, FLOPs = 8 .9G.  
+
+> •
+
+LAA-Former-B: H = W = 224 , P = 16 , L = 12 , D =768 , MLP size = 3072 , No. Heads = 12 , Params = 91 M, FLOPs = 35 .8G. where the MLP size represents the dimension of hidden layers in MLP, the No. Heads denotes the number of heads in MHSA, 
+
+Params is the number of parameters, and FLOPs represents the computational cost in terms of floating point operations per second. For LAA-Swin architecture, we adopt these two backbone variants from Swin [32], namely:  
+
+> •
+
+LAA-Swin-S: H = W = 224 , P = 4 , M = 7 , d = 32 ,
+
+α = 4 , Ch = 96 , Layer Numbers = {2, 2, 18, 2 }, No. Heads = {3, 6, 12, 24 }, Params = 55 M, FLOPs = 6 .5G.  
+
+> •
+
+LAA-Swin-B: H = W = 224 , P = 4 , M = 7 , d = 32 ,
+
+α = 4 , Ch = 128 , Layer Numbers = {2, 2, 18, 2 }, No. Heads = {4, 8, 16, 32 }, Params = 91 M, FLOPs = 11 .5G. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 19 IoU ( , ) > 0.7 
+
+Heatmap GT 
+
+𝐇 
+
+(ii)  Getting virtual 
+
+object size 
+
+(iii)  Make a virtual 
+
+bounding box 
+
+(i) Given  k-th 
+
+vulnerable point 
+
+(iv)  Find all other 
+
+overlapping boxes 
+
+of same size 
+
+(v)  Find radius  𝑟 𝑘  (vi)  Unnormalized 
+
+Gaussian with  𝜎 𝑘 = 1
+
+3 𝑟 𝑘 
+
+TODO: change this 
+
+figure to match with 
+
+reality 
+
+𝐆 𝑖 
+
+𝑟 
+
+Fig. 13: The generation process of ground truth heatmaps by producing using an Unnormalized Gaussian Distribution given a selected vulnerable point. TABLE XIII: In-dataset and Cross-dataset evaluation in terms of AUC (%), AP (%), AR (%), and mF1 (%) at the video-level on multiple deepfake datasets. Results for comparison are directly extracted from the original papers. ∗ indicates our reproduced results using official pre-trained weights. Bold and Underlined highlight the best and the second-best performance, respectively.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+
+> Method Venue Training set Test set Real Fake FF++ CDF2 DFW DFD DFDCP DFDC AUC AUC AP AR mF1 AUC AP AR mF1 AUC AP AR mF1 AUC AP AR mF1 AUC AP AR mF1 Xception ∗[3] ICCV’19 ✓✓93.60 61.18 66.93 52.40 58.78 65.29 55.37 57.99 56.65 89.75 85.48 79.34 82.29 69.90 91.98 67.07 77.57 58.98 55.32 55.84 55.58 FaceXRay+BI [21] CVPR’20 ✓✓99.20 79.50 -------95.40 93.34 --65.50 -------Multi-attentional ∗[13] CVPR’21 ✓✓95.32 68.26 75.25 52.40 61.78 73.56 73.79 63.38 68.19 92.95 96.51 60.76 74.57 83.81 96.52 77.68 86.08 70.05 67.11 63.53 65.27 PCL+I2G [22] ICCV’21 ✓×99.11 90.03 -------99.07 ---74.27 ---67.52 ---RECCE ∗[15] CVPR’22 ✓✓99.56 70.93 70.35 59.48 64.46 68.16 54.41 56.59 55.48 98.26 79.42 69.57 74.17 80.98 92.75 70.69 80.23 71.19 68.97 63.53 66.14 SBI ∗[14] CVPR’22 ✓×98.23 85.55 77.81 68.13 72.65 67.47 55.87 55.82 55.85 96.04 92.79 89.49 91.11 82.22 93.24 71.58 80.99 69.77 72.25 54.87 62.37 DFDT [39] Appl.Sci.’22 ✓✓97.9 88.3 -----------76.1 -------SFDG [28] CVPR’23 ✓✓99.53 75.83 ---69.27 ---88.00 ---73.63 -------CADDM ∗[16] CVPR’23 ✓✓99.26 80.70 87.72 72.56 79.42 76.31 79.19 69.35 73.95 99.03 99.59 82.17 90.04 71.00 95.60 68.49 79.81 70.33 70.01 63.60 66.65 AUNet [54] CVPR’23 ✓×99.46 92.77 -------99.22 ---86.16 ---73.82 ---LSDA [85] CVPR’24 ✓✓95.8 89.8 ---75.6 ---95.6 ---81.2 ---73.5 ---FA-ViT [17] TCSVT’24 ✓✓99.6 93.83 ---84.32 ---94.88 ---85.41 ---78.32 ---UDD [38] AAAI’25 ✓✓-93.1 -------95.5 ---88.1 -------FreqDebias [52] CVPR’25 ✓✓-89.6 ---------------77.8 ---AltFreezing [86] CVPR’23 ✓✓98.60 89.50 -------98.50 ---70.84 ---71.74 ---ISTVT [66] TIFS’23 ✓✓99.0 84.1 -----------74.2 -------TALL-Swin [64] ICCV’23 ✓✓99.87 90.79 -----------76.78 -------FakeSTormer [24] ICCV’25 ✓×98.4 92.4 ---74.2 ---98.5 ---90.0 ---74.6 ---LAA-Net (Ours w/ BI) CVPR’24 ✓×99.95 86.28 91.93 50.01 64.78 57.13 56.89 50.12 53.29 99.51 99.80 95.47 97.59 69.69 93.67 50.12 65.30 71.36 73.02 55.82 63.27 LAA-Former (Ours w/ BI) -✓×99.23 90.34 94.90 63.38 76.00 72.62 75.98 59.97 67.03 93.42 97.49 77.26 86.21 78.71 96.23 60.17 74.04 76.84 80.82 63.31 71.00 LAA-Net (Ours w/ SBI) CVPR’24 ✓×99.96 95.40 97.64 87.71 92.41 80.03 81.08 65.66 72.56 98.43 99.40 88.55 93.64 86.94 97.70 73.37 83.81 72.43 74.46 57.39 64.81 LAA-Former (Ours w/ SBI) -✓×97.67 94.45 97.15 81.29 88.51 81.74 83.72 71.44 77.10 96.12 98.31 78.85 87.52 96.30 99.50 78.01 87.45 78.91 80.01 70.86 75.15
+
+TABLE XIV: In-dataset evaluation on FF++ [3] reported by ACC, AUC, AP, AR, and mF1. 
+
+Method Training Set FF++ Test Set [3] Real Fake ACC AUC AP AR mF1 Ours w/ BI [21] ✓ × 99.03 99.95 99.99 99.21 99.60 Ours w/ SBI [14] ✓ × 99.04 99.96 99.99 99.29 99.64 
+
+Fig. 14: Detection of vulnerable points w/o and w/ Gaussian noise. where M is the window size, d is the query dimension of each head, the expansion layer of each MLP is α, and Ch denotes the channel number in the hidden layers during the first stage. 
+
+F. More Details regarding the Datasets 
+
+Datasets. The FF++ [3] dataset is used for training and validation. In our experiments, we follow the standard splitting protocol of [3]. This dataset contains 1000 original videos and 4000 fake videos generated by four different manipulation methods, namely, Deepfakes (DF) [80], Face2Face (F2F) [82], FaceSwap (FS) [81], and NeuralTextures (NT) [83]. In the training process, we utilize only real images to dynamically generate pseudo-fakes, as discussed in Section III of the main paper. To evaluate the generalization capability of the proposed approach as well as its robustness to high-quality deepfakes, we follow the cross-dataset setting on seven chal-lenging datasets encompassing deepfakes of varying quality and diverse manipulation techniques: (1) Celeb-DFv2 [19] (CDF2), a well-known benchmark with high-quality deep-fakes; (2) Google DeepFake Detection [42] (DFD), which includes 3, 000 forged videos featuring 28 actors in various scenes; (3) DeepFake Detection Challenge [45] (DFDC) and its preview version (i.e., (4) DeepFake Detection Challenge Preview [44] (DFDCP)), a large-scale dataset containing nu-merous distorted videos with issues such as compression and noise; (5) WildDeepfake [43] (DFW), a dataset fully sourced from the internet without prior knowledge of manipulation JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 20 
+
+methods; (6) a diffusion-based test set DiffSwap [47], and (7) 
+
+DF40 [46], a highly diverse and large-scale dataset comprising 
+
+40 distinct deepfake techniques, enables more comprehensive evaluations for the next generation of deepfake detection. To assess the quality of the considered datasets, we com-pute the Mask-SSIM [40] for each benchmark. In particular, CDF2 [19] is formed by the most realistic deepfakes with an average Mask-SSIM value of 0.92 , followed by DFD, DF40, DFDC, and DFDCP with an average Mask-SSIM of 0.88 ,
+
+0.87 , 0.84 and 0.84 , respectively. We note that computing the Mask-SSIM [19] for DFW and DiffSwap was not possible since real and fake images are not paired.

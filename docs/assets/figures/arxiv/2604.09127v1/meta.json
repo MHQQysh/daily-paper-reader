@@ -1,0 +1,150 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-001.webp",
+      "caption": "Fig. 1: Comparison of our proposed FaceLiVTv2 with other lightweight FR models, including EdgeFace [3], SwiftFaceFormer [4], and KANFace [5]. Mean accuracy of Face Benchmark v.s. Mobile Latency (iPhone 15 Pro). The upper-left region of the plot represents the most desirable operating point, where high accuracy is achieved with minimal latency.",
+      "page": 1,
+      "index": 1,
+      "width": 516,
+      "height": 336
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-002.webp",
+      "caption": "TABLE 3: Architecture Details of FaceLiVTv2 Variants.",
+      "page": 6,
+      "index": 2,
+      "width": 494,
+      "height": 339
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-003.webp",
+      "caption": "TABLE 12: Number of Head Ablations of Lite MHLA On FaceLiVTv2-S",
+      "page": 11,
+      "index": 3,
+      "width": 578,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-004.webp",
+      "caption": "TABLE 1: Key architectural properties of representative lightweight face recognition models",
+      "page": 2,
+      "index": 4,
+      "width": 1098,
+      "height": 364
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-005.webp",
+      "caption": "TABLE 7: Ablation On The Overall Impact Of Components On FaceLiVTv2-S Variant with Glint360K as a Training Dataset",
+      "page": 10,
+      "index": 5,
+      "width": 1094,
+      "height": 193
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-006.webp",
+      "caption": "Fig. 2: FaceLiVTv2 architecture with Lite MHLA and structural reparameterization. Stages 1 and 2 use RepMix and the last stage combines RepMix with Lite MHLA as spatial mixer.",
+      "page": 3,
+      "index": 6,
+      "width": 832,
+      "height": 490
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-007.webp",
+      "caption": "Fig. 11: Layer distribution provided by XCode.",
+      "page": 18,
+      "index": 7,
+      "width": 529,
+      "height": 533
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-008.webp",
+      "caption": "TABLE 5: Cross-Platform Latency Comparison of FaceLiVTv2 with SOTA",
+      "page": 8,
+      "index": 8,
+      "width": 540,
+      "height": 420
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-009.webp",
+      "caption": "Fig. 6: Model in CoreML runtime breakdown. Operations highlighted in the redbox represent memory-bound operations, where memory access dominates execution time over computation.",
+      "page": 8,
+      "index": 9,
+      "width": 526,
+      "height": 290
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-010.webp",
+      "caption": "Fig. 3: Architecture comparison of (a) LiteMHLA in FaceLiVTv2 and (b) MHLA in FaceLiVTv1, (c) FaceLiVTv2 Block and (d) FaceLiVT Block. C, H and W denotes as the number of channel, height and width of feature map, h denotes as the number of head on the MHLA.",
+      "page": 4,
+      "index": 10,
+      "width": 1068,
+      "height": 465
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-011.webp",
+      "caption": "TABLE 17: Performance gap between lightweight FaceLiVTv2 variants and large-scale SOTA FR models. Mean Acc denotes the mean accuracy over LFW, CFP-FP, and AgeDB-30. FLOPs and mobile latency are measured at 112×112 input on iPhone 15 Pro.",
+      "page": 19,
+      "index": 11,
+      "width": 1109,
+      "height": 255
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-012.webp",
+      "caption": "Fig. 10: Latency test of (1) FaceLiVTv2-XS, (2) FaceLiVTv2S, (3) FaceLiVTv2-M, (4). FaceLiVTv2-L with XCode using iPhone 15 pro. All model is cverted from pytorch framework to coremltols.",
+      "page": 17,
+      "index": 12,
+      "width": 535,
+      "height": 1076
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-013.webp",
+      "caption": "Fig. 8: Performance evolution for FaceLiVTv2-S across different number of head configuration on IJBB and IJBC Dataset",
+      "page": 12,
+      "index": 13,
+      "width": 496,
+      "height": 876
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-014.webp",
+      "caption": "TABLE 6: Comparison of FaceLiVTv2 Variant with SOTA on TinyFace",
+      "page": 9,
+      "index": 14,
+      "width": 506,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-015.webp",
+      "caption": "Fig. 7: Comparison of our proposed FaceLiVTv2 with other lightweight FR models on mean accuracy of FR benchmark dataset v.s. FLOPs and mean accuracy v.s i5-12500 CPU Latency.",
+      "page": 9,
+      "index": 15,
+      "width": 517,
+      "height": 684
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-016.webp",
+      "caption": "Fig. 4: Structural Reparameterization on RepMix Block. This visualization illustrate the process of merging DW3×3, DW1×1, residual connection, and BN into single DW3×3. The residual connection is substituted by the identity weight with the dimension similar like DW1×1 weight.",
+      "page": 5,
+      "index": 16,
+      "width": 529,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-017.webp",
+      "caption": "TABLE 15: Comparison of FaceLiVTv2 Variant with StateOf-The-Art on IJB-B and IJB-C Benchmark Dataset.",
+      "page": 16,
+      "index": 17,
+      "width": 475,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09127v1/fig-018.webp",
+      "caption": "Fig. 9: Receiver Operating Characteristic of FaceLiVTv2 on IJBB and IJBC Dataset",
+      "page": 16,
+      "index": 18,
+      "width": 504,
+      "height": 876
+    }
+  ]
+}

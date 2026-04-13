@@ -1,0 +1,118 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-001.webp",
+      "caption": "Fig. 1: Comparison of LAA-Net(•), LAA-Former(•), and LAA-Swin(•) with respect to existing methods, namely, Multi-attentional(•) [13], SBI(•) [14], Xception(•) [3], RECCE(•) [15], CADDM(•) [16], FAViT(•) [17], ForensicsAdapter(•) [18] using (a) the AUC performance with respect to different ranges of Mask-SSIM, and (b) its associated boxplots. *The results were obtained using the official source codes pretrained on FF+ [3] and testing on Celeb-DFv2 [19]. Figure best viewed in colors.",
+      "page": 1,
+      "index": 1,
+      "width": 378,
+      "height": 797
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-002.webp",
+      "caption": "Fig. 6: Experiments to analyze the capability of transformer-based networks in deepfake detection. (a) Generalization performance comparison of baseline classifiers (ViT [29]+SBI [14](•), Swin [32]+SBI [14](•)) with two specialized transformer-based (FAViT [17](•), ForensicsAdapter [18](•)) and four CNN-based methods (LAA-Net [23]+SBI [14](•), CADDM [16](•), EfficientNet [25]+SBI [14](•), Xception [26]+SBI [14](•)) across different ranges of Mask-SSIM [40]. All methods adopt FF++ [3] for the training and are tested cross-dataset on CDF2 [19]. More details are described in Section III-C1a. (b) Evolution of the training loss of ViT under different configurations (variation of input resolution and patch size), Xception and EfficientNet, across four types of deepfakes in FF++ [3].",
+      "page": 7,
+      "index": 2,
+      "width": 1071,
+      "height": 319
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-003.webp",
+      "caption": "TABLE I: In-dataset and Cross-dataset evaluation in terms of AUC (%) and AP (%) at the video-level on multiple deepfake datasets. Results for comparison are directly extracted from the original papers. ∗ indicates our reproduced results using official pre-trained weights. Bold and Underlined highlight the best and the second-best performance, respectively.",
+      "page": 10,
+      "index": 3,
+      "width": 1074,
+      "height": 545
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-004.webp",
+      "caption": "Fig. 2: Overview of the proposed LAA-X framework. LAAX is a multi-task learning framework that incorporates an explicit attention mechanism to vulnerable regions through the integration of generic auxiliary tasks. This strategy enables LAA-X to adequately attend to fine-grained artifact-prone areas. Particularly, these additional tasks can be removed at inference, reducing computational cost at test time.",
+      "page": 3,
+      "index": 4,
+      "width": 529,
+      "height": 465
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-005.webp",
+      "caption": "Fig. 12: In order to generate the consistency map prediction Ĉ as well as the associated ground truth C, we first randomly select a vulnerable point located at ps ∈ P . For computing Ĉ, we measure the similarity between the feature at ps (red block) and the features generated from every point. Namely, we use the similarity function in [22]. As for C, we measure the consistency values between the pixel at the ps and all pixels in B, as also described in Eq. (7) of the manuscript.",
+      "page": 18,
+      "index": 5,
+      "width": 524,
+      "height": 379
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-006.webp",
+      "caption": "TABLE IX: Ablation study of LAA-Former’s components.",
+      "page": 13,
+      "index": 6,
+      "width": 522,
+      "height": 336
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-007.webp",
+      "caption": "Fig. 7: Examples are randomly selected to illustrate four types of deepfakes in the common FF++ [3] dataset. It includes Deepfakes (DF) [80], FaceSwap (FS) [81], Face2Face (F2F) [82], and NeuralTextures (NT) [83].",
+      "page": 8,
+      "index": 7,
+      "width": 524,
+      "height": 437
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-008.webp",
+      "caption": "Fig. 3: Overview of the proposed LAA-Net approach. It is formed by two main components, namely, (1) an explicit attention mechanism based on a multi-task learning framework composed of three branches, i.e., the binary classification branch, the heatmap branch, and the self-consistency branch. The heatmap and self-consistency ground-truth data are generated based on the detected vulnerable points, and (2) an Enhanced Feature Pyramid Networks (E-FPN) that aggregates multi-scale features.",
+      "page": 4,
+      "index": 8,
+      "width": 1072,
+      "height": 390
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-009.webp",
+      "caption": "TABLE XIII: In-dataset and Cross-dataset evaluation in terms of AUC (%), AP (%), AR (%), and mF1 (%) at the videolevel on multiple deepfake datasets. Results for comparison are directly extracted from the original papers. ∗ indicates our reproduced results using official pre-trained weights. Bold and Underlined highlight the best and the second-best performance, respectively.",
+      "page": 19,
+      "index": 9,
+      "width": 1072,
+      "height": 342
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-010.webp",
+      "caption": "Fig. 13: The generation process of ground truth heatmaps by producing using an Unnormalized Gaussian Distribution given a selected vulnerable point.",
+      "page": 19,
+      "index": 10,
+      "width": 1072,
+      "height": 271
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-011.webp",
+      "caption": "Fig. 9: Visualization of saliency maps on different types of manipulation from FF++ [3]. LAA-Net and LAA-Former is compared to SBI [14], Xception [3], and MAT [13].",
+      "page": 12,
+      "index": 11,
+      "width": 519,
+      "height": 415
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-012.webp",
+      "caption": "TABLE V: Traditional FPN versus E-FPN using the SBI data synthesis under the cross-dataset evaluation protocol. We report the results when integrating features F(i) from different layers.",
+      "page": 12,
+      "index": 12,
+      "width": 1064,
+      "height": 188
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-013.webp",
+      "caption": "Fig. 8: The proposed Transformer-based LAA-X method. (I) The overall LAA-Former framework, (II) the L2-Att module, and (III) the ground-truth generation of vulnerable patches.",
+      "page": 9,
+      "index": 13,
+      "width": 1076,
+      "height": 421
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04086v1/fig-014.webp",
+      "caption": "Fig. 5: Architecture of the proposed Enhanced Feature Pyramid Network (E-FPN).",
+      "page": 5,
+      "index": 14,
+      "width": 615,
+      "height": 227
+    }
+  ]
+}
