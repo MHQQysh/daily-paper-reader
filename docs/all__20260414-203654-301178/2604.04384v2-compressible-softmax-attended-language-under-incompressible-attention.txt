@@ -1,0 +1,377 @@
+Title: Compressible Softmax-Attended Language under Incompressible Attention
+
+URL Source: https://arxiv.org/pdf/2604.04384v2
+
+Published Time: Thu, 09 Apr 2026 00:16:40 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# Compressible Softmax-Attended Language under Incompressible Attention 
+
+Wonsuk Lee Seoul National University & SK Hynix America 
+
+wonsuk.lee@snu.ac.kr 
+
+April 5, 2026 
+
+Abstract 
+
+Softmax attention defines an interaction through dh head dimensions, but not all dimensions carry equal weight once real text passes through. We decompose the attention logit field into a learned component and a generated component and measure their spectra separately. For all 5,888 KV heads in five transformer language models (124M–7B parameters, four architecture families), the logit energy field ˜E reaches 90% of its variance in 2–11 singular components. The learned interaction matrix W T 
+
+> Q
+
+WK needs 38–75 components for the same threshold out of dh ∈ 64 , 128. The spectral gap is 5–25 × in effective rank. The compressibility of softmax-attended language is a property of the data, not the frame that analyzes it. 
+
+# 1 Introduction 
+
+The key–value cache dominates the memory cost of autoregressive transformer inference and grows linearly with context length. Reducing it requires exploitable structure in the attention pattern. The row-centered attention logit energy field ˜E has rank at most dh + 1, where dh is the head dimension [3], and its effective rank is much lower in practice. The dh-dimensional key cache is redundant. The question is where the redundancy originates. Two possibilities. First, the weight matrices WQ and WK impose spectral structure on the interaction, making the mechanism itself low-rank. A fixed projection from the model parameters then compresses the key cache for any input. Second, the input data concentrates the interaction into a low-dimensional subspace even though the weights are spectrally uniform. Existing KV-cache compression methods assume one or the other. Low-rank weight factorization and static head pruning treat the redundancy as architectural. Token eviction and attention-aware merging treat it as input-dependent. Neither tests the assumption. Comparing the two spectra answers the question and predicts which class of methods should work. We measure both spectra across five models in four architecture families (GPT-2, LLaMA, Qwen, Mistral). They differ by 5–25 × in effective rank. The learned matrix M = W T 
+
+> Q
+
+WK dis-tributes its variance uniformly across all dh directions in every model tested. The generated matrix ˜E concentrates almost all variance into a few. The compression lives in the data, not the weights. Effective key cache compression requires data-adaptive projections that change with every context. The compressibility of softmax-attended language is a property of how language activates attention, not of how attention is built. 1
+
+> arXiv:2604.04384v2 [cs.CL] 7 Apr 2026
+
+# 2 Setup 
+
+A single attention head [4] maps L input embeddings x0, . . . , x L−1 ∈ Rdmodel to queries and keys through learned weight matrices: 
+
+qi = WQ xi ∈ Rdh , kj = WK xj ∈ Rdh . (1) The attention logit is Zij = qT 
+
+> i
+
+kj /√dh, and the attention probability is pij = softmax j (Zij ). 
+
+2.1 The logit energy field ( generated )
+
+Row-centering the logit matrix removes the position-dependent baseline: ˜Eij = Zij − ¯Zi, ¯Zi = 1
+
+L
+
+> L−1
+
+X
+
+> j=0
+
+Zij . (2) Since softmax is shift-invariant, pij = softmax j ( ˜Eij ). The matrix ˜E carries the same information as Z for computing attention. The row-sum identity P 
+
+> j
+
+˜Eij = 0 holds by construction. Therefore ˜E 1 = 0 and 1 is in the right null space. Since Z = QK T/√dh has rank at most dh, and row-centering adds a rank-one term, rank( ˜E) ≤ dh + 1. The SVD of ˜E, with rank R ≤ dh + 1, ˜E =
+
+> R
+
+X
+
+> k=1
+
+σk uk vT 
+
+> k
+
+, (3) decomposes the interaction into R channels ordered by variance [2]. The k-th channel has strength 
+
+σk, left singular vector uk ∈ RL over queries, and right singular vector vk ∈ RL over keys. If the singular values decay rapidly, then a few channels approximate the full matrix and the attention pattern is compressible. The right singular vectors satisfy vk ⊥ 1. This follows from ˜E 1 = 0. The vector 1 is an eigenvector of ˜ET ˜E with eigenvalue zero, while each vk has nonzero eigenvalue σ2
+
+> k
+
+. Eigenvectors of a symmetric matrix with distinct eigenvalues are orthogonal. 
+
+2.2 The interaction matrix ( learned )
+
+The logit is a bilinear form in the input embeddings: 
+
+Zij = xT 
+
+> i
+
+M x j
+
+√dh
+
+, where M = W T 
+
+> Q
+
+WK ∈ Rdmodel ×dmodel . (4) The matrix M factors through Rdh (WQ ∈ Rdh×dmodel , WK ∈ Rdh×dmodel ), so rank( M ) ≤ dh. Its SVD, 
+
+M =
+
+> dh
+
+X
+
+> k=1
+
+λk pk rT 
+
+> k
+
+, (5) decomposes the mechanism’s capacity into dh channels. The singular values λk and their decay rate measure how much spectral structure the weights alone impose. The generated spectrum reflects both the weights and the input. The learned spectrum reflects the weights alone. Comparing the two reveals whether the compression is architectural or input-driven. 23 Experiments 
+
+We computed the singular value spectra of ˜E and M for every attention head in five models spanning four architecture families and two head dimensions. 
+
+Models. GPT-2 (124M, dh = 64, 144 heads). LLaMA-3.2-1B (1.2B, dh = 64, 512 heads). LLaMA-3.2-3B (3.2B, dh = 128, 672 heads). Qwen-2.5-3B (3B, dh = 128, 576 heads). Mistral-7B (7B, 
+
+dh = 128, 1024 heads). The three larger models use grouped query attention, where multiple query heads share a single key-value head. 
+
+Protocol. For M , we compute singular values directly from the weight matrices via QR factor-ization. For ˜E, we extract Q and K (with RoPE applied where applicable) on five texts from the Gutenberg Project [1] (Dickens, Darwin, Shakespeare, the King James Bible, and Adam Smith) at 
+
+L = 256 and compute Z = QK T/√dh. All SVDs use float64 arithmetic. Tables report the median across all heads pooled over the five texts. The effective rank at 90% varies by at most ±1 across texts (standard deviation ≤ 1.2). 
+
+Results. Table 1 compares the cumulative fraction of variance ( Prk=1 σ2
+
+> k
+
+/∥ ˜E∥2 
+
+> F
+
+) captured by the top r components. Table 2 translates these fractions into effective rank. Table 1: Cumulative variance captured by the top r singular components (median across all heads). ˜E concentrates its variance in a few components. W T 
+
+> Q
+
+WK does not. Models are grouped by head dimension: dh = 64 (left) and dh = 128 (right).                                                                           
+
+> GPT-2 LLaMA-1B LLaMA-3B Qwen-3B Mistral-7B
+> rM˜EM˜EM˜EM˜EM˜E
+> 15% 72% 6% 43% 4% 42% 4% 41% 4% 46% 210% 90% 12% 63% 7% 61% 7% 60% 8% 64% 520% 96% 25% 83% 15% 81% 16% 80% 17% 82% 10 33% 98% 42% 93% 25% 90% 27% 90% 29% 91% 20 53% 99% 66% 98% 42% 96% 45% 96% 47% 96% 40 81% 100% 92% 100% 66% 99% 70% 99% 72% 99%
+
+Table 2: Effective rank: number of singular components for the stated variance threshold (median across all heads). The spectral gap between M and ˜E persists across all five models.                                                       
+
+> GPT-2 LLaMA-1B LLaMA-3B Qwen-3B Mistral-7B Threshold M˜EM˜EM˜EM˜EM˜E
+> 80% 40 229 557 553 550 590% 49 238 875 11 70 11 66 10 95% 55 444 13 88 18 83 17 80 17 99% 61 18 54 23 107 39 104 40 102 38
+
+At 90% variance, ˜E needs 2–11 components; M needs 38–75. The ratio ranges from 5 × (LLaMA-1B) to 25 × (GPT-2). The three dh = 128 models converge to ˜E effective rank 10–11 despite learned effective ranks of 66–75, a gap of 6–7 ×. The learned spectrum is flat in every case. 34 Conjecture 
+
+4.1 Incompressible attention framework 
+
+The flat spectrum of M implies that no fixed, low-rank projection can capture most of the inter-action. Discarding any subset of the dh directions loses a proportional fraction of the mechanism’s capacity. The attention framework is, in spectral terms, incompressible. If M had concentrated its spectrum, compression would be straightforward. Project queries and keys onto the dominant eigenvectors, discard the rest, and reduce the head dimension from dh
+
+to r ≪ dh. The flat spectrum rules this out. Each head retains roughly equal capacity in all dh
+
+directions, able to represent whichever query–key interaction the input demands. 
+
+4.2 Compressible logit energy field 
+
+While M describes what the mechanism can do, ˜E describes what it actually does on a specific input. The sharp spectral decay of ˜E means the query–key interaction concentrates into a few dominant patterns for any given context. The concentration comes from the data. Layer normalization and preceding transformer blocks shape the input embeddings xi into a context-dependent manifold rather than spanning all of 
+
+Rdmodel . Queries and keys inherit this low-dimensional structure. The matrix Z = QK T/√dh has formal rank dh but much lower effective rank, determined by the data manifold. The empirical regularity μK = O(1) (key incoherence), measured across 16 transformer language models [3], reflects the same geometry. The weights permit large μK . Language does not require it. Training preserves μK ≈ 2. Two properties of the data support the pattern’s generality. First, it holds across both dh = 64 and dh = 128. Doubling the head dimension roughly doubles the learned effective rank but leaves the generated effective rank at 10–11. Second, it is stable across five texts from different centuries and genres (standard deviation ≤ 1.2). 
+
+4.3 Low-rank structure survives softmax 
+
+Whether the sharp generated spectrum survives softmax is not obvious. A rank-r approximation ˜Er captures most of the Frobenius-norm variance, but softmax is nonlinear and amplifies residuals at peak-attention positions. 
+
+Proposition 4.1 (Softmax stability of low-rank approximation) . Let ˜E ∈ RL×L be the row-centered logit matrix with SVD ˜E = PRk=1 σk uk vT 
+
+> k
+
+, and let ˜Er = Prk=1 σk uk vT 
+
+> k
+
+be its rank-r truncation. Let pi = softmax( ˜Ei) and p(r) 
+
+> i
+
+= softmax(( ˜Er)i) be the attention distributions in row i. If the singular vectors satisfy the delocalization condition 
+
+max  
+
+> j
+
+u2 
+
+> j
+
+≤ β
+
+√L , max  
+
+> j
+
+v2 
+
+> j
+
+≤ β
+
+√L (6) 
+
+for a parameter β, then for every row i:
+
+pi − p(r)  
+
+> i1
+
+≤ β
+
+√L
+
+> R
+
+X
+
+> k=r+1
+
+σk . (7) 
+
+Proof. The residual ∆ ij = PRk=r+1 σk (uk)i (vk)j satisfies 
+
+|∆ij | ≤ 
+
+> R
+
+X
+
+> k=r+1
+
+σk |(uk)i| | (vk)j | ≤ β
+
+√L
+
+> R
+
+X
+
+> k=r+1
+
+σk
+
+4by the delocalization condition (6), since |(uk)i| | (vk)j | ≤ β/ √L for all i, j, k . This bounds ∥∆i∥∞
+
+uniformly over rows. Applying Theorem A.1 (Appendix A) with a = ˜Ei and b = ( ˜Er)i,
+
+∥pi − p(r) 
+
+> i
+
+∥1 = ∥ softmax( ˜Ei) − softmax(( ˜Er)i)∥1 ≤ ∥ ∆i∥∞ ≤ β
+
+√L
+
+> R
+
+X
+
+> k=r+1
+
+σk .
+
+The delocalization condition (6) is verified directly. Measuring β = max j v2 
+
+> j
+
+· √L across every singular vector of every head, from five models and five texts at L = 256, gives median β = 2 .5– 5.6 and maximum β ≤ 14. The value does not grow with model size or head dimension. The delocalization lemma of [3] shows that β is controlled by the key incoherence μK and the condition number κ(K), both of which are bounded across trained models. The bound shrinks with both context length (through 1 /√L) and rank (through the tail P 
+
+> k>r
+
+σk). At r = 20, the tail accounts for 2% of the total variance. The empirical evidence at L = 64–1 ,024 shows no growth in the tail. Direct measurement confirms the prediction. At L = 256 across five models and five texts, the median ∥pi − p(r) 
+
+> i
+
+∥1 is 0.31–0.46 (mean per row) at r = 10, 0.18–0.29 at r = 20, and 0.05–0.14 at 
+
+r = 40. The worst row follows the same trend: 0.90–1.31, 0.52–0.84, and 0.16–0.39 respectively. 
+
+4.4 Conjecture statement 
+
+We conjecture that the low effective rank of ˜E is a universal property of natural language processed by trained transformers. The source is the low intrinsic dimensionality of contextualized embed-dings, not any spectral constraint in the attention weights. Models across four architecture families demonstrate the pattern. Whether it extends beyond language remains open. 
+
+# 5 Discussion 
+
+The spectral gap between M and ˜E has consequences for both compression practice and architec-tural understanding. The flat spectrum of W T 
+
+> Q
+
+WK rules out weight-based compression. Fixed, input-independent projections cannot exploit the concentration in ˜E because the low-rank projection that captures nearly all of the attention variance changes with every context. Effective compression requires data-adaptive methods. This separates existing KV-cache work into two classes. Input-independent methods (low-rank weight factorization, static head dimension reduction) compress the mechanism, which is already spectrally uniform. Context-adaptive methods (eviction policies, token merging, attention-aware pruning) can exploit the sharp data spectrum, but they must track a projection that shifts as the context grows during autoregressive generation. The gap between the mechanism’s full-rank frame and the data’s low-rank activation serves a purpose. Each head allocates uniform spectral capacity across dh dimensions, yet language fills only a few at any given moment. The unused dimensions allow the same head to serve diverse contexts across the training distribution. Idle capacity is flexibility. Proposition 4.1 bounds per-head, per-layer attention fidelity. Three quantities remain open: 1. The output error ∥oi − o(r) 
+
+> i
+
+∥ = ∥ P 
+
+> j
+
+(pij − p(r) 
+
+> ij
+
+)vj ∥ depends on the value matrix V , not just the attention weights. 2. Errors compound across layers. Twenty layers each contributing a small ℓ1 attention error could cancel or amplify depending on whether they are correlated. 53. The accumulated effect on end-to-end perplexity remains an open experimental question. The spectral gap reported here is measured on language models. If structured sequential input drives the concentration, vision transformers and protein models would show similar patterns. If it is specific to natural language, other modalities would exhibit higher effective rank in ˜E. Either outcome would clarify what makes attention compressible. 
+
+# References 
+
+[1] Project Gutenberg. https://www.gutenberg.org/ , 1971–present. [2] G. H. Golub and C. F. Van Loan. Matrix Computations . Johns Hopkins University Press, 4th edition, 2013. [3] W. Lee. On the invariants of softmax attention. arXiv preprint , 2026. [4] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin. Attention is all you need. Advances in Neural Information Processing Systems ,2017. 
+
+# A Appendix 
+
+Theorem A.1 (Softmax Lipschitz bound) . For any a, b ∈ Rk,
+
+∥ softmax( a) − softmax( b)∥1 ≤ ∥ a − b∥∞. (8) 
+
+Proof. Let c = b − a and define p(t) = softmax( a + tc ) for t ∈ [0 , 1], so p(0) = softmax( a) and 
+
+p(1) = softmax( b). By the fundamental theorem of calculus, softmax( b)i − softmax( a)i =
+
+Z 10
+
+ddt p(t) 
+
+> i
+
+dt. 
+
+The softmax Jacobian gives ddt p(t) 
+
+> i
+
+= p(t) 
+
+> i
+
+(ci − μt), where μt = P 
+
+> j
+
+p(t) 
+
+> j
+
+cj = Ep(t) [c]. Applying the triangle inequality inside the integral, 
+
+∥ softmax( b) − softmax( a)∥1 ≤
+
+Z 10
+
+X
+
+> i
+
+p(t) 
+
+> i
+
+|ci − μt| dt. 
+
+The integrand is the mean absolute deviation MAD( c; q) = Eq[|c − Eq[c]|] evaluated at q = p(t). Fix 
+
+t and write q = p(t), μ = μt. By Jensen’s inequality ( φ(x) = x2 is convex), MAD( c; q)2 ≤ Var q(c). By Popoviciu’s inequality, for c bounded in [ m, M ], Var q(c) ≤ (M − m)2/4. Combining, MAD( c; q) ≤
+
+q
+
+Var q(c) ≤ M − m
+
+2 = max i ci − min i ci
+
+2 .
+
+Since max i ci ≤ ∥ c∥∞ and − min i ci ≤ ∥ c∥∞, the range satisfies (max i ci − min i ci)/2 ≤ ∥ c∥∞.Substituting back, 
+
+∥ softmax( b) − softmax( a)∥1 ≤
+
+Z 10
+
+∥c∥∞ dt = ∥c∥∞ = ∥a − b∥∞.
+
+6

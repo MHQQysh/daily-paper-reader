@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04440v2/fig-001.webp",
+      "caption": "Table 2: High-compression sweep. The lora r48 row is a rank-48 LoRA trained under the same protocol; its parameter count and loss are independent of the sparse-coefficient K, so at these compressions it holds ≥ 4× the trainable budget of the spectral cells and is included as a fixed reference line only.",
+      "page": 3,
+      "index": 1,
+      "width": 903,
+      "height": 389
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04440v2/fig-002.webp",
+      "caption": "Table 1: Character-level language modelling on tinyshakespeare at K = mn/2. Validation loss is the mean cross-entropy over 50 held-out batches at the final epoch.",
+      "page": 3,
+      "index": 2,
+      "width": 732,
+      "height": 248
+    }
+  ]
+}

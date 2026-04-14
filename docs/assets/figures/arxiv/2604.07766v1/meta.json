@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07766v1/fig-001.webp",
+      "caption": "Figure 4. Exp A minus Exp D per benchmark (pp). All six values are positive, confirming universal improvement of co-localized over random layer selection.",
+      "page": 6,
+      "index": 1,
+      "width": 649,
+      "height": 272
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07766v1/fig-002.webp",
+      "caption": "Figure 5. Heatmap of learned α (ℓ) k values (10 targeted layers × 8 KV heads) after training Exp A. All 80 values lie in [7.3, 9.0], well above the identity (α = 1.0), indicating systematic frequency upscaling. Layer 23 shows the highest per-head variance (range: 7.30–8.74).",
+      "page": 6,
+      "index": 2,
+      "width": 804,
+      "height": 343
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07766v1/fig-003.webp",
+      "caption": "Table 7. Full sensitivity (δℓ) and RoPE influence (ρℓ) profiles for all 32 layers. Bold = top-10 RoPE-influential layers (0–9), forming",
+      "page": 8,
+      "index": 3,
+      "width": 433,
+      "height": 401
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07766v1/fig-004.webp",
+      "caption": "Figure 1. Scatter plot of sensitivity δℓ vs. RoPE influence ρℓ per layer. Green: co-localized (layer 0 only). Orange: sensitive-only (23–31). Blue: RoPE-influential only (1–9). Gray: neither top-10. Dashed: linear fit. Spearman rs = −0.735 (p < 10−5).",
+      "page": 4,
+      "index": 4,
+      "width": 728,
+      "height": 397
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07766v1/fig-005.webp",
+      "caption": "Figure 2. Dual-axis layer profile: sensitivity δℓ (orange, left axis) and RoPE influence ρℓ (blue dashed, right axis) vs. layer index. The profiles are anti-correlated: sensitivity rises through late layers while RoPE influence concentrates in early layers. Green band marks layer 0, the sole co-localized layer.",
+      "page": 4,
+      "index": 5,
+      "width": 1007,
+      "height": 366
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07766v1/fig-006.webp",
+      "caption": "Table 4. Main results across six benchmarks. Bold green = best fine-tuned model per column. Avg. = macro-average. All scores are percentages.",
+      "page": 5,
+      "index": 6,
+      "width": 818,
+      "height": 206
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07766v1/fig-007.webp",
+      "caption": "Figure 3. Cross-layer ablation: grouped bars per benchmark. Experiment A consistently leads Experiments B, C, and D. The A>B≈C>D pattern holds across all six benchmarks.",
+      "page": 5,
+      "index": 7,
+      "width": 882,
+      "height": 418
+    }
+  ]
+}

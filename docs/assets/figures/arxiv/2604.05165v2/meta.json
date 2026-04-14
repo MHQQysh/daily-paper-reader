@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05165v2/fig-001.webp",
+      "caption": "Figure 5. RSSI performance under varying degrees of user localization error for the 4-user configuration. The framework demonstrates robust, graceful degradation for sub-meter positioning noise, maintaining viable signal strength up to a 0.3 m error threshold. Solid lines represent the mean RSSI over 300 evaluation timesteps, with shaded regions denoting the empirical standard deviation.",
+      "page": 6,
+      "index": 1,
+      "width": 498,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05165v2/fig-002.webp",
+      "caption": "Figure 1. Reflector Design.",
+      "page": 2,
+      "index": 2,
+      "width": 524,
+      "height": 422
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05165v2/fig-003.webp",
+      "caption": "Figure 2. Hierarchical Multi-Agent Reinforcement Learning Architecture. The high-level controller evaluates the global system state to determine discrete user-to-reflector allocations every T timesteps. Concurrently, lowlevel agents utilize masked local observations to continuously optimize focal points using PPO under a CTDE scheme.",
+      "page": 3,
+      "index": 3,
+      "width": 524,
+      "height": 325
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05165v2/fig-004.webp",
+      "caption": "Figure 3. Experimental setup of the conference room simulation environment. The access point (AP) is positioned outside the room, serving users within the designated 10 m × 10 m coverage region. Two mechanically reconfigurable reflectors are deployed at the corners to establish NLOS links.",
+      "page": 4,
+      "index": 4,
+      "width": 524,
+      "height": 550
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05165v2/fig-005.webp",
+      "caption": "Figure 4. Performance evaluation for the 4-user configuration. (a) Episodeaveraged reward convergence over 3,000 training episodes. (b) Deployment RSSI evaluated over 300 timesteps under continuous user mobility. Solid lines denote the mean, and shaded regions indicate the empirical standard deviation.",
+      "page": 5,
+      "index": 5,
+      "width": 500,
+      "height": 617
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05165v2/fig-006.webp",
+      "caption": "Table I SIMULATION ENVIRONMENT AND HMARL HYPERPARAMETERS",
+      "page": 5,
+      "index": 6,
+      "width": 526,
+      "height": 402
+    }
+  ]
+}

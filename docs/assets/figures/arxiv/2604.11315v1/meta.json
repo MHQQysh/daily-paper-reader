@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-001.webp",
+      "caption": "Figure 1: S3 can target low-level hardware patterns to avoid any slowdowns due to memory access conflicts. For m16n8k16 matrix multiplication patterns, we can target the thread-group as one block.",
+      "page": 2,
+      "index": 1,
+      "width": 841,
+      "height": 476
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-002.webp",
+      "caption": "Figure 6: Thread-fragment assignment for mma.sync.aligned.m16n8k16. Cell color encodes the owning thread (hue = thread block g = ⌊t/4⌋, brightness = within-block offset t mod 4). Dashed lines mark the k-half boundary (k=8). Each thread owns 8 fp16 elements of A, 4 of B, and 4 fp32 elements of C. The 2-column k-pair structure of A and B is the hardware reason why 2:4 and 4:8 sparsity patterns are natural: surviving elements fill exactly the k-col pairs owned by a single thread.",
+      "page": 14,
+      "index": 2,
+      "width": 794,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-003.webp",
+      "caption": "Figure 10: Qwen3-4B (36 layers): per-projection output error and decoder error (2:4 pruning, 1024 C4 calibration samples). Same format as Figure 9. S-OBS wins on all 252 linear projections. The decoder error spike at layer 16 is shared by both methods, suggesting an inherently sensitive layer.",
+      "page": 18,
+      "index": 3,
+      "width": 998,
+      "height": 540
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-004.webp",
+      "caption": "Table 4: Canonical sparsity patterns expressed in S3. Strides are implied by standard row-major order. The Keep column is the number of blocks retained per scope.",
+      "page": 13,
+      "index": 4,
+      "width": 771,
+      "height": 226
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-005.webp",
+      "caption": "Figure 4: Per-linear analysis of Qwen3-1.7B 2:4 pruning. Figure 4a: Output error scatter (H-based metric). Points below the diagonal indicate S-OBS achieves lower error. S-OBS wins on 177 of 196 linear layers. Figure 4b: Relative improvement heatmap across layers and sublayer types. Blue indicates S-OBS is better. S-OBS dominates except for a few MLP projections in the final layers.",
+      "page": 8,
+      "index": 5,
+      "width": 1014,
+      "height": 211
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-006.webp",
+      "caption": "Figure 3: End-to-end 2:4 pruning of Qwen3-1.7B. Figure 3a: WikiText-2 perplexity after pruning every fourth decoder layer. S-OBS maintains a growing advantage throughout, reaching 46.3 vs. 56.4 for SparseGPT. Figure 3b: Per-layer decoder output error. S-OBS achieves lower error in 25 of 28 layers; SparseGPT is slightly better only in the final three.",
+      "page": 8,
+      "index": 6,
+      "width": 1014,
+      "height": 255
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-007.webp",
+      "caption": "Figure 9: Per-projection output error and decoder error across decoder layers (2:4 pruning, 1024 C4 calibration samples). Solid = S-OBS, dashed = SparseGPT. Top row: attention projections (Q/K/V/O). Middle row: MLP projections (Gate/Up/Down). Bottom row: full decoder output error. Left column: Qwen3-1.7B. Right column: Qwen3-0.6B. Per-linear metric (top/middle):√",
+      "page": 17,
+      "index": 7,
+      "width": 1000,
+      "height": 836
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-008.webp",
+      "caption": "Figure 5: Standard 2:4 (top) vs. Coupled 2:4 (bottom) over a single A-fragment row of mma.m16n8k16 (16 k-columns). Cell color encodes the owning TID; faded cells are pruned. Arcs link the column pair {c, c+8}; solid arcs are retained pairs, dashed arcs are pruned pairs. Standard 2:4 requires independent masks for each k-half. Coupled 2:4 uses one mask for both halves, halving the metadata and improving the compression ratio from 9/16 to 17/32 (Appendix E.5).",
+      "page": 12,
+      "index": 8,
+      "width": 862,
+      "height": 355
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-009.webp",
+      "caption": "Figure 8: Per-linear analysis of Qwen3-0.6B 2:4 pruning. Figure 8a: Output error scatter. S-OBS wins on 178 of 196 linear layers, comparable to the 177/196 advantage on Qwen3-1.7B. Figure 8b: Improvement heatmap. S-OBS dominates early-to-mid layers but loses in the final layers, particularly for projections with large input dimension (down_proj, K=3072).",
+      "page": 16,
+      "index": 9,
+      "width": 1014,
+      "height": 213
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11315v1/fig-010.webp",
+      "caption": "Figure 7: End-to-end 2:4 pruning of Qwen3-0.6B. Figure 7a: WikiText-2 perplexity after pruning every fourth decoder layer. SparseGPT maintains lower perplexity throughout, reaching 126.2 vs. 154.2 for S-OBS. Figure 7b: Per-layer decoder output error. S-OBS achieves lower error in early-to-mid layers, but SparseGPT becomes substantially better in later layers.",
+      "page": 16,
+      "index": 10,
+      "width": 1016,
+      "height": 272
+    }
+  ]
+}

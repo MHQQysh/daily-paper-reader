@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10459v1/fig-001.webp",
+      "caption": "TABLE I: Overall Performance Comparison with State-of-the-Art Baselines (IMDB Dataset)",
+      "page": 4,
+      "index": 1,
+      "width": 1068,
+      "height": 262
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10459v1/fig-002.webp",
+      "caption": "Fig. 3: Ablation study results across Accuracy, Precision, Recall, F1-score, training time, and parameter count.",
+      "page": 4,
+      "index": 2,
+      "width": 529,
+      "height": 396
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10459v1/fig-003.webp",
+      "caption": "Fig. 1: Overall pipeline of the proposed method.",
+      "page": 3,
+      "index": 3,
+      "width": 420,
+      "height": 316
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10459v1/fig-004.webp",
+      "caption": "Fig. 2: Overall performance comparison: (a) training loss curves, (b) validation accuracy curves, (c) confusion matrix of proposed model, (d) t-SNE feature visualization.",
+      "page": 3,
+      "index": 4,
+      "width": 529,
+      "height": 393
+    }
+  ]
+}

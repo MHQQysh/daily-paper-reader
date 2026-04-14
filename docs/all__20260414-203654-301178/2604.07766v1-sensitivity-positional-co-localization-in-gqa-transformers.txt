@@ -1,0 +1,620 @@
+Title: Sensitivity-Positional Co-Localization in GQA Transformers
+
+URL Source: https://arxiv.org/pdf/2604.07766v1
+
+Published Time: Fri, 10 Apr 2026 00:37:39 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+## Sensitivity-Positional Co-Localization in GQA Transformers 
+
+A Mechanistic Study of Layer-Targeted Fine-Tuning via Correctness-Differential Activation Analysis and Per-KV-Head RoPE Frequency Adaptation 
+
+## Manoj Chandrashekar Rao 
+
+Independent Researcher 
+
+manoj@jonam.io 
+
+Abstract. We investigate a fundamental structural question in Grouped Query Attention (GQA) transformers: do the layers most sensitive to task correctness coincide with the layers where positional encoding adaptation has the greatest leverage? We term this the 
+
+co-localization hypothesis and test it on Llama 3.1 8B, a 32-layer GQA model with a 4:1 query-to-key-value head ratio. We introduce LS-L ORA, which restricts LoRA adaptation to layers identified via a novel correctness-differential hidden-state metric, and GARFA (GQA-Aware RoPE Frequency Adaptation), which attaches 8 learnable per-KV-head scalar multipliers to each targeted layer. Contrary to the co-localization hypothesis, we discover strong anti-localization : task-sensitive layers concentrate in the late network ( ℓ ∈ { 23 –31 })while RoPE-influential layers dominate the early network ( ℓ ∈ { 0–9}), yielding Spearman rs = −0.735 (p = 1 .66 × 10 −6). Despite this anti-localization, a 4-way cross-layer ablation shows that applying both interventions to the sensitivity-identified layers outperforms all alternative configurations by 4–16 percentage points across six diverse benchmarks (MMLU, GPQA, HumanEval+, MATH, MGSM, ARC), approaching Claude 3.5 Haiku on HumanEval+ (67.1% vs. 68.3%) at $100 total compute cost. 
+
+1 Introduction 
+
+The proliferation of large language models (LLMs) has created a pragmatic divide: closed-source models such as Claude 3.5 Haiku [ 1 ] and GPT-4o [ 2] achieve strong general-purpose reasoning, while open-source alternatives such as Llama 3.1 8B [ 3] offer customizability but lag on multi-benchmark performance. Closing this gap through targeted, parameter-efficient fine-tuning is a central challenge of con-temporary NLP research. Low-Rank Adaptation (LoRA) [ 4 ] has emerged as the domi-nant fine-tuning paradigm, injecting rank-decomposed update matrices into selected weight projections. Extensions such as AdaLoRA [ 5] adapt rank allocation based on gradient mag-nitude, while IGU-LoRA [ 6 ] applies integrated gradients for importance scoring. Independently, the Rotary Position En-coding (RoPE) [ 7] community developed context-extension methods (YaRN [ 8 ], LongRoPE [ 9]) by modifying frequency bases across all layers. Despite their parallel development, 
+
+the interaction between layer selection for LoRA and layer selection for RoPE has never been studied. 
+
+This paper addresses a precise mechanistic question: in a GQA transformer, do the layers that most distinguish correct from incorrect reasoning ( sensitivity ) coincide with the lay-ers where per-KV-head RoPE frequency modification most affects task performance ( RoPE influence )? We call this the co-localization hypothesis and design a controlled 4-way ablation to prove or disprove it. 
+
+Contributions. (1) We define the correctness-differential cosine distance δℓ, a functional layer importance metric mea-suring hidden-state divergence between correct and incorrect model inputs—distinct from gradient-based metrics. (2) We in-troduce GARFA, attaching 8 learnable per-KV-head RoPE scalers per targeted layer, exploiting GQA’s 4:1 structural amplification with only 80 new parameters. (3) We dis-cover strong anti-localization : Spearman rs = −0.735 
+
+(p = 1.66 × 10 −6); sensitive layers are ℓ ≥ 23 , RoPE-influential layers are ℓ ≤ 9; only layer 0 appears in both top-10 sets. (4) Via a 4-way ablation, we show that applying both interventions to sensitivity-identified layers outperforms all alternatives by 4–16pp, establishing sensitivity-guided tar-geting as the primary design principle. (5) We release all code, data, and figures for full replication. 
+
+2 Background 2.1 Llama 3.1 8B and Grouped Query Attention 
+
+Llama 3.1 8B [ 3 ] is a 32-layer decoder-only transformer with hidden size 4096, 32 query heads ( NQ), 8 KV heads ( NKV ), GQA ratio G = 4 , head dimension dh = 128 , and RoPE base 
+
+θbase = 500 000 .Grouped Query Attention (GQA) [ 10 ] assigns G =
+
+NQ/N KV query heads to share a single KV head, reducing KV cache by factor G. This creates a structural multiplier: a single scalar modifying one KV head’s RoPE basis simultaneously affects G × dh = 4 × 128 = 512 attention dimensions. 
+
+2.2 Rotary Position Encoding (RoPE) 
+
+RoPE [ 7] encodes token position m by rotating query/key vectors in 2D subspaces. For dimension 2i, the rotation angle 1
+
+> arXiv:2604.07766v1 [cs.CL] 9 Apr 2026
+
+is: 
+
+θm,i = m · θ−2i/d h 
+
+> base
+
+(1) The inner product after rotation depends only on relative posi-tion m − n.
+
+2.3 Low-Rank Adaptation (LoRA) 
+
+LoRA [4] augments a frozen weight W0 ∈ Rd×k with: 
+
+W = W0 + BA, B ∈ Rd×r , A ∈ Rr×k (2) where r ≪ min( d, k ). PEFT’s layers_to_transform 
+
+restricts adaptation to a specified layer subset, which we exploit for targeted LoRA. 
+
+3 Methodology 3.1 Correctness-Differential Sensitivity Analysis 
+
+We quantify each layer’s role in task correctness through the cosine distance between mean-pooled hidden states for paired correct vs. incorrect inputs. 
+
+Paired stimuli. We construct 15 minimal-pair stimuli across three domains: code generation (5 pairs: correct vs. nearly-correct Python, e.g. s==s[::-1] vs. s==s[1:] ), knowl-edge retrieval (5 pairs: factually correct vs. plausible errors, e.g. water freezes at 0°C vs. 4°C), and mathematical reasoning 
+
+(5 pairs: correct vs. subtly wrong derivations). Each pair is syn-tactically minimal so that any hidden-state difference reflects semantic rather than surface-form processing. 
+
+Sensitivity score. For layer ℓ and paired inputs (x+, x −):
+
+δℓ(ℓ, x +, x −) = 1 − h+ 
+
+> ℓ
+
+· h−
+
+> ℓ
+
+∥h+ 
+
+> ℓ
+
+∥ ∥ h− 
+
+> ℓ
+
+∥ (3) where h± 
+
+> ℓ
+
+is the sequence-mean hidden state at layer ℓ. The aggregate score averages over all task domains T and pair sets 
+
+Pτ :
+
+δℓ(ℓ) = 1
+
+|T | 
+
+X 
+
+> τ∈T
+
+1
+
+|P τ |
+
+X
+
+> (x+,x −)∈P τ
+
+δℓ(ℓ, x +, x −) (4) 
+
+Result. The profile is monotonically increasing; the top-10 sensitive layers are: 
+
+L∗ = {0, 23 , 24 , 25 , 26 , 27 , 28 , 29 , 30 , 31 } (5) Layer 31 achieves the highest sensitivity ( δ31 = 1 .62 × 10 −2), consistent with final blocks performing the most refined se-mantic discrimination before decoding. 
+
+3.2 Per-Layer RoPE Influence Probing 
+
+We measure each layer’s positional encoding contribution by scaling its RoPE base frequency by γ = 2 .0 and recording the resulting eval-loss change: 
+
+ρℓ(ℓ) = Lperturbed eval (ℓ) − L baseline eval (6) Larger |ρℓ| indicates greater dependence on precise positional encoding at layer ℓ. We probe all 32 layers, with linear inter-polation for unprobed layers. 
+
+Result. The top-10 RoPE-influential layers concentrate in the early network: 
+
+L∗ 
+
+> RoPE
+
+= {0, 1, 2, 3, 4, 5, 6, 7, 8, 9} (7) 
+
+3.3 Co-Localization Analysis 
+
+We measure rank correlation between the two profiles using Spearman’s rs:
+
+rs = 1 − 6 P 
+
+> ℓ
+
+d2
+
+> ℓ
+
+n(n2 − 1) , dℓ = rank (δℓ(ℓ)) − rank (ρℓ(ℓ)) (8) For our 32-layer model ( n = 32 ): 
+
+rs = −0.735 , p = 1 .66 × 10 −6 (9) This is strong anti-localization : the most task-sensitive layers are systematically the least RoPE-influential. The top-10 sets share only one layer: 
+
+L∗ ∩ L ∗ 
+
+> RoPE
+
+= {0}, overlap = 10% (10) Under the null hypothesis (random assignment), expected over-lap is ≈ 3.1 layers (hypergeometric, N = 32 , K = 10 ,
+
+n = 10 ). The observed overlap of 1 is well below this. 
+
+3.4 Layer-Sensitive LoRA (LS-L ORA) 
+
+LS-L ORA restricts LoRA adaptation to L∗ only: 
+
+∆Wℓ = BℓAℓ, ℓ ∈ L ∗ (11) We apply LoRA with r = 64 , α = 128 to seven projection matrices per layer: {WQ, W K , W V , W O , W gate , W up , W down },yielding ≈42.6M trainable parameters across 10 layers (Ta-ble 1). 
+
+3.5 GQA-Aware RoPE Frequency Adaptation (GARFA) 
+
+For each targeted layer ℓ ∈ L ∗ and KV head k ∈ { 0, . . . , 7},we introduce a learnable scalar α(ℓ) 
+
+> k
+
+modifying the effective RoPE base: 
+
+θ(k,ℓ ) 
+
+> m,i
+
+= m · (θbase · α(ℓ) 
+
+> k
+
+)−2i/d h (12) To prevent degenerate solutions, we reparametrize via an un-constrained raw scalar w:
+
+α(ℓ) 
+
+> k
+
+= 0 .1 + 9 .9 · σ(w(ℓ) 
+
+> k
+
+), α(ℓ) 
+
+> k
+
+∈ [0 .1, 10 .0] (13) initialized near α(ℓ) 
+
+> k
+
+= 1 .0 (identity). In the forward pass, only KV heads are scaled; Q heads retain standard RoPE, creating learned positional asymmetry: 
+
+˜k(k) = RoPE 
+
+
+
+k(k); θbase ·
+
+q
+
+α(ℓ)
+
+> k
+
+
+
+(14) The √· factor linearizes the frequency scaling. GARFA adds 
+
+8 × 10 = 80 parameters total (Table 1). 
+
+3.6 Dual Optimizer Training 
+
+LS-L ORA and GARFA parameters require different learn-ing rates: 
+
+ηLoRA = 2 × 10 −4 (15) 
+
+ηRoPE = 1 × 10 −3 (16) Both use AdamW [ 11 ] with weight decay 0.01 and a cosine schedule with 3% linear warmup. The 5 × higher GARFA rate reflects rapid adaptation of an 80-dimensional space alongside 42.6M LoRA parameters. 2Component Params %                     
+
+> Llama 3.1 8B (base, frozen) 8,030M —LS-L ORA ( r=64 , 10 layers) 42,598,400 0.53% GARFA (8 heads, 10 layers) 80 <0.001%
+> Total trainable 42,598,480 0.53% Table 1. Trainable parameter counts for the full method.
+> Dataset Domain Size
+> Magicoder-OSS-75K [13] Code 75,000 CodeAlpaca-20K [14] Code 20,000 MetaMathQA-30K [15] Math 30,000 OpenHermes-2.5 [16] General 20,000
+> Total 145,000 Table 2. Training dataset composition.
+
+4 Experimental Setup Base model. We use Llama 3.1 8B Instruct [ 3 ] through-out, loaded with QLoRA [ 12 ] 4-bit NF4 double quan-tization (BFloat16 compute dtype) on a single NVIDIA H100 SXM5 80GB GPU (RunPod, $48.30 total). 
+
+Training data. We combine four instruction-tuning datasets (Table 2), formatted with the Llama 3 chat template and trun-cated to 1,024 tokens. A 2% held-out split is used for evalua-tion loss tracking. 
+
+Hyperparameters. LoRA rank r = 64 ,
+
+α = 128 , dropout 0.05; target modules 
+
+{WQ, W K , W V , W O , W gate , W up , W down }; ηLoRA = 2 × 10 −4,
+
+ηRoPE = 1 × 10 −3, cosine schedule, 3% warmup, batch size 4, gradient accumulation 4 steps (effective batch 16), max 3,000 steps, BFloat16 precision. 
+
+Evaluation. We evaluate on six benchmarks: MMLU [ 17 ](5-shot, accuracy), GPQA [18 ] (0-shot, accuracy), Hu-manEval+ [ 19 ] (pass@1, EvalPlus with vLLM), MATH [ 20 ](4-shot, accuracy), MGSM [ 21 ] (8-shot, accuracy), and ARC-Challenge [ 22 ] (25-shot, accuracy). All use lm-eval [ 23 ] except HumanEval+. DROP [ 24 ] was excluded from ablation analysis due to a known incompatibility between lm-eval’s likelihood scoring and instruction-tuned models (near-zero scores ob-served regardless of model quality; included in supplementary for reference). 
+
+Ablation design. We run four experiments varying only the layer sets for LoRA and GARFA, with all other hyperparame-ters fixed (Table 3). L∗ = {0, 23 –31 } (sensitivity-identified); 
+
+Lr = {2, 3, 4, 7, 9, 14 , 18 , 19 , 21 , 22 } (random, seed 123, non-overlapping with L∗). If co-localization drives performance, we predict A > B ≈
+
+C > D . If only LoRA placement matters: A ≈ B > C ≈ D.If only GARFA placement matters: A ≈ C > B ≈ D.
+
+5 Results 5.1 Anti-Localization Finding 
+
+Figures 1 and 2 visualize the finding. The 32 layers separate into two nearly non-overlapping clusters: task-sensitive layers                 
+
+> Exp. LoRA GARFA Role
+> AL∗L∗Co-localized (ours) BL∗LrLoRA alone? CLrL∗GARFA alone? DLrLrRandom control
+> Table 3. Cross-layer ablation design.
+
+(ℓ ≥ 23 , high δℓ, low |ρℓ|) and RoPE-influential layers ( ℓ ≤ 9,low δℓ, high |ρℓ|). Layer 0 is the sole exception, appearing in both top-10 sets. Its dual membership is mechanistically coherent: as the first transformer block, it processes the initial token embedding (sensitive to semantic input) while simultaneously applying the first positional encoding (structurally RoPE-prominent). The sensitivity profile spans more than three orders of magnitude, rising from δ1 = 1.07 × 10 −5 at layer 1 to 
+
+δ31 = 1 .62 × 10 −2 at layer 31 ( >1,500 × increase), consis-tent with progressive semantic abstraction across depth (see Appendix A for full numerical profiles). 
+
+Remark 1. The anti-localization is mechanistically coherent. Early layers apply positional encodings to raw token features, making them structurally RoPE-sensitive. Late layers perform high-level semantic discrimination after positional information has already been integrated, making them task-sensitive but relatively RoPE-insensitive. 
+
+5.2 Main Ablation Results 
+
+Table 4 presents the full evaluation results. 
+
+Finding 1: A ≫ D across all benchmarks. Experiment A (co-localized) outperforms Experiment D (random) by 4–16pp on every single benchmark (Table 5), with no increase in pa-rameter count. Gains are largest on HumanEval+ (+15.8pp) and MGSM (+9.6pp). 
+
+Finding 2: Pattern A > B ≈ C > D. Exp B and Exp C perform between A and D on all benchmarks, with B slightly better than C on GPQA (+3.1pp) and MGSM (+3.7pp), and C better on MATH (+3.1pp). The near-parity of B and C indicates that each intervention contributes independently but sub-additively when applied to non-co-localized layers. 
+
+Finding 3: Synergy of co-localization. Experiment A leads both B and C by 6.7pp on HumanEval+, confirming that com-bining LS-L ORA and GARFA on the same sensitive layers produces synergistic benefit beyond either intervention alone. 
+
+5.3 Learned RoPE Scaling Factors 
+
+Figure 5 shows the learned α(ℓ) 
+
+> k
+
+values. All 80 parameters converge to [7 .3, 9.0] , well above the identity value of 1.0, in-dicating consistent frequency upscaling at task-sensitive layers. The most notable per-head variation occurs at layer 23 (the first sensitive layer): KV heads 1 and 3 learn α ≈ 7.3 while head 4 learns α ≈ 8.9, suggesting that distinct KV heads specialize to different positional ranges at the task decision boundary. Table 6 gives exact values for representative layers. 30 0.2 0.4 0.6 0.8 1 1.2 1.4 1.6
+
+> ·10 −2
+> 0
+> −1
+> −2
+> −3
+> −4
+> −5
+> −6
+> −7
+> ·10 −2
+> 0
+> WEAK CO-LOCALIZATION
+
+Sensitivity Score δℓ
+
+> RoPE Influence Score  ρℓ
+> Neither top-10 (10–22)
+> RoPE-influential only (1–9)
+> Sensitive only (23–31)
+> Co-localized (layer 0)
+
+Figure 1. Scatter plot of sensitivity δℓ vs. RoPE influence ρℓ per layer. Green: co-localized (layer 0 only). Orange: sensitive-only (23–31). Blue: RoPE-influential only (1–9). Gray: neither top-10. Dashed: linear fit. Spearman rs = −0.735 (p < 10 −5).       
+
+> 0510 15 20 25 31
+> 0
+> 5×10 −3
+> 10 −2
+> 1.5×10 −2
+> ·10 −2
+> Layer 0
+
+Layer Index ℓ     
+
+> Sensitivity  δℓ
+> Sensitivity δℓ(left) 0
+> −1
+> −2
+> −3
+> −4
+> −5
+> −6
+> −7
+> ·10 −2
+> RoPE Influence  ρℓ
+> RoPE Influence ρℓ(right)
+
+Figure 2. Dual-axis layer profile: sensitivity δℓ (orange, left axis) and RoPE influence ρℓ (blue dashed, right axis) vs. layer index. The profiles are anti-correlated: sensitivity rises through late layers while RoPE influence concentrates in early layers. Green band marks layer 0, the sole co-localized layer. 
+
+6 Analysis 6.1 Why Anti-Localization Exists 
+
+We propose a structural account based on depth-wise func-tional specialization: 
+
+Proposition 1. In deep transformers, early layers ( ℓ ≤ L/ 4)perform structural feature extraction where positional order-ing governs syntax and token co-occurrence. Late layers (ℓ ≥ 3L/ 4) perform high-level semantic integration where the content of reasoning matters more than token positions. Anti-localization is the natural consequence of this depth-wise specialization. 
+
+Supporting evidence: (i) the sensitivity profile is monoton-ically increasing (progressive semantic abstraction); (ii) the RoPE influence profile peaks at early layers where positional structure is still being established; (iii) middle layers show intermediate values on both profiles, consistent with a gradual transition zone. 
+
+6.2 Why Co-Localized Application Wins 
+
+If early layers are naturally more RoPE-influential, why does applying GARFA to the late sensitive layers (Exp A) outperform applying it to the naturally influential early layers (Exp C)? We propose the computational bottleneck hypothe-sis :
+
+Remark 2. Task performance is bottlenecked at the layers that drive correctness decisions. Applying GARFA to early layers improves general positional processing but does not address the correctness bottleneck. Applying GARFA to sensi-tive late layers modifies how much relative-position context is available when the model makes task decisions , which is what 
+
+4Model MMLU GPQA HumanEval+ MATH MGSM ARC Avg. 
+
+Llama 3.1 8B (baseline) 68.88 35.49 68.90 31.46 45.67 56.66 51.18 Exp D: Lr +Lr (control) 64.01 26.56 51.22 22.87 34.04 52.65 41.89 Exp C: Lr +L∗ 67.18 31.70 60.37 28.12 39.78 53.16 46.72 Exp B: L∗+Lr 67.21 34.82 60.37 25.04 43.45 56.23 47.85 
+
+Exp A: L∗+L∗ (ours) 68.53 34.82 67.07 28.95 43.60 56.14 49.85 
+
+Claude 3.5 Haiku (target) 71.70 33.30 68.30 41.30 75.90 89.20 63.28 
+
+Table 4. Main results across six benchmarks. Bold green = best fine-tuned model per column. Avg. = macro-average. All scores are percentages. 
+
+MMLU GPQA HumanEval+ MATH MGSM ARC 
+
+20 
+
+40 
+
+60 
+
+80 
+
+> 68 .53
+> 34 .82
+> 67 .07
+> 28 .95
+> 43 .6
+> 56 .14
+> 67 .21
+> 34 .82
+> 60 .37
+> 25 .04
+> 43 .45
+> 56 .23
+> 67 .18
+> 31 .7
+> 60 .37
+> 28 .12
+> 39 .78
+> 53 .16
+> 64 .01
+> 26 .56
+> 51 .22
+> 22 .87
+> 34 .04
+> 52 .65
+> Accuracy (%)
+
+Exp A: L∗+L∗ (ours) Exp B: L∗+Lr
+
+Exp C: Lr +L∗ Exp D: Lr +Lr
+
+Figure 3. Cross-layer ablation: grouped bars per benchmark. Experiment A consistently leads Experiments B, C, and D. The A >B≈C>Dpattern holds across all six benchmarks. 
+
+Benchmark ∆ (pp) 
+
+HumanEval+ +15.8 
+
+MGSM +9.6 
+
+GPQA +8.3 
+
+MATH +6.1 
+
+MMLU +4.5 
+
+ARC +3.5 Table 5. Exp A minus Exp D (pp). All six benchmarks are positive. 
+
+L H0 H1 H2 H3 H4 H5 H6 H7 0 8.23 8.62 8.47 8.82 8.89 8.83 8.46 8.98 23 8.74 7.30 8.04 7.31 7.70 7.61 7.68 7.62 27 8.35 7.78 8.24 8.42 8.40 8.00 8.55 8.46 31 7.95 8.24 7.96 7.76 8.60 7.55 7.99 8.17 
+
+Table 6. Learned α(ℓ) 
+
+> k
+
+for representative layers (all ≫ 1.0). 
+
+benchmark performance ultimately depends on. 
+
+This reframes GARFA not as positional tuning in the tra-ditional sense (improving position tracking), but as positional context tuning for task-critical computations .
+
+6.3 GQA Structural Amplification 
+
+The GQA 4:1 ratio creates per-parameter leverage for GARFA. Each scalar α(ℓ) 
+
+> k
+
+affects 4 × 128 = 512 attention dimensions. Across 10 layers: 
+
+8×4×128 ×10 = 40 ,960 head-layer-dim combinations (17) This explains how 80 GARFA scalars have measurable effect alongside 42.6M LoRA parameters: each scalar has ∼500 ×
+
+the dimensional reach of a single LoRA weight. 
+
+6.4 Baseline Regression 
+
+All fine-tuned variants show some regression from the Llama 3.1 8B baseline on knowledge-heavy benchmarks (MMLU, GPQA). This is expected: the code/math-heavy train-ing mixture shifts the output distribution away from the factual format expected by likelihood-based evaluation. The relative ordering A >B>C>D is preserved regardless of the absolute baseline comparison, and Exp A recovers to within 0.35pp of the MMLU baseline. 
+
+7 Related Work Parameter-efficient fine-tuning. LoRA [ 4] estab-lished rank-decomposed updates as the standard PEFT ap-5HumanEval+ MGSM GPQA MATH MMLU ARC 
+
+0
+
+5
+
+10 
+
+15 
+
+15 .8
+
+9.6 8.3
+
+6.1
+
+4.5 3.5
+
+> Exp A  − Exp D (pp)
+
+Figure 4. Exp A minus Exp D per benchmark (pp). All six values are positive, confirming universal improvement of co-localized over random layer selection. 
+
+H0 H1 H2 H3 H4 H5 H6 H7 
+
+L0 
+
+L23 
+
+L24 
+
+L25 
+
+L26 
+
+L27 
+
+L28 
+
+L29 
+
+L30 
+
+L31                                                                       
+
+> 8.23 8.62 8.47 8.82 8.89 8.83 8.46 8.98
+> 8.74 7.38.04 7.31 7.77.61 7.68 7.62
+> 8.49 8.64 8.44 7.99 7.33 7.66 7.47 7.98
+> 8.03 7.54 8.27.59 8.26 8.39 8.46 8.16
+> 8.07 8.57 8.38 7.88 8.04 8.22 8.48.09
+> 8.35 7.78 8.24 8.42 8.488.55 8.46
+> 8.35 8.37 8.28 7.83 8.34 7.95 8.09 8.14
+> 8.56 8.78 8.45 8.78 8.68.19 8.17 8.12
+> 8.01 8.51 8.05 7.57 8.29 8.53 8.07 7.53
+> 7.95 8.24 7.96 7.76 8.67.55 7.99 8.17
+
+7.3
+
+7.6
+
+7.9
+
+8.2
+
+8.5
+
+8.8
+
+9
+
+> α(ℓ)
+> k
+
+Figure 5. Heatmap of learned α(ℓ) 
+
+> k
+
+values (10 targeted layers × 8 KV heads) after training Exp A. All 80 values lie in [7 .3, 9.0] , well above the identity ( α = 1 .0), indicating systematic frequency upscaling. Layer 23 shows the highest per-head variance (range: 7.30 –8.74 ). 
+
+proach. Extensions include QLoRA [ 12 ] (quantized training), AdaLoRA [ 5 ] (adaptive rank via SVD importance), DoRA [ 25 ](magnitude-direction decomposition), and LoRA+ [ 26 ] (dif-ferential A/B learning rates). None of these works study the interaction between layer selection and positional encoding modification. 
+
+RoPE modifications. ALiBi [ 27 ] replaces RoPE with at-tention biases. YaRN [ 8 ] and LongRoPE [ 9 ] scale RoPE fre-quencies uniformly across all layers for context extension. These methods target context length, not task performance. GARFA is the first layer-selective, per-KV-head RoPE adapta-tion method for task fine-tuning. 
+
+Layer analysis. Tenney et al. [ 28 ] showed BERT encodes syntax at lower layers and semantics at higher layers. Rogers et al. [ 29 ] survey BERT layer behaviors. Meng et al. [ 30 ] localize factual associations to middle MLP layers in GPT-style models. Our correctness-differential analysis extends this line of work to causal LLMs using a task-correctness functional signal. 
+
+8 Limitations Single model family. All experiments use Llama 3.1 8B. Whether anti-localization generalizes to other GQA models (Mistral, Gemma, Llama 70B) is open. We conjecture the monotonically increasing sensitivity pattern is general; specific layer indices will vary. 
+
+Sensitivity probe size. Our metric uses 15 manually con-structed pairs. Larger automatically mined pair sets would improve robustness, though our multi-task averaging reduces per-domain bias. 
+
+Training distribution. The code/math-heavy mixture causes distribution shift on factual benchmarks. A more bal-anced dataset would reduce baseline regression without com-promising code/math gains. 
+
+Checkpoint release. Due to storage constraints ( ∼150GB per merged model), we do not release checkpoints but provide all scripts, hyperparameters, and sensitivity profiles for full replication. 
+
+9 Conclusion 
+
+We investigated the co-localization hypothesis in Llama 3.1 8B, asking whether task-sensitive layers and RoPE-influential layers coincide. They do not: Spear-man rs = −0.735 (p = 1.66 × 10 −6) reveals strong anti-localization, with sensitive layers at ℓ ≥ 23 and 6RoPE-influential layers at ℓ ≤ 9.Despite this anti-localization, a controlled 4-way ablation definitively shows that applying both LS-L ORA and GARFA to the sensitivity-identified layers outperforms all alternative placements by 4–16pp across six benchmarks. This establishes the computational bottleneck principle : both weight-space and positional-space interventions are most effective when targeted at the layers that drive task correctness, even if those layers are not where positional encodings are structurally most prominent. Our work opens a new research direction at the intersection of layer attribution, positional encoding design, and GQA-specific analysis, achieving within 1.2pp of Claude 3.5 Haiku on HumanEval+ at $100 total compute cost. 
+
+Acknowledgments 
+
+The author thanks Dr. Truong-Son Hy, Tenure-Track Assis-tant Professor at the University of Alabama at Birmingham and Editor of Scientific Reports (Nature Portfolio), for his arXiv endorsement and kind encouragement in support of this work. 
+
+References 
+
+[1] Anthropic. Claude 3.5 Haiku: Anthropic’s fastest model. 
+
+https://www.anthropic.com/claude/haiku ,2024. [2] OpenAI. GPT-4o system card. https://openai.com/ index/gpt-4o-system-card , 2024. [3] Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Amy Yang, Angela Fan, et al. The Llama 3 herd of models. arXiv preprint arXiv:2407.21783 , 2024. URL https: //arxiv.org/abs/2407.21783 .[4] Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: Low-rank adaptation of large language models. In International Conference on Learning Representations (ICLR) , 2022. URL 
+
+https://arxiv.org/abs/2106.09685 .[5] Qingru Zhang, Minshuo Chen, Alexander Bukharin, Nikos Karampatziakis, Pengcheng He, Yu Cheng, Weizhu Chen, and Tuo Zhao. AdaLoRA: Adaptive budget allocation for parameter-efficient fine-tuning. In International Conference on Learning Representations (ICLR) , 2023. URL https: //arxiv.org/abs/2303.10512 .[6] Yihua Gu et al. IGU-LoRA: Integrated gradients utilization for parameter-efficient fine-tuning. arXiv preprint , 2024. [7] Jianlin Su, Murtadha Ahmed, Yu Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu. RoFormer: Enhanced transformer with rotary position embedding. Neurocomputing , 568:127063, 2024. [8] Bowen Peng, Jeffrey Quesnelle, Honglu Fan, and Enrico Ship-pole. YaRN: Efficient context window extension of large lan-guage models. arXiv preprint arXiv:2309.00071 , 2023. [9] Yiran Chen, Shuohang Qian, Haowei Tang, Xuhui Lai, Siyang Liu, Chenlong Han, and Caiming Xiong. LongRoPE: Extending LLM context window beyond 2 million tokens. arXiv preprint arXiv:2402.13753 , 2024. [10] Joshua Ainslie, James Lee-Thorp, Michiel de Jong, Yury Ze-lasko, Rémi Lebret, and Yi Tay. GQA: Training generalized multi-query transformer models from multi-head checkpoints. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing (EMNLP) , 2023. [11] Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. In International Conference on Learning Repre-sentations (ICLR) , 2019. [12] Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. QLoRA: Efficient finetuning of quantized LLMs. In Advances in Neural Information Processing Sys-tems (NeurIPS) , 2023. URL https://arxiv.org/abs/ 2305.14314 .[13] Yuxiang Wei, Zhe Wang, Jiawei Liu, Yifeng Ding, and Ling-ming Zhang. Magicoder: Source code is all you need. arXiv preprint arXiv:2312.02120 , 2024. [14] Sahil Chaudhary. Code Alpaca: An instruction-following LLaMA model trained on code generation instructions. https: //github.com/sahil280114/codealpaca , 2023. [15] Longhui Yu, Weisen Jiang, Han Shi, Jincheng Yu, Zhengying Liu, Yu Zhang, James T. Kwok, Zhenguo Li, Adrian Weller, and Weiyang Liu. MetaMath: Bootstrap your own mathe-matical questions for large language models. arXiv preprint arXiv:2309.12284 , 2024. [16] Teknium. OpenHermes 2.5: An open dataset of primarily GPT-4 generated instruction tuning data. https://huggingface. co/datasets/teknium/OpenHermes-2.5 , 2023. [17] Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Man-tas Mazeika, Dawn Song, and Jacob Steinhardt. Measuring massive multitask language understanding. arXiv preprint arXiv:2009.03300 , 2021. [18] David Rein, Betty Li Hou, Asa Cooper Stickland, Jackson Petty, Richard Yuanzhe Pang, Julien Dirani, Julian Michael, and Samuel R. Bowman. GPQA: A graduate-level Google-proof Q&A benchmark. arXiv preprint arXiv:2311.12022 , 2023. [19] Jiawei Liu, Chunqiu Steven Xia, Yuyao Wang, and Lingming Zhang. Is your code generated by ChatGPT really correct? rigorous evaluation of large language models with EvalPlus. In 
+
+Advances in Neural Information Processing Systems (NeurIPS) ,2023. [20] Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. Measuring mathematical problem solving with the MATH dataset. In Advances in Neural Information Processing Sys-tems (NeurIPS) , 2021. [21] Freda Shi, Mirac Suzgun, Markus Freitag, Xuezhi Wang, Sunayana Srivats, Soroush Vosoughi, Hyung Won Chung, Yi Tay, Sebastian Ruder, Denny Zhou, Dipanjan Das, and Ja-son Wei. Language models are multilingual chain-of-thought reasoners. arXiv preprint arXiv:2210.03057 , 2022. 
+
+7[22] Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. Think you have solved question answering? try ARC, the AI2 reasoning challenge. arXiv preprint arXiv:1803.05457 , 2018. [23] Leo Gao, Stella Biderman, Sid Black, Laurence Golding, Travis Hoppe, Charles Foster, Jason Phang, Horace He, Anish Thite, Noa Nabeshima, et al. A framework for few-shot language model evaluation. https://github.com/EleutherAI/ lm-evaluation-harness , 2021. [24] Dheeru Dua, Yizhong Wang, Pradeep Dasigi, Gabriel Stanovsky, Sameer Singh, and Matt Gardner. DROP: A reading comprehen-sion benchmark requiring discrete reasoning over paragraphs. In Proceedings of NAACL-HLT , 2019. [25] Shih-Yang Liu, Chien-Yi Wang, Hongxu Yin, Pavlo Molchanov, Yu-Chiang Frank Wang, Kwang-Ting Cheng, and Min-Hung Chen. DoRA: Weight-decomposed low-rank adaptation. In 
+
+International Conference on Machine Learning (ICML) , 2024. URL https://arxiv.org/abs/2402.09353 .[26] Soufiane Hayou, Nikhil Ghosh, and Bin Yu. LoRA+: Ef-ficient low rank adaptation of large models. arXiv preprint arXiv:2402.12354 , 2024. [27] Ofir Press, Noah A. Smith, and Mike Lewis. Train short, test long: Attention with linear biases enables input length extrapola-tion. In International Conference on Learning Representations (ICLR) , 2022. [28] Ian Tenney, Dipanjan Das, and Ellie Pavlick. BERT rediscovers the classical NLP pipeline. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics (ACL) ,2019. [29] Anna Rogers, Olga Kovaleva, and Anna Rumshisky. A primer in BERTology: What we know about how BERT works. Trans-actions of the Association for Computational Linguistics , 8: 842–866, 2020. [30] Kevin Meng, David Bau, Alex Andonian, and Yonatan Belinkov. Locating and editing factual associations in GPT. In Advances in Neural Information Processing Systems (NeurIPS) , 2022. 
+
+A Full Layer Profiles 
+
+Table 7 gives the exact 32-layer profiles used for all layer selection decisions. Bold rows are top-10 RoPE-influential (layers 0–9). 
+
+B Implementation Notes GARFA. LearnableKVHeadRoPEScaler stores a raw 
+
+NKV -vector initialized to 2.2 ( σ(2 .2) ≈ 0.9, so α ≈
+
+1.0). The attention forward pass is monkey-patched via 
+
+types.MethodType . Only KV heads are scaled; Q heads retain standard RoPE. 
+
+Merged checkpoint compatibility. After 
+
+merge_and_unload , safetensors files contain 
+
+rope_scaler.raw keys that vLLM rejects. Strip them before evaluation: 
+
+L δℓ ρℓ L δℓ ρℓ
+
+0 5.13 ×10 −3 −0.001 16 8.59 ×10 −4 −0.030 
+
+1 1.07 ×10 −5 −0.013 17 9.51 ×10 −4 −0.028 
+
+2 2.30 ×10 −5 −0.013 18 1.05 ×10 −3 −0.030 
+
+3 4.79 ×10 −5 −0.012 19 1.16 ×10 −3 −0.028 
+
+4 7.77 ×10 −5 −0.012 20 1.29 ×10 −3 −0.030 
+
+5 1.05 ×10 −4 −0.010 21 1.52 ×10 −3 −0.065 
+
+6 1.36 ×10 −4 −0.010 22 1.72 ×10 −3 −0.060 
+
+7 1.83 ×10 −4 −0.010 23 1.94 ×10 −3 −0.035 
+
+8 2.17 ×10 −4 −0.010 24 2.20 ×10 −3 −0.035 
+
+9 2.71 ×10 −4 −0.011 25 2.49 ×10 −3 −0.037 
+
+10 3.05 ×10 −4 −0.014 26 2.82 ×10 −3 −0.039 
+
+11 3.75 ×10 −4 −0.018 27 3.12 ×10 −3 −0.038 
+
+12 5.17 ×10 −4 −0.020 28 3.62 ×10 −3 −0.036 
+
+13 6.62 ×10 −4 −0.025 29 4.12 ×10 −3 −0.042 
+
+14 7.10 ×10 −4 −0.025 30 5.62 ×10 −3 −0.048 
+
+15 7.77 ×10 −4 −0.028 31 1.62 ×10 −2 −0.048 
+
+Table 7. Full sensitivity ( δℓ) and RoPE influence ( ρℓ) profiles for all 32 layers. Bold = top-10 RoPE-influential layers (0–9), forming 
+
+L∗
+
+> RoPE
+
+.
+
+from safetensors.torch import (load_file, save_file) import glob for sf in glob.glob(f’{merged}/*.safetensors’): t = {k: v for k, v in load_file(sf).items() if ’rope_scaler’ not in k} save_file(t, sf) 
+
+MGSM metric. lm-eval writes MGSM scores under exact_match,flexible-extract , not 
+
+exact_match,none . Result parsers must account for this key name. 8

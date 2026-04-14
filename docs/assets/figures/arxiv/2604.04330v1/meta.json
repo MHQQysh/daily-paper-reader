@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04330v1/fig-001.webp",
+      "caption": "Table 3: COCO detection and segmentation AP on different 𝜎fab. Values are Without/With CCT+NALN fine-tuning.",
+      "page": 6,
+      "index": 1,
+      "width": 414,
+      "height": 340
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04330v1/fig-002.webp",
+      "caption": "Figure 6: Top-1 mean accuracy (%) of ViT-Tiny on CIFAR10 under different fabrication noise levels 𝜎fab. Results are shown for direct noisy inference, normal fine-tuning, CCT fine-tuning, and CCT+NALN.",
+      "page": 5,
+      "index": 2,
+      "width": 506,
+      "height": 342
+    }
+  ]
+}

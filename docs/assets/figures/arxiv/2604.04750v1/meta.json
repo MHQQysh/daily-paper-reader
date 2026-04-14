@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-001.webp",
+      "caption": "Figure 6: Example of mapping 64-node logical EP all-to-all traffic onto a three-layer torus–mesh–mesh topology. (a) Logical TM, (b) topology bandwidth, (c) routed physical traffic, and (d) resulting link utilization.",
+      "page": 6,
+      "index": 1,
+      "width": 502,
+      "height": 482
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-002.webp",
+      "caption": "Figure 15: DSE heatmaps for throughput-optimal and energy-optimal designs across stacked (𝑚) and connected (𝑛) DRAM layer configurations. Energy-efficient designs consistently favor more stacked but fewer connected layers.",
+      "page": 11,
+      "index": 2,
+      "width": 1052,
+      "height": 339
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-003.webp",
+      "caption": "Figure 19: Effectiveness of expanded parallelism in DeepStack. ASTRA-sim* supports only TP/PP/DP.",
+      "page": 11,
+      "index": 3,
+      "width": 482,
+      "height": 249
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-004.webp",
+      "caption": "Table 3: NoC Configurations",
+      "page": 7,
+      "index": 4,
+      "width": 440,
+      "height": 401
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-005.webp",
+      "caption": "Table 2: Architecture Specifications per 800mm2",
+      "page": 7,
+      "index": 5,
+      "width": 448,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-006.webp",
+      "caption": "Figure 14: End-to-end TPS for DeepSeek-V3 and area breakdown across different DRAM stacking layers. The optimal layer depends on batch size and inference phase.",
+      "page": 10,
+      "index": 6,
+      "width": 495,
+      "height": 428
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-007.webp",
+      "caption": "Figure 8: DeepStack modeling accuracy compared to 8×H100 GPUs. Kernels implemented using Triton-distributed.",
+      "page": 8,
+      "index": 7,
+      "width": 468,
+      "height": 264
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-008.webp",
+      "caption": "Figure 9: DeepStack modeling accuracy on vLLM TP8 and EP8 for MoE on an 8×B200 GPU system.",
+      "page": 8,
+      "index": 8,
+      "width": 468,
+      "height": 268
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-009.webp",
+      "caption": "Figure 10: DeepStackmodeling accuracy vs. ASTRA-sim (NS-3 and analytical backends) across Switch and Torus topologies. DeepStack matches NS-3 fidelity with up to ∼ 105× speedup.",
+      "page": 8,
+      "index": 9,
+      "width": 495,
+      "height": 248
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-010.webp",
+      "caption": "Figure 4: Overview of DeepStack DSE Framework.",
+      "page": 4,
+      "index": 10,
+      "width": 1050,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04750v1/fig-011.webp",
+      "caption": "Figure 11: Pareto frontiers from DeepStack’s DSE across design points. A representative subset is shown for clarity.",
+      "page": 9,
+      "index": 11,
+      "width": 941,
+      "height": 191
+    }
+  ]
+}

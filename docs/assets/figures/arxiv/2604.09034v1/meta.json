@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09034v1/fig-001.webp",
+      "caption": "Table 3: Hyperparameters for QLoRA with 70B Models.",
+      "page": 6,
+      "index": 1,
+      "width": 452,
+      "height": 414
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09034v1/fig-002.webp",
+      "caption": "Table 2: Bitsandbytes Quantization Config and Value.",
+      "page": 6,
+      "index": 2,
+      "width": 773,
+      "height": 468
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09034v1/fig-003.webp",
+      "caption": "Table 7: Model Version of Dataset Combination. ’Filtering Platypus’ mentioned in each version represents a combined dataset, which includes all data from rows 1 to 7 as listed in Table 1.",
+      "page": 8,
+      "index": 3,
+      "width": 786,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09034v1/fig-004.webp",
+      "caption": "Table 1: Datasets, Tasks, Number of Data Size, and Licenses. Our datasets, primarily showcased under Open-Platypus [17], demonstrate a strong emphasis on STEM and logical reasoning. In addition to these specialized datasets, we have also incorporated a diverse range of tasks such as general QA and conversation. This approach is part of our strategic effort to conduct instruction tuning across various fields, ensuring a comprehensive and robust training for diverse applications.",
+      "page": 4,
+      "index": 4,
+      "width": 814,
+      "height": 649
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09034v1/fig-005.webp",
+      "caption": "Table 8: Result of Benchmark Test.The testing environment for these benchmarks was identical to that used in the challenge leaderboards. For the MMLU scores, only 17 out of 57 categories were utilized. Additionally, all datasets were evaluated based on 50 examples each to calculate the values. The columns under CNN/DailyMail represent ROUGE-2, Stereotypes (race), Stereotypes (gender), Representation (race), and Representation (gender), respectively.",
+      "page": 9,
+      "index": 5,
+      "width": 640,
+      "height": 188
+    }
+  ]
+}
