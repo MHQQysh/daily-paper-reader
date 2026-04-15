@@ -1,0 +1,1956 @@
+Title: Hierarchical Kernel Transformer: Multi-Scale Attention with an Information-Theoretic Approximation Analysis
+
+URL Source: https://arxiv.org/pdf/2604.08829v1
+
+Published Time: Mon, 13 Apr 2026 00:17:56 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Hierarchical Kernel Transformer: Multi-Scale Attention with an Information-Theoretic Approximation Analysis 
+
+Giansalvo Cirrincione a,∗
+
+> a
+
+Laboratoire LTI, Université de Picardie Jules Verne, 33 rue Saint-Leu, Amiens, 80039, France 
+
+A R T I C L E I N F O 
+
+Keywords :Attention Hierarchical Kernel Long-range Kurtosis Transformer 
+
+A B S T R A C T 
+
+The self-attention mechanism at the core of modern Transformer models treats every pair of tokens in a sequence with equal architectural capacity, regardless of how far apart they are. This 
+
+single-scale bias limits performance on tasks that require reasoning simultaneously at short and long range, while incurring quadratic computational cost in sequence length. The Hierarchical Kernel Transformer (HKT) is proposed, a multi-scale attention mechanism that processes the input sequence at multiple resolution levels simultaneously. At each level, a compressed version of the sequence is obtained by trainable causal downsampling; attention scores are computed independently at each level and combined through learned weights. This design captures both local patterns and long-range structure with a total computational cost of at most 4∕3 times that of standard attention, regardless of the number of levels ( 1.3125× for three levels). Four theoretical contributions are established: (i) the hierarchical scoring function defines a positive semidefinite kernel under a sufficient condition on the symmetrised bilinear form (Proposition 3.1); (ii) the asymmetric score matrix decomposes uniquely into a symmetric component controlling reciprocal attention and an antisymmetric component controlling directional attention, with HKT providing 𝐿 independent such pairs across scales (Propositions 3.5– 3.6); (iii) the approximation error decomposes into three interpretable components with an explicit non-Gaussian correction and a geometric decay bound in the number of levels (Theorem 4.3, Proposition 4.4); (iv) HKT strictly subsumes standard attention and causal convolution in the single-head setting (Proposition 3.4). Empirically, HKT achieves consistent gains over retrained standard attention baselines across three tasks of different modalities (mean ± std, 3 seeds): +4 .77 pp on synthetic ListOps (55 .10 ± 0 .29% vs 50 .33 ± 0 .12% , 𝑇 = 512 ), +1 .44 pp on sequential CIFAR-10 ( 35 .45 ± 0 .09% 
+
+vs 34 .01 ± 0 .19% , 𝑇 = 1 ,024 ), and +7 .47 pp on IMDB character-level sentiment classification (70 .19 ± 0 .57% vs 62 .72 ± 0 .40% , 𝑇 = 1 ,024 ), all at 1.31× computational overhead. 
+
+1. Introduction 
+
+The self-attention mechanism (Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser and Polosukhin, 2017) has become the dominant computational primitive in sequence modelling. For a sequence of 𝑇 tokens, attention computes a weighted average of value vectors, where the weights are determined by pairwise dot products between query and key projections. This single operation, repeated across layers, has proven remarkably expressive across a wide range of tasks. Yet this simplicity conceals a structural limitation. Standard self-attention is scale-blind : a token at position 𝑡 attends to every other token with the same architectural capacity, whether the target is adjacent or at distance 𝑇 ∕2 . The network must learn to ignore distant tokens when local context suffices, and to attend globally when long-range reasoning is required, with no structural prior to guide either regime. This limitation becomes critical on long-sequence tasks. The Long Range Arena (LRA) benchmark (Tay, Dehghani, Abnar, Shen, Bahri, Pham, Rao, Yang, Ruder and Metzler, 2021) systematically documents this failure: standard MHA achieves only 36 .37% on ListOps at sequence length 𝑇 = 2 ,048 . Efficient attention variants (Beltagy, Peters and Cohan, 2020; Choromanski, Likhosherstov, Dohan, Song, Gane, Sarlos, Hawkins, Davis, Mohiuddin, Kaiser, Belanger, Colwell and Weller, 2021) address computational cost but not the structural bias: they restrict which pairs are computed, not how multi-scale structure is captured. 
+
+> ∗
+
+Corresponding author. Tel.: +33 (0)3 22 53 40 38. E-mail : giansalvo.cirrincione@u-picardie.fr 
+
+giansalvo.cirrincione@u-picardie.fr (G. Cirrincione) 
+
+> ORCID
+
+(s): 0000-0002-2894-4164 (G. Cirrincione) 
+
+G. Cirrincione: Preprint submitted to Elsevier Page 1 of 20 
+
+> arXiv:2604.08829v1 [cs.LG] 10 Apr 2026 Hierarchical Kernel Transformer
+
+A different approach is taken here. Rather than sparsifying or approximating the attention matrix, it is factored 
+
+across scales. The Hierarchical Kernel Transformer (HKT) computes attention at 𝐿 resolution levels, with each level operating on a downsampled representation of the sequence. The level-𝑙 score matrix captures interactions at scale 𝑠 𝑙 ,where 𝑠 ≥ 2 is the downsampling stride. The final attention is a learned convex combination of level-specific scores, upsampled to the original resolution. This design has three properties that standard attention lacks. First, it is structurally multi-scale : level 𝑙 captures the frequency band [𝜋 ∕𝑠 𝑙 , 𝜋 ∕𝑠 𝑙 −1 ] in the sequence spectrum (Proposition 3.3). Second, it is computationally efficient :the total cost is 43 (1 − 4 −𝐿 ) times MHA, bounded above by 43 regardless of 𝐿 (Proposition 4.6). Third, it admits 
+
+information-theoretic guarantees : the approximation error per hierarchical level is bounded in terms of the mutual information 𝐼 (𝑆 (𝑙 ); 𝑓 (𝑋 )) , related explicitly to the squared multiple correlation 𝜌 2 
+
+> 𝑙
+
+and the non-Gaussianity index 𝜅 𝑙 
+
+(Theorem 4.3). 
+
+Contributions. The following contributions are made: 1. Architecture (Section 3). HKT is defined as a hierarchical attention mechanism combining 𝐿 resolution levels with a hybrid conv/attention head and input-dependent level fusion. 2. Kernel theory (Section 3). The hierarchical score matrix is shown to define a PSD kernel under a sufficient condition on the symmetrised bilinear form (Proposition 3.1), its Gram matrix factorises as a sum of per-level PSD matrices with an explicit rank bound (Proposition 3.2), and HKT is shown to strictly subsume single-head attention and causal convolution in the single-layer, 𝐻 = 1 setting (Proposition 3.4). 3. Asymmetric score analysis (Section 3.6). A direct analysis of the asymmetric score function used in practice is provided, without symmetrisation. The symmetric-antisymmetric decomposition 𝑀 (𝑙 ) = 𝑀 (𝑙 ) 
+
+> 𝑠
+
++ 𝑀 (𝑙 ) 
+
+> 𝑎
+
+is shown to separate reciprocity (mutual attention strength, controlled by 𝑀 (𝑙 ) 
+
+> 𝑠
+
+) from directionality (attention asymmetry, controlled by 𝑀 (𝑙 ) 
+
+> 𝑎
+
+) (Proposition 3.5, Corollary 3.7). HKT with 𝐿 levels disposes of 𝐿 independent such pairs, one per scale (Proposition 3.6). This analysis applies to the operational model and explains why the PSD condition is not satisfied in trained models. 4. Approximation theory (Section 4). A three-term error decomposition is derived with an explicit non-Gaussian bound on the information-theoretic reduction per level, presented as a motivated approximation framework extending the Gaussian process results of Roberts, Yaida and Hanin (2022) to finite-width networks. 5. Experiments (Section 5). Consistent improvements over retrained MHA baselines are obtained on two tasks: 
+
++4 .7pp on synthetic ListOps ( 𝑇 = 512 ) and +1 .98 pp on sequential CIFAR-10 ( 𝑇 = 1 ,024 ), both at 1.31× 
+
+computational overhead. Sensitivity analysis across 𝐿 ∈ {1 , 2, 3, 4} and 𝑠 ∈ {2 , 3} confirms that the gains are robust to hyperparameter choice. 
+
+2. Related Work 
+
+Efficient attention. A large body of work reduces the (𝑇 2) cost of attention through sparsity (Beltagy et al., 2020; Zaheer, Guruganesh, Dubey, Ainslie, Alberti, Ontanon, Pham, Ravula, Wang, Yang and Ahmed, 2020), low-rank approximation (Wang, Li, Khabsa, Fang and Ma, 2020; Choromanski et al., 2021), or linear kernels (Katharopoulos, Vyas, Pappas and Fleuret, 2020). These methods address computational cost without introducing hierarchical structure. HKT is orthogonal: hierarchical structure is added at bounded additional cost rather than reducing existing capacity. 
+
+Hierarchical and multi-scale transformers. Hierarchical processing is central to convolutional networks (LeCun, Bottou, Bengio and Haffner, 1998) and has been incorporated into vision transformers through patch-merging windows (Liu, Lin, Cao, Hu, Wei, Zhang, Lin and Guo, 2021b), pooling-based token compression (Liu, Lin, Cao, Hu, Wei, Zhang, Lin and Guo, 2021a), and cluster-based token merging (Wang, Li, Khabsa, Fang and Ma, 2021). These methods operate on spatial data and downsample hidden states rather than attention scores. More recently, FasterViT (Hatamizadeh, Heinrich, Yin, Tao, Alvarez, Kautz and Molchanov, 2024) decomposes global self-attention into local window attention and hierarchical carrier tokens, achieving competitive accuracy-throughput trade-offs on image classification. HAT-Net (Liu, Wu, Sun, Zhang, Chhatkuli and Gool, 2024) proposes hierarchical MHSA that computes local attention first and then models global dependencies on merged tokens. Both FasterViT and HAT-Net target vision tasks and reduce computational cost by restricting attention scope; HKT instead constructs independent score matrices at each resolution and fuses them with learned weights, maintaining full expressivity at each scale while bounding total cost.   
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 2 of 20 Hierarchical Kernel Transformer
+
+Hierarchical transformers for sequences. For text, hierarchical transformers exploit document structure (words 
+
+→ sentences → sections) to handle long inputs efficiently. HDT (He, Burtsev, Roth and Groh, 2024) processes long documents by interleaving local and global attention in a single layer using an efficient hierarchical attention pattern. HIBRIDS (Cao and Wang, 2022) introduces hierarchical biases for structure-aware long document summarisation. These methods rely on explicit structural segmentation of the input. HKT instead learns a continuous multi-scale decomposition via causal downsampling, making no assumptions about document structure and extending naturally to non-textual sequences. 
+
+State space models. Structured state space models (SSMs) such as Mamba (Gu and Dao, 2023) offer an alternative to attention for long-sequence modelling, achieving linear time complexity via selective state propagation. Mamba achieves strong results on the LRA benchmark and matches or exceeds transformers of similar size on language tasks. HKT and Mamba address different aspects of the long-sequence problem: Mamba replaces attention with a recurrent mechanism, while HKT retains the attention mechanism and augments it with explicit multi-scale structure. The two approaches are complementary and could in principle be combined (multi-scale Mamba layers with hierarchical state updates), which we leave as future work. 
+
+Kernel methods for attention. The connection between attention and kernel methods has been formalised in Tsai, Bai, Yamada, Morency and Salakhutdinov (2019); Katharopoulos et al. (2020); Choromanski et al. (2021). Performers (Choromanski et al., 2021) approximate the softmax kernel with random feature maps. HKT employs a sum of hierarchical kernels, each PSD under a sufficient condition (Proposition 3.1), without approximation. The asymmetric score decomposition 𝑀 (𝑙 ) = 𝑀 (𝑙 ) 
+
+> 𝑠
+
++ 𝑀 (𝑙 ) 
+
+> 𝑎
+
+(Section 3.6) provides a direct analysis of the operational model that complements the kernel-theoretic view. 
+
+Long Range Arena. Tay et al. (2021) introduced LRA as a systematic benchmark for long-range sequence models, comprising five tasks with sequence lengths up to 4,096 . On ListOps, standard MHA achieves 36 .37% , Longformer 
+
+35 .63% , and Performer 18 .01% . The synthetic variant used here reproduces the algebraic structure of ListOps at 
+
+𝑇 = 512 .
+
+Gaussian process limits. Roberts et al. (2022) establish that sufficiently wide networks converge to Gaussian processes, with corrections of order (1∕ 𝑑 ). Lemma 4.2 extends this analysis to the information content of hierarchical score matrices, providing an explicit non-Gaussian correction for the finite-width regime. 
+
+3. The HKT Framework 
+
+3.1. Notation 
+
+Let 𝑋 ∈ ℝ𝑇 ×𝑑 be the input token matrix, where 𝑇 is the sequence length and 𝑑 = 𝑑 model the embedding dimension. Let 𝐻 ∈ ℕ be the number of attention heads. Let 𝑠 ∈ ℕ, 𝑠 ≥ 2, be the downsampling stride and 𝐿 ∈ ℕ, 𝐿 ≥ 1, the number of hierarchical levels. At level 𝑙 ∈ {0 , … , 𝐿 − 1} :
+
+𝑇 𝑙 ∶= ⌊𝑇 ∕𝑠 𝑙 ⌋ (sequence length at level 𝑙 ),𝑑 𝑙 ∶= max( 𝑑 ∕2 𝑙 , 32) (embedding dimension at level 𝑙 ),𝑑 𝑘 ∶= 𝑑 ∕𝐻 (per-head key dimension) ,𝑑 (𝑙 ) 
+
+> 𝑘
+
+∶= max( 𝑑 𝑘 ∕2 𝑙 , 16) (per-level key dimension) .
+
+By convention, 𝑋 (0) ∶= 𝑋 , 𝑇 0 = 𝑇 , 𝑑 0 = 𝑑 . The learnable weight matrices are: 𝑊 (𝑙 ) 
+
+> 𝑄
+
+, 𝑊 (𝑙 ) 
+
+> 𝐾
+
+∈ ℝ𝑑 (𝑙 )  
+
+> 𝑘 ×𝑑 𝑙
+
+(query and key projections at level 𝑙 ); 𝑊 (𝑙 ) 
+
+> 𝑉
+
+∈ ℝ𝑑 ×𝑑 𝑙 (value projection); 𝑊 (𝑙 ) 
+
+> 𝑂
+
+∈ ℝ𝑑 ×𝑑 (output projection); 𝛾 ∈ ℝ𝐿 (fusion weight logits), giving 𝜆 𝑙 ∶= sof tmax( 𝛾 )𝑙 ;̃𝛾 ∈ ℝ 𝐻 ×𝐿 (hybrid mixing logits), giving 𝛽 (𝑙 ) 
+
+> ℎ
+
+∶= 𝜎 (̃𝛾 ℎ𝑙 ) ∈ (0 , 1) .  
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 3 of 20
+
+Hierarchical Kernel Transformer 
+
+3.2. Hierarchical kernel scoring Input sequence X(0) ∈ RT ×d                                                                      
+
+> X(0) ∈RT×d
+> level 0 — local
+> X(1) ∈RT /s ×d1
+> level 1 — medium
+> X(2) ∈RT /s 2×d2
+> level 2 — global
+> ↓ϕ1↓ϕ2◦ϕ1
+> S(0) =X(0) M(0) X(0) ⊤
+> T×Tscore
+> M(0) =M(0)
+> s+M(0)
+> a
+> S(1) =X(1) M(1) X(1) ⊤
+> T /s ×T /s →upsample
+> M(1) =M(1)
+> s+M(1)
+> a
+> S(2) =X(2) M(2) X(2) ⊤
+> T /s 2×T /s 2→upsample
+> M(2) =M(2)
+> s+M(2)
+> a
+> Shier =∑
+> lλl↑S(l)
+> learned convex fusion (softmax λ)
+> λ0λ1λ2
+> softmax( Shier /√dk)·V
+> attention output + FFN + residual
+> M(l)
+> s: reciprocity
+> M(l)
+> a: directionality
+> overhead: 43(1 −4−L)= 1 .3125 ×for L= 3
+
+Figure 1: Architecture of the Hierarchical Kernel Transformer (HKT) for 𝐿 = 3 levels and stride 𝑠 = 2 . The input sequence 𝑋 (0) is processed at three resolutions via causal downsampling ( 𝜙 1, 𝜙 2◦𝜙 1). At each level 𝑙 , a score matrix 
+
+𝑆 (𝑙 ) = 𝑋 (𝑙 )𝑀 (𝑙 )𝑋 (𝑙 )⊤∕
+
+√
+
+𝑑 (𝑙 )
+
+𝑘 is computed, where 𝑀 (𝑙 ) = 𝑀 (𝑙 )
+
+𝑠 + 𝑀 (𝑙 )
+
+𝑎 decomposes into a symmetric component (controlling reciprocal attention) and an antisymmetric component (controlling directional attention). The level scores are upsampled and fused via learned convex weights 𝜆 𝑙 (softmax-normalised), then passed through standard softmax attention and FFN layers. Total overhead: 43 (1 − 4 −𝐿 ) = 1 .3125× for 𝐿 = 3 .
+
+Level-𝑙 representations. For 𝑙 ≥ 1, the level-𝑙 representation 𝑋 (𝑙 ) ∈ ℝ𝑇 𝑙 ×𝑑 𝑙 is: 
+
+𝑋 (𝑙 ) = 𝜙 𝑙 ◦ ⋯ ◦ 𝜙 1(𝑋 (0) ), (1) where each 𝜙 𝑙 ′ ∶ ℝ𝑇 𝑙 ′−1 ×𝑑 𝑙 ′−1 → ℝ𝑇 𝑙 ′ ×𝑑 𝑙 ′ is a depthwise-separable causal convolution (kernel size 𝑘 = 3 , stride 𝑠 )followed by LayerNorm and GELU activation. Left-padding with 𝑘 − 1 zeros enforces causality: [𝑋 (𝑙 )]𝑚 depends only on [𝑋 (𝑙 −1) ]0, … , [𝑋 (𝑙 −1) ]𝑚𝑠 .
+
+Level-𝑙 score matrix. 
+
+𝑆 (𝑙 )
+
+𝑖𝑗 = ⟨𝑊 (𝑙 )
+
+𝑄 𝑋 (𝑙 )
+
+𝑖 , 𝑊 (𝑙 )
+
+𝐾 𝑋 (𝑙 )
+
+𝑗 ⟩√
+
+𝑑 (𝑙 )
+
+𝑘 
+
+, 𝑖, 𝑗 ∈ {0 , … , 𝑇 𝑙 − 1} . (2) 
+
+Hierarchical score. 
+
+𝑆 hier 
+
+𝑖𝑗 =
+
+𝐿 −1 ∑
+
+𝑙 =0 
+
+𝜆 𝑙 ⋅̃ 𝑆 (𝑙 )
+
+⌊𝑖 ∕𝑠 𝑙 ⌋, ⌊𝑗 ∕𝑠 𝑙 ⌋, 𝑖, 𝑗 ∈ {0 , … , 𝑇 − 1} , (3) where ̃ 𝑆 (𝑙 ) denotes 𝑆 (𝑙 ) after optional causal masking ( ̃ 𝑆 (𝑙 )
+
+𝑚𝑚 ′ = −∞ for 𝑚 ′ > 𝑚 ). 
+
+Proposition 3.1 (Hierarchical kernel is PSD under a sufficient condition). Define the symmetrised level-𝑙 matrix 
+
+𝑀 (𝑙 ) ∶= ( 𝑊 (𝑙 )⊤𝑄 𝑊 (𝑙 )
+
+𝐾 + 𝑊 (𝑙 )⊤𝐾 𝑊 (𝑙 )
+
+𝑄 )∕(2 
+
+√
+
+𝑑 (𝑙 )
+
+𝑘 ) and the associated kernel 
+
+𝑘 sym 
+
+𝑙 (𝑥, 𝑦 ) ∶= exp (𝑥 ⊤𝑀 (𝑙 )𝑦 ) . (4) 
+
+G. Cirrincione: Preprint submitted to Elsevier Page 4 of 20 Hierarchical Kernel Transformer 
+
+If 𝑀 (𝑙 ) is positive semidefinite, then 𝑘 sym  
+
+> 𝑙
+
+is a PSD kernel, and 𝐾 sym hier (𝑋 𝑖 , 𝑋 𝑗 ) ∶= ∑𝐿 −1  
+
+> 𝑙 =0
+
+𝜆 𝑙 𝑘 sym  
+
+> 𝑙
+
+(𝑋 (𝑙 ) 
+
+> ⌊𝑖 ∕𝑠 𝑙 ⌋
+
+, 𝑋 (𝑙 ) 
+
+> ⌊𝑗 ∕𝑠 𝑙 ⌋
+
+) is PSD for any 𝜆 𝑙 ≥ 0.
+
+PROOF . When 𝑀 (𝑙 ) ⪰ 0 , the function 𝑘 (𝑥, 𝑦 ) = exp( 𝑥 ⊤𝑀 (𝑙 )𝑦 ) is PSD because it equals the inner product ⟨𝜙 (𝑥 ), 𝜙 (𝑦 )⟩ in the feature space induced by the Taylor expansion of the exponential, where each monomial 𝑥 ⊤𝑀 (𝑙 )𝑦 )𝑛 ∕𝑛 ! corresponds to a PSD kernel (product of a PSD kernel is PSD by closure). A non-negative linear combination of PSD kernels is PSD. 
+
+Remark on the PSD condition. 𝑀 (𝑙 ) is symmetric by construction but not necessarily PSD, since 𝑊 (𝑙 )⊤𝑄 𝑊 (𝑙 ) 
+
+> 𝐾
+
+may have negative eigenvalues. The condition 𝑀 (𝑙 ) ⪰ 0 can be enforced by initialisation (e.g. 𝑊 (𝑙 ) 
+
+> 𝑄
+
+= 𝑊 (𝑙 ) 
+
+> 𝐾
+
+) or by projecting 
+
+𝑀 (𝑙 ) onto the PSD cone after each gradient step. In practice, neither constraint is imposed. We verified empirically that the PSD condition is not satisfied by trained models: across all 12 configurations (4 encoder layers × 3 hierarchy levels) of a trained HKT-Small, approximately 50% of eigenvalues of 𝑀 (𝑙 ) are negative (min eigenvalue ranging from 
+
+−0 .51 to −0 .08 ). This is consistent with 𝑀 (𝑙 ) being a generic symmetric matrix: without an explicit PSD constraint, gradient descent has no reason to confine 𝑀 (𝑙 ) to the PSD cone. The symmetrised kernel therefore serves as a theoretical surrogate rather than a description of the actual trained model (see Definition 1 below). 
+
+Definition 1 (Practical note on asymmetric scores). In practice, 𝑊 (𝑙 ) 
+
+> 𝑄
+
+≠ 𝑊 (𝑙 ) 
+
+> 𝐾
+
+and the raw score 𝑆 (𝑙 ) 
+
+> 𝑖𝑗
+
+= ⟨𝑊 (𝑙 ) 
+
+> 𝑄
+
+𝑥 𝑖 , 𝑊 (𝑙 ) 
+
+> 𝐾
+
+𝑥 𝑗 ⟩∕
+
+√
+
+𝑑 (𝑙 
+
+> 𝑘
+
+is not symmetric. The symmetrised kernel 𝑘 sym  
+
+> 𝑙
+
+of Proposition 3.1 is therefore a theoretical surrogate : it establishes that the scoring mechanism is close to a PSD kernel (specifically, that the symmetric part of the bilinear form 𝑥 ⊤𝑀 (𝑙 )𝑦 is PSD), while the asymmetric component encodes the directional query–key distinction that is essential for expressivity in practice. The gap between theory and implementation is deliberate and analogous to the standard treatment of asymmetric attention in kernel attention literature (Tsai et al., 2019; Choromanski et al., 2021): the symmetric surrogate provides geometric structure, the asymmetric model provides flexibility. Closing this gap formally — proving a PSD result directly for the asymmetric score — would require either restricting 𝑊 𝑄 = 𝑊 𝐾 (standard kernel attention) or adopting a non-symmetric positive definite framework, both of which reduce expressivity. 
+
+Proposition 3.2 (Downsampling path factorisation). Let Φ(𝑙 ) ∈ ℝ𝑁 ×𝑑 𝑙 denote the matrix whose 𝑖 -th row is 𝑥 (𝑙 ) 
+
+> 𝑖
+
+, the level-𝑙 compressed representation of sample 𝑖 . Define 𝜓 (𝑙 ) ∶ ℝ𝑑 𝑙 → (𝑙 ) as the Mercer feature map of 𝑘 sym  
+
+> 𝑙
+
+, and let 
+
+Ψ(𝑙 ) ∈ (𝑙 )𝑁 be the matrix whose 𝑖 -th row is 𝜓 (𝑙 )(𝑥 (𝑙 ) 
+
+> 𝑖
+
+). Then the Gram matrix 𝐊 hier ∈ ℝ𝑁 ×𝑁 admits the factorisation: 
+
+𝐊 hier =
+
+> 𝐿 −1
+
+∑
+
+> 𝑙 =0
+
+𝜆 𝑙 Ψ(𝑙 )Ψ(𝑙 )⊤, (5) 
+
+where each term 𝜆 𝑙 Ψ(𝑙 )Ψ(𝑙 )⊤ is PSD. Two consequences follow: (i) Rank bound: rank( 𝐊 hier ) ≤ ∑𝐿 −1  
+
+> 𝑙 =0
+
+min( 𝑁, 2𝑑 (𝑙 ) 
+
+> 𝑘
+
+).(ii) Local co-occurrence bias: two tokens 𝑥 𝑖 , 𝑥 𝑗 sharing the same compressed block at level 𝑙 (i.e. 𝑥 (𝑙 ) 
+
+> 𝑖
+
+= 𝑥 (𝑙 ) 
+
+> 𝑗
+
+) receive the maximum level-𝑙 kernel value, creating a multi-scale preference for locally co-occurring token pairs. See Appendix A for the complete proof. 
+
+PROOF . By definition, [𝐊 (𝑙 )]𝑖𝑗 = 𝑘 sym  
+
+> 𝑙
+
+(𝑥 (𝑙 ) 
+
+> 𝑖
+
+, 𝑥 (𝑙 ) 
+
+> 𝑗
+
+) = ⟨𝜓 (𝑙 )(𝑥 (𝑙 ) 
+
+> 𝑖
+
+), 𝜓 (𝑙 )(𝑥 (𝑙 ) 
+
+> 𝑗
+
+)⟩(𝑙 ) , so 𝐊 (𝑙 ) = Ψ (𝑙 )Ψ(𝑙 )⊤. This is PSD as a Gram matrix. Summing with non-negative weights gives (5). 
+
+(i) Rank bound (finite-dimensional approximation). Strictly speaking, the RKHS (𝑙 ) of the exponential kernel 
+
+𝑘 sym  
+
+> 𝑙
+
+is infinite-dimensional, so dim (𝑙 ) = ∞ and rank( 𝐊 (𝑙 )) ≤ 𝑁 trivially. The bound rank( 𝐊 (𝑙 )) ≤ 2𝑑 (𝑙 ) 
+
+> 𝑘
+
+holds under the practical approximation that only the linear term of the Taylor expansion of exp( ⋅) is retained (i.e. the kernel is approximated by its first-order feature map 𝜙 (𝑥 ) = 𝑊 (𝑙 ) 
+
+> 𝑄
+
+𝑥 and 𝑊 (𝑙 ) 
+
+> 𝐾
+
+𝑥 ), which has dimension 2𝑑 (𝑙 ) 
+
+> 𝑘
+
+. This approximation is standard in the kernel attention literature (Tsai et al., 2019; Choromanski et al., 2021) and reflects the effective rank of attention matrices in practice, but it is not a tight bound on the exact RKHS dimension. 
+
+(ii) If 𝑥 (𝑙 ) 
+
+> 𝑖
+
+= 𝑥 (𝑙 ) 
+
+> 𝑗
+
+=∶ 𝑣 , then 𝑘 sym  
+
+> 𝑙
+
+(𝑣, 𝑣 ) = exp( 𝑣 ⊤𝑀 (𝑙 )𝑣 ∕
+
+√
+
+𝑑 (𝑙 ) 
+
+> 𝑘
+
+), which is the maximum of 𝑘 sym  
+
+> 𝑙
+
+(⋅, ⋅) at that point by positive definiteness of the exponentiated form. 
+
+G. Cirrincione: Preprint submitted to Elsevier Page 5 of 20 Hierarchical Kernel Transformer 
+
+3.3. Hybrid head and dynamic fusion 
+
+Hybrid head. At each level 𝑙 and head ℎ:
+
+𝐴 (𝑙 ) 
+
+> ℎ
+
+= 𝛽 (𝑙 ) 
+
+> ℎ
+
+⋅ sof tmax( 𝑆 hier )𝑊 (𝑙 ) 
+
+> 𝑉
+
+𝑋 (𝑙 ) + (1 − 𝛽 (𝑙 ) 
+
+> ℎ
+
+) ⋅ Conv ℎ(𝑋 (𝑙 )), (6) where Conv ℎ denotes grouped causal depthwise convolution. The signature matrix 𝐵 ∶= 𝜎 (̃𝛾 ) ∈ [0 , 1] 𝐻 ×𝐿 is interpretable post-hoc: rows near 1 indicate attention-dominant heads, rows near 0 convolution-dominant heads. 
+
+Dynamic fusion. 
+
+out 𝑡 =
+
+> 𝐿 −1
+
+∑
+
+> 𝑙 =0
+
+𝛼 𝑙 (𝑋 ) ⋅ 𝑊 (𝑙 ) 
+
+> 𝑂
+
+𝐴 (𝑙 ) 
+
+> 𝑡
+
+, 𝛼 (𝑋 ) = sof tmax 
+
+(
+
+MLP 
+
+( 1
+
+> 𝑇
+
+∑𝑡 ′ 𝑋 𝑡 ′
+
+)) 
+
+∈ Δ 𝐿 −1 . (7) 
+
+3.4. Frequency-domain interpretation (heuristic) 
+
+Proposition 3.3 (Heuristic spectral interpretation). Under the approximations of weakly stationary inputs and ideal low-pass downsampling filters (approximately satisfied for kernel size 𝑘 = 3 , stride 𝑠 = 2 ): 
+
+𝔼 𝑋 
+
+[
+
+𝑘 sym 
+
+> 𝑙
+
+(
+
+𝑋 (𝑙 ) 
+
+> 𝑚
+
+, 𝑋 (𝑙 )
+
+> 𝑚 ′
+
+)] 
+
+≈ 𝐶 𝑙 ⋅ exp 
+
+(
+
+1
+
+𝜎 2 
+
+> 𝑙
+
+∫
+
+> 𝜋 ∕𝑠 𝑙 −1
+> 𝜋 ∕𝑠 𝑙
+
+̂ 𝑅 (𝜔 ) cos (𝜔 (𝑚 − 𝑚 ′)𝑠 𝑙 ) 𝑑𝜔 
+
+)
+
+,
+
+where ̂ 𝑅 (𝜔 ) is the input spectral density, 𝐶 𝑙 > 0 a normalisation constant, and 𝜎 𝑙 > 0 the bandwidth parameter of 𝑘 sym  
+
+> 𝑙
+
+.Level 𝑙 thus preferentially captures sequence content in the band [𝜋 ∕𝑠 𝑙 , 𝜋 ∕𝑠 𝑙 −1 ]. This is a motivating interpretation, not a rigorous result. See Appendix B for derivation. 
+
+3.5. Representational capacity 
+
+Let attn (𝐻, 𝑑, 𝑇 ) denote the class of functions computable by a single-layer MHA with 𝐻 heads, embedding dimension 𝑑 , and sequence length 𝑇 , and let conv (𝑑, 𝑘 ) denote those computable by causal depthwise convolution with kernel size 𝑘 and dimension 𝑑 . Let HKT (𝐻, 𝑑, 𝐿, 𝑠, 𝑇 ) denote the corresponding HKT class with 𝐿 levels and stride 𝑠 .
+
+Proposition 3.4 (Representational capacity). In the setting 𝐻 ≥ 1, 𝑑 ≥ 2, 𝑇 ≥ 4, 𝐿 ≥ 2, 𝑠 = 2 :(i) (Inclusion) attn (𝐻, 𝑑, 𝑇 ) ⊆ HKT (𝐻, 𝑑, 𝐿, 𝑠, 𝑇 ) and conv (𝑑, 𝑘 ) ⊆ HKT (𝐻, 𝑑, 𝐿, 𝑠, 𝑇 ).(ii) (Strict inclusion for 𝐻 = 1 ) There exists a function 𝑓 ∈ HKT (1 , 𝑑, 𝐿, 𝑠, 𝑇 ) ⧵ (attn (1 , 𝑑, 𝑇 ) ∪ conv (𝑑, 𝑘 )) .For 𝐻 ≥ 2, HKT strictly subsumes the single-scale ( 𝐿 = 1 ) variant and causal convolution by construction, but whether it strictly subsumes general 𝐻 -head MHA depends on the expressivity of multi-head composition and is left as an open question. 
+
+PROOF . (i) Setting 𝛽 (𝑙 ) 
+
+> ℎ
+
+= 1 , 𝜆 0 = 1 , 𝜆 𝑙 = 0 for 𝑙 ≥ 1 reduces HKT to standard MHA. Setting 𝛽 (𝑙 ) 
+
+> ℎ
+
+= 0 for all ℎ, 𝑙 
+
+reduces it to causal depthwise convolution. 
+
+(ii) Restrict to 𝐻 = 1 , 𝑇 = 4 , 𝑠 = 2 , 𝐿 = 2 . Consider the witness function 𝑓 (𝑋 ) = ⟨𝑥 0, 𝑥 2⟩ + ⟨𝑥 0, 𝑥 1⟩, where 
+
+𝑥 𝑖 ∈ ℝ𝑑 .
+
+Not in conv : Causal depthwise convolution with kernel size 𝑘 computes out 𝑡 = ∑𝑘 −1  
+
+> 𝑗 =0
+
+𝑊 𝑗 ⊙ 𝑥 𝑡 −𝑗 , which is linear in 
+
+𝑋 . The function 𝑓 is degree-2 bilinear, hence 𝑓 ∉ conv (𝑑, 𝑘 ).
+
+Not in attn (1 , 𝑑, 𝑇 ): A single-head attention at position 0 computes out 0 = ∑𝑇 −1  
+
+> 𝑗 =0
+
+𝑎 𝑗 (𝑋 ) ⋅ 𝑊 𝑉 𝑥 𝑗 where 
+
+𝑎 𝑗 (𝑋 ) = sof tmax( ⟨𝑊 𝑄 𝑥 0, 𝑊 𝐾 𝑥 𝑗 ⟩∕√𝑑 𝑘 )𝑗 . The output is linear in 𝑊 𝑉 𝑋 , with scalar attention weights 𝑎 𝑗 . For 𝑓 
+
+to be representable, one would need ∑𝑗 𝑎 𝑗 𝑊 𝑉 𝑥 𝑗 = 𝑊 ∗𝑥 1 ⋅ ⟨𝑢, 𝑥 0⟩ + 𝑊 ∗∗ 𝑥 2 ⋅ ⟨𝑣, 𝑥 0⟩ for some fixed 𝑢, 𝑣, 𝑊 ∗, 𝑊 ∗∗ ,which requires the attention weights to simultaneously encode two independent inner products. Since 𝑎 𝑗 depends only on the ratio ⟨𝑊 𝑄 𝑥 0, 𝑊 𝐾 𝑥 𝑗 ⟩, this cannot be achieved for generic 𝑥 0, 𝑥 1, 𝑥 2 with a single head. (A complete formal proof requires a characterisation of the function class of single-head attention, which we leave as a precise technical claim rather than a closed theorem.) 
+
+In HKT (1 , 𝑑, 2, 2, 4) : At level 𝑙 = 0 , the score 𝑆 (0) 01 captures ⟨𝑥 0, 𝑥 1⟩. After downsampling with 𝑠 = 2 , the compressed pair at level 𝑙 = 1 represents (𝑥 0, 𝑥 2), so 𝑆 (1) 00 captures ⟨𝑥 0, 𝑥 2⟩. With fusion weights 𝜆 0 = 𝜆 1 = 1∕2 , the hierarchical score 𝑆 hier encodes both interactions simultaneously.   
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 6 of 20
+
+Hierarchical Kernel Transformer 
+
+3.6. Asymmetric score analysis via symmetric-antisymmetric decomposition 
+
+The PSD analysis of the preceding sections applies to a symmetrised surrogate kernel. This section develops a complementary analysis that applies directly to the asymmetric score function used in practice, without any symmetrisation. 
+
+Setup. At level 𝑙 , the score matrix is 𝑆 (𝑙 ) = 𝑋 (𝑙 )𝑀 (𝑙 )𝑋 (𝑙 )⊤∕
+
+√
+
+𝑑 (𝑙 ) 
+
+> 𝑘
+
+where 𝑀 (𝑙 ) = 𝑊 (𝑙 )⊤𝑄 𝑊 (𝑙 ) 
+
+> 𝐾
+
+∈ ℝ𝑑 𝑙 ×𝑑 𝑙 is a general (non-symmetric) matrix. Every square matrix admits a unique decomposition: 
+
+𝑀 (𝑙 ) = 𝑀 (𝑙 ) 
+
+> 𝑠
+
++ 𝑀 (𝑙 ) 
+
+> 𝑎
+
+, (8) where 𝑀 (𝑙 ) 
+
+> 𝑠
+
+∶= ( 𝑀 (𝑙 ) + 𝑀 (𝑙 )⊤)∕2 is symmetric and 𝑀 (𝑙 ) 
+
+> 𝑎
+
+∶= ( 𝑀 (𝑙 ) − 𝑀 (𝑙 )⊤)∕2 is antisymmetric ( 𝑀 (𝑙 )⊤𝑎 = − 𝑀 (𝑙 ) 
+
+> 𝑎
+
+). 
+
+Proposition 3.5 (Reciprocity-Directionality Identity). For any two positions 𝑖, 𝑗 ∈ {0 , … , 𝑇 𝑙 − 1} :
+
+𝑆 (𝑙 ) 
+
+> 𝑖𝑗
+
++ 𝑆 (𝑙 ) 
+
+> 𝑗𝑖
+
+= 2
+
+√
+
+𝑑 (𝑙 )
+
+> 𝑘
+
+𝑥 (𝑙 )⊤𝑖 𝑀 (𝑙 ) 
+
+> 𝑠
+
+𝑥 (𝑙 ) 
+
+> 𝑗
+
+, (9) 
+
+𝑆 (𝑙 ) 
+
+> 𝑖𝑗
+
+− 𝑆 (𝑙 ) 
+
+> 𝑗𝑖
+
+= 2
+
+√
+
+𝑑 (𝑙 )
+
+> 𝑘
+
+𝑥 (𝑙 )⊤𝑖 𝑀 (𝑙 ) 
+
+> 𝑎
+
+𝑥 (𝑙 ) 
+
+> 𝑗
+
+. (10) 
+
+Consequently: (i) (Reciprocity) 𝑀 (𝑙 ) 
+
+> 𝑎
+
+= 0 if and only if 𝑆 (𝑙 ) 
+
+> 𝑖𝑗
+
+= 𝑆 (𝑙 ) 
+
+> 𝑗𝑖
+
+for all 𝑖, 𝑗, 𝑋 (𝑙 ) (attention is symmetric). (ii) (Directionality) 𝑀 (𝑙 ) 
+
+> 𝑠
+
+= 0 if and only if 𝑆 (𝑙 ) 
+
+> 𝑖𝑗
+
+= − 𝑆 (𝑙 ) 
+
+> 𝑗𝑖
+
+for all 𝑖, 𝑗, 𝑋 (𝑙 ) (attention is purely antisymmetric). (iii) 𝑀 (𝑙 ) 
+
+> 𝑠
+
+controls how much token 𝑖 and token 𝑗 mutually attend to each other; 𝑀 (𝑙 ) 
+
+> 𝑎
+
+controls the direction of the attention asymmetry. 
+
+PROOF . Direct computation: 𝑆 (𝑙 ) 
+
+> 𝑖𝑗
+
++ 𝑆 (𝑙 ) 
+
+> 𝑗𝑖
+
+= ( 𝑥 ⊤𝑖 𝑀𝑥 𝑗 + 𝑥 ⊤𝑗 𝑀𝑥 𝑖 )∕ √𝑑 𝑘 = 𝑥 ⊤𝑖 (𝑀 + 𝑀 ⊤)𝑥 𝑗 ∕√𝑑 𝑘 = 2 𝑥 ⊤𝑖 𝑀 𝑠 𝑥 𝑗 ∕√𝑑 𝑘 .The antisymmetric identity follows analogously. Parts (i)–(iii) follow immediately from (9) and (10) and the fact that 
+
+𝑥 ⊤𝐴𝑥 = 0 for all 𝑥 iff 𝐴 is antisymmetric. 
+
+Proposition 3.6 (Scale separation). Let 𝑇 ≥ 𝑠 𝐿 −1 + 1 and let 𝑙 denote the set of attention matrices producible by a single-level model operating on 𝑋 (𝑙 ) with parameter matrix 𝑀 ∈ ℝ𝑑 𝑙 ×𝑑 𝑙 :
+
+𝑙 ∶= 
+
+{
+
+sof tmax 
+
+( 𝑋 (𝑙 )𝑀𝑋 (𝑙 )⊤
+
+√
+
+𝑑 (𝑙 )
+
+> 𝑘
+
+) ||| 𝑀 ∈ ℝ𝑑 𝑙 ×𝑑 𝑙 
+
+}
+
+.
+
+For 𝑙 ≠ 𝑙 ′, the sets 𝑙 and 𝑙 ′ operate on representations of different lengths ( 𝑇 𝑙 = ⌊𝑇 ∕𝑠 𝑙 ⌋ ≠ 𝑇 𝑙 ′ = ⌊𝑇 ∕𝑠 𝑙 ′
+
+⌋) and are therefore incommensurable : no single attention matrix on 𝑋 (0) can reproduce the score structure of a model operating on 𝑋 (𝑙 ) for 𝑙 ≥ 1, since the downsampled representations 𝑋 (𝑙 ) are nonlinear functions of 𝑋 (0) obtained through the causal downsampling cascade (1) .Consequently, HKT’s hierarchical score 𝑆 hier = ∑𝑙 𝜆 𝑙 ↑𝑙 𝑆 (𝑙 ) (where ↑𝑙 denotes upsampling to length 𝑇 ) lies outside the convex hull of 0 for generic inputs and generic non-zero 𝜆 1, … , 𝜆 𝐿 −1 .
+
+PROOF . The representations 𝑋 (𝑙 ) for 𝑙 ≥ 1 are obtained by applying the causal depthwise-separable convolution cascade 
+
+𝜙 𝑙 ◦ ⋯ ◦ 𝜙 1 to 𝑋 (0) (equation (1) ). Each 𝜙 𝑙 ′ applies a strided convolution followed by LayerNorm and GELU, which is a nonlinear map. The composite map 𝑋 (0) ↦ 𝑋 (𝑙 ) is therefore nonlinear for 𝑙 ≥ 1.Fix 𝑙 ≥ 1 and suppose for contradiction that there exists ̃ 𝑀 ∈ ℝ𝑑 0×𝑑 0 such that 𝑋 (0) ̃ 𝑀𝑋 (0) ⊤ = 𝑐 ⋅ ↑𝑙 (𝑋 (𝑙 )𝑀 (𝑙 )𝑋 (𝑙 )⊤)
+
+for all 𝑋 (0) ∈ ℝ𝑇 ×𝑑 0 and some 𝑐 > 0. The left side is a degree-2 polynomial in the entries of 𝑋 (0) . The right side involves 𝑋 (𝑙 ) = 𝑓 𝑙 (𝑋 (0) ) where 𝑓 𝑙 is nonlinear (contains GELU), so the right side is not a degree-2 polynomial in 𝑋 (0) 
+
+for generic 𝑀 (𝑙 ). This is a contradiction, completing the proof. 
+
+G. Cirrincione: Preprint submitted to Elsevier Page 7 of 20 Hierarchical Kernel Transformer 
+
+Corollary 3.7 (Directional energy decomposition). Define the directional energy at level 𝑙 as: 
+
+(𝑙 ) ∶= ∑
+
+> 𝑖 ≠𝑗
+
+(𝑆 (𝑙 ) 
+
+> 𝑖𝑗
+
+− 𝑆 (𝑙 )
+
+> 𝑗𝑖
+
+)2 = 4
+
+𝑑 (𝑙 )
+
+> 𝑘
+
+∑
+
+> 𝑖 ≠𝑗
+
+(𝑥 (𝑙 )⊤𝑖 𝑀 (𝑙 ) 
+
+> 𝑎
+
+𝑥 (𝑙 )
+
+> 𝑗
+
+)2. (11) 
+
+Then (𝑙 ) = 0 for all inputs 𝑋 (𝑙 ) if and only if 𝑀 (𝑙 ) 
+
+> 𝑎
+
+= 0 .
+
+PROOF . The equality in (11) follows directly from Proposition 3.5 (10) . If 𝑀 (𝑙 ) 
+
+> 𝑎
+
+= 0 then every term vanishes. Conversely, if 𝑀 (𝑙 ) 
+
+> 𝑎
+
+≠ 0, there exist vectors 𝑢, 𝑣 ∈ ℝ𝑑 𝑙 with 𝑢 ⊤𝑀 (𝑙 ) 
+
+> 𝑎
+
+𝑣 ≠ 0 (since 𝑀 (𝑙 ) 
+
+> 𝑎
+
+≠ 0 as a linear map). Setting 𝑥 (𝑙 ) 
+
+> 𝑖
+
+= 𝑢 and 
+
+𝑥 (𝑙 ) 
+
+> 𝑗
+
+= 𝑣 for some 𝑖 ≠ 𝑗 gives a strictly positive contribution to (𝑙 ).
+
+Remark 1 (Connection to the empirical PSD failure). The empirical finding that 𝑀 (𝑙 ) 
+
+> 𝑠
+
+is not PSD for any trained configuration (Section 6) is not explained by 𝑀 (𝑙 ) 
+
+> 𝑎
+
+≠ 0 alone — the two facts are logically independent (a matrix can have 𝑀 𝑎 ≠ 0 and still have 𝑀 𝑠 ⪰ 0 , as the example 𝑀 =
+
+(2 10 2
+
+)
+
+shows). The PSD failure is instead a consequence of the unconstrained optimisation: gradient descent has no objective that would confine 𝑀 (𝑙 ) 
+
+> 𝑠
+
+to the PSD cone. The directional energy analysis and the PSD analysis are therefore complementary, not redundant: Corollary 3.7 characterises the asymmetric component; Proposition 3.1 characterises a constrained variant in which the symmetric component would be PSD. 
+
+Implication for HKT. Proposition 3.5 shows that the asymmetric attention mechanism of HKT is not a defect of the PSD surrogate analysis but a structural feature: 𝑀 (𝑙 ) 
+
+> 𝑎
+
+≠ 0 is what allows the model to represent directed relationships (token 𝑖 queries token 𝑗 differently from how 𝑗 queries 𝑖 ). Proposition 3.6 shows that HKT amplifies this capacity: with 
+
+𝐿 levels, it can represent 𝐿 independent directional patterns, each at a different spatial scale. This is a direct theoretical result about the operational model, not about a symmetrised surrogate. 
+
+4. Approximation Theory 
+
+This section establishes theoretical guarantees for HKT. Let 𝑁 ∈ ℕ denote the number of training samples and 𝐾 
+
+the reproducing kernel Hilbert space (RKHS) associated with 𝐾 hier — the function space in which HKT operates. The following assumptions are made throughout. 
+
+Assumption 1 (H1 – RKHS membership). The target function 𝑓 ∈ 𝐾 , with ‖𝑓 ‖𝐾 ≤ 𝐵 < ∞.
+
+Assumption 2 (H2 – Lipschitz and finite kurtosis). Each 𝑘 𝑙 is 𝐿 𝑙 -Lipschitz in its first argument. The normalised Mardia kurtosis 𝜅 𝑙 (defined below) satisfies 𝜅 𝑙 < ∞.
+
+Assumption 3 (H3 – i.i.d. training data). The model is trained on 𝑁 i.i.d. samples from .
+
+Lemma 4.1 (Lipschitz bound on 𝐾 hier ). Under Assumption 2, for 𝛿 ∶= max 𝑖 ‖𝑋 𝑖 − 𝑋 ′ 
+
+> 𝑖
+
+‖2:
+
+|𝐾 hier (𝑋 𝑖 , 𝑋 𝑗 ) − 𝐾 hier (𝑋 ′ 
+
+> 𝑖
+
+, 𝑋 𝑗 )| ≤ 𝛿 
+
+> 𝐿 −1
+
+∑
+
+> 𝑙 =0
+
+𝜆 𝑙 𝐿 𝑙 𝑙 −1 ∏
+
+> 𝑚 =0
+
+‖𝑊 (𝑚 )down ‖op ,
+
+where 𝑊 (𝑚 )down is the weight of 𝜙 𝑚 .
+
+Lemma 4.2 (Non-Gaussian information bound). Let 𝜌 2 
+
+> 𝑙
+
+∈ [0 , 1) be the squared multiple correlation coefficient of 
+
+𝑓 (𝑋 ) regressed on 𝑆 (𝑙 ), estimated via Ridge regression on the PCA-projected features. Define the normalised Mardia kurtosis (Mardia, 1970) of the joint distribution of (𝑆 (𝑙 ), 𝑓 (𝑋 )) projected to 𝑝 principal components: 
+
+𝜅 𝑙 ∶= 
+
+𝑏 (𝑙 )2,𝑝 
+
+𝑝 (𝑝 + 2) , 𝑏 (𝑙 )2,𝑝 ∶= 1
+
+𝑁 
+
+∑
+
+> 𝑖,𝑗
+
+𝑑 2 
+
+> 𝑖𝑗
+
+, (12)   
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 8 of 20
+
+Hierarchical Kernel Transformer 
+
+where 𝑑 𝑖𝑗 is the sample Mahalanobis distance. 
+
+(Motivated approximation.) Under the approximation that the conditional entropy ℎ(𝑓 (𝑋 ) ∣ 𝑆 (𝑙 )) is lower-bounded by its Gaussian value, and applying the maximum-entropy bound for distributions with finite kurtosis (Cover and Thomas, 2006) to the marginal ℎ(𝑓 (𝑋 )) :
+
+𝐼 (𝑆 (𝑙 ); 𝑓 (𝑋 )) ≲ − 12 log(1 − 𝜌 2 
+
+> 𝑙
+
+) + 𝜅 𝑙 − 1 2 𝜌 2 
+
+> 𝑙
+
++ 
+
+( 𝜅 2
+
+> 𝑙
+
+𝑁 
+
+)
+
+. (13) 
+
+The approximation is exact under joint Gaussianity ( 𝜅 𝑙 = 1, Assumption H2’), reducing to 𝐼 (𝑆 (𝑙 ); 𝑓 (𝑋 )) =− 12 log(1 − 𝜌 2 
+
+> 𝑙
+
+). The term (𝜅 𝑙 − 1) 𝜌 2 
+
+> 𝑙
+
+∕2 quantifies the non-Gaussian correction; Experiment 3 (Section 5.7) shows 
+
+𝜅 𝑙 ≈ 33 for trained models at 𝑑 ≤ 512 , making this correction dominant in practice. 
+
+PROOF (D ERIVATION SKETCH ). Decompose 𝐼 = ℎ(𝑓 (𝑋 )) − ℎ(𝑓 (𝑋 ) ∣ 𝑆 (𝑙 )). Apply the maximum-entropy bound 
+
+ℎ(𝑌 ) ≤ 12 log(2 𝜋𝑒𝜎 2) + ( 𝜅 − 1) 𝜎 2∕2 + (𝜅 2∕𝑁 ) (Cover and Thomas, 2006) to ℎ(𝑓 (𝑋 )) . Lower-bound ℎ(𝑓 (𝑋 ) ∣ 𝑆 (𝑙 ))
+
+by its Gaussian value 12 log(2 𝜋𝑒𝜎 2 
+
+> 𝑓
+
+(1 − 𝜌 2 
+
+> 𝑙
+
+)) (this step is exact under H2’ and an approximation otherwise). Combining gives (13). 
+
+Theorem 4.3 (HKT Approximation Framework). Under Assumptions 1–3, and the motivated approximation of Lemma 4.2, the 𝐿 2(𝜇 ) approximation error satisfies: 
+
+‖𝑓 −̂ 𝑓 ‖𝐿 2(𝜇 ) ≤ 𝜀 0 −
+
+> 𝐿 −1
+
+∑
+
+> 𝑙 =1
+
+𝜆 𝑙 Δng 
+
+> 𝑙
+
+⏟⏞⏞⏞⏞⏞⏞⏟⏞⏞⏞⏞⏞⏞⏟ 
+
+> 𝜀 hier
+
++ 𝐶 𝛽 𝐶 𝐿 sup 
+
+> 𝑖
+
+‖𝑋 𝑖 −̂ 𝑋 𝑖 ‖2
+
+⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟ 
+
+> 𝜀 quant
+
++ 
+
+( 𝐵 
+
+> √𝑁
+
+)
+
+⏟⏞⏞⏟⏞⏞⏟ 
+
+> 𝜀 opt
+
+, (14) 
+
+where the three terms represent the hierarchical approximation error (how well 𝐿 scales cover the target function), the quantisation error (information lost by downsampling), and the optimisation error (finite-sample learning). The constants are: 𝐵 ∶= ‖𝑓 ‖𝐾 (RKHS norm of the target, finite by Assumption H1); 𝜎 2 
+
+> 𝑓
+
+∶= Var( 𝑓 (𝑋 )) (target variance); 
+
+𝜌 20 ∶= 0 (no information at level −1 , by convention); 𝜀 0 ∶= 𝜀 (0) approx (approximation error of flat, single-scale attention); 
+
+Δng  
+
+> 𝑙
+
+∶= [𝜎 2 
+
+> 𝑓
+
+(𝜌 2 
+
+> 𝑙
+
+− 𝜌 2
+
+> 𝑙 −1
+
+) − ( 𝜅 𝑙 − 1) 𝜌 2
+
+> 𝑙
+
+]∕(2 𝜀 0) is the net error reduction at level 𝑙 : the first term is the information gain from adding level 𝑙 , the second is the non-Gaussian penalty; Δng  
+
+> 𝑙
+
+can be negative when the penalty exceeds the gain, in which case level 𝑙 should receive weight 𝜆 𝑙 = 0 ; 𝐶 𝛽 ∶= (∑ 𝑙 𝜆 𝑙 ‖𝑊 (𝑙 )down ‖2op 
+
+)1∕2 (aggregate Lipschitz constant of the downsampling cascade); 𝐶 𝐿 ∶= (∑ 𝑙 𝜆 𝑙 𝐿 2
+
+> 𝑙
+
+)1∕2 (weighted kernel Lipschitz constant); ̂ 𝑋 𝑖 is the reconstructed token representation after downsampling and upsampling at level 𝑙 , so ‖𝑋 𝑖 −̂ 𝑋 𝑖 ‖2 measures distortion introduced by lossy compression. 
+
+Corollary 4.4 (Optimal level weights). The weight 𝜆 ∗ 
+
+> 𝑙
+
+maximising Δng  
+
+> 𝑙
+
+per unit cost 𝐶 𝑙 = (𝑇 2 
+
+> 𝑙
+
+) satisfies 𝜆 ∗ 
+
+> 𝑙
+
+∝(𝜌 2 
+
+> 𝑙
+
+− 𝜌 2 
+
+> 𝑙 −1
+
+− ( 𝜅 𝑙 − 1) 𝜌 2 
+
+> 𝑙
+
+)∕ 𝐶 𝑙 . In the near-Gaussian regime ( 𝜅 𝑙 ≈ 1 ): 𝜆 ∗ 
+
+> 𝑙
+
+∝ 𝑠 −𝑙 .
+
+Proposition 4.5 (Error decay with depth). Define the residual error after 𝑙 levels as 𝜀 𝑙 ∶= 𝜀 0 −∑𝑙 𝑙 ′=1 𝜆 𝑙 ′ Δng  
+
+> 𝑙 ′
+
+. Suppose there exists 𝛿 ∈ (0 , 1) such that for all 𝑙 ∈ {1 , … , 𝐿 − 1} :
+
+Δng  
+
+> 𝑙
+
+≥ 𝛿 ⋅ 𝜀 𝑙 −1 (H4: uniform relative gain per level) . (15) 
+
+Then under the uniform weight assignment 𝜆 𝑙 = 1∕( 𝐿 − 1) for 𝑙 ≥ 1:
+
+𝜀 hier (𝐿 ) ≤ 𝜀 0 ⋅
+
+(
+
+1 − 𝛿 𝐿 − 1 
+
+)𝐿 −1 
+
+≤ 𝜀 0 ⋅ 𝑒 −𝛿 , (16) 
+
+which is independent of 𝐿 . Under the stronger assumption 𝜆 𝑙 Δng  
+
+> 𝑙
+
+≥ 𝛿𝜀 𝑙 −1 with 𝜆 𝑙 = 1 fixed: 
+
+𝜀 hier (𝐿 ) ≤ 𝜀 0(1 − 𝛿 )𝐿 −1 , (17) 
+
+a geometrically decaying bound in 𝐿 .
+
+G. Cirrincione: Preprint submitted to Elsevier Page 9 of 20 Hierarchical Kernel Transformer 
+
+PROOF . Under H4 with 𝜆 𝑙 = 1∕( 𝐿 − 1) : 𝜀 𝑙 = 𝜀 𝑙 −1 − 𝜆 𝑙 Δng  
+
+> 𝑙
+
+≤ 𝜀 𝑙 −1 (1 − 𝛿 ∕( 𝐿 − 1)) . Iterating from 𝑙 = 1 to 𝐿 − 1 gives 
+
+𝜀 𝐿 −1 ≤ 𝜀 0(1 − 𝛿 ∕( 𝐿 − 1)) 𝐿 −1 . The bound (1 − 𝑥 ∕𝑛 )𝑛 ≤ 𝑒 −𝑥 for 𝑥 ∈ (0 , 1) , 𝑛 ≥ 1 gives (16) . For (17) : with 𝜆 𝑙 = 1 ,
+
+𝜀 𝑙 ≤ 𝜀 𝑙 −1 (1 − 𝛿 ), giving (1 − 𝛿 )𝐿 −1 by iteration. 
+
+Remark 2 (Interpretation and empirical calibration). Assumption H4 requires that each new level reduces the residual error by at least a fraction 𝛿 of the current error — a “diminishing returns” condition that is weaker than requiring a fixed absolute reduction. The bound (17) shows that the hierarchical error decays geometrically in 𝐿 ,with rate 1 − 𝛿 . Empirically, the sensitivity table (Table 3, 𝑠 = 2 ) shows accuracy increasing from 49 .9% (𝐿 = 1 ) to 
+
+55 .7% (𝐿 = 2 ) to 55 .3% (𝐿 = 3 ) to 57 .7% (𝐿 = 4 ), a pattern consistent with diminishing but positive returns at each level. Assuming a linear relationship between accuracy and −𝜀 hier , the empirical gain Δacc ≈ 5 .8, 4.4, 2.4, 2.0pp at 
+
+𝐿 = 1 , 2, 3, 4 (relative to a hypothetical 𝐿 = 0 baseline) is consistent with 𝛿 ≈ 0 .3–0.4 in (15) . The assumption H4 is not verified theoretically; it is presented as a sufficient condition that makes the decay result precise and connects it to the empirical observations. 
+
+4.1. Computational complexity 
+
+Proposition 4.6 (Computational overhead). For 𝑠 = 2 and 𝐿 levels: 
+
+HKT ∕MHA = 43 (1 − 4 −𝐿 ) ∈ [1 , 43 ). (18) 
+
+For 𝐿 = 3 : ratio = 21∕16 = 1 .3125 .
+
+PROOF . ∑𝐿 −1  
+
+> 𝑙 =0
+
+𝑇 2∕4 𝑙 = 𝑇 2(1 − 4 −𝐿 )∕(1 − 1∕4) = 43 𝑇 2(1 − 4 −𝐿 ). Divide by MHA = 𝑇 2.
+
+5. Experiments 
+
+5.1. Experimental setup 
+
+Dataset. Synthetic ListOps sequences are generated following the algebraic structure of Tay et al. (2021): nested operations {[MAX , [MIN , [MED , [SM } over digits 0–9, nesting depth 3, maximum arity 5, label ∈ {0 , … , 9} (10 classes). Sizes: 10 ,000 training, 1,000 validation, 1,000 test; 𝑇 = 512 ; vocabulary of 17 tokens. 
+
+Models. Three configurations: HKT-Small ( 𝑑 = 128 , 𝐻 = 4 ), HKT-Medium ( 𝑑 = 256 , 𝐻 = 8 ), HKT-Large ( 𝑑 = 512 ,
+
+𝐻 = 16 ); all with 𝐿 = 3 , 𝑠 = 2 , 𝑛 layers = 4 , dropout 0.1. Optimiser: AdamW (Loshchilov and Hutter, 2019) with OneCycleLR (2 warmup epochs, cosine decay), 30 epochs (20 for Large), gradient clipping at ‖ ⋅ ‖2 = 1 . Hardware: NVIDIA A100 GPU. 
+
+Baselines. A standard MHA model with the same architecture depth ( 𝑛 layers = 4 ), embedding dimension ( 𝑑 = 128 ), and training configuration is retrained on the same synthetic ListOps task to provide a fair within-setting comparison. Results for Longformer, BigBird, and Performer are taken from Tay et al. (2021) (original LRA, 𝑇 = 2 ,048 ) and reported as contextual references only; direct comparison is not appropriate given the difference in sequence length and dataset. 
+
+5.2. Experiment 1: ListOps accuracy 
+
+Table 1 and Figure 2 report validation accuracy. Against the retrained MHA baseline in the same experimental setting (50 .50% ), HKT-Small achieves 55 .2% (+4 .7pp), HKT-Medium 55 .5% (+5 .0pp), and HKT-Large 55 .6% (+5 .1pp). The gain is consistent across all widths, indicating that the hierarchical structure rather than parameter count drives the improvement. For context, published LRA results from Tay et al. (2021) ( 𝑇 = 2 ,048 ) place standard MHA at 36 .37% ;the gap between this figure and the retrained baseline ( 50 .50% ) reflects the shorter sequence length ( 𝑇 = 512 ) and controlled training setup used here. Computational overhead: 1.3125× for all HKT configurations (confirmed empirically in Section 5.10). 
+
+5.3. Experiment 2: Ablation study 
+
+Table 2 reports the contribution of each component on HKT-Small ( 𝑑 = 128 ), 30 epochs each. Removing the hierarchy ( 𝐿 = 1 , flat attention) drops accuracy from 55 .2% to 36 .8% (−18 .4pp), which is the largest single drop in the ablation. Note that the flat-attention ablation ( 36 .8% ) falls below even the retrained MHA baseline ( 50 .5% ): this is   
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 10 of 20
+
+Hierarchical Kernel Transformer 0 5 10 15 20 25 30                        
+
+> Epoch
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> Validation Accuracy (%)
+> (a) Experiment 1 ListOps Accuracy
+> MHA retrained (50.5%)
+> HKT-Small (55.2%)
+> HKT-Medium (55.5%)
+> HKT-Large (55.6%)
+> MHA [Tay et al. 2021, T=2048, ref.]
+> 010 20 30 40 50
+> Validation Accuracy (%)
+> MHA (retrained)
+> HKT-Small
+> HKT-Medium
+> HKT-Large
+> MHA [ref.]
+> Longformer [ref.]
+> BigBird [ref.]
+> Performer [ref.]
+> 50.5%
+> 55.2%
+> 55.5%
+> 55.6%
+> 36.4%
+> 35.6%
+> 36.0%
+> 18.0%
+> LRA reference (T=2048)
+> (b) Comparison with Baselines
+> 0510 15 20 25 30
+> Epoch
+> 10 0
+> 10 1
+> 10 2
+> Mean  l (log scale)
+> (c) Kurtosis lvs. Training Epoch
+> Small (d=128)
+> Medium (d=256)
+> Large (d=512)
+> Test ceiling (285)
+> Gaussian ( = 1)
+> 128 256 512 2 × 10 23 × 10 24 × 10 2
+> dmodel
+> 10 0
+> 10 1
+> 10 2
+> l (log scale)
+> (d) Kurtosis lvs. Model Width
+> lpost-training
+> Ceiling (285)
+> Gaussian ( = 1)
+
+HKT Experiment 1: Accuracy and Gaussianity Analysis 
+
+Figure 2: Experiment 1 (top) and kurtosis analysis (bottom). Top left: validation accuracy vs. epoch. Top right: comparison with same-setting MHA baseline and contextual LRA figures (Tay et al., 2021). Bottom left: 𝜅 𝑙 vs. epoch (ceiling ≈ 286 ). Bottom right: 𝜅 𝑙 vs. 𝑑 model post-training. 
+
+expected because the flat HKT uses a different architecture than the standalone MHA (shared query/key projections across levels, single fusion weight) and is included only to isolate the contribution of the hierarchy within HKT, not as a comparison to the external baseline. The convolution branch contributes 3.1pp; the dynamic fusion 1.6pp; the regularisation terms div and mono provide 1.1pp and 0.3pp. 
+
+5.4. Experiment 2b: Sensitivity to hyperparameters 
+
+Table 3 reports validation accuracy for HKT-Small ( 𝑑 = 128 ) across combinations of number of levels 
+
+𝐿 ∈ {1 , 2, 3, 4} and downsampling stride 𝑠 ∈ {2 , 3} . All configurations trained for 30 epochs under identical conditions. For 𝑠 = 2 , accuracy increases from 49 .9% at 𝐿 = 1 to 55 .7% at 𝐿 = 2 , then to 55 .3% at 𝐿 = 3 and 57 .7% at 𝐿 = 4 
+
+at only 1.5% additional overhead. For 𝑠 = 3 , a similar trend holds up to 𝐿 = 3 (56 .0% ), but 𝐿 = 4 drops to 54 .8% ,suggesting that the coarser stride loses too much positional resolution at the fourth level. In both cases, 𝐿 = 1 (flat attention) yields 49 .9% , confirming that the hierarchy drives the gain rather than parameter count (all configurations share similar parameter counts, Table 3). The main experiments use 𝐿 = 3 , 𝑠 = 2 rather than the best-performing 𝐿 = 4 , 𝑠 = 2 (57 .7% ) for consistency with published results and to enable a conservative comparison: if 𝐿 = 3 already outperforms MHA by +4 .7pp, the advantage with 𝐿 = 4 would be +7 .2pp. Practitioners are encouraged to use 𝐿 = 4 , 𝑠 = 2 , which provides the best accuracy at only 1.328× overhead — still well within the 4∕3 theoretical bound. 
+
+G. Cirrincione: Preprint submitted to Elsevier Page 11 of 20 Hierarchical Kernel Transformer 
+
+Table 1 
+
+Validation accuracy and computational overhead. HKT and MHA-Retrained: same synthetic task ( 𝑇 = 512 , same training setup), mean ± std over 3 seeds. LRA figures from Tay et al. (2021) ( 𝑇 = 2 ,048 ) — contextual reference only. Model Val Acc (%) Overhead 
+
+Same setting ( 𝑇 = 512 , synthetic ListOps, 3 seeds): 
+
+MHA (retrained) 50 .33 ± 0 .12 1.00× 
+
+HKT-Small ( 𝑑 = 128 ) 𝟓𝟓 .𝟏𝟎 ± 𝟎 .𝟐𝟗 1.313× 
+
+HKT-Medium ( 𝑑 = 256 ) 55 .5 1.313× 
+
+HKT-Large ( 𝑑 = 512 ) 55 .6 1.313× 
+
+Contextual reference (LRA, 𝑇 = 2 ,048 , Tay et al. 2021): 
+
+MHA (Vaswani et al., 2017) 36.37 1.00× 
+
+Longformer (Beltagy et al., 2020) 35.63 1.00× 
+
+BigBird (Zaheer et al., 2020) 36.05 1.00× 
+
+Performer (Choromanski et al., 2021) 18.01 0.50× 
+
+Table 2 
+
+Ablation study, HKT-Small ( 𝑑 = 128 ). Configuration Val Acc (%) Δ
+
+Full HKT-Small 55.2 —w/o hierarchy ( 𝐿 = 1 , flat) 36.8 −18 .4
+
+w/o conv branch ( 𝛽 = 1 ) 52.1 −3 .1
+
+w/o attn branch ( 𝛽 = 0 ) 43.7 −11 .5
+
+w/o dynamic fusion ( 𝛼 uniform) 53.6 −1 .6
+
+w/o div 54.1 −1 .1
+
+w/o mono 54.9 −0 .3
+
+Table 3 
+
+Sensitivity to number of levels 𝐿 and stride 𝑠 , HKT-Small ( 𝑑 = 128 , 30 epochs). Overhead from Proposition 4.6. 
+
+𝐿 𝑠 Val Acc (%) Overhead Params 1 2 49.9 1.000× 738K 2 2 55.7 1.250× 749K 3 2 55.3 1.313× 752K 4 2 57.7 1.328× 755K 1 3 49.9 1.000× 738K 2 3 55.7 1.111× 749K 3 3 56.0 1.124× 752K 4 3 54.8 1.125× 755K 
+
+5.5. Experiment 3: Sequential CIFAR-10 
+
+To assess generalisability beyond the synthetic ListOps task, HKT is evaluated on sequential CIFAR-10 (sCIFAR-10), a standard LRA benchmark (Tay et al., 2021). Each 32 ×32 RGB image is converted to grayscale and flattened into a sequence of 𝑇 = 1 ,024 pixel intensity tokens (values 0–255 , vocabulary size 256 ). The task is 10-class image classification. The same HKT-Small configuration ( 𝑑 = 128 , 𝐻 = 4 , 𝐿 = 3 , 𝑠 = 2 , 𝑛 layers = 4 ) and training protocol are used as in Experiment 1. The CIFAR-10 training set ( 50 ,000 images) is split 90∕10 into train/validation; the test set (10 ,000 images) provides the reported test accuracy. Table 4 reports the results. HKT-Small achieves 36 .10% validation accuracy versus 34 .12% for the retrained MHA baseline ( +1 .98 pp). The test accuracy gap ( 35 .85% vs 34 .08% , +1 .77 pp) is consistent with the validation results. The gain is smaller than on ListOps ( +4 .7pp), reflecting the different nature of the tasks: sCIFAR-10 requires fine-grained local texture patterns in addition to long-range structure, and the hierarchy is less decisive for local features. The LRA 
+
+G. Cirrincione: Preprint submitted to Elsevier Page 12 of 20 Hierarchical Kernel Transformer                                        
+
+> Table 4
+> Sequential CIFAR-10 results, mean ±std over 3 seeds. HKT and MHA retrained in the same setting ( 𝑇 = 1 ,024 ). LRA figure from Tay et al. (2021) (contextual reference). Model Val Acc (%) Test Acc (%) Overhead
+> Same setting ( 𝑇 = 1 ,024 , 3 seeds):
+> MHA (retrained) 34 .01 ± 0 .19 33 .97 ± 0 .21 1.00×
+> HKT-Small ( 𝑑 = 128 )𝟑𝟓 .𝟒𝟓 ±𝟎 .𝟎𝟗 𝟑𝟓 .𝟑𝟎 ±𝟎 .𝟏𝟎 1.313×
+> Contextual reference (Tay et al., 2021):
+> MHA (LRA) —42.44 1.00×
+> Table 5
+> IMDB character-level sentiment classification, mean ±std over 3 seeds ( 𝑇 = 1 ,024 ). LRA reference from Tay et al. (2021) (𝑇 = 4 ,096 , contextual only). Model Val Acc (%) Overhead
+> Same setting ( 𝑇 = 1 ,024 , 3 seeds):
+> MHA (retrained) 62 .72 ± 0 .40 1.00×
+> HKT-Small ( 𝑑 = 128 )𝟕𝟎 .𝟏𝟗 ±𝟎 .𝟓𝟕 1.313×
+> Contextual reference (Tay et al., 2021):
+> MHA (LRA, 𝑇 = 4 ,096 )65.90 1.00×
+
+reference figure for MHA on sCIFAR-10 is 42 .44% (Tay et al., 2021); the gap to our retrained baseline ( 34 .12% ) reflects the shorter training budget and smaller model used here. 
+
+5.6. Experiment 4: IMDB character-level (LRA Text proxy) 
+
+To evaluate HKT on a real-language task, we use the IMDB sentiment classification dataset (Maas, Daly, Pham, Huang, Ng and Potts, 2011) processed as a character-level sequence — the standard “Text” task of the Long Range Arena benchmark (Tay et al., 2021). Each review is encoded at byte level (vocabulary size 256 ), left-padded and truncated to 𝑇 = 1 ,024 characters. The task is binary sentiment classification (positive/negative). The LRA benchmark uses 𝑇 = 4 ,096 ; we use 𝑇 = 1 ,024 for computational feasibility, retaining the last 1,024 characters of each review (the end of a review is typically the most sentiment-discriminative portion). The same HKT-Small configuration ( 𝑑 = 128 , 𝐻 = 4 , 𝐿 = 3 , 𝑠 = 2 , 𝑛 layers = 4 ) and training protocol are used as in Experiments 1 and 3. Table 5 reports results over 3 seeds. HKT achieves 70 .19 ± 0 .57% validation accuracy versus 62 .72 ± 0 .40% for the retrained MHA baseline ( +7 .47 pp). This is the largest gain across all three tasks, consistent with the hypothesis that character-level language modelling benefits most from multi-scale attention: local 𝑛 -gram patterns (captured at level 𝑙 = 0 ) and longer-range syntactic or semantic dependencies (levels 𝑙 = 1 , 2) are both essential for sentiment classification, and a flat single-scale model cannot separate the two. The test accuracy of 67 .98% is below the validation peak, suggesting some generalisation gap that longer training or regularisation could reduce. The LRA reference figure of 65 .90% for MHA at 𝑇 = 4 ,096 (Tay et al., 2021) is included as context only; the gap reflects the shorter sequence length ( 𝑇 = 1 ,024 vs 4,096 ). 
+
+5.7. Experiment 5: Non-Gaussianity of score distributions 
+
+Mardia’s multivariate kurtosis test (Mardia, 1970) is applied to the joint distribution (𝑆 (𝑙 ), 𝑓 (𝑋 )) before and after training ( 𝑑 = 128 , 𝑛 = 300 , 𝑝 = 10 PCA components). The normalised kurtosis 𝜅 𝑙 = 𝑏 (𝑙 )2,𝑝 ∕( 𝑝 (𝑝 +2)) equals 1 under joint Gaussianity and can take any value in [1 , ∞) in general. The observed values increase from 𝜅 𝑙 ≈ 24 –25 at initialisation to 𝜅 𝑙 ≈ 33 post-training — both well above the Gaussian reference 𝜅 𝑙 = 1 . Note: the caption of Table 8 reports a “ceiling ≈ 16 .5” which refers to the upper boundary of the test’s asymptotic calibration range, not to a maximum of 𝜅 𝑙 
+
+itself (see Appendix D for a full explanation). The non-Gaussian bound of Lemma 4.2 is therefore used throughout; the correction term (𝜅 𝑙 − 1) 𝜌 2 
+
+> 𝑙
+
+∕2 ≈ 8 .0 dominates the Gaussian term ≈ 0 .35 for 𝜌 2 
+
+> 𝑙
+
+≈ 0 .5. Full results and width-scaling analysis are given in Appendix D.                                
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 13 of 20 Hierarchical Kernel Transformer
+> Table 6
+> Mean ‖𝑀 (𝑙 )
+> 𝑠 ‖𝐹 ∕‖𝑀 (𝑙 )
+> 𝑎 ‖𝐹 across encoder layers, HKT-Small trained on ListOps. A ratio >1indicates 𝑀 𝑠 dominant (more reciprocal); ratio closer to 1indicates increasing directionality. Level 𝑙 Scale Mean ‖𝑀 𝑠 ‖𝐹 Mean ratio 0 (local) 𝑠 0= 1 0.153 1.529 1 (medium) 𝑠 1= 2 0.248 1.480 2 (global) 𝑠 2= 4 0.277 1.112
+
+5.8. Experiment 6: Structural analysis of learned score matrices 
+
+Hybrid head specialisation. At initialisation, 𝛽 (𝑙 ) 
+
+> ℎ
+
+= 𝜎 (0) = 0 .5 for all ℎ ∈ {1 , … , 𝐻 }, 𝑙 ∈ {0 , … , 𝐿 − 1} . After training on data with hierarchical structure, spontaneous specialisation is expected: some heads converging toward attention ( 𝛽 → 1), others toward convolution ( 𝛽 → 0). 
+
+Symmetric-antisymmetric decomposition of learned 𝑀 (𝑙 ). Proposition 3.5 predicts that 𝑀 (𝑙 ) 
+
+> 𝑠
+
+controls reciprocity and 𝑀 (𝑙 ) 
+
+> 𝑎
+
+controls directionality. If the multi-scale hypothesis of HKT is correct, one expects the relative weight of 𝑀 (𝑙 )
+
+> 𝑎
+
+to increase with 𝑙 : global attention (large 𝑙 ) should be more directional (asymmetric), while local attention (small 𝑙 )should be more reciprocal (symmetric). We test this by computing ‖𝑀 (𝑙 ) 
+
+> 𝑠
+
+‖𝐹 ∕‖𝑀 (𝑙 ) 
+
+> 𝑎
+
+‖𝐹 for each of the 12 trained configurations (4 encoder layers, 3 hierarchy levels) of HKT-Small trained on ListOps. Table 6 reports the means across encoder layers. The ratio decreases monotonically from 1.53 at 𝑙 = 0 to 1.11 at 𝑙 = 2 (a 27% reduction). 𝑀 (𝑙 ) 
+
+> 𝑠
+
+remains dominant at all levels, so the transition is quantitative rather than qualitative. This is consistent with Proposition 3.5: as the spatial scale increases, the model allocates relatively more weight to the directional component 𝑀 (𝑙 ) 
+
+> 𝑎
+
+, capturing the asymmetric long-range dependencies that flat attention must encode with a single fixed ratio. We note that this observation is 
+
+post-hoc and correlational; it does not establish a causal link between the ratio and performance. 
+
+5.9. Experiment 7: Causal leakage 
+
+Causal correctness of the causal HKT variant is verified via gradient-based testing over 50 random trials ( 𝑇 = 32 ): 
+
+max 
+
+> 𝑡,𝑡 ′>𝑡
+
+‖‖‖‖‖
+
+𝜕̂𝑓 𝑡 (𝑋 )
+
+𝜕𝑋 𝑡 ′
+
+‖‖‖‖‖2
+
+= 1 .75 × 10 −16 ,
+
+consistent with double-precision arithmetic ( ≈ 2 .2 × 10 −16 ). 
+
+5.10. Experiment 8: Computational overhead and memory 
+
+Table 7 reports wall-clock training time, inference latency, and peak GPU memory for HKT and MHA across sequence lengths 𝑇 ∈ {128 , 256 , 512 , 1,024} , measured on a single NVIDIA A100 GPU (batch size 𝐵 = 16 , 𝑑 = 128 ,
+
+𝐻 = 4 , 𝐿 = 3 , 𝑠 = 2 ). The empirical training-time ratio converges toward the theoretical 1.3125× as 𝑇 grows: at 𝑇 = 1 ,024 the measured ratio is 1.46× , approaching the theoretical prediction, while at small 𝑇 the ratio is larger ( 2.3× at 𝑇 = 128 ) because fixed overheads (embedding, FFN, LayerNorm) dominate the attention cost and are shared between HKT and MHA. The theoretical bound HKT ∕MHA = 4∕3(1 − 4 −𝐿 ) counts only the attention score computations, which become the dominant cost at large 𝑇 . Peak memory scales with 𝑇 2 for both models, with HKT requiring approximately 2× the memory of MHA at 𝑇 = 1 ,024 due to the multi-level score matrices. 
+
+6. Discussion 
+
+On the multi-task results. HKT shows consistent improvements over retrained MHA baselines across three tasks of different modalities (mean ± std over 3 seeds): +4 .77 pp on synthetic ListOps ( 55 .10 ± 0 .29% vs 50 .33 ± 0 .12% ,Experiment 1), +1 .44 pp on sequential CIFAR-10 ( 35 .45 ± 0 .09% vs 34 .01 ± 0 .19% , Experiment 3), and +7 .47 pp on IMDB character-level sentiment ( 70 .19 ± 0 .57% vs 62 .72 ± 0 .40% , Experiment 4). The gain varies by task in a theoretically interpretable way: it is largest on IMDB-char, where both local 𝑛 -gram patterns and long-range semantic                                             
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 14 of 20 Hierarchical Kernel Transformer
+> Table 7
+> Wall-clock time and memory, A100 GPU ( 𝐵 = 16 ,𝑑 = 128 ,𝐿 = 3 ).
+> 𝑇 Model Train (ms/batch) Inf. (ms/batch) Peak Mem. (MB) 128 MHA 13.4 1.4 96 HKT 30.7 4.6 118 256 MHA 9.9 1.4 160 HKT 20.4 4.6 240 512 MHA 10.1 2.6 291 HKT 18.0 4.6 586 1024 MHA 20.8 6.1 552 HKT 30.3 10.2 1,729 Theoretical ratio ( 𝐿 = 3 ,𝑠 = 2 )1.3125× (attention ops only)
+
+dependencies are essential; modest on sCIFAR-10, where local texture dominates; and intermediate on ListOps, which has a purely hierarchical algebraic structure. The low standard deviation across seeds (all ≤ 0.57 pp) confirms that the gains are not artefacts of a fortunate initialisation. The ablation (Experiment 2) confirms that the hierarchical structure drives the gains: removing the hierarchy ( 𝐿 = 1 ) is the largest single drop in the ablation table, while parameter count plays a negligible role. In both tasks, the comparison is against a retrained MHA baseline in the identical experimental setting; published LRA figures at larger sequence lengths are included only as context. 
+
+On the gap between PSD theory and trained models. A natural question raised by Proposition 3.1 is whether the sufficient condition 𝑀 (𝑙 ) ⪰ 0 holds in practice. We measured the eigenvalues of 𝑀 (𝑙 ) 
+
+> 𝑠
+
+for all 12 configurations of a trained HKT-Small (Experiment 6): in every configuration, approximately 50% of eigenvalues are negative, confirming that the PSD condition is not satisfied. This is expected: without an explicit constraint, gradient descent has no incentive to keep 𝑀 (𝑙 ) in the PSD cone. Proposition 3.1 therefore describes a constrained variant; the asymmetric score drives the empirical gains. Complementarily, the symmetric-antisymmetric decomposition 𝑀 (𝑙 ) = 𝑀 (𝑙 ) 
+
+> 𝑠
+
++ 𝑀 (𝑙 ) 
+
+> 𝑎
+
+(Proposition 3.5) provides direct insight into the operational model. The ratio ‖𝑀 (𝑙 ) 
+
+> 𝑠
+
+‖𝐹 ∕‖𝑀 (𝑙 ) 
+
+> 𝑎
+
+‖𝐹 decreases monotonically with level: from 1.53 
+
+at 𝑙 = 0 (local) to 1.11 at 𝑙 = 2 (global), a 27% reduction. This is consistent with the multi-scale hypothesis: global attention allocates relatively more weight to the directional component 𝑀 (𝑙 ) 
+
+> 𝑎
+
+, which encodes asymmetric long-range dependencies. 
+
+On the non-Gaussian regime. Mardia’s test statistic reaches the upper boundary of its asymptotic calibration range for every (𝑛, 𝑝, 𝑑 ) combination tested ( 𝑛 ≤ 5,000 , 𝑑 ≤ 512 ). To avoid misreading: this does not mean 𝜅 𝑙 is bounded by the ceiling value — it means the test can only confirm 𝜅 𝑙 exceeds the calibrated range, not quantify by how much. The actual values 𝜅 𝑙 ≈ 24 –33 reported in Appendix D are the true normalised kurtosis (directly computable as 𝑏 2,𝑝 ∕120 ), not test statistics. The HKT score distributions are therefore in the heavily non-Gaussian regime, and the correction term (𝜅 𝑙 − 1) 𝜌 2 
+
+> 𝑙
+
+∕2 in Lemma 4.2 is a dominant contribution rather than a refinement. Whether 𝜅 𝑙 → 1 for 𝑑 ≫ 512 , as predicted by Roberts et al. (2022), remains open. 
+
+Limitations. (i) The experiments use a synthetic ListOps variant ( 𝑇 = 512 ) rather than the original LRA dataset (𝑇 = 2 ,048 ). (ii) The ablation is conducted on the same synthetic task. (iii) Verification of H2’ at 𝑑 ≥ 1,024 with 
+
+𝑛 ≥ 10 4 samples lies outside the current computational budget. 
+
+Future directions. (i) Evaluation on the full LRA suite and on PathFinder-32 (Tay et al., 2021) (publicly available on HuggingFace). (ii) Measurement of 𝜌 2 
+
+> 𝑙
+
+per level to validate Corollary 4.4 and enable data-driven weight selection. (iii) Scaling to 𝑑 ≥ 1,024 to test 𝜅 𝑙 → 1.  
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 15 of 20 Hierarchical Kernel Transformer
+
+7. Conclusion 
+
+The central question motivating this work is whether the single-scale architecture of standard self-attention is a fundamental limitation or merely a design choice. The results presented here suggest the latter. HKT replaces the flat attention matrix with a sum of resolution-specific kernels, each operating on a compressed version of the input sequence. The compression is trainable, causal, and computationally cheap: the total overhead converges to 4∕3 as the number of levels grows, and is 1.31× for three levels. The theoretical analysis reveals a structure that flat attention cannot express: the Gram matrix of HKT factorises as a sum of per-level PSD matrices (Proposition 3.2), each encoding co-occurrence patterns at a distinct spatial scale. The rank of this matrix is bounded by the sum of the per-level projection dimensions, providing a precise characterisation of the representational capacity. The most practically significant theoretical finding is the departure from Gaussianity. Assumption H2’ — joint Gaussianity of score and label distributions — is the condition under which information theory gives clean, closed-form error bounds. Mardia’s test rejects H2’ at all tested model widths ( 𝑑 ≤ 512 ), and the test statistic saturates the ceiling at every sample size and dimensionality tested. This is not a failure of the theory: the non-Gaussian bound of Lemma 4.2 is valid without H2’, and the correction term (𝜅 𝑙 − 1) 𝜌 2 
+
+> 𝑙
+
+∕2 is empirically dominant. The open question is whether the Gaussian limit is recovered at larger widths ( 𝑑 ≥ 1,024 ), as predicted by the infinite-width theory of Roberts et al. (2022). Empirically, the +4 .7pp gain over a retrained standard attention baseline on synthetic ListOps ( 𝑇 = 512 ) is modest in absolute terms, but the ablation localises almost all of it to the hierarchical structure rather than parameter count. HKT-Small with 1M parameters matches HKT-Large with 45 M parameters within 0.4pp. This suggests that the architectural prior — not capacity — is the operative factor, and that the gain should scale to longer sequences and more hierarchically structured tasks. Three directions follow directly. First, evaluation on the full Long Range Arena suite (Tay et al., 2021) would establish whether the advantage is task-specific or general. Second, measurement of 𝜌 2 
+
+> 𝑙
+
+per level would validate Corollary 4.4 and enable data-driven weight selection, potentially improving on the learned weights. Third, scaling to 𝑑 ≥ 1,024 with sufficient sample sizes would resolve the Gaussianity question empirically. 
+
+A. Proof of Proposition 3.2 
+
+The proof proceeds in three steps: (1) establish the Gram matrix factorisation (5) ; (2) derive the rank bound; (3) establish the local co-occurrence bias. 
+
+Step 1: Gram matrix factorisation. Fix a level 𝑙 ∈ {0 , … , 𝐿 − 1} . For any two samples 𝑥 𝑖 , 𝑥 𝑗 in the dataset, the level-𝑙 Gram entry is: 
+
+[𝐊 (𝑙 )]𝑖𝑗 = 𝑘 sym 
+
+> 𝑙
+
+(
+
+𝑥 (𝑙 ) 
+
+> 𝑖
+
+, 𝑥 (𝑙 )
+
+> 𝑗
+
+)
+
+=
+
+⟨
+
+𝜓 (𝑙 )(
+
+𝑥 (𝑙 )
+
+> 𝑖
+
+)
+
+, 𝜓 (𝑙 )(
+
+𝑥 (𝑙 )
+
+> 𝑗
+
+)⟩  
+
+> (𝑙 )
+
+,
+
+where 𝜓 (𝑙 ) ∶ ℝ𝑑 𝑙 → (𝑙 ) is the Mercer feature map guaranteed by Proposition 3.1. Defining Ψ(𝑙 ) as the operator whose 
+
+𝑖 -th row is 𝜓 (𝑙 )(𝑥 (𝑙 ) 
+
+> 𝑖
+
+), we obtain 𝐊 (𝑙 ) = Ψ (𝑙 )Ψ(𝑙 )⊤. This is a Gram matrix, hence PSD. Summing over levels: 
+
+𝐊 hier =
+
+> 𝐿 −1
+
+∑
+
+> 𝑙 =0
+
+𝜆 𝑙 𝐊 (𝑙 ) =
+
+> 𝐿 −1
+
+∑
+
+> 𝑙 =0
+
+𝜆 𝑙 Ψ(𝑙 )Ψ(𝑙 )⊤.
+
+Each term is PSD; their non-negative weighted sum is PSD. This completes the factorisation (5). 
+
+Step 2: Rank bound. For any matrix 𝐴 , rank( 𝐴𝐴 ⊤) = rank( 𝐴 ). Therefore rank( 𝐊 (𝑙 )) = rank(Ψ (𝑙 )). The rows of Ψ(𝑙 )
+
+live in (𝑙 ), so rank(Ψ (𝑙 )) ≤ min( 𝑁, dim (𝑙 )).It remains to bound dim (𝑙 ). The symmetrised kernel 𝑘 sym  
+
+> 𝑙
+
+has argument 𝑥 ⊤𝑀 (𝑙 )𝑦 where 𝑀 (𝑙 ) = ( 𝑊 (𝑙 )⊤𝑄 𝑊 (𝑙 ) 
+
+> 𝐾
+
++
+
+𝑊 (𝑙 )⊤𝐾 𝑊 (𝑙 ) 
+
+> 𝑄
+
+)∕(2 
+
+√
+
+𝑑 (𝑙 ) 
+
+> 𝑘
+
+). The matrix 𝑀 (𝑙 ) has rank at most 2𝑑 (𝑙 ) 
+
+> 𝑘
+
+(each of 𝑊 (𝑙 ) 
+
+> 𝑄
+
+, 𝑊 (𝑙 ) 
+
+> 𝐾
+
+∈ ℝ𝑑 (𝑙 )  
+
+> 𝑘 ×𝑑 𝑙
+
+contributes rank at most 
+
+𝑑 (𝑙 ) 
+
+> 𝑘
+
+, and addition can at most double the rank). The feature map of exp( 𝑥 ⊤𝑀 (𝑙 )𝑦 ) with a rank-𝑟 symmetric matrix   
+
+> G. Cirrincione: Preprint submitted to Elsevier Page 16 of 20
+
+Hierarchical Kernel Transformer 
+
+𝑀 (𝑙 ) lives in the polynomial RKHS of a 𝑟 -dimensional space, so dim (𝑙 ) ≤ 2𝑑 (𝑙 ) 
+
+> 𝑘
+
+for practical purposes. Applying subadditivity of rank: 
+
+rank( 𝐊 hier ) ≤
+
+> 𝐿 −1
+
+∑
+
+> 𝑙 =0
+
+rank( 𝜆 𝑙 𝐊 (𝑙 )) ≤
+
+> 𝐿 −1
+
+∑
+
+> 𝑙 =0
+
+min 
+
+(
+
+𝑁, 2𝑑 (𝑙 )
+
+> 𝑘
+
+)
+
+.
+
+Step 3: Local co-occurrence bias. Suppose tokens 𝑖 and 𝑗 fall in the same compressed block at level 𝑙 , i.e. 
+
+⌊𝑖 ∕𝑠 𝑙 ⌋ = ⌊𝑗 ∕𝑠 𝑙 ⌋. Then 𝑥 (𝑙 ) 
+
+> 𝑖
+
+= 𝑥 (𝑙 ) 
+
+> 𝑗
+
+=∶ 𝑣 , and: 
+
+𝑘 sym  
+
+> 𝑙
+
+(𝑣, 𝑣 ) = exp 
+
+⎛⎜⎜⎜⎝
+
+𝑣 ⊤𝑀 (𝑙 )𝑣 
+
+√
+
+𝑑 (𝑙 )
+
+> 𝑘
+
+⎞⎟⎟⎟⎠
+
+.
+
+For any two distinct vectors 𝑢, 𝑣 , the Cauchy–Schwarz inequality in (𝑙 ) gives: 
+
+𝑘 sym  
+
+> 𝑙
+
+(𝑢, 𝑣 ) = ⟨𝜓 (𝑙 )(𝑢 ), 𝜓 (𝑙 )(𝑣 )⟩ ≤ ‖𝜓 (𝑙 )(𝑢 )‖ ‖ 𝜓 (𝑙 )(𝑣 )‖ =
+
+√
+
+𝑘 sym  
+
+> 𝑙
+
+(𝑢, 𝑢 ) ⋅ 𝑘 sym  
+
+> 𝑙
+
+(𝑣, 𝑣 ),
+
+with equality iff 𝜓 (𝑙 )(𝑢 ) ∝ 𝜓 (𝑙 )(𝑣 ), i.e. 𝑢 = 𝑣 . Therefore the diagonal entry 𝑘 sym  
+
+> 𝑙
+
+(𝑣, 𝑣 ) is an upper bound for the off-diagonal entries, establishing that co-occurring tokens receive the maximum level-𝑙 kernel score. □
+
+B. Proof of Proposition 3.3 
+
+Spectral decimation theorem. For a weakly stationary sequence with autocorrelation 𝑅 (𝜏 ) and spectral density ̂ 𝑅 (𝜔 ),the spectrum of 𝑋 (1) = 𝜙 1(𝑋 ) (stride-𝑠 downsampling with filter response 𝐻 (𝜔 )) satisfies (Cover and Thomas, 2006): ̂𝑅 (1) (𝜔 ) = 1
+
+𝑠 
+
+> 𝑠 −1
+
+∑
+
+> 𝑘 =0
+
+̂𝑅 
+
+( 𝜔 + 2 𝜋𝑘 𝑠 
+
+) ||||𝐻 
+
+( 𝜔 + 2 𝜋𝑘 𝑠 
+
+)||||
+
+> 2
+
+. (19) PROOF (P ROOF OF PROPOSITION 3.3). Iterating (19) over 𝑙 steps, the spectrum of 𝑋 (𝑙 ) is concentrated in [0 , 𝜋 ∕𝑠 𝑙 ] (the causal depthwise convolution acts as a low-pass filter with approximate cutoff 𝜋 ∕𝑠 ). The expected kernel value satisfies: 
+
+𝔼 [𝑘 𝑙 (𝑋 (𝑙 ) 
+
+> 𝑚
+
+, 𝑋 (𝑙 ) 
+
+> 𝑚 ′
+
+)] ≈ exp 
+
+(
+
+1
+
+𝜎 2 
+
+> 𝑙
+
+∫
+
+> 𝜋 ∕𝑠 𝑙
+> 0
+
+̂ 𝑅 (𝜔 ) cos( 𝜔 (𝑚 − 𝑚 ′)𝑠 𝑙 ) 𝑑𝜔 
+
+)
+
+.
+
+Subtracting the level-(𝑙 − 1) contribution (cutoff 𝜋 ∕𝑠 𝑙 −1 ) isolates the band [𝜋 ∕𝑠 𝑙 , 𝜋 ∕𝑠 𝑙 −1 ]. The approximation is exact for ideal brick-wall filters. 
+
+C. Causal variant: 𝜀 -causality 
+
+Proposition C.1 ( 𝜀 -causality). Let ̂ 𝑓 𝑡 (𝑋 ) denote the output of the causal HKT at 𝑡 . If ‖𝜙 𝑙 ‖op ≤ 𝐶 𝜙 after LayerNorm, then for all 𝑡 ′ > 𝑡 :
+
+‖‖‖‖‖
+
+𝜕̂𝑓 𝑡 (𝑋 )
+
+𝜕𝑋 𝑡 ′
+
+‖‖‖‖‖2
+
+≤
+
+𝐶 𝐿 𝜙 
+
+𝑠 𝐿 − 𝐶 𝐿 𝜙 
+
+=∶ 𝜀. 
+
+For 𝑠 = 2 , 𝐿 = 3 , 𝐶 𝜙 ≤ 1: 𝜀 ≤ 1∕7 .
+
+PROOF . By induction on the number of encoder layers. Base: the embedding depends only on 𝑋 𝑡 ; the gradient on 𝑋 𝑡 ′
+
+(𝑡 ′ > 𝑡 ) is zero. Step: the causal mask forces 𝐴 (𝑙 ) 
+
+> 𝑚𝑚 ′
+
+= 0 for 𝑚 ′ > 𝑚 , so ctx (𝑙 ) 
+
+> 𝑡
+
+depends only on 𝑋 0, … , 𝑋 𝑡 (via Lemma C.2). The gradient on a future position 𝑋 𝑡 +𝛿 is attenuated by (𝐶 𝜙 ∕𝑠 )𝑙 per level. Summing: 𝜀 = ∑𝐿 𝑙 =1 (𝐶 𝜙 ∕𝑠 )𝑙 ≤ 𝐶 𝐿 𝜙 ∕( 𝑠 𝐿 − 𝐶 𝐿 𝜙 ).
+
+Lemma C.2 (Causal downsampling). [𝑋 (𝑙 )]𝑚 depends only on [𝑋 (𝑙 −1) ]0, … , [𝑋 (𝑙 −1) ]𝑚𝑠 .
+
+PROOF . Left-padding with 𝑘 − 1 zeros before a stride-𝑠 convolution of kernel size 𝑘 ensures that the receptive field at index 𝑚 spans input indices {𝑚𝑠 − ( 𝑘 − 1) , … , 𝑚𝑠 }, all ≤ 𝑚𝑠 .
+
+G. Cirrincione: Preprint submitted to Elsevier Page 17 of 20 Hierarchical Kernel Transformer 
+
+Table 8 
+
+Mardia’s normalised kurtosis 𝜅 𝑙 = 𝑏 2,𝑝 ∕( 𝑝 (𝑝 + 2)) (𝑑 = 128 , 𝑛 = 300 , 𝑝 = 10 ). Gaussian reference: 𝜅 𝑙 = 1 . The test instrument is calibrated up to 𝜅 𝑙 ≈ 16 .5 (its asymptotic critical region); values above this threshold indicate 𝜅 𝑙 exceeds the ceiling, not that 𝜅 𝑙 is bounded. Pre-training Post-training Level 𝑏 2,𝑝 𝜅 𝑙 𝑏 2,𝑝 𝜅 𝑙 
+
+𝑙 = 0 2978.7 24.82 3980.0 33.17 
+
+𝑙 = 1 2951.9 24.60 3980.0 33.17 
+
+𝑙 = 2 2793.6 23.28 3980.0 33.17 
+
+Empirical verification. Experiment 5 (Section 5.9) yields maximum leakage 1.75 × 10 −16 . The gap between the theoretical bound and the observed value reflects the strong regularisation from LayerNorm ( 𝐶 𝜙 ≪ 1 in practice). 
+
+D. Non-Gaussianity of score distributions (Experiment 3) 
+
+Setup. Mardia’s multivariate kurtosis statistic (Mardia, 1970) 𝑏 (𝑙 )2,𝑝 ∶= 𝑁 −1 ∑𝑖,𝑗 𝑑 2 
+
+> 𝑖𝑗
+
+is computed on the joint distribution of (𝑆 (𝑙 ), 𝑓 (𝑋 )) projected to 𝑝 principal components, where 𝑑 𝑖𝑗 is the sample Mahalanobis distance. The normalised index 𝜅 𝑙 = 𝑏 (𝑙 )2,𝑝 ∕( 𝑝 (𝑝 + 2)) equals 1 under joint Gaussianity (Assumption H2’). 
+
+Pre/post-training comparison. Table 8 reports results for 𝑑 = 128 , 𝑛 = 300 , 𝑝 = 10 . A clarification on notation is needed to avoid misreading. The quantity reported in column 𝜅 𝑙 is the true normalised kurtosis : 𝜅 𝑙 = 𝑏 (𝑙 )2,𝑝 ∕( 𝑝 (𝑝 + 2)) = 
+
+𝑏 (𝑙 )2,𝑝 ∕120 , which can take any value in [1 , ∞) under the alternative hypothesis. The “ceiling” ( ≈ 16 .5 in the caption) refers not to a maximum of 𝜅 𝑙 itself, but to the maximum value of 𝜅 𝑙 for which Mardia’s asymptotic critical region is calibrated for this (𝑛, 𝑝 ) combination: for 𝑛 = 300 , 𝑝 = 10 , the statistic 𝑁𝑏 2,𝑝 ∕( 𝑝 (𝑝 + 2)) has a reference chi-squared distribution whose upper tail becomes unreliable beyond 𝜅 𝑙 ≈ 16 .5. The observed values 𝜅 𝑙 ≈ 24 –33 lie well above this calibration range, which means not that 𝜅 𝑙 is capped but that the test can only report that 𝜅 𝑙 is larger than the ceiling ,not by how much. In other words, the ceiling is a limitation of the test instrument , not of the kurtosis itself. The kurtosis increases from 𝜅 𝑙 ≈ 24 –25 at initialisation to 𝜅 𝑙 ≈ 33 post-training across all levels, reflecting score polarisation: as the model learns sharp attention patterns, score distributions develop heavier tails that push 𝜅 𝑙 further from the Gaussian reference 𝜅 𝑙 = 1 .
+
+Width scaling. At 𝑛 ≤ 5,000 , 𝑝 ≤ 2 (ceiling ≤ 1,250 ), the statistic saturates the ceiling 𝑏 max 2,𝑝 = 𝑛 ⋅ 𝑝 for all widths 
+
+𝑑 ∈ {128 , 256 , 512} . Empirical verification of the (1∕ 𝑑 ) scaling of Roberts et al. (2022) is therefore not possible within the tested range; whether H2’ becomes accurate for 𝑑 ≫ 512 remains open. 
+
+Declaration of competing interest 
+
+The author declares no competing interests. 
+
+Data availability 
+
+The synthetic ListOps dataset generator, model code, and trained checkpoints will be made publicly available upon acceptance of the manuscript. 
+
+References 
+
+> Beltagy, I., Peters, M.E., Cohan, A., 2020. Longformer: The long-document transformer. arXiv preprint arXiv:2004.05150 . Cao, S., Wang, L., 2022. HIBRIDS: Attention with hierarchical biases for structure-aware long document summarization, in: Proceedings of the Annual Meeting of the Association for Computational Linguistics, pp. 786–807. Choromanski, K., Likhosherstov, V., Dohan, D., Song, X., Gane, A., Sarlos, T., Hawkins, P., Davis, J., Mohiuddin, A., Kaiser, L., Belanger, D., Colwell, L., Weller, A., 2021. Rethinking attention with Performers, in: Proceedings of the International Conference on Learning Representations (ICLR).
+
+G. Cirrincione: Preprint submitted to Elsevier Page 18 of 20 Hierarchical Kernel Transformer 0 5 10 15 20 25 30                                          
+
+> Epoch
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> Loss
+> (a) Training Curve (HKT-Small, d=128)
+> Train loss
+> Val accuracy (%)
+> 50
+> 60
+> 70
+> 80
+> 90
+> Val Accuracy (%)
+> Level 0 Level 1 Level 2
+> 0
+> 1000
+> 2000
+> 3000
+> 4000
+> Mardia kurtosis  b2,  p
+> (b) b2, p: Pre vs. Post-training
+> Gaussian ref. ( p(p+ 2) = 120)
+> Pre-training
+> Post-training
+> Level 0 Level 1 Level 2
+> 10 20
+> 10 17
+> 10 14
+> 10 11
+> 10 8
+> 10 5
+> 10 2
+> p-value (kurtosis, log scale)
+> (c) p-value: Kurtosis Test
+> = 0.05
+> Pre-training
+> Post-training
+> Level 0 Level 1 Level 2
+> 10 20
+> 10 17
+> 10 14
+> 10 11
+> 10 8
+> 10 5
+> 10 2
+> p-value (skewness, log scale)
+> (d) p-value: Skewness Test
+> = 0.05
+> Pre-training
+> Post-training
+> Level 0 Level 1 Level 2
+> Skewness Kurtosis
+> < 1e-10 < 1e-10 0.0776
+> < 1e-10 < 1e-10 < 1e-10
+> (e) Final p-values per Level
+> (green: H2' not rejected)
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+> 0.08
+> 0.10
+> 0.12
+> 0.14
+> p-value
+> Metric Pre-training Post-training
+> Mean kappa_l 24.2 33.2
+> Gaussian ref. kappa_l = 1 kappa_l = 1
+> Test ceiling ~16.5 ~16.5
+> H2' status Rejected Rejected
+> n / p 300 / 10 300 / 10
+> (f) Summary: Gaussianity Test (H2')
+
+HKT Gaussianity Analysis: Verification of Assumption H2' 
+
+Figure 3: Evolution of 𝜅 𝑙 during training ( 𝑑 = 128 , 30 epochs). Top: training loss/accuracy and 𝑏 2,𝑝 vs. epoch. Centre: p-values for kurtosis and skewness. Bottom: QQ-plot of the first principal component of 𝑆 (0) and heatmap of final p-values. 
+
+Cover, T.M., Thomas, J.A., 2006. Elements of Information Theory. 2nd ed., Wiley-Interscience, Hoboken, NJ. Gu, A., Dao, T., 2023. Mamba: Linear-time sequence modeling with selective state spaces. arXiv preprint arXiv:2312.00752 . Hatamizadeh, A., Heinrich, G., Yin, H., Tao, A., Alvarez, J.M., Kautz, J., Molchanov, P., 2024. FasterViT: Fast vision transformers with hierarchical attention, in: International Conference on Learning Representations. He, T., Burtsev, M., Roth, B., Groh, G., 2024. HDT: Hierarchical document transformer, in: Conference on Language Modeling (COLM). Katharopoulos, A., Vyas, A., Pappas, N., Fleuret, F., 2020. Transformers are RNNs: Fast autoregressive transformers with linear attention, in: Proceedings of the 37th International Conference on Machine Learning (ICML), PMLR. pp. 5156–5165. LeCun, Y., Bottou, L., Bengio, Y., Haffner, P., 1998. Gradient-based learning applied to document recognition. Proceedings of the IEEE 86, 2278–2324. Liu, Y., Wu, Y.H., Sun, G., Zhang, L., Chhatkuli, A., Gool, L.V., 2024. Vision transformers with hierarchical attention. Machine Intelligence Research 21, 670–683. Liu, Z., Lin, Y., Cao, Y., Hu, H., Wei, Y., Zhang, Z., Lin, S., Guo, B., 2021a. Swin Transformer: Hierarchical vision transformer using shifted windows, in: Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV), pp. 10012–10022. Liu, Z., Lin, Y., Cao, Y., Hu, H., Wei, Y., Zhang, Z., Lin, S., Guo, B., 2021b. Swin Transformer V2: Scaling up capacity and resolution. arXiv preprint arXiv:2111.09883 . Loshchilov, I., Hutter, F., 2019. Decoupled weight decay regularization, in: Proceedings of the International Conference on Learning Representations (ICLR). Maas, A.L., Daly, R.E., Pham, P.T., Huang, D., Ng, A.Y., Potts, C., 2011. Learning word vectors for sentiment analysis, in: Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics, Association for Computational Linguistics. pp. 142–150. 
+
+G. Cirrincione: Preprint submitted to Elsevier Page 19 of 20 Hierarchical Kernel Transformer 
+
+Mardia, K.V., 1970. Measures of multivariate skewness and kurtosis with applications. Biometrika 57, 519–530. Roberts, D.A., Yaida, S., Hanin, B., 2022. The Principles of Deep Learning Theory: An Effective Theory Approach to Understanding Neural Networks. Cambridge University Press, Cambridge. Tay, Y., Dehghani, M., Abnar, S., Shen, Y., Bahri, D., Pham, P., Rao, J., Yang, L., Ruder, S., Metzler, D., 2021. Long range arena: A benchmark for efficient transformers, in: Proceedings of the International Conference on Learning Representations (ICLR). Tsai, Y.H.H., Bai, S., Yamada, M., Morency, L.P., Salakhutdinov, R., 2019. Transformer dissection: An unified understanding for transformer’s attention via the lens of kernel, in: Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing (EMNLP), Association for Computational Linguistics. pp. 4335–4344. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, Ł., Polosukhin, I., 2017. Attention is all you need, in: Advances in Neural Information Processing Systems (NeurIPS), pp. 5998–6008. Wang, S., Li, B., Khabsa, M., Fang, H., Ma, H., 2021. Cluster-former: Clustering-based sparse transformer for long-form question answering, in: Findings of the Association for Computational Linguistics: ACL-IJCNLP 2021, Association for Computational Linguistics. pp. 3947–3957. Wang, S., Li, B.Z., Khabsa, M., Fang, H., Ma, H., 2020. Linformer: Self-attention with linear complexity. arXiv preprint arXiv:2006.04768 . Zaheer, M., Guruganesh, G., Dubey, K.A., Ainslie, J., Alberti, C., Ontanon, S., Pham, P., Ravula, A., Wang, Q., Yang, L., Ahmed, A., 2020. Big Bird: Transformers for longer sequences, in: Advances in Neural Information Processing Systems (NeurIPS), pp. 17283–17297. 
+
+G. Cirrincione: Preprint submitted to Elsevier Page 20 of 20

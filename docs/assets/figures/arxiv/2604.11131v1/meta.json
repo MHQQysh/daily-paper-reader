@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11131v1/fig-001.webp",
+      "caption": "Fig. 2: A sample quantum circuit with 4 qubits, having angle encoding using RX gates and L = 3 layers of strongly entangled variational layers, followed by full measurement in Z-Basis. Here we use three different entanglement layers.",
+      "page": 4,
+      "index": 1,
+      "width": 529,
+      "height": 418
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11131v1/fig-002.webp",
+      "caption": "Fig. 4: Comparing learning curves for different distributed learning frameworks between (a) classical, (b) quantum–classical, and (c) quantum models. Results are reported for a 2-agent cooperative Pong game with the observation space reduced to 64×64. Curves show the moving average of the mean reward with a window size of 5, while the shaded regions indicate the corresponding standard deviation.",
+      "page": 5,
+      "index": 2,
+      "width": 448,
+      "height": 834
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11131v1/fig-003.webp",
+      "caption": "TABLE I: Performance analysis on two agent cooperative pong game for different combinations of policy model and distribution strategies. A CNN and a QNN based architectures are used for classical and quantum models, respectively. There are 1170 tunable parameters in the VQCs used in quantum models.",
+      "page": 5,
+      "index": 3,
+      "width": 520,
+      "height": 337
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11131v1/fig-004.webp",
+      "caption": "Fig. 1: Architecture of MADQRL framework. Agents learn independently to optimize for joint objective defined by the environment. This independent training happens on local observation, reward and action spaces, such that the joint policy can be approximated by the product of local policies. Here, the MDP representation of the environment is just an example for completeness of the system.",
+      "page": 3,
+      "index": 4,
+      "width": 890,
+      "height": 890
+    }
+  ]
+}

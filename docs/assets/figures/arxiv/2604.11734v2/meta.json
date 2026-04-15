@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11734v2/fig-001.webp",
+      "caption": "Fig. 2. Two-level MDP formulation for reinforcement learning. We construct a two-level MDP consisting of an inner denoising MDP and an outer environment-interaction MDP, and use Gaussian likelihoods at each denoising step so that the denoising process can be optimized via policy gradients.",
+      "page": 6,
+      "index": 1,
+      "width": 501,
+      "height": 871
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11734v2/fig-002.webp",
+      "caption": "Fig. 5. Qualitative comparison between pre-training and RL post-training on an 8-second closed-loop rollout.",
+      "page": 11,
+      "index": 2,
+      "width": 1034,
+      "height": 772
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11734v2/fig-003.webp",
+      "caption": "Fig. 6. Qualitative comparison with and without the AdaLN-Zero module",
+      "page": 11,
+      "index": 3,
+      "width": 518,
+      "height": 274
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11734v2/fig-004.webp",
+      "caption": "Fig. 4. Closed-loop planning visualizations in real traffic scenes. We simulate the driving scenario in a closed-loop manner over an 8-second horizon, using Vehicle 1 as the centric viewpoint. The 1-second history trajectory is marked behind the vehicle.",
+      "page": 10,
+      "index": 4,
+      "width": 1027,
+      "height": 275
+    }
+  ]
+}

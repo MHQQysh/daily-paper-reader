@@ -1,0 +1,142 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-001.webp",
+      "caption": "Figure 1: Illustration of the asymmetric costs in ToolIntegrated Reasoning (TIR). Toolcalls induce KV-Cache eviction, and long tool responses inflate the context length, significantly increasing the cost of subsequent decoding steps.",
+      "page": 1,
+      "index": 1,
+      "width": 454,
+      "height": 500
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-002.webp",
+      "caption": "Figure 4: PTE (Prefill-Token Equivalents) versus Average Score on five benchmarks. The bubble size represents the scale of active parameters. Models in the bottom-right region exhibit better trade-offs between efficiency and accuracy. Note the logarithmic scale on the y-axis.",
+      "page": 6,
+      "index": 2,
+      "width": 928,
+      "height": 634
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-003.webp",
+      "caption": "Figure 14: Pattern III: Lack of Tool Priors. An example from AIME24 where Qwen-2.5-7B-Instruct fails to utilize the Python tool effectively. The model invokes the code interpreter but forgets to include a print statement, resulting in an empty output. This suggests a lack of pretraining exposure to the tool environment, leading to wasted inference steps.",
+      "page": 21,
+      "index": 3,
+      "width": 950,
+      "height": 756
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-004.webp",
+      "caption": "Figure 2: Overview of the four inefficiency patterns in Tool-Integrated Reasoning.",
+      "page": 2,
+      "index": 4,
+      "width": 943,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-005.webp",
+      "caption": "Figure 5: Distribution of average PTE per reasoning step across five benchmarks. The cost per step escalates as the context length grows, contrasting with the token-based \"front-loading\" trend.",
+      "page": 7,
+      "index": 5,
+      "width": 944,
+      "height": 442
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-006.webp",
+      "caption": "Figure 6: Visualization of tool-mixing behavior on WebInstruct-Verified. Point color indicates the ratio of mixed-tool trajectories, with lighter colors (yellow) representing higher mixing frequencies.",
+      "page": 7,
+      "index": 6,
+      "width": 420,
+      "height": 325
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-007.webp",
+      "caption": "Figure 15: Pattern IV: Tool Format Collapse. An example from SimpleQA illustrating model brittleness. Tongyi-Deepresearch fails to adhere to the predefined tool schema, hallucinating a search tool format that differs syntactically from the system prompt (likely reverting to its training data format). This mismatch causes immediate parsing error and recurring failures in the following steps despite the semantic intent being correct.",
+      "page": 22,
+      "index": 7,
+      "width": 950,
+      "height": 975
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-008.webp",
+      "caption": "Figure 8: Distribution of Average Assistamt Response Tokens Across Reasoning Steps. The figure illustrates the response length for each step in a reasoning trajectory. The phenomenon is described as \"first-step effect\" where models tend to \"front-load\" their computational budget.",
+      "page": 14,
+      "index": 8,
+      "width": 944,
+      "height": 448
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-009.webp",
+      "caption": "Figure 9: System Prompt Example",
+      "page": 14,
+      "index": 9,
+      "width": 950,
+      "height": 496
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-010.webp",
+      "caption": "Figure 10: Answer Verify Prompt",
+      "page": 14,
+      "index": 10,
+      "width": 950,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-011.webp",
+      "caption": "Table 1: Gamma Values of Different LLMs. We evaluated a range of state-of-the-art open-source models, all of which were officially declared as having tool-calling capabilities.",
+      "page": 3,
+      "index": 11,
+      "width": 462,
+      "height": 1005
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-012.webp",
+      "caption": "Table 3: Gamma Values of Different LLMs. We evaluated a range of state-of-the-art open-source models, all of which were officially declared as having tool-calling capabilities.",
+      "page": 13,
+      "index": 12,
+      "width": 950,
+      "height": 541
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-013.webp",
+      "caption": "Figure 12: Pattern I: Confirmatory Tool Usage. An example from AIME24 where Qwen3-235B-Thinking solves the problem internally first, arriving at the correct answer. However, it subsequently invokes the Python tool solely to verify this known result. This \"Think-then-Verify\" behavior unnecessarily inflates the context length and PTE cost without contributing new information to the solution.",
+      "page": 19,
+      "index": 13,
+      "width": 950,
+      "height": 1035
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-014.webp",
+      "caption": "Table 7: Quantitative breakdown of inefficiency patterns. Frequency and cost multiplier measured within dominant model-task settings where each pattern occurs most distinctly.",
+      "page": 17,
+      "index": 14,
+      "width": 754,
+      "height": 215
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-015.webp",
+      "caption": "Table 6: Accuracy (%), average uncached total tokens(prefil and decode), tooluse times, and average PTE comparison (Part 2: SimpleQA & Webinstrucut)",
+      "page": 17,
+      "index": 15,
+      "width": 950,
+      "height": 449
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-016.webp",
+      "caption": "Figure 13: Pattern II: Tool-Mixing. An example from WebInstruct-Verified where DeepSeek-V3.1-Terminus fragmentally alternates between Search and Python tools. This behavior accumulates context of intermediate outputs and inflates the PTE cost, yet yields no obvious accuracy improvement compared to single-toolset strategies (as evidenced in Fig. 4e).",
+      "page": 20,
+      "index": 16,
+      "width": 902,
+      "height": 1373
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05404v1/fig-017.webp",
+      "caption": "Table 5: Accuracy (%), average uncached total tokens(prefil and decode), tooluse times, and average PTE comparison (Part 1: MATH & AIME)",
+      "page": 16,
+      "index": 17,
+      "width": 950,
+      "height": 449
+    }
+  ]
+}
