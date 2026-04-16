@@ -1,0 +1,506 @@
+Title: A Dual Cross-Attention Graph Learning Framework For Multimodal MRI-Based Major Depressive Disorder Detection
+
+URL Source: https://arxiv.org/pdf/2604.10116v1
+
+Published Time: Tue, 14 Apr 2026 00:39:12 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# A D UAL CROSS -A TTENTION GRAPH LEARNING FRAMEWORK 
+
+# FOR MULTIMODAL MRI-B ASED MAJOR DEPRESSIVE DISORDER 
+
+# DETECTION 
+
+A P REPRINT 
+
+Nojod M. Alotaibi* 
+
+Department of Computer Science, Faculty of Computing and Information Technology, King Abdulaziz University, Jeddah, Saudi Arabia 
+
+nalotaibi0351@stu.kau.edu.sa 
+
+Areej M. Alhothali* 
+
+Department of Computer Science, Faculty of Computing and Information Technology, King Abdulaziz University, Jeddah, Saudi Arabia 
+
+aalhothali@kau.edu.sa 
+
+April 14, 2026 
+
+# ABSTRACT 
+
+Major depressive disorder (MDD) is a prevalent mental disorder associated with complex neurobio-logical changes that cannot be fully captured using a single imaging modality. The use of multimodal magnetic resonance imaging (MRI) provides a more comprehensive understanding of brain changes by combining structural and functional data. Despite this, the effective integration of these modalities remains challenging. In this study, we propose a dual cross-attention–based multimodal fusion framework that explicitly models bidirectional interactions between structural MRI (sMRI) and resting-state functional MRI (rs-fMRI) representations. The proposed approach is tested on the large-scale REST-meta-MDD dataset using both structural and functional brain atlas configurations. Numerous experiments conducted under a 10-fold stratified cross-validation demonstrated that the proposed fusion algorithm achieves robust and competitive performance across all atlas types. The proposed method consistently outperforms conventional feature-level concatenation for functional atlases, while maintaining comparable performance for structural atlases. The most effective dual cross-attention multimodal model obtained 84.71% accuracy, 86.42% sensitivity, 82.89% specificity, 84.34% precision, and 85.37% F1-score. These findings emphasize the importance of explicitly modeling cross-modal interactions for multimodal neuroimaging-based MDD classification. 
+
+Keywords Major Depressive Disorder (MDD), Structural MRI (sMRI), Functional MRI (rs-fMRI), Deep Learning (DL), Vision Transformer (ViT), Graph Attention Network (GAT), Dual Cross-Attention. 
+
+# 1 Introduction 
+
+Major Depressive Disorder (MDD) is one of the most prevalent and debilitating mental disorders in the world, affecting millions of individuals and causing significant social and economic burdens [ 1 ]. Although there is extensive clinical research, the current diagnosis is based primarily on symptom-based assessments and subjective clinical interviews, which can lead to inconsistencies in diagnosis and delayed interventions. However, several neuroimaging studies have shown that it is closely related to structural and functional abnormalities in specific brain regions [ 2]. In the last decade, neuroimaging has emerged as a promising avenue to identify potential biomarkers of MDD [ 3 ]. Modalities such as structural magnetic resonance imaging (sMRI) and resting-state functional MRI (rs-fMRI) provide complementary insights crucial to the development of automated diagnosis frameworks for a wide range of brain disorders [ 3]. sMRI provides high-resolution structural information of the brain, reflecting anatomical and morphological alterations related to gray matter (GM) structure [ 4]. sMRI studies revealed structural changes in many brain regions in patients with MDD, including the temporal lobe, frontal lobe, and limbic system [ 5 ]. In contrast, rs-fMRI measures boldoxygen-level-dependent (BOLD) signals of subjects to detect abnormalities or dysfunction on the functional connectivity network 
+
+> arXiv:2604.10116v1 [cs.CV] 11 Apr 2026
+
+arXiv Template A P REPRINT 
+
+(FCN) [ 2]. The rs-fMRI findings found that MDD patients had abnormal FC related to the central executive network (CEN), the salience network (SN), and the default mode network (DMN) [5]. Currently, most neuroimaging-based MDD studies have focused on examining structural or functional imaging biomarkers through machine learning (ML) and deep learning (DL) approaches that can analyze complex medical images and assist physicians in making accurate diagnoses. Several sMRI-based studies, including [ 6], [ 7 ], [ 8 ], and [ 9], have demonstrated that structural changes provide discriminative information for MDD. Similarly, rs-fMRI-based studies such as [ 10 ], [ 11 ], [ 12 ], and [ 13 ] have reported significant functional abnormalities associated with the disorder. Despite their respective strengths, unimodal investigations do not take advantage of the complementary information provided by combining sMRI with rs-fMRI. To overcome this limitation, recent studies have increasingly explored multimodal learning frameworks that jointly analyze sMRI and rs-fMRI data. Such multimodal neuroimaging approaches have emerged as one of the most promising research fields in neuroscience [ 14 ]. It has been demonstrated in several multimodal studies that combining sMRI and rs-fMRI can improve MDD classification performance compared with unimodal models [ 15 , 16 , 17 , 18 ]. In this context, graph-based learning methods have attracted significant interest, as they model connectivity patterns among brain regions in neuroimaging data. Graph Neural Networks (GNNs) offer a powerful framework for representing relationships between brain regions, where nodes correspond to regions of interest (ROIs) and edges describe structural or functional interactions [19]. In particular, GNN-based methods effectively capture inter-regional dependencies and exhibit strong performance in neuroimaging-based disease classification [ 8]. Despite these advances, many multimodal MDD studies combine sMRI and rs-fMRI features using simple concatenation strategies, which fail to capture the relationships between structural and functional brain networks. In some graph-based multimodal studies, structural and functional brain graphs are constructed and processed separately. Consequently, cross-modal interactions between these modalities remain largely unexplored. To the best of our knowledge, bidirectional attention mechanisms for modeling interactions between sMRI and rs-fMRI graphs have not been examined in MDD studies. Furthermore, effective feature representation plays a crucial role for improving neuroimaging-based classification performance. Traditional ML and DL approaches often utilize local feature extraction mechanisms that may fail to capture complex spatial dependencies and long-range relationships among brain regions. Recently, Vision Transformers (ViTs) have demonstrated strong capability in medical image analysis by capturing global contextual relationships through self-attention mechanisms [ 20 ]. Several studies have reported that ViT-based models achieve improved performance compared with conventional convolutional neural networks (CNNs) in MRI-based disease classification tasks [21, 22]. To address these shortcomings, we propose a dual cross-attention–based multimodal fusion framework for MDD detection that integrates sMRI and rs-fMRI data to exploit complementary brain information. The main contributions of this work are summarized as follows: 1. A ViT-based structural representation module that extracts high-level ROI embeddings from 3D sMRI data and constructs a structural brain graph to model anatomical relationships between brain regions. 2. A functional graph construction strategy that models inter-regional interactions using functional connectivity estimated from rs-fMRI signals. 3. A unified Graph Attention Network (GAT) encoder that learns node embeddings from both structural and functional graphs within a consistent architecture. 4. A dual cross-attention fusion mechanism that captures bidirectional interactions between structural and func-tional representations, enabling each modality to refine the features of its counterpart before final classification. 
+
+# 2 Related Work 
+
+In recent years, advances in neuroimaging-based MDD analysis have increased research efforts on multimodal learning approaches that leverage complementary information from sMRI and rs-fMRI data. These methods can capture richer representations of disease-related brain changes compared to single-modality models. With the advent of deep learning and graph-based representations, multimodal frameworks are evolving from simple feature fusion approaches to more expressive architectures that explicitly model cross-modal interactions. In this review, we summarize representative studies in the field and place the proposed method within a broader framework of multimodal neuroimaging studies. Early multimodal studies relied primarily on handcrafted connectivity or radiomic features coupled with classical machine learning techniques. For instance, Mousavian et al. [ 15 ] developed an ML workflow based on brain connectivity features extracted from sMRI and rs-fMRI images using spatial cube similarity measures. Their method assessed multiple ML classifiers and produced an accuracy of 91% on the NKI dataset. Similarly, Ma et al. [ 23 ] employed 2arXiv Template A P REPRINT 
+
+radiomic features extracted from sMRI and diffusion tensor imaging (DTI) with a Random Forest classifier (RF), reporting 86.75% accuracy in distinguishing MDD from healthy controls (HCs). However, these methods are highly dependent on manual feature engineering and feature selection procedures, which may limit their scalability and ability to capture complex multimodal feature interactions. Graph-based DL methods have also been extensively investigated. Pan et al. [ 24 ] designed a multi-scale adaptive multi-channel fusion GCN (MAMF-GCN) framework using attention mechanisms for predicting mental disorders. Several channels were used to build phenotyping data and fMRI’s population graphs under different brain atlases. Their approach achieved an accuracy of 97.67% on the Autism Brain Imaging Data Exchange (ABIDE) dataset and 99.25% on the MDD dataset. Wang et al. [ 19 ] developed the Adaptive Multimodal Neuroimage Integration (AMNI) framework combining Graph Convolutional Network (GCN) for rs-fMRI and 3D Convolutional Neural Network (CNN) for sMRI, with an adaptation module to reduce modality discrepancy. The AMNI algorithm was evaluated on the REST-meta-MDD dataset and achieved an accuracy of 65%. Although graph-based multimodal frameworks enhance connectivity modeling, structural and functional graphs are typically created separately and fused using feature aggregation or attention mechanisms, which may not adequately capture reciprocal cross-modal interactions at the embedding level. Recently, several studies have focused on the use of attention mechanisms and transformer-based architectures to improve the integration of multimodal information. Zheng et al. [ 16 ] proposed an attention-based multimodal framework integrating structural and functional features, achieving 72.00% accuracy on the REST-meta-MDD dataset. Yuan et al. [ 17 ] developed the Brain Dynamic Attention Network (BDANet), which generates dynamic brain graphs and analyzes them using a GCN. Moreover, the model integrated an ensemble classifier to mitigate multisite domain variability, yielding an overall accuracy of 81.6%. Similarly, Chen et al. [ 25 ] introduced the Multimodal Multitask Dynamic Disentanglement (MMDD) framework, in which sMRI features were extracted using a 3D ResNet backbone and functional time-series data was modeled using an LSTM-Transformer encoder. Further, a bidirectional cross-attention fusion mechanism was integrated into the framework, providing 77.76% accuracy on the REST-meta-MDD dataset. Meanwhile, domain-adaptive and federated multimodal approaches have been introduced to address multisite het-erogeneity. Fan et al. [ 18 ] developed the personalized Federated Gradient Matching and Contrastive Optimization (pF-GMCO) algorithm to deal with domain shift and facilitate scalable MDD classification using multimodal MRI data. Their model utilized gradient matching using cosine similarity to weight contributions obtained from different sites, contrastive learning for client-specific model optimization, and multimodal compact bilinear (MCB) pooling to combine sMRI and fMRI features. The pF-GMCO model achieved 79.07% accuracy on the REST-meta-MDD dataset. Nevertheless, this framework predominantly focused on federated adaptation and client-specific optimization, with limited emphasis on explicitly modeling structured cross-modal interactions at the representation level. To overcome these limitations, we propose a dual cross-attention mechanism that operates directly on structural and functional brain graphs. Specifically, bidirectional cross-attention is applied between corresponding nodes of the two modality-specific graphs, enabling reciprocal refinement of node embeddings while maintaining graph topology. By explicitly modeling structural–functional dependencies at the node level, the proposed approach enables more effective integration of complementary information and improves discriminative representation learning for robust MDD classification. 
+
+# 3 Dataset Description 
+
+3.1 REST-meta-MDD Dataset 
+
+As part of this study, we used data from the REST-meta-MDD consortium, a publicly available and open-access repository that represents the largest multi-site dataset for major depressive disorder (MDD) to date [ 26 ]. This dataset consists of 2,428 subjects collected from 25 imaging sites, including 1,300 MDD patients (826 females and 474 males) and 1,128 HCs [26, 27]. In each site, comprehensive phenotypic information was collected, including age, sex, episode status (first-episode or recurrent), medication status, illness duration, and symptom severity assessed using the 17-item Hamilton Depression Rating Scale (HAMD) [ 26 ]. Furthermore, the dataset includes two imaging modalities for each participant: T1-weighted structural MRI (sMRI) and resting-state functional MRI (rs-fMRI). Data collection procedures at each contributing site were approved by the local Institutional Review Boards, and all participants provided written informed consent before participating [26, 27]. 3arXiv Template A P REPRINT 
+
+3.2 Data Preprocessing 
+
+The structural MRI (sMRI) and resting-state functional MRI (rs-fMRI) data were preprocessed using standardized neuroimaging pipelines to maintain data quality and consistency between subjects. T1-weighted sMRI images were preprocessed using the Computational Anatomy Toolbox (CAT12) implemented in SPM12 [ 27 ]. The preprocessing pipeline involved bias-field correction, skull stripping, and segmentation into gray matter (GM), white matter (WM), and cerebrospinal fluid (CSF) [ 27 ]. The segmented images were then spatially normalized to the Montreal Neurological Institute (MNI) standard template to ensure anatomical alignment across subjects [ 27 ]. In this study, GM images were used for subsequent analysis as they capture relevant structural information about brain morphology. Each GM image has spatial dimensions of 121 × 145 × 121 voxels. An analysis of rs-fMRI data was performed using the Data Processing Assistant (DPARSF) toolbox [ 27 ]. The preprocessing steps included discarding the initial volumes to allow signal stabilization, correcting slice-timing and head motion. The functional images were subsequently normalized to the MNI space and spatially smoothed. Linear detrending and temporal band-pass filtering were further applied to remove low-frequency drift and high-frequency noise. In addition, nuisance covariates were regressed out to reduce non-neuronal contributions, and sites with fewer than ten subjects were excluded to ensure data reliability and consistency across centers [27]. Furthermore, our analysis of regional time series extracted using selected brain atlases found that some brain regions of certain subjects contained missing signals. Therefore, these subjects were removed from the subsequent analysis to maintain data quality. In this study, 1563 participants were retained from 16 sites after preprocessing, of which 
+
+810 were patients with major depressive disorder (MDD) and 753 were healthy controls (HC). Detailed demographic information about the subjects included in our study is provided in Table 1. To remove potential confounding factors, we first regressed out the variation between subjects in age and sex using a nonlinear Gaussian process model [ 28 ]. Site-related variability (also called batch effects) was then corrected using the ComBat harmonization method [ 29 ]. ComBat applies an empirical Bayes framework to estimate and remove site-specific effects while preserving biologically meaningful variation across subjects [ 29 , 30 ]. The Combat model can be expressed as: 
+
+Yij = α + Xij β + γi + δiϵij (1) Where Yij indicates the time series value for subject j at site i, α is the overall mean, Xij is a design matrix for the biological covariates (i.e., sex and age), β reflects the regression coefficients for the covariates, γi and δi represent the site effects (additive and multiplicative effects), and ϵij is the residual error. This procedure improves the consistency of multi-site neuroimaging data and supports reliable downstream analysis. Table 1: Demographic Information of the 1563 Study Subjects. 
+
+Group Number of subjects Male Female Average ± Standard deviation (%) Age Education 
+
+MDD 810 293 517 34.39 ±11.55 11.96 ±3.37 HC 753 307 446 34.61 ±13.17 13.57 ±3.42 
+
+# 4 Methodology 
+
+In this section, we present the proposed multimodal framework for MDD detection that integrates sMRI and rs-fMRI data from the REST-meta-MDD dataset. Our methodology extends previously developed graph-based learning frameworks for sMRI [ 8] and rs-fMRI data [ 10 ]. By combining these two complementary pipelines into a single multimodal architecture, the proposed framework is designed to capture coordinated structural-functional brain alterations associated with MDD. As illustrated in Figure 1, the overall framework is composed of four main components: (1) a structural MRI-based graph learning module for extracting anatomical features from sMRI data, (2) a functional MRI-based graph learning module for extracting functional connectivity features from rs-fMRI data, (3) a unified Graph Attention Network (GAT) encoder, and (4) a multimodal fusion module for integrating structural and functional graph representations. 4arXiv Template A P REPRINT 
+
+Figure 1: Overall architecture of the proposed dual cross-attention multimodal framework. sMRI, structural MRI; rs-fMRI, functional MRI; ROI, brain regions of interest; MLP, multilayer perceptron; GAT, graph attention network; LeakyReLU, leaky rectified linear unit; GAP, global average pooling; MDD, major depressive disorder; HC, healthy controls. 5arXiv Template A P REPRINT 
+
+4.1 Structural MRI-based Graph Learning 4.1.1 Atlas-based ROI Extraction 
+
+With the atlas-based extraction strategy, the brain is partitioned into meaningful areas of interest (ROIs) based on predefined neuroanatomical atlases. This approach is designed to represent brain organization in a structured and biologically informed manner, thereby allowing region-level analysis that is compatible with established neuroimaging studies. In this study, structural and functional atlases are used to examine the impact of different parcellation strategies. Specifically, two structural atlases: Automated Anatomical Labeling (AAL, 116 ROIs) [ 31 ] and Harvard–Oxford (HO, 112 ROIs) [ 32 ] and two functional atlases: Dosenbach (Dose, 160 ROIs) [ 33 ] and Craddock (CK, 200 ROIs) [ 34 ] are utilized and systematically compared. Atlas-based approaches define ROIs based on known anatomical or functional boundaries, as opposed to patch-based approaches that utilize uniform spatial partitioning. This produces spatially consistent regions across subjects, which reduces variability introduced by arbitrary patch placement and facilitates comparable neurobiological analysis of corresponding regions. This consistency is particularly crucial in graph-based models, since it ensures that corresponding nodes across subject-specific graphs represent the same brain regions, thereby enabling the model to learn meaningful regional patterns and retain biological interpretation. For each subject, ROIs are extracted as volumetric patches, where the total number of patches corresponds directly to the number of regions in the selected atlas. These ROIs are represented as fixed-size 3D patches of 32 × 32 × 32 voxels, ensuring uniform input dimensions across all regions and subjects. The extracted patches are then fed into the 3D Vision Transformer (ViT), which learns region-specific discriminative representations, thus enhancing model performance. 
+
+4.1.2 Structural Feature Encoder: 3D Vision Transformer 
+
+In recent years, the Vision Transformer (ViT) has demonstrated strong performance across a range of visual analysis tasks by modeling global dependencies through self-attention mechanisms [ 35 ]. The ViT does not rely on local receptive fields like convolutional neural networks, but rather processes images as a sequence of patches in which long-range spatial relationships can be captured explicitly [ 20 ]. As part of this study, we utilized a 3D ViT to extract discriminative representations from sMRI data to conduct downstream analysis. With a preprocessed 3D sMRI volume, the image is divided into a set of non-overlapping 3D patches of size 32 ×32 ×32 .Each 3D patch represents a single ROI, which can be defined anatomically or functionally based on the chosen atlas. The resulting patch sequence is xp = [ x1
+
+> p
+
+, x 2
+
+> p
+
+, . . . , x Np ], where N is the number of patches (ROIs). Specifically, each 3D patch xip is flattened into a one-dimensional vector and then mapped to a lower-dimensional embedding space using a linear patch embedding layer [35]: 
+
+zi 
+
+> 0
+
+= Ex ip, i = 1 , . . . , N (2) In this case, E ∈ Rd×P is a learnable projection matrix, P = 32 3 is the patch dimensionality, and d = 128 is the embedding dimension, zi 
+
+> 0
+
+∈ Rd indicates the obtained patch embedding, and N is the number of patches. Additionally, a learnable classification token zCLS  
+
+> 0
+
+is prepended to the patch embedding sequence, enabling the model to capture global contextual information for downstream classification as follows [35]: 
+
+Zs 
+
+> 0
+
+= [ zCLS  
+
+> 0
+
+; z10 ; z20 ; . . . ; zN 
+
+> 0
+
+] + Epos (3) Assuming that Epos is the learned positional encoding matrix for the entire input sequence. This embedded sequence is analyzed by a stack of Transformer encoder layers ( L = 6 ), each consisting of a multi-head self-attention (MHSA) and a multi-layer perceptron (MLP). Further, layer normalization (LN) is applied before MHSA and MLP, while residual connections are incorporated after both operations to facilitate stable training and efficient information propagation. Transformer encoder operations are formulated as follows [35]: 
+
+Z′sℓ = MHSA  LN  Zsℓ−1
+
+ + Zsℓ−1, ℓ = 1 , . . . , L (4) 
+
+Zsℓ = MLP (LN (Z′sℓ )) + Z′sℓ ℓ = 1 , . . . , L (5) During the MHSA module, the input embeddings Zsℓ−1 are linearly projected into query, key, and value matrices as follows [35]: 
+
+Q = Zsℓ−1WQ, K = Zsℓ−1WK , V = Zsℓ−1WV , (6) Where Zsℓ−1 denotes the input embeddings to the ℓ − th encoder layer, and WQ, WK , and WV ∈ Rd×dk are learnable weight matrices. The head dimension dk = dh , where d is the embedding dimension and h is the number of attention heads. In our configuration, d = 128 and h = 8 , resulting in dk = 16 .6arXiv Template A P REPRINT 
+
+The attention output is then computed using scaled dot-product attention [35]: Attention (Q, K, V ) = softmax 
+
+ QK T
+
+√dk
+
+
+
+V (7) Where Q, K, and V refer to the query, key, and value matrices, respectively. This attention operation is performed in parallel across h heads, and the outputs are combined and linearly projected to produce the final attention result. In this manner, the model is capable of simultaneously capturing diverse contextual information from multiple spatial perspectives. In this study, the entire ViT is fine-tuned using the classification objective for learning task-specific representations. We construct the final representation by concatenating the [CLS] embedding with all ROI embeddings, rather than relying solely on the [CLS] token: 
+
+Zs 
+
+> final
+
+= [ zCLS  
+
+> L
+
+∥ z1 
+
+> L
+
+∥ z2 
+
+> L
+
+∥ . . . ∥ zNL ] (8) In this case, ∥ denotes concatenation and Zs 
+
+> final
+
+is the resulting feature vector. Our design maintains the global contextual information captured by the [CLS] token along with the region-specific structural patterns encoded in the ROI tokens, improving the discriminative power of the learned representation. The final classification output is then produced by feeding the obtained Zfinal into a fully connected layer (FCN) with a softmax activation. 
+
+ˆy = softmax (W Z s 
+
+> final
+
++ b) (9) Assume W and b are the weight and bias of the final classification layer, and ˆy represent the predicted class probability. 
+
+4.1.3 Structural Graph Construction 
+
+This section explains the procedure for constructing subject-specific brain graphs from region-level embeddings derived from the 3D ViT, as shown in Algorithm 1. Each subject is represented by a graph Gs = ( V, E ), in which each node vi ∈ V corresponds to the brain region (ROI) defined by the selected atlas and represented by its ViT embedding zi. The edges ( E) are determined based on the pairwise cosine similarity between the region embeddings. Cosine similarity is adopted as it measures the angular consistency between high-dimensional feature vectors while remaining invariant to their magnitudes, thereby reducing the impact of inter-subject variability and feature-scale differences [ 36 , 37 ]. Furthermore, it introduces no additional learnable parameters and is computationally efficient, which makes it suitable for constructing similarity-based brain graphs based on deep sMRI representations [ 37 , 38 ]. A cosine similarity calculation between two embeddings zi and zj
+
+is performed using the following formula [39]: Cosine_similarity (zi, z j ) = zi · zj
+
+∥zi∥∥ zj ∥ (10) Here, the numerator zi · zj represents the product of zi and zj , while the denominator ∥zi∥∥ zj ∥ represents the product of the Euclidean norms of these embeddings. Notably, cosine similarity scores range from -1 to 1, where 1 denotes complete similarity, 0 denotes orthogonality, and -1 represents dissimilarity. This produces a similarity matrix COS ∈ RN ×N , where N denotes the number of ROIs. Then, a K-nearest neighbor (KNN) approach with K = 10 is applied to build a sparse and informative graph by preserving only the top-K most similar ROIs for each node. Afterward, a weighted undirected edges are created between each node and its selected neighbors, where edge weights reflect cosine similarity values. Overall, the proposed graph construction procedure generates a weighted, subject-specific brain graph that emphasizes the most informative inter-regional relationships while suppressing weak or noisy connections, producing a robust and discriminative structural representation for downstream GNN–based classification. 
+
+4.2 Functional MRI-based Graph Learning 4.2.1 ROI Time-Series Extraction 
+
+Resting-state fMRI (rs-fMRI) measures intrinsic neural activity through temporal fluctuations in the blood-oxygen-level-dependent (BOLD) signal [ 2]. To generate region-wise functional representations, each preprocessed rs-fMRI volume is divided into N ROIs based on a predefined brain atlas. This atlas-based decomposition provides a standardized representation of brain activity among subjects that facilitates subsequent graph construction. 7arXiv Template A P REPRINT 
+
+Algorithm 1: Structural Graph Construction Process 
+
+Input: Set of ViT embeddings Zs = {z1, z 2, . . . , z N } for subject s, number of neighbors K = 10 
+
+Output: Subject-specific graph Gs = ( V, E ), where V is the set of nodes and E is the set of edges 
+
+Structural graph construction: for each subject s = 1 , . . . , S do 1. Compute the cosine similarity matrix (COS): for each pair of ROIs (i, j ) do 
+
+COS ij = cosine _similarity (zi, z j )
+
+2. Construct KNN graph (K = 10) :
+
+Define node set V = {v1, v 2, . . . , v N }, where each node corresponds to one brain ROI; 
+
+for each node vi ∈ V do 
+
+Identify the set NK (vi) of K most similar nodes to a node vi based on COS; 
+
+for each node vh ∈ N K (vi), h̸ = i do 
+
+Add undirected edge (vi, v h) with weight wij = COS ij 
+
+return Gs
+
+For each subject, the rs-fMRI signal within each ROI is averaged over voxels to produce an ROI-wise time-series matrix: Y = [ y1, y 2, . . . , y N ] ∈ RT ×N
+
+In this case, T represents the number of time points, N is the number of ROIs, and yi ∈ RT corresponds to the complete rs-fMRI time series of the i-th ROI at T time points. We used T = 140 time points in this study. This representation preserves temporal dynamics at the regional level and reduces noise and dimensionality compared with a voxel-based representation. 
+
+4.2.2 Functional Connectivity Estimation 
+
+A functional connectivity network (FCN) describes the statistical dependence between brain activity signals measured from spatially distinct brain regions [ 40 ]. Specifically, a FCN can be constructed by computing the correlation between each pair of ROIs using Pearson correlation coefficients (PC) as follows [19]: 
+
+bij = corr (yi, y j )= (yi − ¯yi)T (yj − ¯yj )
+
+q
+
+(yi − ¯yi)T (yi − ¯yi)
+
+q
+
+(yj − ¯yj )T (yj − ¯yj )
+
+(11) Here, bij ∈ [−1, 1] indicates the correlation between the i-th and j-th ROIs, yi and yj are time series points for ROIs i
+
+and j, respectively, whereas ¯yi and ¯yj represent the mean values of the corresponding ROI time series. This procedure produces a symmetric FCN ∈ RN ×N , where N represents the number of ROIs. Fisher’s z-transformation is then applied to FCN values to improve comparability and stabilize variance across different sites [41]. 
+
+4.2.3 Functional Graph Construction 
+
+In this section, the estimated FCN is transformed into a subject-specific function brain network to enable graph-based representation learning. Graph representation enables the modeling of complex inter-regional interactions that are difficult to capture with conventional vector-based formulations. In addition, it provides a more comprehensive analysis of brain connectivity, leading to more accurate predictions in brain-related studies. Suppose that Gf = ( V, E ) represents the functional graph for a given subject, where V = {v1, v 2, . . . , v N } are the ROI nodes, and E identifies the set of edges, while N is the number of ROIS. To construct an informative and sparse topology, a KNN strategy with K = 10 is applied to the FCN. Particularly, only the K ROIs with the highest functional connectivity values are kept as neighbors of each node vi. Edges are then established between node vi and each selected neighbor vh, producing an undirected graph. The weight assigned to each edge is given by the corresponding FCN entry: wij = F CN ij . In addition, the node feature vector for vi is specified as the i-th row of the FCN, reflecting its pairwise functional relationships with all other nodes. This functional graph Gf is subsequently used as input to the unified Graph Attention Network (GAT) encoder to learn enriched node representations. The detailed procedure of functional graph construction is summarized in Algorithm 2. 8arXiv Template A P REPRINT 
+
+Algorithm 2: Functional Graph Construction Process 
+
+Input: ROI time-series matrix Y ∈ RT ×N for subject s, number of neighbors K = 10 
+
+Output: Subject-specific graph Gf = ( V, E ), where V is the set of nodes and E is the set of edges 
+
+Functional graph construction: for each subject s = 1 , . . . , S do 
+
+Let Y = [ y1, y2, . . . , yN ], where yi ∈ RT ;
+
+1. Compute functional connectivity matrix (FCN): for each pair of ROIs (i, j ) do 
+
+F CN ij = corr( yi, yj );
+
+2. Apply Fisher z-transformation: 
+
+Zij = 12 ln 
+
+ 1 + F CN ij 
+
+1 − F CN ij 
+
+
+
+Set similarity matrix FCN ← Z;
+
+3. Construct KNN graph ( K = 10 ): 
+
+Define node set V = {v1, v 2, . . . , v N }, where each node represents one brain ROI; 
+
+for each node vi ∈ Vi = 1 , . . . , N do 
+
+Identify NK (vi), the indices of the top-K largest values in FCN; 
+
+for each vj ∈ N K (vi), j̸ = i do 
+
+Add undirected edge (vi, v j ) with weight wij = F CN ij 
+
+return Gf
+
+4.3 Unified Graph Attention Network Encoder 
+
+Graph Attention Networks (GATs) represent a class of Graph Neural Networks (GNNs) that incorporate attention mechanisms to adaptively weight the contributions of neighboring nodes during message passing [ 42 ]. GAT aggregates neighborhood information by assigning data-driven importance coefficients to inter-node interactions, enabling an effective representation of complex and heterogeneous relationships [ 42 ]. This property is especially useful for brain graphs, as the significance of inter-regional connections may differ across subjects and imaging modalities. In this study, a Graph Attention Network (GAT) is used as a unified encoder to learn node-level representations from subject-specific brain graphs. The same GAT architecture is applied independently for each modality, providing a consistent graph-based representation that can be applied across different modalities. The unified GAT encoder operates on graphs derived from region-wise embeddings to produce node representations, which are later used in multimodal fusions. For a given subject, a graph is defined as Gm = ( V, E ), where V represents the set of nodes that correspond to ROIs and E represents the set of edges encoding inter-regional relationships of modality m ∈ { s, f }. In addition, each node 
+
+vi is associated with a feature vector zmi ∈ Rdm , obtained from the upstream modality-specific encoder. In particular, 
+
+ds = 128 for the structural modality, while df = N for the functional modality. Within a GAT layer, node features are first linearly transformed using a learnable weight matrix Wmk associated with the 
+
+k-th attention head. The attention coefficient is then computed for a target node vi and each of its neighbors vj ∈ N (vi)
+
+as follows [42]: 
+
+eij = LeakyReLU  aTk
+
+Wmk zmi ∥ Wmk zmj
+
+ (12) Where emij indicates the importance of node vj attributes to node vi, the Leaky Rectified Linear Unit (LeakyReLU) is a nonlinear function, ak is a learnable attention vector, .T is a transposition, and ∥ reflects the concatenation operation. Moreover, a softmax function is applied to normalize the coefficients over all the neighbors of node vi, allowing them to be compared across nodes [42]: 
+
+αmij = exp( emij )
+
+P  
+
+> vl∈N (vi)
+
+exp( emil ) (13) Where αmij represents the normalized attention coefficient and exp (.) is the exponential function. 9arXiv Template A P REPRINT 
+
+These normalized attention coefficients are used to generate an updated embedding for node vi based on the aggregated information from its neighbors [42]: 
+
+hmi = σ
+
+ X  
+
+> vj∈N (vi)
+
+αmij Wmk zmj
+
+ (14) In this case, σ represents a nonlinear activation function. Finally, the outputs of the K attention heads are concatenated to produce the final node representation for each brain region [42]: 
+
+hmi = Kk=1 h(k,m ) 
+
+> i
+
+∈ Rdn (15) Assume that dn = 64 refers to the dimensionality of the resulting node embeddings. Accordingly, node embeddings for a specific modality m can be expressed as: H(m) = {h(m)1 , h(m)2 , . . . , h(m) 
+
+> N
+
+} ∈ RN ×dn , where N is the number of ROIs. The modality-specific node embedding matrices Hs and Hf represent unified graph-based representations of brain regions that are subsequently utilized for multimodal fusion and downstream classification. 
+
+4.4 Multimodal Fusion Learning 
+
+The multimodal learning framework intends to capture coordinated structural–functional brain changes associated with MDD through the integration of graph-based representations derived from sMRI and rs-fMRI. For systematically inves-tigating the effectiveness of multimodal integration, two fusion strategies are examined: a feature-level concatenation module and a dual cross-attention fusion module. 
+
+4.4.1 Feature-Level Concatenation 
+
+The feature-level concatenation module offers a straightforward and effective baseline for multimodal fusion by directly combining structural and functional graph representations at the embedding level. In this module, the complementary contribution of features derived from sMRI and rs-fMRI are assessed without explicitly modeling cross-modal interactions. In feature-level fusion, graph-level embeddings are first constructed from the node representations learned by the unified GAT encoder. Assume that Hs ∈ RN ×dn , Hf ∈ RN ×dn are the structural and functional node embeddings obtained from the unified GAT encoder, respectively, for a given subject. Specifically, N denotes the number of nodes (ROIs) and 
+
+dn is the dimensionality of the node embeddings. Graph-level embeddings are obtained by applying a global average pooling (GAP) operation across the node dimension [43]: 
+
+Gs = GAP (Hs) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+Hsi , Gf = GAP (Hf ) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+Hfi (16) Here, Gs ∈ RdG , Gf ∈ RdG represent the graph embeddings for the structural and functional modalities,respectively, 
+
+dG = 64 reflects the dimensionality of the learned structural and functional graph embeddings, and N is the number of nodes (ROIs). The multimodal representation is then constructed by concatenating the two graph embeddings, as expressed in the following equation: 
+
+Zfusion = [ Gs ∥ Gf ] (17) This fused representation preserves modality-specific information while facilitating joint learning during the subsequent classification process. In this formulation, ∥ indicates vector concatenation, while Zfusion ∈ R2×dG signifies the fused multimodal graph embeddings. The multimodal embedding Zfusion is then fed into a multilayer perceptron (MLP) classifier to perform MDD prediction. The MLP consists of two fully connected (FC) layers with nonlinear activation function and dropout regularization. The first FC layer transforms the fused embedding into a hidden feature space in the following manner: 
+
+H = ReLU (W1Zfusion + b1) (18) Assume that the Rectified Linear Unit (ReLU) is a nonlinear function, W1 ∈ Rdh×2dG and b1 ∈ Rdh denote the weight matrix and bias of the first FC layer, and dh = 64 represents the hidden dimension of the MLP. 10 arXiv Template A P REPRINT 
+
+To improve generalization and reduce overfitting, dropout function is applied: 
+
+˜H = Dropout (H) (19) Afterward, the second FC layer produces the final prediction labels ˆy as follows: 
+
+ˆy = W2 ˜H + b2, (20) Here, W2 ∈ RC×dh , and b2 ∈ RC are the weight matrix and bias of the second FC layer, and C is the number of classes (MDD vs. HC). The predicted labels ˆy are then passed to a softmax function during training to compute class probabilities p:
+
+p = softmax (ˆ y). (21) A stratified 10-fold cross-validation approach is employed to train and evaluate the proposed model to ensure robust and unbiased performance estimation. Performance metrics are averaged across all folds to provide a reliable assessment of the model’s generalization capability. Moreover, we optimized the model using a L2 regularization technique called weight decay in conjunction with the adaptive Moment Estimation (Adam) algorithm. The detailed configuration of this model in our experiments can be found in Table 2. Table 2: Configuration of the Feature-Level Concatenation Model 
+
+Parameter Value 
+
+Number of layers 2Hidden dimension 64 Output dimension 2Learning rate 1 × 10 −2
+
+Weight decay 1 × 10 −4
+
+Dropout 0.5 Batch size 16 Optimizer Adam Loss function Cross-entropy Folds 10 
+
+4.4.2 Dual Cross-Attention Fusion 
+
+To explicitly model interactions between structural and functional brain representations, we present a dual cross-attention fusion module that performs bidirectional attention between node embeddings derived from sMRI and rs-fMRI graphs. Specifically, this module is composed of two complementary components: sMRI-guided rs-fMRI attention, with structural node embeddings attending to functional node embeddings, and rs-fMRI-guided sMRI attention, with functional node embeddings attending to structural node embeddings [ 16 ]. In contract to feature-level concatenation that integrates structural and functional information by directly fusing their graph embeddings, the proposed dual cross-attention approach allows direct information exchange at the node level, permitting each modality to selectively emphasize informative regions in the other modality. Afterward, the updated node embeddings from each modality are aggregated through global pooling to produce graph representations, which are then fused and provided to a MLP for subject-level classification. Suppose that Hs ∈ RN ×dn , Hf ∈ RN ×dn are the node embeddings of the structural and functional graphs, respectively, derived from the unified GAT encoder, where N is the number of ROIs defined by the atlas, and dn = 64 is the size of the node embeddings for both modalities after projection by the unified GAT encoder. In the sMRI-guided rs-fMRI attention branch, structural node embeddings guide the refinement of functional represen-tations. In particular, functional node embeddings are projected into queries ( Q), while structural node embeddings are projected into keys ( K) and values ( V) as follows [44]: 
+
+Qf = Hf WfQ, Ks = HsWsK , Vs = HsWsV (22) Where WfQ, WsK , WsV ∈ Rdh×da are learnable projection matrices, and da is the attention subspace dimension. The attention output is computed using scaled dot-product attention [44]: 
+
+Attention s→f = softmax Qf (Ks)T
+
+√da
+
+!
+
+Vs (23) 11 arXiv Template A P REPRINT 
+
+Where (.)T represents the matrix transpose. The resulting attended features are then integrated with the original functional node embeddings using a residual connection followed by layer normalization (LN) [44]: 
+
+H′f = LN  Hf + Attention s→f
+
+ . (24) Similarly, the rs-fMRI-guided sMRI attention branch enables functional node embeddings to guide the refinement of structural representations. In this case, structural node embeddings are projected into queries, whereas functional node embeddings are projected into keys and values [44]: 
+
+Qs = HsWsQ, Kf = Hf WfK , Vf = Hf WfV (25) Assume that WsQ, WfK , WfV ∈ Rdh×da refers to the weight matrices of the linear projections, and da reflects the attention subspace dimension. Scaled dot-product attention is then used to calculate the attention output [44]: 
+
+Attention f →s = softmax Qs  Kf T
+
+√da
+
+!
+
+Vf (26) Afterwards, a residual connection is used to combine the attended structural features with their original structural node embeddings, which is subsequently processed by layer normalization (LN) [44]: 
+
+H′s = LN( Hs + Attention f →s) . (27) After bidirectional cross-attention, the refined node embeddings H′s and H′f are independently aggregated by the GAP function to obtain graph embeddings Gs and Gf . Finally, the two graph representations are concatenated to create a unified multimodal embedding Zfusion , which is then passed to the MLP classifier for subject-level prediction. Notably, the structure of this MLP is the same as that described in Section 4.4.1. In this study, a stratified 10-fold cross-validation analysis is conducted to evaluate the proposed dual cross-attention fusion model. Final results are reported as the average of all folds, which reduces partitioning variability and improves reliability. A summary of the detailed training settings and architectural hyperparameters of the dual cross-attention model is presented in Table 3. Table 3: Configuration of the Dual Cross-Attention Fusion Model 
+
+Parameter Value 
+
+Embedding dimension 64 Number of attention heads 8Classification head multilayer perceptron (MLP) Learning rate 5 × 10 −4
+
+Weight decay 3 × 10 −5
+
+Dropout 0.3 Batch size 16 Optimizer Adam Loss function Cross-entropy Folds 10 
+
+# 5 Results and Discussion 
+
+This section outlines the evaluation metrics that we used to evaluate the classification task. Next, we present and discuss the prediction performance of our model using the REST-meta-MDD dataset. 
+
+5.1 Evaluation Metrics 
+
+The entire study is conducted using PyTorch and training is performed on an NVIDIA A100 GPU-equipped Aziz Supercomputer, which significantly speeds up the training of deep learning models for MRI images and graphs, in particular. During evaluation, we assessed model performance using several standard evaluation metrics, including accuracy, sensitivity, specificity, precision, and F1-score. These metrics are calculated as follows: 12 arXiv Template A P REPRINT 
+
+Accuracy = (T P + T N )(T P + T N + F P + F N ) (28) 
+
+Sensitivity = T P 
+
+(T P + F N ) (29) 
+
+Specif icity = T N 
+
+(F P + T N ) (30) 
+
+P recision = T P 
+
+(T P + F P ) (31) 
+
+F 1 − score = (2 × P recision × Sensitivity )(P recision + Sensitivity ) (32) For this study, T P represents the correct classification of positive samples (MDD), T N represents the correct classifica-tion of negative samples (HC), F P reflects the incorrect classification of negative samples as positives, and F N reflects the incorrect classification of positive samples as negatives. 
+
+5.2 Experimental Results 5.2.1 Performance Comparison of Fusion Mechanisms 
+
+To measure the effectiveness of different multimodal fusion strategies, we performed a comprehensive comparison between the dual cross-attention mechanism and the widely used feature-level concatenation approach. These two fusion strategies were applied to the same structural and functional graph representations and evaluated using 10-fold stratified cross-validation. This study examined accuracy, sensitivity, specificity, precision, and F1-score to ensure a fair and robust comparison. Table 4 presents the average classification performance and standard deviation for both fusion strategies under different atlas configurations. For the structural atlases (AAL and HO), feature-level concatenation and dual cross-attention achieved highly com-parable performance across all evaluation metrics. For the AAL-based model, feature-level concatenation delivered an accuracy of 75.74 ±0.19%, slightly higher than that obtained using Dual Cross-Attention 75.54 ±0.31%. Both fusion approaches showed similar sensitivity 80.25%. However, the concatenation method produced marginally higher specificity (70.92 ±0.39% vs. 70.52 ±1.21%), precision (74.62 ±0.25% vs. 74.38 ±0.62%), and F1-score (77.33 ±0.14% vs. 77.20 ±0.23%) compared with dual cross-attention. With the HO-based model, feature-level concatenation achieved a slightly higher accuracy of 78.53 ±0.29%, as compared to dual cross-attention of 78.34 ±0.28%. However, dual cross-attention had a marginally higher sensitivity (75.68 ±0.96% vs. 75.31 ±0.00%), whereas concatenation produced slightly higher specificity (81.97 ±0.60% vs. 81.18 ±1.03%), precision (81.66 ±0.50% vs. 81.10 ±0.69%), and F1-score (78.36 ±0.23% vs. 78.29 ±0.36%). Overall, this high alignment of performance indicates that the dual cross-attention mechanism can effectively integrate structural and functional representations without compromising performance, when using anatomically defined parcellations. This confirms the robustness and stability of the proposed fusion strategy across different atlases. In contrast, dual cross-attention consistently outperforms feature-level concatenation across all evaluation metrics for the functional atlases (Dose and CK). In the Dose-based model, dual cross-attention increased accuracy from 81.98 ±0.58% to 83.44 ±0.58%, sensitivity from 80.99 ±0.82% to 83.58 ±1.57%, precision from 83.57 ±0.61% to 84.21 ±0.80%, and F1-score from 82.26 ±0.59% to 83.89 ±0.92%. For the CK-based model, dual cross-attention produced slightly higher accuracy (77.58 ±0.79% vs. 76.82 ±1.07%), sensitivity (77.53 ±0.79% vs. 76.42 ±1.61%), precision (77.63 ±1.76% vs. 77.24 ±2.36%), and F1-score (78.10 ±0.81% vs. 77.28 ±0.98%) compared with concatenation. These consistent improvements in performance prove that the proposed dual cross-attention mechanism is especially effective for functional atlases, in which regions are identified based on functional connectivity patterns. Further, this approach aligns complementary structural and functional information more effectively than direct feature-level concatenation, since it explicitly models cross-modal interactions. A further validation of the robustness of the fusion strategies can be found in Table 5. This table presents the classification results for the single fold that had the highest accuracy during cross-validation. Across all atlas configurations, the results demonstrate that feature-level concatenation and dual cross-attention provide comparable performance for structural atlases (AAL and HO), whereas dual cross-attention consistently produces superior performance for functional atlases (Dose and CK). In summary, these findings offer robust evidence that dual cross-attention offers a powerful and expressive technique for multimodal fusion across diverse atlas types when compared with conventional feature-level concatenation. 13 arXiv Template A P REPRINT 
+
+Table 4: Average Classification Results and Standard Deviation of 10-fold Cross-validation for Multimodal Fusion Models. Bolded values indicate the best performing results. 
+
+Method Average ± Standard deviation (%) Accuracy Sensitivity Specificity Precision F1-score 
+
+> Concatenation
+
+AAL-based model 75.74 ±0.19 80.25 ±0.00 70.92 ±0.39 74.62 ±0.25 77.33 ±0.14 HO-based model 78.53 ±0.29 75.31 ±0.00 81.97 ±0.60 81.66 ±0.50 78.36 ±0.23 Dose-based model 81.98 ±0.58 80.99 ±0.82 83.02 ±0.71 83.57 ±0.61 82.26 ±0.59 CK-based model 76.82 ±1.07 76.42 ±1.61 77.24 ±2.36 78.20 ±1.61 77.28 ±0.98 Dual cross-attention AAL-based model 75.54 ±0.31 80.25 ±0.87 70.52 ±1.21 74.38 ±0.62 77.20 ±0.23 HO-based model 78.34 ±0.28 75.68 ±0.96 81.18 ±1.03 81.10 ±0.69 78.29 ±0.36 Dose-based model 83.44 ±0.58 83.58 ±1.57 83.29 ±1.03 84.21 ±0.80 83.89 ±0.92 
+
+CK-based model 77.58 ±0.79 77.53 ±1.54 77.63 ±1.76 78.72 ±1.18 78.10 ±0.81 Table 5: Classification Results for the Fold with the Highest Accuracy from 10-Fold Stratified Cross-Validation. Bolded values indicate the best performing results 
+
+## Method Accuracy% Sensitivity% Specificity% Precision% F1-score% 
+
+> Concatenation
+
+## AAL-based model 75.80 80.25 71.05 74.71 77.38 HO-based model 78.98 75.31 82.89 82.43 78.71 Dose-based model 82.17 81.48 82.89 83.54 82.50 CK-based model 77.71 76.54 78.95 79.49 77.99 Dual cross-attention AAL-based model 75.80 80.25 71.05 74.71 77.38 HO-based model 78.98 75.31 82.89 82.43 78.71 Dose-based model 84.71 86.42 82.89 84.34 85.37 
+
+## CK-based model 78.34 79.01 77.63 79.01 79.01 14 arXiv Template A P REPRINT 
+
+5.2.2 Comparison with Existing Studies 
+
+Table 6 presents a comparison of the proposed multimodal framework with representative state-of-the-art approaches for MDD classification based on neuroimaging data, including both single-modality and multimodal approaches. The single-modality methods utilize either sMRI [ 8 ] or rs-fMRI [ 10 ], while multimodal approaches integrate information from both modalities [ 16 , 17 , 18 , 25 , 45 ]. All compared studies were evaluated on the same REST-meta-MDD dataset, allowing fair comparison between different approaches. Notably, we re-implemented both unimodal sMRI [ 8] and rs-fMRI [ 10 ] models using the same preprocessing pipeline adopted in the proposed framework to ensure consistent experimental settings. Among all compared methods, the proposed multimodal Dose-based framework provided the best overall performance. It attained the highest accuracy (83.44 ±0.58%), specificity (83.29 ±1.03%), and precision (84.21 ±0.80%). The model also achieved high sensitivity (83.58 ±1.57%) and F1-scores (83.89 ±0.92%), suggesting a balanced classification per-formance. These results support the robustness and stability of the proposed fusion strategy. Yuan et al. [ 17 ] developed a dynamic cross-domain attention network for fusing multimodal information. They reported the highest sensitivity (87.80 ±0.62%) and F1-score (86.90 ±0.53%) among the compared studies. Nevertheless, overall classification accuracy (81.67 ±0.66%) was lower than that of the proposed method. Furthermore, the relatively low specificity (68.70 ±0.47%) indicates that there is a trade-off between sensitivity and false-positive control. In contrast, Fan et al. [ 18 ] designed a multimodal federated learning framework with the aim of improving data privacy and cross-site generalization. Although they achieved a competitive accuracy of 79.07 ±0.02%, other evaluation metrics like sensitivity and F1-score were not reported, limiting a comprehensive performance comparison. Following this, the multimodal HO-based model achieved 78.34 ±0.28% accuracy, with 81.18 ±1.03% specificity, and 81.10 ±0.69% precision, indicating stable and reliable classification performance. In addition, the balanced performance across sensitivity (75.68 ±0.96%) and F1-score (78.29 ±0.36%) further illustrates the robustness of the proposed dual cross-attention mechanism when applied to structurally defined parcellations. In comparison, Chen et al. [ 25 ] proposed a multimodal multitask disentanglement framework to mitigate site effects and enhance robustness. The model provided an accuracy of 77.76 ±1.02%, with sensitivity of 83.23 ±7.06%, and an F1-score of 79.92 ±1.91%. Similarly, the multimodal CK-based model yielded 77.58 ±0.79% accuracy, 77.53 ±1.54% sensitivity, 77.63 ±1.76% specificity, 78.72 ±1.18% precision, and 78.10 ±0.81% F1-score. This further demonstrates that the dual cross-attention strategy remains effective across different functional atlas configurations. Li et al. [ 45 ] developed the M-ENAS framework, an evolutionary neural architecture search method for automated diagnosis of MDD using multimodal MRI imaging. Their method produced an accuracy of 73.68%, sensitivity of 74.13%, specificity of 72.88%, precision of 69.95%, and F1-score of 71.98%. Despite producing balanced results, their model generated lower discriminative performance than other multimodal frameworks. Further comparisons with single-modality models (sMRI-only and rs-fMRI-only) reveal that multimodal integration yielded clear performance improvements for all atlas configurations. As compared to sMRI models, the multimodal framework demonstrated modest improvements for structural atlases (AAL and HO), with accuracy gains of 1.02% and 0.57%, along with increases in F1-score of 0.84% and 0.77%, respectively. In contrast, the functional atlases were observed to exhibit significantly greater improvements. It was observed that accuracy increased by 7.45%, specificity by 12.89%, precision by 9.44%, and F1-score by 6.16% for the Dose atlas, while accuracy and F1-score gained by 4.78% and 4.12% for the CK atlas. A more distinct pattern emerged when comparing multimodal models with rs-fMRI models. For structural atlases, accuracy improved by 10.25% for AAL and 13.95% for HO, with notable improvements in sensitivity, specificity, precision, and F1-score. There were greater improvements observed for functional atlases, where accuracy increased by 18.47% for Dose and 12.80% for CK, alongside significant improvements in sensitivity, specificity, precision, and F1-score. In summary, the comparative results show that the proposed framework achieves superior and more balanced per-formance compared to both single-modality and existing multimodal approaches, with substantial gains observed across different atlas configurations and evaluation metrics. These findings support the effectiveness of the proposed multimodal fusion strategy for robust MDD classification by explicitly modeling cross-modal interactions. 
+
+5.3 Statistical Comparison Between Single-Modal and Multimodal Approaches 
+
+In this section, two-sample t-tests were conducted to determine whether there were significant differences in performance between multimodal and single-modal models (sMRI-only and rs-fMRI–only). The results are summarized in Table 7. In this study, differences were considered statistically significant when p < 0.05 
+
+15 arXiv Template A P REPRINT 
+
+Table 6: Average Classification Results and Standard Deviation of 10-fold Cross-validation for Existing Multimodal Fusion Models. Bolded values indicate the best performing results. 
+
+Method Average ± Standard deviation (%) Accuracy Sensitivity Specificity Precision F1-score 
+
+> sMRI models
+
+AAL-based model 74.52 ±0.90 79.75 ±1.85 68.95 ±3.12 73.31 ±1.66 76.36 ±0.64 HO-based model 77.77 ±0.66 74.32 ±2.05 81.45 ±1.71 81.06 ±1.12 77.52 ±0.91 Dose-based model 75.99 ±1.18 81.24 ±3.70 70.40 ±5.80 74.77 ±3.08 77.73 ±0.69 CK-based model 72.80 ±1.28 75.06 ±3.26 70.40 ±3.07 73.05 ±1.64 73.98 ±1.53 rs-fMRI models  AAL-based model 65.29 ±2.32 76.67 ±7.46 53.16 ±10.96 64.02 ±3.50 69.41 ±1.94 HO-based model 64.39 ±1.08 74.32 ±6.91 53.82 ±6.48 63.29 ±1.43 68.15 ±2.52 Dose-based model 64.97 ±2.85 70.62 ±12.97 58.95 ±11.33 65.19 ±2.97 66.93 ±6.23 CK-based model 64.78 ±2.13 71.85 ±6.62 57.24 ±10.25 64.64 ±3.53 67.72 ±1.73 Multimodal models AAL-based model 75.54 ±0.31 80.25 ±0.87 70.52 ±1.21 74.38 ±0.62 77.20 ±0.23 HO-based model 78.34 ±0.28 75.68 ±0.96 81.18 ±1.03 81.10 ±0.69 78.29 ±0.36 Dose-based model 83.44 ±0.58 83.58 ±1.57 83.29 ±1.03 84.21 ±0.80 83.89 ±0.92 CK-based model 77.58 ±0.79 77.53 ±1.54 77.63 ±1.76 78.72 ±1.18 78.10 ±0.81 Zheng et al. [16] 72.00 ±1.70 64.9 ±9.80 77.5 ±5.80 — —Yuan et al.[17] 81.67 ±0.66 87.80 ±0.62 68.70 ±0.47 — 86.90 ±0.53 
+
+Chen et al.[25] 77.76 ±1.02 83.23 ±7.06 — — 79.92 ±1.91 Fan et al. [18] 79.07 ±0.02 — — — —Li et al. [45] 73.68 74.13 72.88 69.95 71.98 The comparison between the multimodal and sMRI models showed statistically significant improvements in some evaluation metrics across the atlases. The multimodal approach exhibited highly significant gains in accuracy, specificity, precision, and F1-score for the Dose and CK functional atlases, indicating the importance of integrating structural and functional information. For the AAL and HO structural atlases, significant improvements were observed in accuracy and F1-score, while other metrics showed no statistically significant differences. Similar trends were observed when comparing multimodal with rs-fMRI models. Multimodal approaches produced statistically significant improvements for functional atlases across all evaluated metrics, while improvements for structural atlases were found in accuracy, specificity, precision, and F1-score. Overall, the statistical analysis reveals that the proposed multimodal fusion technique consistently outperforms single-modal approaches in multiple atlas configurations. The most significant improvements were observed for functional atlases, while significant gains were also achieved for structural atlases, demonstrating the robustness and effectiveness of explicitly modeling cross-modal interactions. 
+
+# 6 Conclusion 
+
+In this study, we proposed a multimodal graph-based framework for MDD classification that explicitly models structural–functional interactions through a dual cross-attention mechanism. The proposed approach offers reciprocal refinement of modality-specific embeddings while preserving graph topology by performing bidirectional cross-16 arXiv Template A P REPRINT 
+
+Table 7: Statistical Analysis of Significant Differences (p-values) Between Single-Modal and Multimodal Approaches. Bolded values indicate statistically significant differences between models at p < 0.05 .                                             
+
+> Method Accuracy Sensitivity Specificity Precision F1-score
+> Multimodal and sMRI models AAL-based model 0.0048 0.4695 0.1751 0.0865 0.0017
+> HO-based model 0.0294 0.0890 0.6959 0.9300 0.0295
+> Dose-based model 0.0000 0.0965 0.0000 0.0000 0.0000
+> CK-based model 0.0000 0.0547 0.0000 0.0000 0.0000
+> Multimodal and rs-fMRI models AAL-based model 0.0000 0.1691 0.0002 0.0000 0.0000
+> HO-based model 0.0000 0.5674 0.0000 0.0000 0.0000
+> Dose-based model 0.0000 0.0081 0.0000 0.0000 0.0000
+> CK-based model 0.0000 0.0221 0.0000 0.0000 0.0000
+
+attentions between corresponding nodes of the structural and functional brain graphs. In this manner, complementary multimodal information can be utilized more effectively, thereby optimizing discriminative representation learning at the node level. A comprehensive analysis of the large-scale REST-meta-MDD dataset has demonstrated that the proposed framework achieves robust and balanced performance across multiple atlas configurations. The model consistently enhances classification metrics compared to both single-modality and existing multimodal approaches while maintaining stability under the stratified cross-validation method. These findings emphasize the importance of explicitly modeling bidirectional structural–functional dependencies for multimodal neuroimaging analysis. Several research directions remain to be explored in the future. First, extending the framework toward multi-atlas integration may further enhance representational diversity by capturing complementary anatomical and functional parcellation schemes within a unified learning framework. Second, incorporating additional imaging modalities, such as DTI may improve the richness of multimodal representations. Finally, integrating explainability mechanisms would provide significant neurobiological insights into modality-specific and region-specific contributions. 
+
+# References 
+
+[1] L. Cui, S. Li, S. Wang, X. Wu, Y. Liu, W. Yu, Y. Wang, Y. Tang, M. Xia, and B. Li, “Major depressive disorder: hypothesis, mechanism, prevention and treatment,” Signal transduction and targeted therapy , vol. 9, no. 1, p. 30, 2024. [2] J. Pilmeyer, W. Huijbers, R. Lamerichs, J. F. Jansen, M. Breeuwer, and S. Zinger, “Functional mri in major depressive disorder: A review of findings, limitations, and future prospects,” Journal of Neuroimaging , vol. 32, no. 4, pp. 582–595, 2022. [3] E. E. Tulay, B. Metin, N. Tarhan, and M. K. Arıkan, “Multimodal neuroimaging: basic concepts and classification of neuropsychiatric diseases,” Clinical EEG and neuroscience , vol. 50, no. 1, pp. 20–33, 2019. [4] C. Zhuo, G. Li, X. Lin, D. Jiang, Y. Xu, H. Tian, W. Wang, and X. Song, “The rise and fall of mri studies in major depressive disorder,” Translational psychiatry , vol. 9, no. 1, p. 335, 2019. [5] L. Dai, H. Zhou, X. Xu, and Z. Zuo, “Brain structural and functional changes in patients with major depressive disorder: a literature review,” PeerJ , vol. 7, p. e8170, 2019. [6] B. AR, A. Adiga, B. Mahanand, and D. Consortium, “3d convolutional neural network model for detection of major depressive disorder from grey matter images,” Applied Sciences , vol. 15, no. 19, p. 10312, 2025. [7] J. Gao, M. Chen, D. Xiao, Y. Li, S. Zhu, Y. Li, X. Dai, F. Lu, Z. Wang, S. Cai, et al. , “Classification of major depressive disorder using an attention-guided unified deep convolutional neural network and individual structural covariance network,” Cerebral Cortex , vol. 33, no. 6, pp. 2415–2425, 2023. [8] N. M. Alotaibi, A. M. Alhothali, and M. S. Ali, “3dvit-gat: a unified atlas-based 3d vision transformer and graph learning framework for major depressive disorder detection using structural mri data,” Scientific Reports , 2026. 17 arXiv Template A P REPRINT 
+
+[9] Y. Xiao, X. Liu, Y. Qian, B. Huang, P. Tang, and Z. Zhang, “Diagnosis of major depressive disorder based on anomaly detection with smri gray matter slices,” in 2024 IEEE Smart World Congress (SWC) , pp. 1271–1277, IEEE, 2024. [10] N. M. Alotaibi, A. M. Alhothali, and M. S. Ali, “Multi-atlas ensemble graph neural network model for major depressive disorder detection using functional mri data,” Frontiers in Computational Neuroscience , vol. 19, p. 1537284, 2025. [11] Z. Xia, Y. Fan, K. Li, Y. Wang, L. Huang, and F. Zhou, “Depressiongraph: a two-channel graph neural network for the diagnosis of major depressive disorders using rs-fmri,” Electronics , vol. 12, no. 24, p. 5040, 2023. [12] D.-J. Lee, D.-H. Shin, Y.-H. Son, J.-W. Han, J.-H. Oh, D.-H. Kim, J.-H. Jeong, and T.-E. Kam, “Spectral graph neural network-based multi-atlas brain network fusion for major depressive disorder diagnosis,” IEEE Journal of Biomedical and Health Informatics , vol. 28, no. 5, pp. 2967–2978, 2024. [13] Q. Liu, Y. Zhang, L. Guo, and Z. Wang, “Spatial-temporal data-augmentation-based functional brain network analysis for brain disorders identification,” Frontiers in Neuroscience , vol. 17, p. 1194190, 2023. [14] Y.-D. Zhang, Z. Dong, S.-H. Wang, X. Yu, X. Yao, Q. Zhou, H. Hu, M. Li, C. Jiménez-Mesa, J. Ramirez, et al. ,“Advances in multimodal data fusion in neuroimaging: overview, challenges, and novel orientation,” Information Fusion , vol. 64, pp. 149–187, 2020. [15] M. Mousavian, J. Chen, Z. Traylor, and S. Greening, “Depression detection from smri and rs-fmri images using machine learning,” Journal of Intelligent Information Systems , vol. 57, no. 2, pp. 395–418, 2021. [16] G. Zheng, W. Zheng, Y. Zhang, J. Wang, M. Chen, Y. Wang, T. Cai, Z. Yao, and B. Hu, “An attention-based multi-modal mri fusion model for major depressive disorder diagnosis,” Journal of neural engineering , vol. 20, no. 6, p. 066005, 2023. [17] X. Yuan, M. Chen, P. Ding, A. Gan, A. Gong, Z. Chu, W. Nan, Y. Fu, and Y. Cheng, “Cross-domain identification of multisite major depressive disorder using end-to-end brain dynamic attention network,” IEEE Transactions on Neural Systems and Rehabilitation Engineering , vol. 32, pp. 33–42, 2023. [18] Z. Fan, J. Xu, J. Su, and D. Hu, “Classifying major depressive disorder using multimodal mri data: A personalized federated algorithm,” Brain Sciences , vol. 15, no. 10, p. 1081, 2025. [19] Q. Wang, L. Li, L. Qiao, and M. Liu, “Adaptive multimodal neuroimage integration for major depression disorder detection,” Frontiers in Neuroinformatics , vol. 16, p. 856175, 2022. [20] P. Dai, Y. Zhou, Y. Shi, D. Lu, Z. Chen, B. Zou, K. Liu, S. Liao, and R. meta MDD Consortium, “Classification of mdd using a transformer classifier with large-scale multisite resting-state fmri data,” Human brain mapping ,vol. 45, no. 1, p. e26542, 2024. [21] Y. Bi, A. Abrol, Z. Fu, and V. Calhoun, “Multivit: Multimodal vision transformer for schizophrenia prediction using structural mri and functional network connectivity data,” in 2023 IEEE 20th International Symposium on Biomedical Imaging (ISBI) , pp. 1–5, IEEE, 2023. [22] N. Shaffi, V. Viswan, and M. Mahmud, “Ensemble of vision transformer architectures for efficient alzheimer’s disease classification,” Brain Informatics , vol. 11, no. 1, p. 25, 2024. [23] H. Ma, D. Zhang, D. Sun, H. Wang, and J. Yang, “Gray and white matter structural examination for diagnosis of major depressive disorder and subthreshold depression in adolescents and young adults: a preliminary radiomics analysis,” BMC medical imaging , vol. 22, no. 1, p. 164, 2022. [24] J. Pan, H. Lin, Y. Dong, Y. Wang, and Y. Ji, “Mamf-gcn: Multi-scale adaptive multi-channel fusion deep graph convolutional network for predicting mental disorder,” Computers in biology and medicine , vol. 148, p. 105823, 2022. [25] Q. Chen, P. Dai, K. Huang, T. Hu, and S. Liao, “Mmdd: A multimodal multitask dynamic disentanglement framework for robust major depressive disorder diagnosis across neuroimaging sites,” Diagnostics , vol. 15, no. 23, p. 3089, 2025. [26] X. Chen, B. Lu, H.-X. Li, X.-Y. Li, Y.-W. Wang, F. X. Castellanos, L.-P. Cao, N.-X. Chen, W. Chen, Y.-Q. Cheng, et al. , “The direct consortium and the rest-meta-mdd project: towards neuroimaging biomarkers of major depressive disorder,” Psychoradiology , vol. 2, no. 1, pp. 32–42, 2022. [27] C.-G. Yan, X. Chen, L. Li, F. X. Castellanos, T.-J. Bai, Q.-J. Bo, J. Cao, G.-M. Chen, N.-X. Chen, W. Chen, et al. ,“Reduced default mode network functional connectivity in patients with recurrent major depressive disorder,” 
+
+Proceedings of the National Academy of Sciences , vol. 116, no. 18, pp. 9078–9083, 2019. 18 arXiv Template A P REPRINT 
+
+[28] D. Lei, W. H. Pinaya, J. Young, T. Van Amelsvoort, M. Marcelis, G. Donohoe, D. O. Mothersill, A. Corvin, S. Vieira, X. Huang, et al. , “Integrating machining learning and multimodal neuroimaging to detect schizophrenia at the level of the individual,” Human brain mapping , vol. 41, no. 5, pp. 1119–1135, 2020. [29] A. El-Gazzar, R. M. Thomas, and G. van Wingen, “Harmonization techniques for machine learning studies using multi-site functional mri data,” bioRxiv , pp. 2023–06, 2023. [30] W. E. Johnson, C. Li, and A. Rabinovic, “Adjusting batch effects in microarray expression data using empirical bayes methods,” Biostatistics , vol. 8, no. 1, pp. 118–127, 2007. [31] N. Tzourio-Mazoyer, B. Landeau, D. Papathanassiou, F. Crivello, O. Etard, N. Delcroix, B. Mazoyer, and M. Joliot, “Automated anatomical labeling of activations in spm using a macroscopic anatomical parcellation of the mni mri single-subject brain,” Neuroimage , vol. 15, no. 1, pp. 273–289, 2002. [32] D. N. Kennedy, N. Lange, N. Makris, J. Bates, J. Meyer, and V. S. Caviness Jr, “Gyri of the human neocortex: an mri-based analysis of volume and variance.,” Cerebral Cortex (New York, NY: 1991) , vol. 8, no. 4, pp. 372–384, 1998. [33] N. U. Dosenbach, B. Nardos, A. L. Cohen, D. A. Fair, J. D. Power, J. A. Church, S. M. Nelson, G. S. Wig, A. C. Vogel, C. N. Lessov-Schlaggar, et al. , “Prediction of individual brain maturity using fmri,” Science , vol. 329, no. 5997, pp. 1358–1361, 2010. [34] R. C. Craddock, G. A. James, P. E. Holtzheimer III, X. P. Hu, and H. S. Mayberg, “A whole brain fmri atlas generated via spatially constrained spectral clustering,” Human brain mapping , vol. 33, no. 8, pp. 1914–1928, 2012. [35] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, et al. , “An image is worth 16x16 words: Transformers for image recognition at scale,” arXiv preprint arXiv:2010.11929 , 2020. [36] K. You, “Semantics at an angle: When cosine similarity works until it doesn’t,” arXiv preprint arXiv:2504.16318 ,2025. [37] Y. Zhang, Y. Fang, X. Yu, Y. Peng, and Z. Ju, “Cosine similarity graph attention networks for autism spectrum disorder diagnosis,” in 2024 World Rehabilitation Robot Convention (WRRC) , pp. 1–5, 2024. [38] J. Liu, X. Yu, H. Fukuyama, T. Murai, J. Wu, Q. Li, and Z. Zhang, “Csepc: a deep learning framework for classifying small-sample multimodal medical image data in alzheimer’s disease,” BMC geriatrics , vol. 25, no. 1, p. 130, 2025. [39] Y. Bi, A. Abrol, S. Jia, J. Sui, and V. D. Calhoun, “Gray matters: Vit-gan framework for identifying schizophrenia biomarkers linking structural mri and functional network connectivity,” NeuroImage , vol. 297, p. 120674, 2024. [40] G. Collin and M. van den Heuvel, “Chapter 18 - anatomical and functional brain network architecture in schizophrenia,” in The Neurobiology of Schizophrenia (T. Abel and T. Nickl-Jockschat, eds.), pp. 313–336, San Diego: Academic Press, 2016. [41] V. M. Vergara, Q. Yu, and V. D. Calhoun, “A method to assess randomness of functional connectivity matrices,” 
+
+Journal of neuroscience methods , vol. 303, pp. 146–158, 2018. [42] P. Veliˇ ckovi´ c, G. Cucurull, A. Casanova, A. Romero, P. Lio, and Y. Bengio, “Graph attention networks,” arXiv preprint arXiv:1710.10903 , 2017. [43] H. Cui, W. Dai, Y. Zhu, X. Kan, A. A. C. Gu, J. Lukemire, L. Zhan, L. He, Y. Guo, and C. Yang, “Braingb: a benchmark for brain network analysis with graph neural networks,” IEEE transactions on medical imaging ,vol. 42, no. 2, pp. 493–506, 2022. [44] E. L. Jimale, W. Chen, M. A. Al-antari, Y. H. Gu, V. K. Agbesi, W. Feroze, F. Akmel, J. M. Assefa, and A. Shahzad, “Graph-to-text generation with bidirectional dual cross-attention and concatenation,” Mathematics , vol. 13, no. 6, p. 935, 2025. [45] T. Li, N. Hou, J. Yu, Z. Zhao, Q. Sun, M. Chen, Z. Yao, S. Ma, J. Zhou, and B. Hu, “Evolutionary neural architecture search for automated mdd diagnosis using multimodal mri imaging,” Iscience , vol. 27, no. 10, 2024. 19

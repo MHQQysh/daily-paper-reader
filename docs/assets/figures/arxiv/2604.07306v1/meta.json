@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07306v1/fig-001.webp",
+      "caption": "Figure 1. Illustrations of: (a) Our Motivation: Performance comparison of static vs. dynamic pruning methods under label noise. (upper) Dynamic pruning is inherently more robust to noise than static pruning. Random dynamic pruning consistently outperforms random static pruning across all noise types. (bottom) This motivates our work to further improve dynamic methods, where our AlignPrune achieves a new state-of-the-art, consistently outperforming dynamic (InfoBatch [42]) and static-robust (Prune4ReL [39], labeled as ‘Static SOTA’) baselines. (b) Our Observation: Failure of loss-based pruning methods. Existing methods use a loss threshold (dashed line) that is unreliable, which could mistakenly prune many low-loss clean samples while retain high-loss noisy ones. As pruning progresses, the accumulation of noisy examples in the training loop degrades the overall model performance. (c) Our Insight: Divergent Loss Trajectories of Clean vs. Noisy Samples. We find that clean samples typically follow a smooth, monotonic decrease in loss, while noisy samples exhibit non-monotonic loss patterns, highlighting the potential of trajectory-based reference signals in separating clean from noisy data.",
+      "page": 2,
+      "index": 1,
+      "width": 1018,
+      "height": 216
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07306v1/fig-002.webp",
+      "caption": "Table 3. Classification results on ImageNet-1K across modern CNN and ViT architectures. Performance gaps relative to the full-training setting are indicated as superscripts.",
+      "page": 7,
+      "index": 2,
+      "width": 690,
+      "height": 205
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07306v1/fig-003.webp",
+      "caption": "Figure 4. Ablation on hyper-parameter selection on CIFAR-100N. Best viewed in color.",
+      "page": 7,
+      "index": 3,
+      "width": 1004,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07306v1/fig-004.webp",
+      "caption": "Figure 2. Illustration of the proposed plug-and-play AlignPrune module. Existing dynamic pruning methods [42, 67] rank samples based on their loss values, which could mistakenly result in a final subset S(t) retained with noisy samples. Our method replaces the ranking score with DAS, where noisy samples tend to have low scores to be correctly pruned, resulting in a robust subset S(t) composed primarily of clean samples. Best viewed in color.",
+      "page": 4,
+      "index": 4,
+      "width": 888,
+      "height": 352
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07306v1/fig-005.webp",
+      "caption": "Table 1. Classification results on CIFAR-100N with ResNet-18. Performance gaps relative to the full-training setting are indicated as superscripts. The mean ∆ is computed across all noise types.",
+      "page": 5,
+      "index": 5,
+      "width": 768,
+      "height": 571
+    }
+  ]
+}

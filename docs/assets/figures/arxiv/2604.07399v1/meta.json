@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07399v1/fig-001.webp",
+      "caption": "Figure 1. Comparison of accuracy and training-time efficiency on CIFAR-100 using PCL and token reduction methods, with efficiency metrics measured on a Jetson Orin Nano. Our method exhibits a more balanced accuracy–efficiency trade-off under edgedevice constraints.",
+      "page": 1,
+      "index": 1,
+      "width": 467,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07399v1/fig-002.webp",
+      "caption": "Table 1. Comparison of CL methods on three datasets. ▼/△ indicate that the corresponding method is statistically worse/better than the proposed method, based on a paired t-test (p < 0.05). Higher is better for Accuracy (↑), while lower is better for Forgetting (↓). All results are averaged over 10 runs.",
+      "page": 6,
+      "index": 2,
+      "width": 1026,
+      "height": 333
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07399v1/fig-003.webp",
+      "caption": "Figure 3. Comparison of memory usage, training time, and energy consumption between our method and other PCL methods on three datasets on the Jetson Orin Nano. For clarity, method names are abbreviated (e.g., CODA = CODA-Prompt, CP = C-Prompt, OS++ = OS-Prompt++, OS = OS-Prompt).",
+      "page": 6,
+      "index": 3,
+      "width": 1005,
+      "height": 343
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07399v1/fig-004.webp",
+      "caption": "Figure 4. Comparison of accuracy and memory usage between CPS-Prompt and other token reduction methods based on the CODAPrompt baseline under varying reduction ratios on the Jetson Orin Nano.",
+      "page": 7,
+      "index": 4,
+      "width": 1005,
+      "height": 324
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07399v1/fig-005.webp",
+      "caption": "Figure 5. Comparison of training time and memory usage between CPS-Prompt and other token reduction methods based on the CODAPrompt baseline under varying reduction ratios on the Jetson Orin Nano.",
+      "page": 7,
+      "index": 5,
+      "width": 1005,
+      "height": 324
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07399v1/fig-006.webp",
+      "caption": "Figure 2. Overview of the CPS-Prompt framework. Left: CPS selects a small subset of task-relevant patches to preserve accuracy while reducing memory usage. Right: DPCT mitigates representation mismatch through decoupled training, where the prompt is optimized with sparse patches and the classifier with full patches.",
+      "page": 3,
+      "index": 6,
+      "width": 1036,
+      "height": 489
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07399v1/fig-007.webp",
+      "caption": "Figure 8. Qualitative comparison between deterministic top-k and stochastic sampling at a reduction ratio of 0.5 on CUB-200.",
+      "page": 8,
+      "index": 7,
+      "width": 396,
+      "height": 311
+    }
+  ]
+}

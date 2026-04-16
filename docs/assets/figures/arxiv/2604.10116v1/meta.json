@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10116v1/fig-001.webp",
+      "caption": "Table 4: Average Classification Results and Standard Deviation of 10-fold Cross-validation for Multimodal Fusion Models. Bolded values indicate the best performing results.",
+      "page": 14,
+      "index": 1,
+      "width": 968,
+      "height": 435
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10116v1/fig-002.webp",
+      "caption": "Table 5: Classification Results for the Fold with the Highest Accuracy from 10-Fold Stratified Cross-Validation. Bolded values indicate the best performing results",
+      "page": 14,
+      "index": 2,
+      "width": 975,
+      "height": 437
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10116v1/fig-003.webp",
+      "caption": "Table 7: Statistical Analysis of Significant Differences (p-values) Between Single-Modal and Multimodal Approaches. Bolded values indicate statistically significant differences between models at p < 0.05.",
+      "page": 17,
+      "index": 3,
+      "width": 975,
+      "height": 370
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10116v1/fig-004.webp",
+      "caption": "Table 3: Configuration of the Dual Cross-Attention Fusion Model",
+      "page": 12,
+      "index": 4,
+      "width": 518,
+      "height": 264
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10116v1/fig-005.webp",
+      "caption": "Figure 1: Overall architecture of the proposed dual cross-attention multimodal framework. sMRI, structural MRI; rs-fMRI, functional MRI; ROI, brain regions of interest; MLP, multilayer perceptron; GAT, graph attention network; LeakyReLU, leaky rectified linear unit; GAP, global average pooling; MDD, major depressive disorder; HC, healthy controls.",
+      "page": 5,
+      "index": 5,
+      "width": 944,
+      "height": 1261
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10116v1/fig-006.webp",
+      "caption": "Table 6: Average Classification Results and Standard Deviation of 10-fold Cross-validation for Existing Multimodal Fusion Models. Bolded values indicate the best performing results.",
+      "page": 16,
+      "index": 6,
+      "width": 968,
+      "height": 810
+    }
+  ]
+}

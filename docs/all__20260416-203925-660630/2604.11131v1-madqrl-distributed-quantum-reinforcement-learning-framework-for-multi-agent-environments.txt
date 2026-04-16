@@ -1,0 +1,246 @@
+Title: MADQRL: Distributed Quantum Reinforcement Learning Framework for Multi-Agent Environments
+
+URL Source: https://arxiv.org/pdf/2604.11131v1
+
+Published Time: Tue, 14 Apr 2026 02:19:53 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# MADQRL: Distributed Quantum Reinforcement Learning Framework for Multi-Agent Environments 
+
+Abhishek Sawaika 1, Samuel Yen-Chi Chen 2, Udaya Parampalli 1, Rajkumar Buyya 1
+
+> 1
+
+Quantum Cloud Computing and Distributed Systems Lab (qCLOUDS), School of Computing and Information Systems, The University of Melbourne, Australia 
+
+> 2
+
+Brookhaven National Laboratory, Upton, NY, USA 
+
+asawaika@student.unimelb.edu.au; ycchen1989@ieee.org; (udaya, rbuyya)@unimelb.edu.au 
+
+Abstract —Reinforcement learning (RL) is one of the most prac-tical ways to learn from real-life use-cases. Motivated from the cognitive methods used by humans makes it a widely acceptable strategy in the field of artificial intelligence. Most of the environ-ments used for RL are often high-dimensional, and traditional RL algorithms becomes computationally expensive and challenging to effectively learn from such systems. Recent advancements in practical demonstration of quantum computing (QC) theories, such as compact encoding, enhanced representation and learning algorithms, random sampling, or the inherent stochastic nature of quantum systems, have opened up new directions to tackle these challenges. Quantum reinforcement learning (QRL) is seeking significant traction over the past few years. However, the current state of quantum hardware is not enough to cater for such high-dimensional environments with complex multi-agent setup. To tackle this issue, we propose a distributed framework for QRL where multiple agents learn independently, distributing the load of joint training from individual machines. Our method works well for environments with disjoint sets of action and observation spaces, but can also be extended to other systems with reasonable approximations. We analyze the proposed method on cooperative-pong environment and our results indicate ∼10% improvement from other distribution strategies, and ∼ 5% improvement from classical models of policy representation. 
+
+I. I NTRODUCTION 
+
+Quantum computing has attracted considerable attention due to its ability to provide computational advantages over classical computing for certain classes of problems [1]. Al-though present-day quantum hardware is constrained by noise, limited coherence times, and device imperfections, extensive research efforts are underway to realize practical quantum advantages [2]. Within this context, quantum machine learning (QML) has emerged as a particularly promising direction, aiming to integrate quantum computational principles into machine learning (ML) frameworks. Most existing QML ap-proaches adopt a hybrid quantum–classical architecture [3], where quantum processors are used for subroutines that can exploit quantum effects, while classical processors manage components better suited to conventional computation. Vari-ational quantum algorithms (VQAs) [4] constitute the core computational paradigm underlying most contemporary QML models. Built upon parameterized quantum circuits optimized via classical routines, VQAs have enabled QML methods to be applied across a broad range of learning scenarios, including supervised classification [5], sequential and time-series modeling [6], [7], natural language processing [8]–[11], and graph based learning [12], etc. Within this landscape, QRL [13] has recently emerged as a particularly compelling research direction, aiming to exploit quantum-enhanced representations, optimization dy-namics, and stochasticity to improve the decision-making capabilities of learning agents. As real-world environments increasingly involve decentralized decision processes, partial observability, and interactions among multiple autonomous en-tities, extending QRL frameworks beyond single-agent settings toward multi-agent quantum reinforcement learning (MA-QRL) becomes a natural and necessary progression [14]. Such multi-agent formulations open new opportunities to investigate quantum-enabled coordination, competition, and information sharing among agents, while also posing fundamental chal-lenges related to scalability. To enable such systems and overcome the scalability is-sues on near-term quantum devices, we propose a distributed framework for such MA-QRL problems. Major contributions of our work include: 1) An architecture for distributed quantum reinforcement learning for multi-agent environments, learning joint tasks through independent training. 2) Detailed analysis of this framework to showcase prac-tical usability and limitations on a benchmarking envi-ronment of two agent cooperative pong game. The rest of the paper is organised as follows: A brief introduction to RL in Section II, followed by our solution methodology in Section III, and discussions on experiments and results in Section IV. Finally, we conclude and provide remarks on possible future directions in Section V. II. R EINFORCEMENT LEARNING 
+
+Reinforcement learning is a class of ML problems that aims to learn an optimal strategy for state-action pairs (policy), from an environment usually described through a Markov decision process (MDP) [15]. Training usually involves an iterative feedback-based loop, where an agent (learner) continuously interacts with the environment (MDP) to gradually learn the policy, while maximizing the expected reward using a controlled exploration-exploitation mechanism [16]. 
+
+> arXiv:2604.11131v1 [cs.AI] 13 Apr 2026
+
+A. Single-Agent Environments 
+
+Consider a simplistic representation of a RL problem using the following MDP definition: 1) State Space (S) : S = SO ∪ SI ∪ ST , is a collection of starting ( SO ), intermediate ( SI ) and terminating ( ST )states. 2) Action Space (A) : A = {a1, a 2, ... }, is the set of possible actions. 3) Transition Function (P) : S1 ×A×S2 → [0 , 1] , defines the probability of transition P (s, a, s ′) = P r (s′|s, a )
+
+from a state ’ s’ to a state ’ s′’ under an action ’ a’. 4) Reward Function (R) : S1 × A × S2 → R, defines the reward for a transition (s, a, s ′) from state ’ s’ to a state ’s′’ under an action ’ a’. Where, (S1, S 2) ⊆ S, s ∈ S1, s ′ ∈ S2 and a ∈ A. Then a single-agent environment (SAE) is the one where the entire action space (A) is managed by only one learning agent. 
+
+B. Multi-Agent Environments 
+
+A multi-agent environment (MAE) is an extension of the previous definition, where the entire action space (A) can be divided into disjoint sets of action spaces ( Ai), s.t. 
+
+Ai = {ai1, a i2, ... } | A = S Ai and Ai ∩ Aj = ϕ, ∀i̸ = j.Where, each action space Ai is associated with a distinct learn-ing agent (i). Correspondingly, a transition (s, a, s ′) is defined by a joint action vector a : ×Ai = ( a1x, a 2y , ..., a iz ), ∀i > 
+
+1 and ∃aiα ∈ Ai.Some of the popular MAE include games like Chess, GO, Pong, etc., and real world applications like robotics, power systems, autonomous vehicles, etc. [17]. These can be modeled either in a collaborative system (COL-MAE) where agents train towards a common objective, or a competitive system (COMP-MAE) with conflicting rewards [18]. 
+
+C. Deep Reinforcement Learning 
+
+Given the environment description, the objective of a RL algorithm is to learn a policy, s.t.: 
+
+Policy (π) : S ×A → [0 , 1] defines the posterior probability of selecting an action ’ a’ given the current state ’ s’ i.e. 
+
+π(s, a ) = P r (a|s),while maximizing the expected discounted reward :
+
+max  
+
+> π
+
+Est∼P,a t∼π
+
+ t=∞X
+
+> t=0
+
+γt ∗ R(st, a t, s t+1 )
+
+!
+
+(1) Where, 0 < γ < 1 is the discount factor to gradually decrease the impact of rewards coming from far-off future. Most of the practical environments are often high-dimensional, and it becomes challenging to solve for such objective using traditional RL algorithms such as temporal-difference (TD) [19] or Q-Learning [20]. Therefore, the learn-able functions like Policy ( π), Value ( Vπ (s)) and Quality (Qπ (s, a )) can be represented as deep neural networks and some suitable algorithm can be used to learn these mappings. This is the central idea behind deep reinforcement learning (DRL) [21]. Here, Value Function (Vπ ) : S → R, defines the expected reward of starting from state ’ s’ and following the policy ’ π’from time t > 0, s.t. Vπ (s) = 
+
+Est∼P,a t∼π
+
+ t=∞X
+
+> t=0
+
+γt ∗ R(st, a t, s t+1 ) | so = s, π 
+
+
+
+and Quality Function (Qπ ) : S × A → R, provides the expected reward of starting from state ’ s’ with action ’ a’ and then following the policy ’ π’ from time t > 0, s.t. Qπ (s, a ) = 
+
+Est∼P,a t∼π
+
+ t=∞X
+
+> t=0
+
+γt ∗ R(st, a t, s t+1 ) | so = s, a o = a, π 
+
+
+
+D. PPO Learning Algorithm 
+
+Proximal Policy Optimization (PPO) algorithm [22] is a spe-cial case of policy gradient method [23], where a parametrized policy ( π(θ)) is learned to find the optimal values of param-eters (θ) for an objective J(θ), similar to that in Equation 1, over a finite horizon ( 0 ≤ t < T ), using gradient ascent techniques. i.e. θi+1 = θi + α∇θ ∗ J(θ).The objective function specific to PPO algorithm is defined as: 
+
+J(θ) = max 
+
+> θ
+
+ Et [min ( SO, SO clipped )]  (2) Where, SO = rt(θ) ∗ ˆAt, SO clipped = clip  rt(θ), 1 −
+
+ϵ, 1 + ϵ ∗ ˆAt, and 
+
+ˆAt is the estimate of Advantage function (Aπ ) which calculates the benefit of taking an action ’ a’ from a starting state ’ s’, s.t. 
+
+Aπ (s, a ) = Qπ (s, a ) − Vπ (s)
+
+The policy ratio rt(θ) = πθ (at|st) / π θold (at|st), identifies the importance of action ’ a’ between the current and the previous policy, and hence guides the direction of gradient movement in the learning process. Authors in PPO had introduced this clipping technique, see Equation 2, to restrict rt(θ) within an 
+
+ϵ bound and thereby avoiding unbalanced updates of policy parameters. III. S OLUTION METHODOLOGY 
+
+This section presents our proposed distributed learning framework designed for MA-QRL problems, along with the details on model architecture used for policy representation. This system is designed specifically for large COL-MAE sys-tem and works well for environments with distinct observation spaces and less dependency on information from other agents. 
+
+A. Distributed Learning Framework 
+
+Authors in [24] have used three classes to classify learning strategies for MAE, namely centralized training centralized execution (CTCE), distributed training decentralized execution (DTDE) and centralized training and decentralized execution (CTDE). In this work we have used the following nomen-clatures, with CTCE as ”Joint”, DTDE as ”Independent” and CTDE as ”Shared” for our experiments. Agent 1   
+
+> A1j
+> Agent (i) Agent 2
+> A2j
+> Aij
+> S2
+> S0
+> S1
+> S4
+> S3S5
+> A1/R 1
+> A7/R 7
+> A6/R 6
+> A3/R 3
+> A5/R 5
+> A4/R 4
+> A2/R 2
+> A8/R 8
+> R1Ri
+> R2
+> MDP
+> Environment
+
+Fig. 1: Architecture of MADQRL framework. Agents learn independently to optimize for joint objective defined by the environment. This independent training happens on local observation, reward and action spaces, such that the joint policy can be approximated by the product of local policies. Here, the MDP representation of the environment is just an example for completeness of the system. CTCE trains a joint policy 
+
+πCT CE (θ) = P r (a | s)
+
+where a is the joint action space of all agents performing simultaneous transitions (s, a, s′)π from joint states s to s′,as described in Section II-B. Whereas, in CTDE every agent learns a shared policy 
+
+πCT DE (θ) ≃ P r (a | si) = Y πi(θ) ∗ I(i, j ), ∀j̸ = i
+
+which is trained over local states ’ si’ and mutual information ’I’. πi(θ) is similar to that in πDT DE i (θ).At last, through DTDE every agent (i) learns a local policy 
+
+πDT DE i (θ) = P r (ai | si)
+
+trained over local states ’ si’ and actions ’ ai, as if they are learning independently. The Joint policy π(θ) can be written by 
+
+P r (a | s) ≈ Y
+
+> i
+
+P r (ai | si)
+
+We took motivation from these strategies and designed a framework for distributed quantum reinforcement learning with hybrid quantum-classical model, within the DTDE class. It is opposed to the recent work in [25] which train multiple copies of a SAE and periodically share policy parameters for weight synchronization. This simply distributes the training load to multiple learners rather than learning a multi-agent environment using distributed training. Figure 1 presents the architecture diagram of our proposed framework for distributed quantum reinforcement learning for multi-agent environments (MADQRL). 
+
+B. Quantum Policy Representation 
+
+Recent research in QRL has shown promise in the use of various quantum-inspired techniques for different RL tasks [13]. Where, authors in [26] encoded the MDP into quan-tum states and proposed a projective measurement [27] and Grover’s search [28] based strategy for a TD like policy up-date, authors in [29] uses VQC and QNN based architectures for policy representation in a DRL based setting. A variational quantum circuit (VQC) usually consists of three major components: 1) An Encoder Circuit E(X): to encode classical data into quantum bits. 2) A Parametrized Circuit C(Θ q ): for learning user defined objectives. 3) Measurements and Post Processing : to translate quan-tum information into classical output / objectives for optimization. We design a quantum neural network (QNN) [30] based model, with three layers of hybrid quantum-classical layer, to represent the policy function π(θ). Here, the policy parameters 
+
+θ are directly mapped to QNN’s parameters Θ = Θ q ∪ θc,where Θq and θc are quantum and classical model parameters, respectively. Each agent has a separate version of the policy model for training. i.e. πi(θi) | θi → Θi.A single layer of the QNN model consists of the following layers: Flatten Linear Layer VQC RELU Linear layer RELU 
+
+We use angle encoding with Rx gate and multiple layers of fully-entangled parametrized circuit with sequence of Rx, Rz and CNOT gates in the VQC model. This design help us to access larger sections of the Hilbert space and provide maximal entanglement properties for efficient policy training. It also helps in increasing the expressivity power of learning process with smaller model sizes. Figure 2 shows a sample VQC with 4 qubit and 3 layers of parametrized circuit. IV. P ERFORMANCE EVALUATION 
+
+We present the experimental setup used for our study and the analysis of our findings. The designed system can work with any traditional learning algorithm for a DRL based system, but for our experiments we have used PPO for policy update. 
+
+A. Experiment Design 
+
+We experiment with cooperative-pong [31] environment provided by PettingZoo [32]. This environment has 2 agents with discrete action space: {-1,0,1 }, representing {left, no, right } movements, respectively. The aim of this game is to 
+
+Fig. 2: A sample quantum circuit with 4 qubits, having angle encoding using RX gates and L = 3 layers of strongly entangled variational layers, followed by full measurement in 
+
+Z-Basis. Here we use three different entanglement layers. keep the ball within the playing arena for longest period of time, by precise movements of paddles (agents), based on ball dynamics. Fig 3 shows a sample snapshot of the game. It is important to note that the ball can leave the arena only from the left or the right edges. The state space is represented by an rgb array of size (560 x 960 x 3), and each agent observe only half of the screen. We scaled the canvas size (state space) to 64 x 64 for simplicity of our experiments. 
+
+Fig. 3: A snapshot of the cooperative-pong game environment. The entire black box is the ”playing arena”, the small white dot at the center is the ”ball”, which moves freely based on the laws of physics, and the two elongated white area on the left and the right edges are the paddles, representing agents. Here, the right one is a cake shaped paddle, while the one on the left side is a standard block paddle. We choose this game because it is a COL-MAE and the observation space per agent are disjoint. Therefore, the joint policy π(θ) can be factorized as π(θ) = π1(θ1) ∗ π2(θ2),s.t. optimizing for the individual rewards jointly optimize for the whole game, i.e. the ball remain in the court for longer durations. We run the whole training pipeline using Ray framework [33] for ∼15K iterations, with batch size of 512, learning rate ( α) = 10 −4, ϵ = 0.3, γ = 0 .95 , kl coefficient = 0.2, vf coefficient = 1.0 and entropy coefficient = 0.5. We compare performance between the quantum model, as described in Section III-B, with 13 qubits and 9 layers, and the classical model with CNN [34] layers activated by RELU functions. 
+
+B. Results Analysis 
+
+We conduct experiments to compare the proposed frame-work of ”independent” training against two other strategies of ”joint” and ”shared” learning. We test for both classical and quantum models. We also compare the effect of entanglement on training of the quantum model in joint learning setup, within a basic entangling layer (BE) and a strongly entangling layer (SE). As mentioned earlier, one of the key contributors to the success of our proposed design is the disjoint nature of observation space, even though the game is collaborative. It is observed from Figure 4 that the independent learning strategy performs best and the shared mechanism performs worst. This is due to unnecessary confusions created for additional information learning and sharing in the shared case. We can also verify this in Table I from the large amount of trainable parameters used in the shared case, and the degradation in test episodes post learning. The independent learning strategy takes more time explor-ing, and hence takes more time to train. Joint policy on the other hand takes least time to train upto a reasonable performance. This is measured using saturation point, see Table I, observed while learning with incremental number of trials in the stochastic process of episode sampling. TABLE I: Performance analysis on two agent cooperative pong game for different combinations of policy model and distribution strategies. A CNN and a QNN based architectures are used for classical and quantum models, respectively. There are 1170 tunable parameters in the VQCs used in quantum models.                      
+
+> Model -Distribution Total Runtime (s) Test Episodes Trainable Weights Sampling Saturation (%iterations)
+> Classical-Shared 377 193 40074 40 Classical-Joint
+> 291 254 20560 35.8 Classical-Independent 391 264 18752 45 Quantum-Shared 2753 176 20140 37.9 Quantum-Joint SE
+> 1529 259 10889 37.8 Quantum-Joint BE 1795 245 10893 37.5 Quantum-Independent 2835 288 10691 48
+
+It is important to note that the number of trainable pa-rameters for quantum models are almost half of that of their classical counterparts, yet they perform better in most of the cases, see Table I. Except for the shared case, where the classical model outperforms quantum. On the contrary, since VQC’s are trained on a simulator, there is a trade-off for runtime, where quantum model takes more time due to exponential cost of qubit simulations. −10        
+
+> −8
+> −6
+> −4
+> Mean Reward
+> (a)
+> Classical_Joint
+> Classical_Shared
+> Classical_Independent
+> −10
+> −8
+> −6
+> −4
+> −2
+> 0
+> Mean Reward
+> (b)
+> Classical_Joint
+> Classical_Independent
+> Quantum_Joint_SE
+> Quantum_Independent
+> 02000 4000 6000 8000 10000 12000 14000
+> Iterations
+> −10
+> −8
+> −6
+> −4
+> −2
+> 0
+> Mean Reward
+> (c)
+> Quantum_Joint_BE
+> Quantum_Joint_SE
+> Quantum_Shared
+> Quantum_Independent
+
+Fig. 4: Comparing learning curves for different dis-tributed learning frameworks between (a) classical, (b) quan-tum–classical, and (c) quantum models. Results are reported for a 2-agent cooperative Pong game with the observation space reduced to 64 × 64 . Curves show the moving average of the mean reward with a window size of 5, while the shaded regions indicate the corresponding standard deviation. From results in Figure 4(c), we see that the model with SE layer performs better than the one with BE layer. Where, it has higher average reward during training process, lower runtime and larger test episodes. This is mainly because the quantum circuit with higher entanglement compensates for the information loss due to significant feature reduction by the linear layer used for compressing data for circuits with fewer qubits. V. C ONCLUSIONS AND FUTURE WORK 
+
+We proposed a framework for distributed quantum rein-forcement learning using independent training and hybrid quantum-classical model for policy representation. We demon-strated the utility of such design for environments with disjoint spaces and minimal communication requirements. Our experiments on cooperative-pong environment using PPO algorithm showed ∼10% improvement in final test episodes and mean episodic rewards for a hybrid quantum-classical representation. Since VQC’s are trained on a sim-ulator, there is a trade-off for training runtime. Moreover, given the nature of the underlying environment, the proposed distributed framework with independent learning outperformed other strategies of joint and shared learning, for both classical and quantum representations. This work can be easily integrated with other learning algorithms and extended for environments having similar structural but different environment parameters such as, but not limited to, continuous state, action and observation spaces, and for competitive environments where information about other agents are often not known. It can also be applied for environments modeled using partially observable MDPs. Being distributed, it can scale well for larger environments. ACKNOWLEDGMENTS 
+
+This work is supported by the University of Melbourne and Maitri scholarships from the Department of Foreign Affairs and Trade, Government of Australia. REFERENCES [1] M. A. Nielsen and I. L. Chuang, Quantum computation and quantum information . Cambridge University Press, 2010. [2] A. D. Corcoles, A. Kandala, A. Javadi-Abhari, D. T. McClure, A. W. Cross, K. Temme, P. D. Nation, M. Steffen, and J. M. Gambetta, “Chal-lenges and Opportunities of Near-Term Quantum Computing Systems,” 
+
+Proceedings of the IEEE , vol. 108, pp. 1338–1352, 8 2020. [3] A. McCaskey, E. Dumitrescu, D. Liakh, and T. Humble, “Hybrid Programming for Near-Term Quantum Computing Systems,” 2018 IEEE International Conference on Rebooting Computing, ICRC 2018 , 7 2018. [4] M. Cerezo, A. Arrasmith, R. Babbush, S. C. Benjamin, S. Endo, K. Fujii, J. R. McClean, K. Mitarai, X. Yuan, L. Cincio, and P. J. Coles, “Variational quantum algorithms,” Nature Reviews Physics 2021 3:9 ,vol. 3, pp. 625–644, 8 2021. [5] M. Schuld and F. Petruccione, “Supervised Learning with Quantum Computers,” 2018. [6] S. Y.-C. Chen, S. Yoo, and Y.-L. L. Fang, “Quantum long short-term memory,” in 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 8622–8626, IEEE, 2022. [7] A. Sawaika, S. Krishna, T. Tomar, D. P. Suggisetti, A. Lal, T. Shrivastav, N. Innan, and M. Shafique, “A Privacy-Preserving Federated Framework with Hybrid Quantum-Enhanced Learning for Financial Fraud Detec-tion,” 7 2025. [8] S. S. Li, X. Zhang, S. Zhou, H. Shu, R. Liang, H. Liu, and L. P. Garcia, “Pqlm-multilingual decentralized portable quantum language model,” in 
+
+2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 1–5, IEEE, 2023. [9] C.-H. H. Yang, J. Qi, S. Y.-C. Chen, Y. Tsao, and P.-Y. Chen, “When bert meets quantum temporal convolution learning for text classification in heterogeneous computing,” in 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 8602–8606, IEEE, 2022. [10] R. Di Sipio, J.-H. Huang, S. Y.-C. Chen, S. Mangini, and M. Worring, “The dawn of quantum natural language processing,” in 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 8612–8616, IEEE, 2022. [11] J. Stein, I. Christ, N. Kraus, M. B. Mansky, R. M¨ uller, and C. Linnhoff-Popien, “Applying qnlp to sentiment analysis in finance,” in 2023 IEEE International Conference on Quantum Computing and Engineering (QCE) , vol. 2, pp. 20–25, IEEE, 2023. [12] N. Innan, A. Sawaika, A. Dhor, S. Dutta, S. Thota, H. Gokal, N. Patel, M. A.-Z. Khan, I. Theodonis, and M. Bennai, “Financial fraud detection using quantum graph neural networks,” Quantum Machine Intelligence ,vol. 6, no. 1, p. 7, 2024. [13] S. Y.-C. Chen, “Quantum reinforcement learning: Concepts and appli-cations,” Quantum Computational AI , pp. 3–23, 1 2026. [14] W. Yu and J. Zhao, “Quantum Multi-Agent Reinforcement Learning as an Emerging AI Technology: A Survey and Future Directions,” 
+
+ICCA 2023 - 2023 5th International Conference on Computer and Applications, Proceedings , 2023. [15] M. L. Puterman, “Chapter 8 Markov decision processes,” Handbooks in Operations Research and Management Science , vol. 2, pp. 331–434, 1 1990. [16] R. S. Sutton and A. G. Barto, “Book Reviews Reinforcement Learning,” 1999. [17] L. Bus ¸oniu, R. Babuˇ ska, and B. De Schutter, “A comprehensive survey of multiagent reinforcement learning,” IEEE Transactions on Systems, Man and Cybernetics Part C: Applications and Reviews , vol. 38, pp. 156–172, 3 2008. [18] S. Kraus, “Negotiation and cooperation in multi-agent environments,” 
+
+Artificial Intelligence , vol. 94, pp. 79–97, 7 1997. [19] G. Tesauro et al. , “Temporal difference learning and td-gammon,” 
+
+Communications of the ACM , vol. 38, no. 3, pp. 58–68, 1995. [20] C. J. C. H. Watkins and P. Dayan, “Q-learning,” Machine Learning 1992 8:3 , vol. 8, pp. 279–292, 5 1992. [21] Y. Li, “Deep Reinforcement Learning: An Overview,” 1 2017. [22] J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. K. Openai, “Proximal Policy Optimization Algorithms,” 7 2017. [23] R. S. Sutton, D. McAllester, S. Singh, and Y. Mansour, “Policy Gradient Methods for Reinforcement Learning with Function Approximation,” 
+
+Advances in Neural Information Processing Systems , vol. 12, 1999. [24] S. Gronauer and K. Diepold, “Multi-agent deep reinforcement learning: a survey,” Artificial Intelligence Review 2021 55:2 , vol. 55, pp. 895–943, 4 2021. [25] K. C. Chen, S. Y. C. Chen, C. Y. Liu, and K. K. Leung, “Quantum-Train-Based Distributed Multi-Agent Reinforcement Learning,” 2025 IEEE Symposium for Multidisciplinary Computational Intelligence Incubators, MCII Companion 2025 , 2025. [26] D. Dong, C. Chen, H. Li, and T. J. Tarn, “Quantum reinforcement learning,” IEEE Transactions on Systems, Man, and Cybernetics, Part B: Cybernetics , vol. 38, no. 5, pp. 1207–1220, 2008. [27] D. Barberena and A. J. Friedman, “Overview of projective quantum measurements,” 4 2024. [28] L. K. Grover, “A fast quantum mechanical algorithm for database search Citation in BibTeX format A fast quantum mechanical algorithm for database search,” 1996. [29] S. Y. C. Chen, C. H. H. Yang, J. Qi, P. Y. Chen, X. Ma, and H. S. Goan, “Variational Quantum Circuits for Deep Reinforcement Learning,” IEEE Access , vol. 8, pp. 141007–141024, 2020. [30] S. Gupta and R. K. Zia, “Quantum Neural Networks,” Journal of Computer and System Sciences , vol. 63, pp. 355–383, 11 2001. [31] “Cooperative Pong - PettingZoo Documentation, https://pettingzoo.farama.org/environments/butterfly/cooperative pong/.” [32] J. Terry, B. Black, N. Grammel, M. Jayakumar, A. Hari, R. Sullivan, L. S. Santos, C. Dieffendahl, C. Horsch, R. Perez-Vicente, et al. ,“Pettingzoo: Gym for multi-agent reinforcement learning,” Advances in Neural Information Processing Systems , vol. 34, pp. 15032–15043, 2021. [33] P. Moritz, R. Nishihara, S. Wang, A. Tumanov, R. Liaw, E. Liang, M. Elibol, Z. Yang, W. Paul, M. I. Jordan, and I. Stoica, “Ray: A distributed framework for emerging AI applications,” in 13th USENIX Symposium on Operating Systems Design and Implementation (OSDI 18) , (Carlsbad, CA), pp. 561–577, USENIX Association, Oct. 2018. [34] R. Chauhan, K. K. Ghanshala, and R. C. Joshi, “Convolutional Neural Network (CNN) for Image Detection and Recognition,” ICSCCC 2018 - 1st International Conference on Secure Cyber Computing and Com-munications , pp. 278–282, 7 2018.

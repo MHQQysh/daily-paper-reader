@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07628v1/fig-001.webp",
+      "caption": "Table 8: Comparison of attention-computation strategies across CIM, PIM, and digital transformer accelerators.",
+      "page": 11,
+      "index": 1,
+      "width": 1024,
+      "height": 367
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07628v1/fig-002.webp",
+      "caption": "Figure 6: DG-FeFET crossbar array for trilinear MAC. (a)𝑂 = 𝐴 · 𝐵𝑇 ·𝐶: weights 𝐵𝑇 stored in device conductance, input 𝐴 applied to rows, modulator 𝐶 applied to columns. (b) 𝑂 = 𝐴 · 𝐵 ·𝐶𝑇 : weights 𝐶𝑇 stored in device conductance, input 𝐵 applied to rows, modulator 𝐴 broadcast across all columns.",
+      "page": 7,
+      "index": 2,
+      "width": 1044,
+      "height": 339
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07628v1/fig-003.webp",
+      "caption": "Figure 8: Per-task GLUE benchmark scores for four bitcell/ADC configurations (SA=64×64, seq = 128). Grey: bilinear; blue: trilinear. Error bars show ±1 std over 2–3 seeds. CoLA (Matthews Corr.) omitted due to its different metric scale.",
+      "page": 10,
+      "index": 3,
+      "width": 491,
+      "height": 400
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07628v1/fig-004.webp",
+      "caption": "Figure 3: Hierarchical organization of the trilinear CIM accelerator. (Top-left) Chip level: 2×2 tile grid with global buffer, accumulation unit, and Special Function Unit (SFU) for Softmax, LayerNorm, and Activation. (Top-right) Tile level: 2×2 Processing Element (PE) grid with tile input buffer and accumulation/output buffer. (Bottom-left) PE level: 2×2 array grid with tile input buffer. (Bottom-right) SubArray level: DG-FeFET cells driven by wordline/control-line (WL/CL) switch matrix (rows) and back-gate-line/source-line (BGL/SL) switch matrix/DAC (columns), with multiplexer (MUX)→ADC→Adder→Shift Register readout pipeline.",
+      "page": 4,
+      "index": 4,
+      "width": 474,
+      "height": 474
+    }
+  ]
+}

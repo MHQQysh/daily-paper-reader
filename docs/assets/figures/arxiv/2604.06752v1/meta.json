@@ -1,0 +1,110 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-001.webp",
+      "caption": "Figure 6: Learned representations of textual messages for Desire, Love, and Nervousness (top row) and the corresponding representations after isometric (Möbius) correction (bottom row).",
+      "page": 10,
+      "index": 1,
+      "width": 963,
+      "height": 633
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-002.webp",
+      "caption": "Figure 8: Emotion correlation matrix learned by EmBolic. Each cell (i, j) show how frequently emotion i appears together with j in top 5. Darker cells indicate stronger pairwise correlations.",
+      "page": 14,
+      "index": 2,
+      "width": 532,
+      "height": 478
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-003.webp",
+      "caption": "Figure 9: Map of emotions in the Poincaré disc learned from the co-occurrence matrix of emotions depicted in Figure 8.",
+      "page": 14,
+      "index": 3,
+      "width": 590,
+      "height": 367
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-004.webp",
+      "caption": "Figure 1: Circumplex model of affect by Russell [11]. Permissions obtained.",
+      "page": 3,
+      "index": 4,
+      "width": 492,
+      "height": 439
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-005.webp",
+      "caption": "Figure B.2: Learned representations of textual messages for all 28 emotion categories. Each panel shows representations of messages annotated by the same emotion. The Möbius correction is further applied to these representations, in order to align fingers with radii/angles.",
+      "page": 18,
+      "index": 5,
+      "width": 977,
+      "height": 1236
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-006.webp",
+      "caption": "Figure 3: Embolic architecture.",
+      "page": 8,
+      "index": 6,
+      "width": 940,
+      "height": 468
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-007.webp",
+      "caption": "Figure B.3: Validation on the test set. Representations of test messages for 28 emotions and the radii encoding these emotions. Correct predictions correspond to the points lying on the radii. Representations shown for one embedding only. The final prediction is made based on scores obtained for three embeddings.",
+      "page": 19,
+      "index": 7,
+      "width": 976,
+      "height": 1252
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-008.webp",
+      "caption": "Table 4: High-confidence mispredictions of the emotion classification model",
+      "page": 12,
+      "index": 8,
+      "width": 944,
+      "height": 194
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-009.webp",
+      "caption": "Figure 7: Visualization of the validation results. Representations of test messages for Desire, Love and Nervousness and the radii encoding these emotions. Correct predictions correspond to the points which are placed on the radii. The confidence levels are encoded by the moduli (distances from the center).",
+      "page": 12,
+      "index": 9,
+      "width": 962,
+      "height": 314
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-010.webp",
+      "caption": "Figure 4: Hyperbolic GloVe word embeddings in the Poincaré disc.",
+      "page": 9,
+      "index": 10,
+      "width": 571,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-011.webp",
+      "caption": "Figure 5: Randomly selected words with their representations in the Poincaré disc. This illustrates emotion-related semantic ambiguity of certain words.",
+      "page": 9,
+      "index": 11,
+      "width": 368,
+      "height": 369
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-012.webp",
+      "caption": "Figure 2: Visualization of the Poincaré disc. Two parallel geodesic lines (the shortest paths connecting points) in the left panel and visualization of distances in the right panel. The distance between points O and A is equal to the distance between B and C.",
+      "page": 5,
+      "index": 12,
+      "width": 920,
+      "height": 341
+    },
+    {
+      "url": "assets/figures/arxiv/2604.06752v1/fig-013.webp",
+      "caption": "Figure B.1: Continuation of Figure 4 Hyperbolic GloVe word embeddings in the Poincaré disc for two additional simulations.",
+      "page": 16,
+      "index": 13,
+      "width": 762,
+      "height": 367
+    }
+  ]
+}

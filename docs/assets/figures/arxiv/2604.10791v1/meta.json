@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10791v1/fig-001.webp",
+      "caption": "Figure 1: Standard block (left) vs. proposed block (right). The green pre-projection constructs nonlinear features before Q/K/V. The blue content skip routes those features around attention, adding directly to the output. Both paths are position-agnostic; positional encoding enters only at RoPE.",
+      "page": 3,
+      "index": 1,
+      "width": 648,
+      "height": 622
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10791v1/fig-002.webp",
+      "caption": "Table 2: Frozen probe results. Base model frozen throughout. Bold = best per model per metric. Trainable parameter counts vary due to rank granularity (LoRA) and skip projection (d2 per layer).",
+      "page": 4,
+      "index": 2,
+      "width": 914,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10791v1/fig-003.webp",
+      "caption": "Figure 2: Learned content skip projection weight norms by layer. Both models show the same pattern: later layers activate the content bypass more strongly. Skip weights are initialized at N (0, 10−4); the growth is entirely learned.",
+      "page": 5,
+      "index": 3,
+      "width": 969,
+      "height": 268
+    }
+  ]
+}
