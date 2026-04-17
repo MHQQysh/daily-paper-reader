@@ -1,0 +1,708 @@
+Title: EPIR: An Efficient Patch Tokenization, Integration and Representation Framework for Micro-expression Recognition
+
+URL Source: https://arxiv.org/pdf/2604.08106v1
+
+Published Time: Fri, 10 Apr 2026 00:57:07 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+# EPIR: An E ffi cient Patch Tokenization, Integration and Representation Framework for Micro-expression Recognition 
+
+Junbo Wang a,1 , Liangyu Fu a,1 , Yuke Li a, ∗, Yining Zhu b, Xuecheng Wu c, Kun Hu d
+
+> a
+
+School of Software, Northwestern Polytechnical University, Xi’an, 710129, China 
+
+> b
+
+School of Computer Science, Northwestern Polytechnical University, Xi’an, 710129, China 
+
+> c
+
+School of Computer Science and Technology, Xi’an Jiaotong University, Xi’an, 710049, China 
+
+> d
+
+School of Science, Edith Cowan University, WA, 6027, Australia 
+
+Abstract 
+
+Micro-expression recognition can obtain the real emotion of the individual at the cur-rent moment. Although deep learning-based methods, especially Transformer-based methods, have achieved impressive results, these methods have high computational complexity due to the large number of tokens in the multi-head self-attention. In addi-tion, the existing micro-expression datasets are small-scale, which makes it di ffi cult for Transformer-based models to learn e ff ective micro-expression representations. There-fore, we propose a novel E ffi cient Patch tokenization, Integration and Representation framework (EPIR), which can balance high recognition performance and low compu-tational complexity. Specifically, we first propose a dual norm shifted tokenization (DNSPT) module to learn the spatial relationship between neighboring pixels in the face region, which is implemented by a refined spatial transformation and dual norm projection. Then, we propose a token integration module to integrate partial tokens among multiple cascaded Transformer blocks, thereby reducing the number of tokens without information loss. Furthermore, we design a discriminative token extractor, which first improves the attention in the Transformer block to reduce the unnecessary focus of the attention calculation on self-tokens, and uses the dynamic token selection 
+
+> ∗
+
+Corresponding author 
+
+Email addresses: jbwang@nwpu.edu.cn (Junbo Wang), lyfu@mail.nwpu.edu.cn (Liangyu Fu), 
+
+liyuke@nwpu.edu.cn (Yuke Li), yiningzhu@nwpu.edu.cn (Yining Zhu), wuxc3@stu.xjtu.edu.cn 
+
+(Xuecheng Wu), hukun_sdu@hotmail.com (Kun Hu) 
+
+> 1
+
+Both authors contributed equally to this work. 
+
+> arXiv:2604.08106v1 [cs.CV] 9 Apr 2026
+
+module (DTSM) to select key tokens, thereby capturing more discriminative micro-expression representations. We conduct extensive experiments on four popular public datasets (i.e., CASME II, SAMM, SMIC, and CAS(ME) 3). The experimental results show that our method achieves significant performance gains over the state-of-the-art methods, such as 9.6% improvement on the CAS(ME) 3 dataset in terms of UF1 and 4.58% improvement on the SMIC dataset in terms of UAR metric. 
+
+Keywords: Emotion recognition, Micro-expression recognition, Vision Transformer, Aff ective computing. 
+
+1. Introduction 
+
+Humans intuitively convey psychological states through facial expressions, which involve the activation of various facial muscle regions to communicate emotions. These expressions can be classified into macro-expressions and micro-expressions based on the extent of muscle movement [1]. Micro-expression recognition, a specialized task within a ff ective computing, focuses on classifying brief micro-expression clips into distinct emotional categories. In contrast to macro-expressions, micro-expressions are characterized by their spontaneous nature, subtle intensity, and rapid duration, typically lasting between 1 /25 to 1 /3 of a second [2]. As a result, micro-expressions serve as reliable indicators of genuine emotions, even when individuals attempt to suppress or mask their true feelings. This unique characteristic makes micro-expression recognition particularly valuable across vari-ous critical domains, including psychological evaluation, commercial negotiations, and human-computer interaction [2]. However, the accurate recognition presents signif-icant challenges due to their inherent characteristics: involuntary nature, extremely rapid duration, and subtle spatiotemporal variations in facial muscle movements. Fur-thermore, micro-expression recognition can be influenced by contextual emotional cues and culturally specific expression patterns, adding additional complexity to recogni-tion [3], [4], [5]. Recently, various feature representation learning methods, such as hand-crafted features with expert experiences and deep learning-based methods [6, 7, 8, 9] have 2(a) Our EPIR (b) Previous Method 
+
+> Patch Tokenization
+> Transformer Encoder
+> Integration
+> Selection
+
+Optical Flow Feature Map 
+
+RGB Sequence 
+
+## OR Figure 1: Comparison of (a) our EPIR and (b) the previous Transformer-based micro-expression recognition model. The blue square denotes a visual token. 
+
+been explored. However, these methods, especially Transformer-based methods, su ff er from high computational complexity due to excessive tokens in the self /cross-attention mechanism, as shown in Fig. 1 (b). At the same time, since micro-expression recog-nition is a fine-grained task, the main purpose is to extract a few key tokens that can represent a certain micro-expression class. Excessive unimportant tokens will bring noise and a ff ect the model’s deterministic judgment. In addition, the current perfor-mance ceiling of micro-expression recognition methods is constrained by the limited scale of available datasets, primarily due to the inherent challenges in acquiring au-thentic spontaneous micro-expression samples under controlled experimental condi-tions, which consequently makes it challenging for conventional transformer architec-tures with substantial data requirements to learn e ff ective representations for micro-expression recognition. To address these challenges, we propose a novel E ffi cient Patch tokenization, In-tegration and Representation framework (EPIR) with Vision Transformer for micro-expression recognition. It is constructed with a dual norm shifted patch tokenization 3(DNSPT) module, a token integration module, and a subsequent discriminative to-ken extractor composed of a dynamic token selection module (DTSM) and cascading Transformer block with an inter-token self-attention, as illustrated in Fig. 2. To ef-fectively process each sample, our EPIR extracts optical flow features using a pair of frames - the onset and apex frames from the input micro-expression clip. Unlike previ-ous methods that directly use convolutional neural networks (CNNs) or Transformers for representation, our EPIR first utilizes the DNSPT module to learn spatial relations between neighboring facial pixels through spatial transformation and dual norm projec-tion. Next, it uses the token integration module to fuse tokens with similar information, reducing the number of tokens involved in the calculation while ensuring recognition performance. In order to extract key tokens that can represent micro-expression classes from numerous token sequences, we designed a discriminative token extractor, that uses the cascading Transformer block to represent micro-expression information, in-corporating DTSM to select the key patches /tokens, and in each transformer block, EPIR improved the self-attention to achieve more deterministic decisions. Notably, the overall EPIR is trained end-to-end with a subsequent MLP head and can dynamically generate more discriminative representations, even with small-scale micro-expression datasets. The experimental results show that our method achieves significant perfor-mance gains over the state-of-the-art methods. It should be noted that this paper is an extended version of our conference paper PTSR [10] presented at ACM ICMR 2025. The journal version includes the new design to the method for micro-expression recognition, we want to explore more possibilities for model e ffi ciency. Thus, we propose the token integration in the Transformer blocks to further lightweight the model while guaranteeing recognition performance; To fully verify the recognition performance of the model, we conducted more experiments. In addition to the traditional experiments under the Composite Database Evaluation (CDE) protocol, we carried out a larger scope of experiments under the Single Database Experiments (SDE) protocol on each dataset, and carried out visual qualitative analysis, so as to evaluate the model performance more comprehensively and objectively. In summary, the overall contributions of this paper are summarized as follows: 4• We propose a dual norm shifted patch tokenization module to learn spatial re-lation between neighboring pixels of the face region, which is implemented by elaborating spatial transformation and dual norm projection. 
+
+• We propose a token integration module to reduce the number of tokens in atten-tion calculation while ensuring recognition performance. 
+
+• We design a discriminative token extractor composed of inter-token attention-based Transformer blocks and a dynamic token selection module (DTSM) to flexibly extract micro-expression key tokens. 
+
+• Extensive experiments on CASME II, SAMM, SMIC and CAS(ME) 3 datasets demonstrate the superiority of our EPIR, exhibiting the highest improvements of 4.58% in terms of UAR and 3.5% in terms of UF1 under the CDE protocol, 5.52% in terms of UAR and 9.66% in terms of UF1 under the SDE protocol. 
+
+2. Related Work 
+
+2.1. Traditional Micro-Expression Recognition 
+
+Traditional micro-expression recognition relies on manually designed feature ex-traction and machine learning algorithms for classification. [6] employed temporal in-terpolation models and the first comprehensive spontaneous micro-expression corpus to accurately recognize. [7] proposed a simple and e ff ective Main Directional Mean Optical-flow (MDMO) feature for micro-expression recognition. [11] proposed the Local Binary Patterns with Six Intersection Points (LBP-SIP) volumetric descriptor, which provided a more compact and lightweight representation. [12] develop a novel multi-task mid-level feature learning method to enhance the discrimination ability of extracted low-level features by learning a set of class-specific feature mappings, which would be used for generating our mid-level feature representation. These methods basically follow the paradigm of face detection-feature extraction-feature selection-classification. They have achieved some success in simpler scenarios, but they often exhibit low robustness when faced with complex environments, such as variations in 5lighting, facial occlusions, or blurred expressions. Moreover, the limitations of hand-crafted feature design present challenges in handling the diversity and complexity of micro-expressions. 
+
+2.2. Deep Learning-based Micro-Expression Recognition 
+
+Deep learning supports end-to-end training and can directly learn from raw image or video data to the final micro-expression classification results, avoiding the infor-mation loss and error accumulation that may be caused by multiple independent steps such as feature extraction, feature selection, and classifier training in traditional meth-ods. Recently, various deep learning-based methods have achieved groundbreaking advancements in micro-expression recognition, which utilize deep neural networks to automatically learn micro-expression representations, significantly enhancing recogni-tion performance. From the perspective of deep neural network, these methods can be classified into CNN-based and Vision Transformer-based methods: 
+
+CNN-based micro-expression recognition. CNN has been extensively utilized in various computer vision downstream tasks since its proposal. Its robust local per-ception has significantly contributed to advancements in micro-expression recognition. CNN-based micro-expression recognition can be classified into three classes based on the data input modality: static images, dynamic sequence /features, and multi-modal combinations. The methods using static images typically select the apex frame of an micro-expression clip as the modeling target, allowing the model to learn the most typi-cal micro-expression features, thus achieving high evaluation metrics [8, 13]. However, these methods neglect the dynamic micro-expression information, making it unsuit-able for certain applications, e.g., real-time emotion monitoring and human-computer interaction. Methods using dynamic sequence /features extract features from micro-expression image sequences and onset-apex pairs using 3D CNNs, or apply 2D CNNs to optical flow feature maps [14], [15], [16], [9]. They focus on the essence of micro-expressions, thus holding greater research value from a practical application perspec-tive. However, due to the ambiguity of dynamic features, the model must identify subtle discriminative features from numerous highly similar dynamic features for clas-sification. As a result, the performance is often less than satisfactory. To enhance 6performance, some methods employ multi-stream CNN to extract both dynamic and static features, subsequently combining them using various strategies [17, 18, 19]. [20] propose a novel multimodal learning framework that combines ME and physiological signals information. These methods compensate for the performance deficiencies of dynamic feature methods, but invariably have a significant increase in computational complexity. 
+
+Vision Transformer-based micro-expression recognition. Compared with CNNs, Vision Transformer [21] excels at modeling global features, which demonstrates better performance than CNNs in classification tasks. Recently, many studies have adopted Vison Transformers as the backbone for micro-expression recognition, achieving per-formance improvements [22], [23] despite persistent issues caused by data modali-ties. However, due to the lack of local inductive bias in models compared to CNNs, the high performance of vision Transformers often comes at the cost of large-scale datasets. [24] proposed HTNet to enhance recognition accuracy by segmenting micro-expressions into key areas. [25] proposed MFDAN to incorporate optical flow priors into the attention learning in the guided image encoding branch, enabling the model to focus on the most discriminative facial regions. Unfortunately, the limited scale of micro-expression datasets has been a long-standing challenge in micro-expression recognition due to the di ffi culty of collecting micro-expression samples. This leads to the frequent occurrence of overfitting during training in Transformer-based model for micro-expression recognition, ultimately hindering the improvement of recogni-tion performance. Several works mitigated the issue through self-supervised learning [26] or by incorporating macro-expression data [27]. However, achieving accurate micro-expression recognition using supervised learning with fixed small-scale micro-expression datasets remains a critical study. At the same time, the high computational overhead caused by excessive tokens should also be addressed. 
+
+3. Methodology 
+
+Fig. 2 illustrates the overall framework of the proposed EPIR. First, we extract the onset frame Xonset (usually the first frame of the clip) and apex frame Xapex (the frame 7Onset Frame Apex Frame    
+
+> Face Detector MTCNN
+> Token Integration Module
+> Discriminative Token Extractor Dual Norm Shifted Patch Tokenization Optical Flow Feature Map
+> Optical Flow Calculation
+> Transformer Block
+> × 6
+> Dynamic Token Selection Module Single Transformer Block MLP Head
+> Dual Norm Shifted Patch Tokenization
+> Four-direction Spatial Shift
+> Right-Up
+> Left-Down
+> Right-Down
+> Left-Up
+> Shifted Feature Maps
+> Image Concatenate
+> Concatenated Feature Map
+> Patch Partition Patch Feature Maps
+> Flattening
+> 1st Layer Normalization
+> Fully Connected Layer
+> 2nd Layer Normalization Dual Norm Projection Visual Tokens
+> Dynamic Token Selection Module
+> Recursive Matrix Multiplication
+> Token Integration Module
+> Key Vector Cosine-Similarity Computation
+> Token Part I
+> Token Part II Similar Token Group 灤nIntegrated Token
+> The Unintegrated Tokens
+> Integrated
+> Representation
+> Attention Matrix
+> !~"
+> #
+> Attention Matrix
+> !~" $%!
+> …
+> Recursive  atrix
+> Attention Matrix
+> &'()"
+> #
+> Attention Matrix
+> &'()" $%!
+> ……
+> Selection by Index
+> Prediction
+> ℒ+,( ℒ+-
+
+
+
+> A
+
+Figure 2: The overall framework of our proposed EPIR. The left column shows the overall framework of EPIR, and the right column shows the detailed working process of its three main modules. Lce and Lcon 
+
+denote the cross-entropy and contrastive loss function, respectively. 
+
+with the largest scale of facial muscle movement) from the micro-expression clips. Us-ing MTCNN [28], we detect the facial regions from these two key frames, and we can obtain two RGB frames XDonset and XDapex that do not contain background noise. Next, we calculate the optical flow feature maps V of the two RGB frames and input V into DNSPT for path tokenization, thereby obtaining the initial representation of the micro-expression clips. Subsequently, we input the representation into the token integration module and the discriminative token extractor to get the discriminative tokens nec-essary for distinguishing di ff erent categories of micro-expressions. Finally, we input these discriminative tokens to the MLP Head for micro-expression recognition. 
+
+3.1. Facial Optical Flow 
+
+We use the Farneback’s algorithm [29] to compute the optical flow between the two micro-expression frames as follows: 
+
+Vxy = (u(x, y), v(x, y)) , (1) 8Vz =
+
+s
+
+∂Vx2
+
+∂x + ∂Vy2
+
+∂y + 12
+
+ ∂Vx2
+
+∂y + ∂Vy2
+
+∂x
+
+, (2) where x ∈ (1 , 2, ..., H) and y ∈ (1 , 2, ..., W) denote the height H and width W of the 
+
+XDi , respectively, u(x, y) and v(x, y) are the horizontal and vertical components of the displacement estimate for each pixel in XDi , Vxy = [Vx, Vy]; Vxy ∈ RW×H×2, ∂Vx 2 
+
+> ∂x
+
+, ∂Vy2 
+
+> ∂y
+
+,  
+
+> ∂Vx2
+> ∂y
+
+, and ∂Vy2 
+
+> ∂x
+
+are the first-order partial derivatives of Vxy . Finally, the optical flow feature map is formed as V = [Vxy , Vz], V ∈ RW×H×3.
+
+3.2. Tokenization and Integration for Micro-Expression 
+
+It is challenging to construct a large-scale micro-expression dataset due to the spe-cial nature of micro-expressions, so the current micro-expression datasets are generally small in scale, which a ff ects the performance of deep learning-based micro-expression recognition. Therefore, how to make the model converge well and learn high-quality knowledge when trained from scratch on a small-scale dataset becomes a problem worth studying. To adapt EPIR to the small-scale datasets without using additional data, inspired by [30], we propose Dual Norm Shifted Patch Tokenization (DNSPT). 
+
+Dual Norm Shifted Patch Tokenization makes the model learn spatial relation between neighboring pixels of the face region. As shown in Fig. 2, first, the input optical flow feature map V is spatially shifted by half of the feature map size in the four diagonal directions (i.e., right-up, left-up, left-down, and right-down). Next, the shifted feature maps are cropped to the same size as the input and concatenated to V.After that, the concatenated feature maps are divided into patches. Finally, the visual token t is obtained by the dual norm projection module. The whole process is: 
+
+t = LN FC LN P h V; V1 
+
+> s
+
+; V2 
+
+> s
+
+; V3 
+
+> s
+
+; V4
+
+> s
+
+i , (3) where Vis ∈ RH×W×3 denotes the ith shifted optical flow feature map V, P( ·) denotes patch partition, FC( ·) denotes the learnable linear projection implemented by a fully connected layer, and LN( ·) denotes the layer normalization. Next, we concatenate the class token with the visual token and then add the position embedding. The process can be expressed as: 9tpe = [xcls ; t] + Epos , (4) where xcls ∈ Rd denotes a class token, Epos ∈ R(N+1) ×d denotes a learnable position embedding, d is the hidden dimension of the Transformer block, and N is the number of embedded tokens, tpe ∈ R(N+1) ×d.
+
+Token Integration Module. An excessive number of redundant tokens adds com-putational overhead without improving recognition performance. Therefore, we pro-posed the token integration module. As shown in Fig. 2, it consists of cascaded Transformer blocks, and we integrated tokens between the attention module and the feedforward neural network of each Trans-former block. Set t ∈ RN×d is the tokens output by a Transformer block in the token integration module, where N is the number of tokens and d is the dimension. We divide 
+
+t into two parts of equal capacity t1 ∈ RN/2×d and t2 ∈ RN/2×d. Next, we take the sim-ilarity of the key vector of each token in the attention module as the token similarity, and calculate the similarity of all tokens in t1 and t2 pairwise. Based on the similarity, we select the most similar K token pairs tsim ∈ R2·K×d, and calculate the average of the two tokens in each pair to get the new integrated tokens tint ∈ R1×d, which will be con-catenated with the unintegrated tokens tres ∈ R(N−K)×d and input into the feedforward neural network. The process can be expressed as: 
+
+tksim = [ti
+
+> 1
+
+; t j
+
+> 2
+
+], (5) 
+
+tsim = [t1
+
+> sim
+
+; t2
+
+> sim
+
+; ... ; tKsim ], (6) 
+
+tres = t[∼ tsim ], (7) 
+
+tint = AVG( tsim ), (8) 
+
+t = [tint ; tres ]. (9) 
+
+3.3. Discriminative Token Extraction 
+
+Micro-expression di ff erences often lie in the fine-grained pixel-level patterns, so the key to recognition is to extract fine-grained representations that e ff ectively distinguish 10 emotion categories. For Transformer-based models, this typically involves a small number of patches /tokens. Too many tokens may cause noise to the task and increase computational complexity. To extract key tokens for micro-expression recognition, we propose the discriminative token extractor. Specifically, it consists of a cascaded Transformer block and a dynamic token selection module. In addition, we improved the self-attention mechanism in the Transformer block by masking the self-token’s attention score, thereby encouraging the model to focus on the relationships between the current token and other tokens. This module is described in detail below: 
+
+Inter-Token Attention with Learnable Scaling (ITALS). In the original Vision Transformer [21], the similarity matrix of multi-head self-attention can be expressed as: Ri,j(x) = xE q(xE k)T , (10) where x ∈ R(N+1) ×d denotes the intermediate representation LN( Yl) input to the multi-head self-attention, Eq ∈ Rd×dq and Ek ∈ Rd×dk denote the projection of the Query and Key, dq and dk is the dimensions of the Query and Key. R i,j(x) ∈ R(N+1) ×(N+1) denotes the similarity matrix calculated by the Query and Key. In ITALS, we mask the diagonal elements, which assign higher inter-token rela-tions scores by excluding self-token relations from participating in softmax operations. Specifically, the diagonal mask sets the diagonal component of the similarity matrix in the Query and Key computation to −∞ . The ITALS can more focus on other tokens than its own. The proposed diagonal mask is defined as follows: RMi,j (x) =
+
+
+
+Ri,j(x) (i , j)
+
+−∞ (i = j)
+
+, (11) where R Mi,j (x) denotes each component of the masked similarity matrix. The scaling in softmax controls the smoothness of the output distribution, the smaller the scaling, the sharper the distribution, which a ff ects the diversity and certainty of the predictions. By ITALS, EPIR learns to adjust this scaling during training, im-proving the attention score by shrinking the scaling. This makes the output distribution 11 more discriminative, thereby improving the accuracy and certainty of the predictions. The ITALS is defined as: ITALS( x) = Softmax( RMi,j (x)
+
+τ )xE v, (12) where x is the same as x ∈ R(N+1) ×d in Eq. 10, τ is the learnable scaling, Ev ∈ Rd×dv
+
+is the projection of the Value in self attention, dv is the dimension of the Value in self attention. Set t ∈ R(N−6·K)×d is the representation output by the token integration module. Next, we input t into the 6 Transformer blocks, and the process can be expressed as: 
+
+Y′ 
+
+> 1
+
+= ITALS(LN( t)) , (13) 
+
+Y1 = FFN(LN( Y′
+
+> 1
+
+)) + Y′
+
+> 1
+
+, (14) 
+
+Y′ 
+
+> l
+
+= ITALS(LN( Yl−1)) + Yl−1, (15) 
+
+Yl = FFN(LN( Y′ 
+
+> l
+
+)) + Y′ 
+
+> l
+
+, (16) where Y′ 
+
+> l
+
+denotes the intermediate representation in each Transformer block, Yl denotes the output representation of the lth Transformer block, and l ∈ (2 , 3, ..., 12). FFN( ·)denotes the feed-forward neural network, and ITALS( ·) denotes inter-token attention with learnable scaling. 
+
+Dynamic Token Selection Module. To address the ability of local discrimina-tive representation capture, inspired by [31], we designed the dynamic token selection module (DTSM) before the last Transformer block in the discriminative token extrac-tor. Fig. 2 shows how the attention matrix is integrated with DTSM. Specifically, set the number of ITALS heads to K = 3, the intermediate representations input to the last Transformer block can be denoted as Yl = [Y0 
+
+> l
+
+; Y1 
+
+> l
+
+; Y2 
+
+> l
+
+; ... ; YNl ], l = 12. The attention weights of the 12 Transformer blocks before the last Transformer block are denoted as: 
+
+Al = [a0 
+
+> l
+
+; a1 
+
+> l
+
+; a2 
+
+> l
+
+; ... ; aKl ] l ∈ 1, 2, ..., L − 1, (17) 
+
+ail = [ai0 
+
+> l
+
+; ai1 
+
+> l
+
+; ai2 
+
+> l
+
+; ... ; aiN 
+
+> l
+
+] i ∈ 0, 1, 2, ..., K − 1. (18) 12 Next, we integrate the attention weights of 12 layers, which recursively applies matrix multiplication to the original attention weights in 12 layers to obtain the final attention weights: 
+
+A f inal =
+
+> L−1
+
+Y
+
+> l=1
+
+Al, (19) where L denotes the number of Transformer blocks in the discriminative token extrac-tor. Compared to the original attention weights A12 of a single Transformer block, A f inal 
+
+contains the propagation of micro-expression information from the input to the higher-level embedding, which is a better design for sense local discriminative regions. Then we select the indexes A1 
+
+> f
+
+, A2 
+
+> f
+
+, ..., AKf relative to the maximum values of the K di ff er-ent attention heads in A f inal , and extract the corresponding indexed tokens from Y12 .Finally, the selected tokens are spliced with the class tokens to be used as the input representation of the last Transformer block: 
+
+Yselect = [Y0 
+
+> l
+
+; YA1 
+
+> f
+> l
+
+; YA2 
+
+> f
+> l
+
+; ... ; YAKf 
+
+> l
+
+]. (20) Next, the last Transformer block performs the same calculations on Yselect ∈ R(K+1) ×d
+
+as in Eq. 15 and Eq. 16 to obtain Y f inal ∈ R(K+1) ×d. Finally, the MLP Head implemented by a fully connected layer and Softmax process Y f inal to obtain the prediction: ˆy = arg max  
+
+> i∈I
+
+Softmax(FC( Y f inal )) i, (21) where i is the index of max value in the prediction vector, and I = (0 , 1, ..., Nclass − 1), 
+
+Nclass is the number of micro-expression classes. 
+
+3.4. Loss Function 
+
+Since the feature di ff erences between micro-expression classes are minor, using only simple cross-entropy loss cannot adequately guide discriminative representation learning. Followed [31], the contrastive loss Lcon is added in addition to the cross-entropy loss, which is used to minimize the similarity of the class tokens corresponding to di ff erent labels and maximize the similarity of class tokens of samples with the same 13 class. To prevent the loss from being dominated by simple negative samples, a constant margin α is introduced in the contrastive loss Lcon , and only pairs of negative samples with similarity more significant than α contribute to Lcon . Lcon for a sample with batch size B can be expressed as: 
+
+Lcon = 1
+
+B2
+
+> B
+
+X
+
+> i
+
+
+
+> B
+
+X 
+
+> j:yi=yj
+
+1 − Sim( Yi, Y j) +
+
+> B
+
+X 
+
+> j:yi,yj
+
+max Sim( Yi, Y j) − α, 0  , (22) where Yi and Y j are pre-processed by L2 normalization and Sim( Yi, Y j) is the dot prod-uct of Yi and Y j. The total loss can be expressed as: 
+
+L = Lce (y, ˆy) + Lcon (Y f inal ). (23) 
+
+4. Experiments 
+
+4.1. Datasets 
+
+To verify the e ff ectiveness of our proposed method, we conducts experiments based on the CASME II, SAMM, SMIC and CAS(ME) 3 datasets, respectively. The detailed information of the four datasets is as follows: CASME II [32] is a comprehensive spontaneous MEs dataset containing 247 MEs samples collected from 26 participants. It is labeled with five emotion categories: hap-piness , disgust , surprise , repression , and others , which will be used in the SDE pro-tocol. In the CDE protocol, the samples are reclassified into three labels: positive ,
+
+negative , and surprise , to align with the SMIC dataset. SAMM [33] is a spontaneous dataset comprising 159 MEs samples from 32 partici-pants. It is labeled with 8 emotion categories: happiness , anger , surprise , disgust , fear ,
+
+sadness , contempt , and others . Followed the rules of previous work, labels with few samples do not participate in training and evaluation, so five labels are left in SAMM: 
+
+happiness , anger , surprise , contempt , others for the SDE protocol. In the CDE proto-col, the samples are reclassified into three labels: positive , negative , and surprise , to align with the SMIC dataset. 14 SMIC [34] is a spontaneous dataset comprising 164 MEs samples from 16 partici-pants. The dataset is labeled with 3 emotion categories: positive , negative , and surprise 
+
+for both CDE and SDE protocols. CAS(ME) 3 [35] provides about 80 hours of video, over 8 million frames, contain-ing 1109 manually annotated MEs. The larger sample size allowed e ffi cient validation of the MER method while avoiding database bias. It is labeled with 7 emotion cate-gories: happiness , anger , surprise , disgust , fear , sadness , and others . Followed [24], We reclassify these samples into three categories: positive , negative , and surprise for the SDE protocol. Followed [36], the Single Database Experiment (SDE) and the Composite Database Evaluation (CDE) are conducted as the popular micro-expression recognition eval-uation. The CDE merges CASME II, SAMM, SMIC datasets and relabels micro-expression samples in CASME II and SAMM datasets to the same with the samples in SMIC dataset. In addition, according to previous work, all evaluation is performed under the Leave-One-Subject-Out (LOSO) cross-validation evaluation protocol. 
+
+4.2. Evaluation Metrics 
+
+Unweighted F1-score (UF1) : Calculate all the true positives T P c, false positives 
+
+FP c and false negatives FN c of class c (total C classes) on the n-fold LOSO validation method, respectively, and get F1c. We finally reach the UF1 by averaging the F1c of class c, with the following equations: 
+
+F1c = 2T P c
+
+2T P c + FP c + FN c
+
+(24) 
+
+UF 1 = 1
+
+C
+
+X
+
+> c
+
+F1c (25) 
+
+Unweighted Average Recall (UAR) : First calculate the accuracy Acc c for class c
+
+(total C classes) and the average all the Acc c to get the final UAR, the formulas are as follows: 
+
+Acc c = T P c
+
+Nc
+
+(26) 15 Table 1: Comparative experiments with existing methods for micro-expression recognition under CDE pro-tocol. 
+
+Method Params FLOPs Full SAMM CASME II SMIC UF1 UAR UF1 UAR UF1 UAR UF1 UAR 
+
+Traditional micro-expression recognition methods 
+
+LBP-TOP [7] - - 0.5882 0.5785 0.3954 0.4102 0.7026 0.7429 0.2000 0.5280 Bi-WOOF [37] - - 0.6296 0.6227 0.5211 0.5139 0.7805 0.8026 0.5727 0.5829 
+
+Deep learning-based micro-expression recognition methods 
+
+OFF-ApexNet [38] - - 0.7196 0.7069 0.5409 0.5392 0.8764 0.8681 0.6817 0.6695 STSTNet [15] - - 0.7353 0.7605 0.6588 0.6810 0.8382 0.8686 0.6801 0.7013 CapsuleNet [39] - - 0.6520 0.6506 0.6209 0.5989 0.7068 0.7018 0.5820 0.5877 Dual-Inception [14] - - 0.7322 0.7278 0.5868 0.5663 0.8621 0.8560 0.6645 0.6726 EMR [40] - - 0.7885 0.7824 0.7754 0.7152 0.8293 0.8209 0.7461 0.7530 RCN-A [41] - - 0.7430 0.7190 0.7600 0.6720 0.8510 0.8120 0.6330 0.6440 GEME [42] - - 0.7400 0.7500 0.6870 0.6540 0.8400 0.8510 0.6290 0.6570 MERSiamC3D [43] - - 0.8070 0.7900 0.7480 0.7280 0.8820 0.8760 0.7360 0.7600 FeatRef [44] - - 0.7838 0.7832 0.7372 0.7155 0.8915 0.8873 0.7011 0.7083 FRL-DGT [45] - - 0.812 0.811 0.772 0.758 0.919 0.903 0.743 0.749 GLEFFN [46] - - 0.8121 0.8208 0.7458 0.7843 0.8825 0.9110 0.7714 0.7856 HTNet [24] 438.51 214.6 0.8603 0.8475 0.8131 0.8124 0.9532 0.9516 0.8049 0.7905 MFDAN [25] - - 0.8453 0.8688 0.7871 0.8196 0.9134 0.9326 0.6815 0.7043 OFVIG-Net [47] - - 0.6720 0.6632 0.6066 0.5787 0.7129 0.7195 0.6435 0.6400 
+
+Ours 7.03 84.03 0.8852 0.8944 0.8383 0.8383 0.9882 0.9896 0.8279 0.8363 
+
+UAR = 1
+
+C
+
+X
+
+c
+
+Acc c (27) 
+
+4.3. Implementation details 
+
+All experiments were conducted using PyTorch 2.0.0 on Ubuntu, the training and evaluation were done using the single NVIDIA RTX 4090 GPU (24G). On each dataset, the epoch is set to 300, the learning rate is 5e-5 , and the batch size is 256, using Adam to perform parameter optimization. 
+
+4.4. Comparison to State-of-the-art Methods 
+
+Experimental Results under CDE Protocol: To validate the performance of EPIR, we conduct comparative experiments to compare EPIR with state-of-the-art methods under the CDE protocol. Furthermore, To verify the lightweight of EPIR, 16 ') #&') (%$%& %'#" ') #&') (%$%& %#(" %('                                   
+
+>           
+> #"(&#" '%* #"   '&'
+> ') #&') (%$%& %'#" ') #&') (%$%& %#(" %('
+>           
+> #"(&#" '%* #"   '&'
+> ') #&') (%$%& %'#" ') #&') (%$%& %#(" %('
+>         
+> #"(&#" '%* #"    '&'
+> ') #&') (%$%& %'#" ') #&') (%$%& %#(" %('
+>          
+> #"(&#" '%* #"  #!$#&' '& ) ('#"
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+
+Figure 3: Confusion matrices for the proposed EPIR on the composite database (SAMM, SMIC, CASME II). The data in each cell denotes the accuracy for the particular class. 
+
+we calculated the number of model parameters and FLOPs for EPIR and other micro-expression recognition methods (we only considered methods released in the past three years that have public open-source implementations), the units are in millions (M). The experimental results are shown in Table 1 (SAMM, CASME II, SMIC). In Table 1, -means that the results are not available in the corresponding literature. Full denotes the experimental results of composite training and evaluation on SAMM, CASME II, and SMIC datasets. Data in bold denotes the best result, data with an underline denotes the second-best result, and the units of Params and FLOPs are both millions (M). As can be seen from Table 1, firstly, compared with traditional micro-expression recognition methods, deep learning-based methods have significant performance im-provements. At the same time, EPIR generally achieves better results than the existing deep learning-based methods on the three micro-expression recognition datasets, with the highest improvement in UF1 and UAR of 2.49% and 2.56% on the composite eval-uation (Full), 2.52% and 1.87% on the SAMM dataset, 3.5% and 3.8% on the CASME II dataset, and 2.3% and 4.58% on the SMIC dataset. Notably, EPIR achieved im-provements in most of the metrics on the three datasets using only 1.6% of HTNet [24] parameters. For FLOPs, EPIR has a lower time complexity while achieving su-perior results. Thus, we suppose that even with a very small training data scale, EPIR can achieve e ffi cient micro-expression recognition with extremely low time and space complexity. Fig. 3 presents the confusion matrix of EPIR under the CDE protocol. In the CASME II dataset, EPIR attains a 100% recognition accuracy for the Negative and 17 $&  #$& %"!"# "$  $&  #$& %"!"# " % "%$        
+
+>    
+>       
+>  %#  $"'    ( $#$
+> 
+> 
+> 
+> 
+
+Figure 4: Confusion matrices for the proposed EPIR on the CAS(ME) 3. The data in each cell denotes the accuracy for the particular class. Table 2: Comparative experiments with existing methods for micro-expression recognition on CAS(ME) 3
+
+under SDE protocol. 
+
+Method Params FLOPs CAS(ME) 3
+
+UF1 UAR STSTNet [15] - - 0.3795 0.3792 FeatRef [44] - - 0.3493 0.3413 
+
+μ-BERT [26] 333.4 414.5 0.5604 0.6125 HTNet [24] 438.51 214.6 0.5767 0.5415 
+
+Ours 7.03 84.03 0.6727 0.6345 
+
+Surprise classes. 
+
+Experimental Results under SDE Protocol: Table 2 and Table 3 show the re-sults among EPIR with existing methods under SDE protocol, Fig. 4 illustrates the confusion matrix on the CAS(ME) 3 dataset. In Table 2 and Table 3, - means that the results are not available in the correspond literature. Data in bold indicates the best-performing result, data with an underline indicates the second-best result, and the units of Params and FLOPs are both millions (M). Firstly, compared with traditional methods, deep learning-based methods can still be significantly ahead. Compared with the micro-expression recognition method based on large language models, conven-18 Table 3: Comparative experiments for micro-expression recognition under SDE protocol.                                                                                                   
+
+> Method Params FLOPs SAMM CASME II SMIC UF1 UAR UF1 UAR UF1 UAR
+> Traditional micro-expression recognition methods
+> LBP-TOP [7] --0.3589 0.3968 0.3589 0.3968 0.3421 0.4338 MDMO [11] ----0.4966 0.5169 0.5845 0.5897 Bi-WOOF [37] ----0.6100 0.5885 0.6200 0.6220
+> Deep learning-based micro-expression recognition methods
+> Graph-TCN [48] --0.6985 0.7500 0.7246 0.7398 --LGCcon [8] --0.3400 0.4090 0.6400 0.6502 --AUGCN +AUFusion [49] --0.7045 0.7426 0.7047 0.7427 --SLSTT [22] --0.6400 0.7239 0.7530 0.7581 0.7240 0.7371 I3D +MOCO [7] --0.5436 0.6838 0.7366 0.7630 0.7492 0.7561 SRMCL [50] --0.6599 0.7463 0.8286 0.8320 0.7887 0.7898
+> Large language model-based micro-expression recognition methods
+> MELLM [51] ----0.4849 0.5337 --
+> Ours 7.03 84.03 0.8011 0.8052 0.8712 0.8466 0.8025 0.8213
+
+tional models are obviously more suitable for micro-expression recognition at present. Micro-expression recognition is a fine-grained task, and the current large language model’s cognition is not su ffi cient to complete it. At the same time, due to the large scale, more resources will be consumed. Among the methods based on deep learning, EPIR can show better recognition results than the SOTA methods on the four datasets under SDE protocol, with the improvement in UF1 and UAR of 9.66% and 5.52% on the SAMM dataset, 4.26% and 1.46% on the CASME II dataset, 1.38% and 3.15% on the SMIC dataset, and 9.6% and 2.2% on the CAS(ME) 3 dataset. For e ffi ciency, EPIR achieved improvements on the CAS(ME) 3 datasets using only 2.1% of μ-Bert [26]. 
+
+4.5. Ablation Study 
+
+We conducted ablation experiments to verify the role of various components in EPIR. The quantitative results are shown in Table 4 and Table 5. In Table 4 and Ta-ble 5, Full denotes the experimental results of composite training and evaluation on 19 Table 4: Ablation experiments for micro-expression recognition. 
+
+Method Full SAMM CASME II SMIC UF1 UAR UF1 UAR UF1 UAR UF1 UAR Baseline 0.7325 0.7214 0.6318 0.6307 0.8511 0.8532 0.6532 0.6767 
+
++DTSM 0.7736 0.7838 0.7351 0.7253 0.8741 0.8703 0.7147 0.7052 
+
++ITALS 0.8021 0.8165 0.7962 0.7815 0.8753 0.8712 0.7501 0.7326 
+
++SPT 0.8513 0.8627 0.8135 0.7831 0.9797 0.9714 0.8031 0.8122 
+
++DNSPT 0.8759 0.8747 0.8288 0.7941 0.9808 0.9791 0.8167 0.8215 
+
++Token Integration 0.8852 0.8944 0.8303 0.8303 0.9882 0.9896 0.8279 0.8363  
+
+> Table 5: Ablation experiments for micro-expression recognition on CAS(ME) 3dataset.
+
+Method CAS(ME) 3
+
+UF1 UAR Baseline 0.3647 0.3129 
+
++DTSM 0.4497 0.4792 
+
++ITALS 0.5318 0.5132 
+
++SPT 0.6233 0.5613 
+
++DNSPT 0.6604 0.6169 
+
++Token Integration 0.6727 0.6345 
+
+SAMM, CASME II, and SMIC datasets. The specific design of the di ff erent experi-mental control groups is as follows: 
+
+• Baseline denotes using the Vision Transformer [21] only; 
+
+• +DTSM denotes the integration of the DTSM before the last Transformer block in the discriminative token extractor, along with the Lcon during training; 
+
+• +ITALS denotes modifying the self-attention of the Transformer block in +DTSM 
+
+group to ITALS; 
+
+• +SPT denotes that the shifted patch tokenization (SPT) is added to the +ITALS 
+
+group; 20 3 6 12 13 Transformer Blocks (n)          
+
+> 0.76
+> 0.78
+> 0.80
+> 0.82
+> 0.84
+> 0.86
+> 0.88
+> 0.90 UF1
+> 3612 13 Transformer Blocks (n)
+> 0.80
+> 0.82
+> 0.84
+> 0.86
+> 0.88
+> 0.90 UAR
+> 3612 13 Transformer Blocks (n)
+> 0.45
+> 0.50
+> 0.55
+> 0.60
+> 0.65
+> 0.70 UF1
+> 3612 13 Transformer Blocks (n)
+> 0.50
+> 0.52
+> 0.54
+> 0.56
+> 0.58
+> 0.60
+> 0.62
+> 0.64 UAR
+
+Figure 5: Ablation experiments on the number of Transformer blocks, the two subfigures on the left are the UAR and UF1 metrics under the CDE protocol, and the two subfigures on the right are the UAR and UF1 metrics on the CAS(ME) 3 dataset. The abscissa is the number n of Transformer blocks in all cases. 
+
+• +DNSPT denotes that the dual norm projection module is added to the SPT based on the +SPT group. 
+
+• +Token Integration denotes that the token integration module is added based on the +DNSPT group, i.e., EPIR. 
+
+The role of DTSM. The experimental results in Table 4 and Table 5 denote that compared to the ordinary vision Transformer [21], DTSM achieves better micro-expression recognition due to its better capability of local discriminative feature extraction. The combination of DTSM and Lcon enables the model to focus on discriminative features of di ff erent micro-expression classes. 
+
+The role of ITALS. The experimental results between +DTSM group and +ITALS 
+
+group show that by improving the self-attention to ITALS, the learnable scaling and di-agonal masking successfully make softmax’s output distribution more discriminative. This not only makes the model converge as quickly as possible from small-scale data but also helps the DTSM select discriminative micro-expression representations more easily. 
+
+The role of DNSPT. The experimental results between +ITALS group and +SPT 
+
+group show that by performing spatial transformations on the input optical flow fea-tures before tokenization, SPT implicitly augments all input representations, allowing it to achieve good performance even when dealing with small-scale datasets. Addition-ally, the results between +SPT group and +DNSPT group show that dual normaliza-tion projection e ff ectively enhances training stability by controlling the mean gradient 21 Figure 6: Actual e ff ect of token integration module on micro-expression samples. We take two micro-expression samples (first and third rows) and their corresponding optical flow feature maps (second and fourth rows), from left to right, with integration rates of 0%, 30%, 60%, and 80%, respectively. 
+
+norm during model training in the process of projecting optical flow patches into visual tokens, contributing significantly to the robustness and generalization of EPIR. 
+
+The role of the Token Integration. The experimental results between +DNSPT 
+
+group and +Token Integration group show that token integration has promoted the recognition performance of the model on the four datasets. By increasing the density of micro-expression information, this module not only reduces the computational com-plexity of the model, but also ensures or even improves the recognition e ff ect of the model. In addition, we verify the actual e ff ect of token integration module on micro-expression samples, and the experimental results are shown in Fig. 6. We can clearly find that when the integration rate of tokens is 30%, the information of micro-expressions is not significantly missing, and the balance between computational complexity and recognition performance can be achieved in this case. However, when the integra-tion rate reaches 60%, the micro-expression information has been significantly miss-22 ing, although the computational complexity is reduced, the recognition performance has been greatly reduced. When the integration rate reaches 80%, the information of micro-expression has nearly disappeared, and it cannot be represented and recognized. 
+
+The role of the number of Transformer blocks. To verify the role of the number of Transformer blocks on the recognition performance, we conducted ablation exper-iments as shown in Fig. 5. We find that when the number of Transformer block is less than 13, the recognition performance is proportional to the number of Transformer blocks. When the number of Transformer blocks is greater than or equal to 13, the recognition performance of the model is inversely proportional to the number of Trans-former blocks, we eventually chose to set the number of Transformer blocks to 13. 
+
+5. Conclusion 
+
+In this paper, we propose EPIR for micro-expression recognition. EPIR is a new de-sign based on PTSR. To further realize the lightweight of the model while ensuring the recognition performance, we selectively integrate tokens in Transformer blocks, and successfully achieve more e ffi cient micro-expression recognition. We conduct com-prehensive large-scale experiments to evaluate the model performance, extensive ex-perimental results on SAMM, CASME II, SMIC, and CAS(ME) 3 datasets demonstrate that EPIR achieves significant performance improvement under the di ffi cult conditions of extremely low computational complexity and small-scale datasets, demonstrating the superiority and e ffi ciency of EPIR. We hope that this work can bring inspiration to the micro-expression recognition community. 
+
+6. CRediT authorship contribution statement 
+
+Junbo Wang: Writing - original draft, Writing - review & editing, Conceptualiza-tion, Methodology, Formal analysis, Supervision, Funding acquisition, Project admin-istration, Resources. Liangyu Fu: Writing - original draft, Conceptualization, Method-ology, Software, Data curation, Investigation, Validation, Formal analysis, Visualiza-tion. Yuke Li: Writing - review & editing, Supervision, Resources, Funding acquisi-tion. Yining Zhu: Writing - review & editing, Supervision, Resources, Funding ac-23 quisition. Xuecheng Wu: Writing - review & editing, Resources. Kun Hu: Writing -review & editing, Resources. 
+
+7. Declaration of competing interest 
+
+The authors declare that they have no known competing financial interests or per-sonal relationships that could have appeared to influence the work reported in this pa-per. 
+
+8. Data availability 
+
+Data will be made available on request. 
+
+9. Declaration of generative AI and AI-assisted technologies in the manuscript preparation process 
+
+This work did not use generative AI and AI-assisted technologies in the manuscript preparation process. 
+
+References 
+
+[1] E. Paul, Emotions revealed: recognizing faces and feelings to improve communi-cation and emotional life, NY: OWL Books (2007). [2] Y. Li, J. Wei, Y. Liu, J. Kauttonen, G. Zhao, Deep learning for micro-expression recognition: A survey, IEEE Transactions on A ff ective Computing 13 (4) (2022) 2028–2046. [3] W. Merghani, A. K. Davison, M. H. Yap, A review on facial micro-expressions analysis: datasets, features and metrics, arXiv preprint arXiv:1805.02397 (2018). [4] C. Crivelli, A. J. Fridlund, Inside-out: From basic emotions theory to the behav-ioral ecology view, Journal of Nonverbal Behavior 43 (2) (2019) 161–194. 24 [5] P. M. Niedenthal, M. Rychlowska, F. Zhao, A. Wood, Historical migration pat-terns shape contemporary cultures of emotion, Perspectives on Psychological Sci-ence 14 (4) (2019) 560–573. [6] T. Pfister, X. Li, G. Zhao, M. Pietikäinen, Recognising spontaneous facial micro-expressions, in: 2011 international conference on computer vision, IEEE, 2011, pp. 1449–1456. [7] Y. Wang, J. See, R. C.-W. Phan, Y.-H. Oh, Lbp with six intersection points: Re-ducing redundant information in lbp-top for micro-expression recognition, in: Asian conference on computer vision, Springer, 2014, pp. 525–537. [8] Y. Li, X. Huang, G. Zhao, Joint local and global information learning with sin-gle apex frame detection for micro-expression recognition, IEEE Transactions on Image Processing 30 (2020) 249–263. [9] M. Wei, X. Jiang, W. Zheng, Y. Zong, C. Lu, J. Liu, Cmnet: contrastive magni-fication network for micro-expression recognition, in: Proceedings of the AAAI Conference on Artificial Intelligence, 2023, pp. 119–127. [10] L. Fu, J. Wang, Q. Jin, Y. Zhu, H. Wang, Y. Li, X. Wu, K. Hu, Ptsr: A unified patch tokenization, selection and representation framework for e ffi cient micro-expression recognition, in: Proceedings of the 2025 International Conference on Multimedia Retrieval, 2025, pp. 312–320. [11] Y.-J. Liu, J.-K. Zhang, W.-J. Yan, S.-J. Wang, G. Zhao, X. Fu, A main directional mean optical flow feature for spontaneous micro-expression recognition, IEEE Transactions on A ff ective Computing 7 (4) (2015) 299–310. [12] J. He, J.-F. Hu, X. Lu, W.-S. Zheng, Multi-task mid-level feature learning for micro-expression recognition, Pattern Recognition 66 (2017) 44–52. [13] Y. Li, X. Huang, G. Zhao, Can micro-expression be recognized based on single apex frame?, in: 2018 25th IEEE International Conference on Image Processing (ICIP), IEEE, 2018, pp. 3094–3098. 25 [14] L. Zhou, Q. Mao, L. Xue, Dual-inception network for cross-database micro-expression recognition, in: 2019 14th IEEE International Conference on Auto-matic Face & Gesture Recognition (FG 2019), IEEE, 2019, pp. 1–5. [15] S.-T. Liong, Y. S. Gan, J. See, H.-Q. Khor, Y.-C. Huang, Shallow triple stream three-dimensional cnn (ststnet) for micro-expression recognition, in: 2019 14th IEEE international conference on automatic face & gesture recognition (FG 2019), IEEE, 2019, pp. 1–5. [16] Z. Xia, X. Hong, X. Gao, X. Feng, G. Zhao, Spatiotemporal recurrent convolu-tional networks for recognizing spontaneous micro-expressions, IEEE Transac-tions on Multimedia 22 (3) (2019) 626–640. [17] A. J. R. Kumar, B. Bhanu, Micro-expression classification based on landmark relations with graph attention convolutional network, in: Proceedings of the IEEE /CVF conference on computer vision and pattern recognition, 2021, pp. 1511–1520. [18] N. Liu, X. Liu, Z. Zhang, X. Xu, T. Chen, O ff set or onset frame: A multi-stream convolutional neural network with capsulenet module for micro-expression recognition, in: 2020 5th international conference on intelligent informatics and biomedical sciences (ICIIBMS), IEEE, 2020, pp. 236–240. [19] B. Sun, S. Cao, J. He, L. Yu, Two-stream attention-aware network for spontaneous micro-expression movement spotting, in: 2019 IEEE 10th International Confer-ence on Software Engineering and Service Science (ICSESS), IEEE, 2019, pp. 702–705. [20] L. Zhang, Y. Qian, O. Arandjelovi´ c, T. Zhu, H. Xiao, Multimodal latent emotion recognition from micro-expression and physiological signal, Pattern Recognition 169 (2026) 111963. [21] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Un-terthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, et al., An image is 26 worth 16x16 words: Transformers for image recognition at scale, arXiv preprint arXiv:2010.11929 (2020). [22] L. Zhang, X. Hong, O. Arandjelovi´ c, G. Zhao, Short and long range relation based spatio-temporal transformer for micro-expression recognition, IEEE Transactions on A ff ective Computing 13 (4) (2022) 1973–1985. [23] S. Indolia, S. Nigam, R. Singh, V. K. Singh, M. K. Singh, Micro expression recognition using convolution patch in vision transformer, IEEE Access (2023). [24] Z. Wang, K. Zhang, W. Luo, R. Sankaranarayana, Htnet for micro-expression recognition, Neurocomputing (2024) 128196. [25] W. Cai, J. Zhao, R. Yi, M. Yu, F. Duan, Z. Pan, Y.-J. Liu, Mfdan: Multi-level flow-driven attention network for micro-expression recognition, IEEE Transactions on Circuits and Systems for Video Technology (2024). [26] X.-B. Nguyen, C. N. Duong, X. Li, S. Gauch, H.-S. Seo, K. Luu, Micron-bert: Bert-based facial micro-expression recognition, in: Proceedings of the IEEE /CVF Conference on Computer Vision and Pattern Recognition, 2023, pp. 1482–1492. [27] B. Xia, W. Wang, S. Wang, E. Chen, Learning from macro-expression: A micro-expression recognition framework, in: Proceedings of the 28th ACM Interna-tional Conference on Multimedia, 2020, pp. 2936–2944. [28] K. Zhang, Z. Zhang, Z. Li, Y. Qiao, Joint face detection and alignment using mul-titask cascaded convolutional networks, IEEE signal processing letters 23 (10) (2016) 1499–1503. [29] G. Farnebäck, Two-frame motion estimation based on polynomial expansion, in: Image Analysis: 13th Scandinavian Conference, SCIA 2003 Halmstad, Sweden, June 29–July 2, 2003 Proceedings 13, Springer, 2003, pp. 363–370. [30] S. H. Lee, S. Lee, B. C. Song, Vision transformer for small-size datasets, arXiv preprint arXiv:2112.13492 (2021). 27 [31] J. He, J.-N. Chen, S. Liu, A. Kortylewski, C. Yang, Y. Bai, C. Wang, Transfg: A transformer architecture for fine-grained recognition, in: Proceedings of the AAAI conference on artificial intelligence, 2022, pp. 852–860. [32] W.-J. Yan, X. Li, S.-J. Wang, G. Zhao, Y.-J. Liu, Y.-H. Chen, X. Fu, Casme ii: An improved spontaneous micro-expression database and the baseline evaluation, PloS one 9 (1) (2014) e86041. [33] A. K. Davison, C. Lansley, N. Costen, K. Tan, M. H. Yap, Samm: A spontaneous micro-facial movement dataset, IEEE transactions on a ff ective computing 9 (1) (2016) 116–129. [34] X. Li, T. Pfister, X. Huang, G. Zhao, M. Pietikäinen, A spontaneous micro-expression database: Inducement, collection and baseline, in: 2013 10th IEEE International Conference and Workshops on Automatic face and gesture recogni-tion (fg), IEEE, 2013, pp. 1–6. [35] J. Li, Z. Dong, S. Lu, S.-J. Wang, W.-J. Yan, Y. Ma, Y. Liu, C. Huang, X. Fu, Cas (me) 3: A third generation facial spontaneous micro-expression database with depth information and high ecological validity, IEEE Transactions on Pattern Analysis and Machine Intelligence 45 (3) (2022) 2782–2800. [36] J. See, M. H. Yap, J. Li, X. Hong, S.-J. Wang, Megc 2019–the second facial micro-expressions grand challenge, in: 2019 14th IEEE International Conference on Automatic Face & Gesture Recognition (FG 2019), IEEE, 2019, pp. 1–5. [37] S.-T. Liong, J. See, K. Wong, R. C.-W. Phan, Less is more: Micro-expression recognition from video using apex frame, Signal Processing: Image Communica-tion 62 (2018) 82–92. [38] Y. S. Gan, S.-T. Liong, W.-C. Yau, Y.-C. Huang, L.-K. Tan, O ff -apexnet on micro-expression recognition system, Signal Processing: Image Communication 74 (2019) 129–139. 28 [39] N. Van Quang, J. Chun, T. Tokuyama, Capsulenet for micro-expression recogni-tion, in: 2019 14th IEEE International Conference on Automatic Face & Gesture Recognition (FG 2019), IEEE, 2019, pp. 1–7. [40] Y. Liu, H. Du, L. Zheng, T. Gedeon, A neural micro-expression recognizer, in: 2019 14th IEEE international conference on automatic face & gesture recognition (FG 2019), IEEE, 2019, pp. 1–4. [41] Z. Xia, W. Peng, H.-Q. Khor, X. Feng, G. Zhao, Revealing the invisible with model and data shrinking for composite-database micro-expression recognition, IEEE Transactions on Image Processing 29 (2020) 8590–8605. [42] X. Nie, M. A. Takalkar, M. Duan, H. Zhang, M. Xu, Geme: Dual-stream multi-task gender-based micro-expression recognition, Neurocomputing 427 (2021) 13–28. [43] S. Zhao, H. Tao, Y. Zhang, T. Xu, K. Zhang, Z. Hao, E. Chen, A two-stage 3d cnn based learning method for spontaneous micro-expression recognition, Neu-rocomputing 448 (2021) 276–289. [44] L. Zhou, Q. Mao, X. Huang, F. Zhang, Z. Zhang, Feature refinement: An expression-specific feature learning and fusion method for micro-expression recognition, Pattern Recognition 122 (2022) 108275. [45] Z. Zhai, J. Zhao, C. Long, W. Xu, S. He, H. Zhao, Feature representation learn-ing with adaptive displacement generation and transformer fusion for micro-expression recognition, in: Proceedings of the IEEE /CVF Conference on Com-puter Vision and Pattern Recognition, 2023, pp. 22086–22095. [46] C. Guo, H. Huang, Gle ff n: A global-local event feature fusion network for micro-expression recognition, in: Proceedings of the 3rd Workshop on Facial Micro-Expression: Advanced Techniques for Multi-Modal Facial Expression Analysis, 2023, pp. 17–24. 29 [47] L. Zhang, Y. Zhang, X. Sun, W. Tang, X. Wang, Z. Li, Micro-expression recog-nition based on direct learning of graph structure, Neurocomputing 619 (2025) 129135. [48] L. Lei, J. Li, T. Chen, S. Li, A novel graph-tcn with a graph structured repre-sentation for micro-expression recognition, in: Proceedings of the 28th ACM international conference on multimedia, 2020, pp. 2237–2245. [49] L. Lei, T. Chen, S. Li, J. Li, Micro-expression recognition based on facial graph representation learning and facial action unit fusion, in: Proceedings of the IEEE /CVF conference on computer vision and pattern recognition, 2021, pp. 1571–1580. [50] Y. Bao, C. Wu, P. Zhang, C. Shan, Y. Qi, X. Ben, Boosting micro-expression recognition via self-expression reconstruction and memory contrastive learning, IEEE Transactions on A ff ective Computing (2024). [51] Z. Zhang, S. Zhao, S. Liu, S. Yin, X. Mao, T. Xu, E. Chen, Mellm: Exploring llm-powered micro-expression understanding enhanced by subtle motion perception, arXiv preprint arXiv:2505.07007 (2025). 30

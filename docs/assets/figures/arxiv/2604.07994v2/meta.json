@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07994v2/fig-001.webp",
+      "caption": "Figure 1. The pixel-wise absolute error between HR and SR images from RCAN [52] and PFT [28]. These concentrated error areas at high-frequency regions motivate our SAT’s design: we preserve full-resolution Query while compressing Key–Value tokens in homogeneous areas for achieving efficient global attention.",
+      "page": 1,
+      "index": 1,
+      "width": 508,
+      "height": 239
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07994v2/fig-002.webp",
+      "caption": "Table 1. Comparison between SAT and other SOTA methods at ×2, ×3, ×4 scales for image ISR. The top-2 results are in red and blue.",
+      "page": 7,
+      "index": 2,
+      "width": 1032,
+      "height": 541
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07994v2/fig-003.webp",
+      "caption": "Table 2. Comparison between SAT-light and other methods at ×2, ×4 scales on lightweight benchmark. Top-2 results are in red and blue.",
+      "page": 7,
+      "index": 3,
+      "width": 1032,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07994v2/fig-004.webp",
+      "caption": "Figure 5. Qualitative comparison of visual results between our SAT and other state-of-the-art SR methods. Best results are marked in bold.",
+      "page": 8,
+      "index": 4,
+      "width": 931,
+      "height": 260
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07994v2/fig-005.webp",
+      "caption": "Figure 6. Visualization on low-resolution input for cluster center selection (red points) across different network layers. Early layers maintain broad spatial coverage, while deeper layers increasingly concentrate on semantically salient regions such as edges and pattern features. This progressive adaptation enables efficient compression without exhaustive spatial coverage.",
+      "page": 8,
+      "index": 5,
+      "width": 931,
+      "height": 200
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07994v2/fig-006.webp",
+      "caption": "Figure 3. The illustration of the Selective Aggregation Attention (SAA). SAA aggregates N input tokens into K = k%×N tokens (with k = 3) to compact the Key-Value matrices, preserving the full-resolution Query matrix to form an efficiently global cross-attention.",
+      "page": 4,
+      "index": 6,
+      "width": 979,
+      "height": 244
+    }
+  ]
+}

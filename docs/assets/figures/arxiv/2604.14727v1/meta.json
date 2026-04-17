@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-001.webp",
+      "caption": "TABLE I: Summary of Mathematical Notations and Network Variables",
+      "page": 15,
+      "index": 1,
+      "width": 1097,
+      "height": 1418
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-002.webp",
+      "caption": "Fig. 7. Visualizing the Common Refinement of MHSA and FFN (PMHSA∧PFFN ). To illustrate the geometric mechanism driving the complexity bounds in Theorem V.5, we present a simplified case with 2 tokens and 2 FFN neurons. (Plot A) The MHSA layer performs input-dependent routing, dynamically defining the contextual Voronoi regions (the where). (Plot B) The FFN provides a fixed structural shattering via ReLU activation hyperplanes. (Plot C) The combined transformer block evaluates to the common refinement of both partitions. The attention layer establishes the coarse semantic context, while the FFN systematically shatters each attention-defined cell into finer linear regions, mathematically driving the combinatorial explosion across depths.",
+      "page": 21,
+      "index": 2,
+      "width": 1061,
+      "height": 306
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-003.webp",
+      "caption": "Fig. 1. Combinatorial Explosion of Linear Regions in Transformers. Visualizing the exact spatial partitioning of a query space (dmodel = 2) by a tropical transformer with sequence length N = 4. As the network depth L increases from 1 to 3, the number of maximal linear regions N undergoes a staggering geometric expansion, strictly following our derived Θ(NdmodelL) bound. This topological metric demonstrates how deep composition intrinsically shatters the input space into a maximally complex polyhedral structure, quantifying the expressivity of transformers.",
+      "page": 2,
+      "index": 3,
+      "width": 1064,
+      "height": 367
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-004.webp",
+      "caption": "Fig. 6. Empirical Growth of Geometric Complexity in Tropical Transformer. Log–log plots of measured combinatorial quantities. (a) Empirical lower bounds on the number of linear regions under depth composition via Monte Carlo sampling. (b) Exact vertex counts of the Minkowski sum associated with multi-head aggregation. The monotonically increasing slopes confirm the combinatorial complexity gain driven by H .",
+      "page": 13,
+      "index": 4,
+      "width": 1039,
+      "height": 362
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-005.webp",
+      "caption": "Fig. 3. Partitioning of the query space Rdk in the tropical limit. As detailed in the legend: white stars denote keys kj , colored tiles represent maximal linear regions (Voronoi cells), and black lines identify routing boundaries H. (a) Standard Voronoi diagram where routing is determined by Euclidean distance to keys. (b) Power Voronoi diagram corresponding to dot-product attention, where cell geometry is biased by wj = ∥kj∥2. Note the disappearance of the purple and orange regions in (b) due to their relatively small weights, confirming the possibly empty property in Theorem IV.3.",
+      "page": 8,
+      "index": 5,
+      "width": 898,
+      "height": 286
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-006.webp",
+      "caption": "Fig. 2. Recursive spatial partitioning in a 2-layer MLP (d = 2). (Bottom) Layer 1 (n = 3 neurons) induces N1 = 7 linear regions via Definition III.2. (Middle) Structural space-folding: the ReLU activation enables subsequent hyperplanes to intersect the pre-activated regions. (Top) Layer 2 (n = 3) achieves a multiplicative expansion, yielding a theoretical maximum of N2 = 49 regions.",
+      "page": 4,
+      "index": 6,
+      "width": 802,
+      "height": 379
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-007.webp",
+      "caption": "TABLE II RIGOROUS MAPPING BETWEEN STANDARD DL DOMAIN, TROPICAL DOMAIN, AND GEOMETRY.",
+      "page": 17,
+      "index": 7,
+      "width": 1026,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-008.webp",
+      "caption": "Fig. 5. Visualizing the Power Voronoi Limit of Self-Attention via Maslov Dequantization. The attention routing in a 2D query space (q1, q2) is shown for temperatures τ ∈ 1.0, 0.5, 0.1, 0.001, with white stars marking keys and colors showing aggregated values. (Left) At τ = 1.0, softmax produces blended distributions, suppressing subordinate keys. (Right) As τ → 0, these features sharply emerge, and continuous curves collapse into piecewise-constant polytopes with linear boundaries, empirically confirming the Power Voronoi diagram from Theorem IV.3.",
+      "page": 12,
+      "index": 8,
+      "width": 1064,
+      "height": 273
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14727v1/fig-009.webp",
+      "caption": "Fig. 4. Visualizing the Geometric Rationale of Multi-Head Self-Attention via Minkowski Sums. To illustrate the combinatorial polytope gain from Theorem V.2, we construct 3D Newton polytopes for self-attention with sequence length N = 6. (Left) A single head yields a simple polytope with at most N vertices. (Middle & Right) Under the tropical view, multi-head aggregation corresponds to the Minkowski sum of individual polytopes, producing complex mixed-face structures and increasing the vertex count from 6 to 216. This demonstrates the superior spatial partitioning capacity of multi-head attention, scaling as O(NH).",
+      "page": 9,
+      "index": 9,
+      "width": 1037,
+      "height": 325
+    }
+  ]
+}

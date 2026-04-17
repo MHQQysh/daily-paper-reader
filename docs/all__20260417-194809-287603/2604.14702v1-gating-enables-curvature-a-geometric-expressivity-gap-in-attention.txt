@@ -1,0 +1,2080 @@
+Title: Gating Enables Curvature: A Geometric Expressivity Gap in Attention
+
+URL Source: https://arxiv.org/pdf/2604.14702v1
+
+Published Time: Fri, 17 Apr 2026 00:43:21 GMT
+
+Number of Pages: 41
+
+Markdown Content:
+# Gating Enables Curvature: A Geometric Expressivity Gap in Attention 
+
+# Satwik Bathula, Anand A. Joshi Department of Electrical and Computer Engineering University of Southern California 
+
+# sbathula@usc.edu, ajoshi@usc.edu 
+
+Abstract 
+
+Multiplicative gating is widely used in neural architectures and has recently been applied to attention layers to improve performance and training stability in large lan-guage models. Despite the success of gated attention, the mathematical implications of gated attention mechanisms remain poorly understood. We study attention through the geometry of its representations by modeling outputs as mean parameters of Gaus-sian distributions and analyzing the induced Fisher–Rao geometry. We show that ungated attention operator is restricted to intrinsically flat statistical manifolds due to its affine structure, while multiplicative gating enables non-flat geometries, including positively curved manifolds that are unattainable in the ungated setting. These results establish a geometric expressivity gap between ungated and gated attention. Empiri-cally, we show that gated models exhibit higher representation curvature and improved performance on tasks requiring nonlinear decision boundaries whereas they provide no consistent advantage on tasks with linear decision boundaries. Furthermore, we iden-tify a structured regime in which curvature accumulates under composition, yielding a systematic depth amplification effect. 
+
+Keywords: Attention mechanisms, Geometric deep learning, Representation geometry, Riemannian geometry, Information geometry, Expressivity, Multiplicative gating, Intrinsic curvature 
+
+# 1 Introduction 
+
+Attention mechanisms are a core part of transformer models used for sequence modeling and large language models [16]. Prior work studies the expressivity of attention mechanisms, including universality and depth separation [19, 10, 13, 17]. These works study what input-output mappings attention models can represent, independent of training. Yet, the intrinsic geometric structure of the representation spaces induced by attention layers remains largely unexplored. An attention layer defines a family of representations rather than a single mapping. Understanding the geometry of this family provides a comple-mentary notion of expressivity that focuses on how representations are organized internally rather than which functions can be computed. We study the geometry induced by attention layers by modeling their outputs as parame-ters of a statistical manifold equipped with the Fisher–Rao metric, whose curvature captures 1
+
+> arXiv:2604.14702v1 [cs.LG] 16 Apr 2026
+
+intrinsic properties of the representation space [1, 4, 2, 11, 3, 8]. For Gaussian decoders, the Fisher geometry associated with the mean parameter is Euclidean, so any nonzero cur-vature arises solely from the structure of the attention mapping itself. This choice isolates the geometric structure induced by the architecture, rather than by the statistical model [15, 1]. Recent architectural developments have introduced attention mechanisms augmented with multiplicative gating, reporting improvements in training stability, scaling behavior, and long-context modeling [14, 20, 5, 6, 18, 7, 9]. While these results establish the practical benefits of gating, a fundamental question remains as to how multiplicative gating affects the intrinsic geometry of representations produced by attention layers. We show that standard ungated attention has a structural limitation, since its outputs are affine combinations of value vectors, which implies that the associated statistical manifolds are intrinsically flat. In contrast, multiplicative gating removes this affine constraint and enables non-flat geometries. Recent empirical work has identified a key limitation of standard softmax attention: the composition of the value and output projections induces a low-rank linear bottleneck, re-stricting the expressiveness of attention representations. In particular, the attention output can be rewritten as 
+
+oki = X
+
+> j
+
+Skij Xj (W kV W kO ),
+
+where the effective transformation is governed by the product W kV W kO , whose rank is at most dk ≪ dmodel (Eq. (6), Sec. 4.1 in [14]). This shows that attention operates through a low-rank linear mapping. We show that this algebraic constraint has a direct geometric interpretation. Since attention outputs are convex combinations of value vectors, they admit an affine represen-tation whose image lies in a low-dimensional subspace of the ambient space. As we prove, such affine embeddings induce intrinsically flat statistical manifolds. Thus, the low-rank bottleneck can be understood as a restriction to flat representation geometry. Multiplica-tive gating removes this constraint by introducing input-dependent nonlinear modulation, enabling non-flat (curved) geometries. In this work, we study gated and ungated attention from a geometric perspective, with the following contributions: 
+
+• We introduce a geometric framework for analyzing attention by modeling outputs as mean parameters of Gaussian distributions and studying the induced statistical manifolds under the Fisher–Rao metric. 
+
+• We show that standard ungated attention is restricted to intrinsically flat statistical manifolds, as a consequence of the output’s affine structure. 
+
+• We provide a geometric interpretation of the low-rank bottleneck in attention by showing that the affine structure of ungated attention confines representations to low-dimensional subspaces, inducing intrinsically flat geometry. 
+
+• We prove that introducing a multiplicative gate strictly enlarges the class of realiz-able geometries in the sense that it enables statistical manifolds with strictly positive curvature that are provably unattainable by ungated attention. 
+
+• We show that this phenomenon persists in arbitrary output dimensions D ≥ 3 and within fully content-aware attention architectures. 2• We analyze the resulting geometry under small parameter perturbations, showing that positive curvature is intrinsic and locally stable. 
+
+• We complement the theory with a synthetic experiment showing that gated models can exhibit higher representation curvature than ungated counterparts, illustrating that the geometric flexibility enabled by gating can manifest in trained models. 
+
+• We connect curvature to representation structure by showing that affine attention representations induce flat geometry, while multiplicative gating enables non-affine (curved) representations. 
+
+Representation-level implication. Ungated attention produces representations con-fined to affine (flat) geometry, which can limit the ability to directly capture non-affine structure at the level of a single block. Multiplicative gating relaxes this constraint, en-abling intrinsically curved representations and supporting a richer class of representational geometries, particularly for data with nonlinear or manifold structure. These results characterize the representational structure induced by a single attention block, providing a pointwise geometric perspective that complements the depth scaling analysis developed later in the paper. This perspective parallels combinatorial expressivity results for deep networks [12], where depth enables growth in representational complexity under suitable structural conditions. In contrast, our results characterize a geometric mechanism through which multiplicative gating can induce and amplify intrinsic curvature. 
+
+Figure 1: Geometric intuition for curvature generation in attention. Left: Ungated attention produces affine combinations of value vectors, so outputs lie in the affine hull aff {U1, U 2, U 3}, yielding a flat representation manifold with zero curvature. Right: Gating introduces element-wise modulation Y ′(X) = Y (X) ⊙ g(X), breaking affine structure and enabling nonzero curvature in the induced representation manifold. 32 Preliminaries 
+
+# 2.1 Notations 
+
+Linear algebra. All vectors are real-valued. We write RD for the ambient representation space and use lowercase letters for vectors and uppercase letters for matrices. Inner products and norms are taken with respect to the standard Euclidean structure on RD . For vectors 
+
+a, b ∈ RD , a ⊙ b denotes their componentwise (Hadamard) product. 
+
+Probability simplex. The probability simplex in Rn is denoted by ∆n−1 := 
+
+(
+
+α ∈ Rn αi ≥ 0,
+
+> n
+
+X
+
+> i=1
+
+αi = 1 
+
+)
+
+.
+
+Gaussian statistical manifolds. We consider Gaussian distributions of the form 
+
+p(y | μ) = N (y; μ, I D ),
+
+where the mean parameter μ ∈ RD varies and the covariance is fixed. This defines a statistical manifold parameterized by μ.
+
+Fisher–Rao geometry and fixed covariance. The Fisher–Rao metric provides a canon-ical, parameterization-invariant notion of geometry for statistical models, ensuring that geometric quantities such as curvature are intrinsic and not dependent on the choice of coordinates. For a Gaussian location family with fixed covariance Σ ≻ 0, 
+
+p(y | μ) = N (y; μ, Σ) ,
+
+the Fisher information for the mean parameter is given by 
+
+I(μ) = Σ −1.
+
+Consequently, for any parameterization μ = μ(ϕ), the induced Riemannian metric is 
+
+gij (ϕ) = ∂iμ(ϕ)⊤Σ−1∂j μ(ϕ),
+
+which corresponds to a Mahalanobis inner product. Defining the whitened mean ˜ μ(ϕ) = Σ−1/2μ(ϕ), this metric reduces to the Euclidean form 
+
+gij (ϕ) = ⟨∂i ˜μ(ϕ), ∂ j ˜μ(ϕ)⟩,
+
+showing that any fixed non-isotropic covariance is equivalent to the isotropic case under a linear change of coordinates. As a result, the intrinsic geometry of any statistical manifold induced by μ(ϕ) is de-termined entirely by the embedding ϕ 7 → μ(ϕ) ⊂ RD . All geometric properties therefore depend only on μ(ϕ). For Gaussian location families, the Fisher–Rao metric coincides with the Euclidean metric and serves only as a coordinate-invariant formulation of the induced geometry. In particular, since the metric is constant, any nonzero curvature arises from the embedding μ(ϕ) rather than from the statistical model. If the covariance were allowed to depend on the input, then the Fisher metric itself would vary with ϕ and contribute 4additional curvature, even when μ(ϕ) is affine, making it difficult to attribute geometric effects to the attention mechanism alone. This choice therefore provides a minimal setting in which any observed curvature is attributable solely to the attention mapping. We consider a Gaussian location family with fixed covariance, under which the Fisher–Rao metric on the mean parameter reduces to a constant (Euclidean) metric. Consequently, the intrinsic geometry of the induced statistical manifold is determined entirely by the embed-ding μ(ϕ) ⊂ RD , and any nonzero curvature arises solely from the structure of this mapping. This construction should be viewed as a coordinate-invariant realization of a constant Riemannian metric on the representation space, rather than as a modeling assumption on the data distribution. In more general likelihood models where the metric varies with the parameters, additional curvature may arise from the metric itself. Our formulation isolates the geometric contribution of the attention operator. 
+
+Curvature. We use standard notions from Riemannian geometry. The Riemann curvature tensor is denoted by R, and sectional curvature by K. A manifold is said to be flat if R ≡ 0, and to have positive curvature if sectional curvatures are strictly positive on an open set. 
+
+Attention outputs. Throughout the paper, attention outputs are denoted by Y (X) ∈
+
+RD and are interpreted as mean parameters of Gaussian distributions. Ungated attention outputs take the form 
+
+Y (X) = 
+
+> n
+
+X
+
+> i=1
+
+αi(X)Ui, α(X) ∈ ∆n−1,
+
+where Ui ∈ RD are value vectors. Although the attention weights αi(X) depend nonlinearly on the input through the softmax, the output Y (X) remains an affine combination of the value vectors. It is this affine structure of the output, rather than the nonlinearity in the weights, that determines the geometry of the induced representation manifold. Gated attention outputs are of the form 
+
+Y ′(X) = Y (X) ⊙ σ(Xg (X)Wθ ),
+
+where σ is a smooth elementwise nonlinearity with values in (0 , 1), Xg (X) denotes a gating input, and Wθ is a trainable matrix. Unless stated otherwise, all geometric statements are local and hold on open sets where the parameterization μ(ϕ) of the statistical manifold is smooth and has full-rank Jacobian. 
+
+# 2.2 Problem Setup and Formulation 
+
+We formalize attention architectures and the geometric objects they induce. Our goal is to compare the intrinsic geometry of representations produced by ungated and gated attention mechanisms, independent of training dynamics and downstream tasks. 
+
+Attention architecture. We consider a single-head attention layer of the form introduced by [16]. Let X denote an input sequence, and let 
+
+U1, . . . , U n ∈ RD
+
+5be value vectors obtained after value and output projections. The ungated attention output is given by 
+
+Y (X) = 
+
+> n
+
+X
+
+> i=1
+
+αi(X)Ui, α(X) ∈ ∆n−1,
+
+where the attention weights αi(X) are produced by a softmax over query–key interactions. For fixed value vectors U1, . . . , U n, the mapping X 7 → Y (X) takes values in the affine span of {U1, . . . , U n}, reflecting the affine structure of ungated attention outputs. 
+
+Gated attention. We consider attention augmented with a multiplicative gate. Let 
+
+Xg (X) ∈ Rm denote a gating input, Wθ ∈ Rm×D a trainable matrix, and σ : R → (0 , 1) a smooth elementwise nonlinearity. The gated attention output is 
+
+Y ′(X) = Y (X) ⊙ σ(Xg (X)Wθ ).
+
+When the gate is constant, this reduces to the ungated case up to a fixed rescaling. Allowing the gate to vary introduces nonlinear modulation of the attention output. 
+
+Representation geometry. To study the geometry of attention representations, we as-sociate each output with a Gaussian distribution whose mean is given by the attention output, 
+
+p(y | μ) = N (y; μ, I D ), μ(X) = Y (X).
+
+As discussed in Section 2.1, the Fisher–Rao metric for this model is Euclidean on the mean parameter, so the induced geometry is determined entirely by the embedding μ(X) ⊂ RD .In particular, curvature reflects nonlinear structure in the mapping X 7 → Y (X). This provides a principled way to study the intrinsic geometry of representations pro-duced by attention layers, independent of parameterization. 
+
+Problem formulation. We compare the statistical manifolds induced by ungated and gated attention, 
+
+Mung := {N (Y (X), I D ) | X ∈ X } ,
+
+Mgat := {N (Y ′(X), I D ) | X ∈ X } .
+
+Our goal is to characterize the geometric constraints imposed by the affine structure of ungated attention, and to determine whether multiplicative gating enlarges the class of realizable geometries. In particular, we ask: 
+
+• What geometric structures are imposed by the affine form of ungated attention? 
+
+• Can multiplicative gating enable representations with nonzero intrinsic curvature? 
+
+• Does gating strictly enlarge the range of geometries realizable by attention? 
+
+# 3 Main Results 
+
+This section develops the main theoretical results describing the intrinsic geometry of sta-tistical manifolds induced by ungated and gated attention operators. Proofs of all results in this section are deferred to the appendix. We first examine the intrinsic geometry induced by ungated attention under the Gaussian decoder. 6Theorem 3.1 (Flatness of ungated attention manifolds) . An ungated attention operator whose coefficients range over the relative interior of the simplex and whose outputs are affine combinations of value vectors and hence lie in an affine subspace, equipped with a Gaussian decoder, induces an intrinsically flat statistical manifold. 
+
+More precisely, let U1, . . . , U n ∈ RD be fixed value vectors and define the convex hull 
+
+U := conv( U1, . . . , U n) = 
+
+( nX
+
+> i=1
+
+αiUi α ∈ ∆n−1
+
+)
+
+⊂ RD .
+
+Let k := dim aff {U1, . . . , U n} = dim span {U1 − Un, . . . , U n−1 − Un}. On the relative interior relint( U), choose affine coordinates 
+
+φ : Ω ⊂ Rk → relint( U),μung (ϕ) := φ(ϕ) = a + Bϕ, for ϕ ∈ Ω.
+
+where B ∈ RD×k has full column rank. Consider the statistical manifold 
+
+Mung := {N (μung (ϕ), I D ) | ϕ ∈ Ω},
+
+equipped with the Fisher–Rao metric. Then the induced Riemannian metric on Ω is con-stant: 
+
+gung  
+
+> ij
+
+(ϕ) = ⟨∂iμung (ϕ), ∂ j μung (ϕ)⟩ = Cij ,
+
+where C = ( Cij ) is a fixed positive-definite matrix. Consequently, the Levi–Civita con-nection has vanishing Christoffel symbols, and the Riemann curvature tensor and sectional curvatures satisfy 
+
+Rung ≡ 0, Kung = 0 on Ω .
+
+Thus, Mung is isometric to an open subset of the Euclidean space ( Rk, C ) and is intrin-sically flat. 
+
+Remark 3.2 (Intrinsic flatness of ungated attention) . The flatness established in Theo-rem 3.1 is intrinsic to ungated attention and does not depend on the chosen parameteriza-tion. In affine coordinates ϕ ∈ Ω ⊂ Rk, the induced Fisher–Rao metric satisfies 
+
+gung  
+
+> ij
+
+(ϕ) = ⟨∂iμung (ϕ), ∂ j μung (ϕ)⟩ = Cij ,
+
+for a constant positive-definite matrix C. Hence the Levi–Civita connection is flat and the Riemann curvature tensor vanishes identically on Ω. For any diffeomorphism ψ : ˆΩ → Ω, the pullback metric ˜ g = ψ∗gung satisfies 
+
+R(˜ g) = ψ∗R(gung ) ≡ 0.
+
+Therefore no smooth reparameterization can induce nonzero curvature. The vanishing curvature therefore shows a fundamental geometric limitation of ungated attention, arising from the affine form of its output together with the Euclidean Fisher geometry of the Gaussian mean family. The above result also admits an interpretation in terms of the low-rank structure of attention. 7Remark 3.3 (Connection to low-rank bottleneck) . The affine form μung (ϕ) = a + Bϕ 
+
+reflects the fact that attention outputs are convex combinations of value vectors, arising from the simplex constraint α(X) ∈ ∆n−1. Consequently, the output lies in the affine hull of these vectors. The effective dimensionality of this subspace is governed by the span of the value matrix, and in particular by the rank of B ∈ RD×k, whose columns span a k-dimensional subspace. Thus, μung (ϕ) takes values in the affine subspace a + span( B), and although μung (ϕ) ∈ RD , its image is confined to a k-dimensional affine subspace. This aligns with prior observations that attention induces a low-rank linear mapping through the value projection V = XW V followed by the output mapping WO , whose rank is bounded by dk ≪ dmodel (see Eq. (6), Sec. 4.1 in [14]). Although the bound k ≤ n − 1 is structural, in typical transformer architectures the effective dimension is much smaller than the ambient dimension, so that k ≪ D in practice. In our formulation, this affine structure induces a constant metric and hence intrinsic flatness of the representation manifold. In this sense, the low-rank bottleneck is not merely an algebraic property of the attention operator, but a geometric one, corresponding to an intrinsic restriction to flat representation manifolds. We next consider the effect of introducing a multiplicative gate into the attention output. 
+
+Lemma 3.4 (Multiplicative gating generically destroys affine structure) . Let U ⊂ Rd be a connected open set with d ≥ 1. Let 
+
+Y (ϕ) = a + Bϕ, B ∈ RD×d, rank( B) = d, 
+
+and denote by Bi ∈ RD the i-th column of B. For g ∈ C2(U, RD ) define 
+
+μ(ϕ) = Y (ϕ) ⊙ g(ϕ),
+
+where ⊙ denotes the componentwise (Hadamard) product. Then for all i, j ,
+
+∂ij μ = Bi ⊙ ∂j g + Bj ⊙ ∂ig + Y ⊙ ∂ij g. 
+
+Moreover, the set 
+
+A = {g ∈ C2(U, RD ) : μ is affine on U }
+
+is a proper closed linear subspace of C2(U, RD ) (with its Fr´ echet topology). Hence A is nowhere dense and meagre, and for residual g ∈ C2(U, RD ), the map μ is non-affine. Equiv-alently, non-affinity holds generically in the Baire category sense. 
+
+From generic non-affinity to geometric flexibility. Lemma 3.4 shows that multiplica-tive gating generically destroys the affine structure of the embedding μ(ϕ) = Y (ϕ) ⊙ g(ϕ). In particular, for generic g, the second derivative D2μ does not vanish identically and the Jacobian Jμ is non-constant on open sets. Since the induced Fisher–Rao metric is 
+
+G(ϕ) = Jμ(ϕ)⊤Jμ(ϕ), this yields a non-constant metric. A non-constant metric does not in general imply nonzero curvature, but it reflects a departure from affine structure. Establish-ing nonzero curvature requires either an explicit curvature computation or a construction with known curvature. This is formalized below by explicit constructions and genericity results. 8Existence of curved realizations (witness construction). While Lemma 3.4 estab-lishes that multiplicative gating breaks affine structure, it does not specify the types of geometries that can be realized. The following theorem provides a concrete witness, show-ing that multiplicative gating can realize strictly positively curved statistical manifolds.The broader structural result is that flatness is nongeneric under multiplicative gating. 
+
+Theorem 3.5 (Concrete witness of non-flat geometry under multiplicative gating) . There exist 
+
+• an output dimension D = 3 ,
+
+• a connected open set U ⊂ R2,
+
+• a smooth affine map Y : U → R3,
+
+• a smooth map X : U → R,
+
+• and a matrix Wθ ∈ R1×3 with rank( Wθ ) = 1 ,such that the following hold: (i) the ungated map 
+
+μung (ϕ) := Y (ϕ)
+
+is affine, and the corresponding statistical manifold induced under the Gaussian de-coder 
+
+p(y | μ) = N (y; μ, I 3)
+
+is intrinsically flat. (ii) the gated map 
+
+μgat (ϕ) := Y (ϕ) ⊙ σ X(ϕ)Wθ
+
+
+
+parametrizes a smooth patch of the unit sphere S2 ⊂ R3. Consequently, the induced Fisher–Rao metric has Gaussian curvature 
+
+Kgat (ϕ) ≡ 1 > 0 for all ϕ ∈ U. 
+
+Corollary 3.6 (Realizability in gated attention) . There exists a single-head, single-layer attention block with multiplicative gating of the form 
+
+Y ′ = Y ⊙ σ(XW θ ),
+
+such that, under the Gaussian decoder p(y | μ) = N (y; μ, I D ), the induced statistical mani-folds satisfy 
+
+Kung ≡ 0, Kgat (ϕ) ≡ 1 > 0 for all ϕ ∈ U. 
+
+In particular, multiplicative gating in attention architectures can realize strictly positively curved statistical manifolds that ungated attention cannot realize. 
+
+9Curvature gap inside the architectural class. Lemma 3.4 establishes that multi-plicative gating generically destroys affine structure, while Theorem 3.5 provides an explicit curved witness in an abstract gated embedding. The next theorem strengthens this further by showing that the same geometric separation can be realized inside a standard content-aware transformer attention block. In this sense, the curvature gap is not merely a property of an abstract construction, but an expressivity phenomenon already present within the architectural class itself. 
+
+Theorem 3.7 (Existence of a curvature gap inside content-aware attention) . Consider a single-head, single-layer transformer attention block with standard content-aware projections 
+
+Q(X) = XW Q,K(X) = XW K ,V (X) = XW V ,U (X) = V (X)WO .
+
+We adopt the convention that all vectors are represented as row vectors, and linear maps act on the right. For a fixed position j, let 
+
+Yj (X) = 
+
+> n
+
+X
+
+> i=1
+
+αji (X) Ui(X)
+
+denote the attention output at position j, where the weights αji (X) are obtained by applying the softmax to Q(X)K(X)⊤. Let the decoder be the Gaussian family 
+
+p(y | μ) = N (y; μ, I 3),
+
+so that the Fisher–Rao metric on the mean parameter is Euclidean. Define the gated output at position j by 
+
+Y ′ 
+
+> j
+
+(X) = Yj (X) ⊙ σ(Xg (X)Wθ ),
+
+where Xg is a differentiable function of X, Wθ ∈ Rm×3 has rank 3, and σ : ( −∞ , ∞) → (0 , 1) 
+
+is a smooth elementwise nonlinearity. Then there exist 
+
+• a connected open set U ⊂ R2,
+
+• a smooth map ϕ 7 → X(ϕ) producing input sequences, 
+
+• projection matrices WQ, W K , W V , W O ,
+
+• and a gating matrix Wθ ∈ Rm×3 with rank( Wθ ) = 3 ,such that the following hold simultaneously. (i) The ungated output realizes an affine (flat) map in ϕ. For all ϕ ∈ U ,
+
+Yj (X(ϕ)) = a + Bϕ 
+
+for some a ∈ R3 and full-rank B ∈ R3×2. The induced statistical manifold 
+
+Mung := {N (Yj (X(ϕ)) , I 3) : ϕ ∈ U }
+
+is isometric to an open subset of Euclidean space, and hence 
+
+Kung (ϕ) = 0 for all ϕ ∈ U. 
+
+10 (ii) Gated output is spherical. There exists a differentiable choice of gating input Xg (ϕ)
+
+such that 
+
+Y ′ 
+
+> j
+
+(X(ϕ)) = s(ϕ), s(ϕ) = 
+
+
+
+cos ϕ1 cos ϕ2
+
+cos ϕ1 sin ϕ2
+
+sin ϕ1
+
+ ,
+
+which parametrizes a smooth patch of the unit sphere S2 ⊂ R3. The induced statistical manifold 
+
+Mgat := {N (Y ′ 
+
+> j
+
+(X(ϕ)) , I 3) : ϕ ∈ U }
+
+is isometric to a spherical patch and satisfies 
+
+Kgat (ϕ) = 1 for all ϕ ∈ U. 
+
+Thus multiplicative gating introduces a strictly richer geometric class within standard content-aware attention. The construction below provides an explicit witness to the curvature gap. Ungated attention remains flat, whereas gated attention realizes a strictly positively curved statistical manifold inside the same architectural family, where ungated attention is a special case of gated attention. 
+
+Corollary 3.8 (Geometric expressivity of the multiplicative gate) . Fix the projection ma-trices WQ, W K , W V , W O and the input map ϕ 7 → X(ϕ) constructed in Theorem 3.7. Let the only trainable parameter be the gating matrix Wθ in 
+
+Y ′ 
+
+> j
+
+(X) = Yj (X) ⊙ σ Xg (X) Wθ
+
+.
+
+Then the family of statistical manifolds realizable by varying Wθ strictly contains the ungated family (obtained when the gate is constant). In particular, there exist choices of Wθ such that 
+
+Kung ≡ 0, Kgat (ϕ) ≡ 1 > 0, for all ϕ ∈ U. 
+
+Thus, multiplicative gating strictly enlarges the set of realizable statistical manifolds within the same attention architecture. 
+
+Corollary 3.9 (Extension to higher-dimensional decoders) . The construction of Theo-rem 3.7 extends to Gaussian decoders in dimension D ≥ 3.Specifically, embedding the spherical patch s(ϕ) in the first three coordinates of RD and keeping the remaining coordinates constant yields a gated statistical manifold whose sectional curvatures in planes tangent to the spherical directions are strictly positive, while the ungated manifold remains flat. Thus, the curvature gap persists for all D ≥ 3.
+
+# Depth amplification under composition 
+
+The preceding results establish that multiplicative gating enables intrinsically curved rep-resentations within a single attention block, and that this curvature gap persists within standard content-aware architectures. However, these results do not address how such ge-ometric structure behaves under composition across layers. In particular, it is not clear whether curvature introduced by gating remains a local effect or can accumulate with depth. To analyze this, we consider a regime in which the gated attention stack admits a local co-ordinate representation with coherent multiplicative structure across layers. This leads to a conditional local normal form, under which the geometric effect of gating can be tracked explicitly and shown to amplify under composition. 11 Lemma 3.10 (Local gated-attention normal form) . Let FL : X → RD be the representation map of an L-layer gated attention stack. Suppose there exist a point x0 ∈ X , an open neighborhood x0 ∈ U , a local input chart χin : U → V ⊂ R2, and a local output chart 
+
+χout : FL(U ) → W ⊂ RD such that 
+
+χin (x0) = 0 
+
+and 
+
+χout ◦ FL ◦ χ−1in (u, v ) = 
+
+
+
+u, v, 
+
+> L
+
+X
+
+> ℓ=1
+
+aℓψ(u, v ), 0, . . . , 0
+
+
+
+,
+
+for some coefficients aℓ > 0 and some ψ ∈ C2(V ).Define 
+
+AL := 
+
+> L
+
+X
+
+> ℓ=1
+
+aℓ.
+
+Then 
+
+χout ◦ FL ◦ χ−1in (u, v ) =  u, v, A Lψ(u, v ), 0, . . . , 0.
+
+The representation in Lemma 3.10 should be interpreted as a local structural reduction rather than a universal representation theorem for gated attention. It isolates a regime in which multiplicative gating induces coherent additive accumulation across layers. The results that follow characterize the geometric consequences of this mechanism, rather than asserting that arbitrary gated attention models satisfy this form. Such conditional structural analyses are standard in the theory of deep networks, where results are often established under specific parameter regimes to isolate mechanisms of expressivity. 
+
+Realizability of the normal form. The local normal form in Lemma 3.10 is not merely hypothetical. Using constructions similar to Theorem 3.7, one can explicitly realize gated attention stacks in which the attention weights are uniform and the value and output projec-tions align the ungated output with a fixed coordinate direction. Choosing gating inputs so that each layer produces a scalar modulation of the form aℓψ(u, v ), the residual connection accumulates these contributions across layers. In such a regime, the representation map reduces locally to the stated normal form. 
+
+Lemma 3.11 (Realizability of the local gated-attention normal form) . Fix an integer L ≥ 1
+
+and positive coefficients a1, . . . , a L. Let U ⊂ R2 be a connected open set, and let ψ ∈ C2(U )
+
+satisfy 
+
+0 < a ℓψ(u, v ) < 1 for all (u, v ) ∈ U and all ℓ = 1 , . . . , L. 
+
+Then there exists an L-layer gated attention stack with multiplicative gating of the form 
+
+Y ′ = Y ⊙ σ(Xg Wθ ),
+
+together with residual connections and a smooth local input parametrization 
+
+(u, v ) 7 → X(u, v ),
+
+such that the induced representation map is exactly 
+
+(u, v ) 7 −→  u, v, 
+
+> L
+
+X
+
+> ℓ=1
+
+aℓψ(u, v ), 0, . . . , 0.
+
+12 Lemma 3.12 (Gaussian curvature of the graph normal form) . Let U ⊂ R2 be open with 
+
+0 ∈ U , and let ψ ∈ C2(U ) satisfy 
+
+∇ψ(0) = 0 .
+
+For AL > 0, define 
+
+FL(u, v ) =  u, v, A Lψ(u, v ), 0, . . . , 0 ∈ RD ,
+
+and let 
+
+ML := FL(U )
+
+with the Riemannian metric induced from the Euclidean metric on RD . Then the Gaussian curvature of ML at FL(0) is 
+
+KML
+
+ FL(0)  = A2 
+
+> L
+
+det D2ψ(0) .
+
+Theorem 3.13 (Depth-amplified intrinsic curvature under a gated-attention normal form) .
+
+Under the assumptions of the preceding two lemmas, 
+
+KML
+
+ FL(0)  = A2 
+
+> L
+
+det D2ψ(0) .
+
+In particular, if there exists a0 > 0 such that aℓ ≥ a0 for all ℓ, then 
+
+KML
+
+ FL(0)  ≥ a20 det D2ψ(0) L2.
+
+If in addition det D2ψ(0) > 0, then 
+
+KML
+
+ FL(0)  ≥ a20 det D2ψ(0) L2.
+
+Note that the curvature scaling depends on the cumulative amplitude AL = PLℓ=1 aℓ,and not on depth alone. In particular, a single-layer model with sufficiently large gate amplitude could achieve the same curvature. The result therefore characterizes a regime in which depth provides a systematic mechanism for accumulating curvature, rather than being the only means of achieving it. 
+
+Corollary 3.14 (Higher-dimensional embedding) . Let D ≥ 3, and define 
+
+eFL(u, v ) =  u, v, A Lψ(u, v ), 0, . . . , 0 ∈ RD .
+
+Let fML := eFL(U ). Then 
+
+KfML
+
+  eFL(0)  = A2 
+
+> L
+
+det D2ψ(0) ,
+
+and consequently 
+
+KfML
+
+  eFL(0)  ≥ a20 det D2ψ(0) L2
+
+whenever aℓ ≥ a0 > 0 for all ℓ. If also det D2ψ(0) > 0, then 
+
+KfML
+
+  eFL(0)  ≥ a20 det D2ψ(0) L2.
+
+Proof. The additional coordinates are constant, so they do not affect the induced metric. Thus the intrinsic geometry of fML is identical to that of the graph surface in R3. The curvature identity follows immediately from the theorem, and the bounds follow from the same estimate on AL.13 Interpretation. Theorem 3.13 shows that, under the local gated-attention normal form, the intrinsic curvature at the base point satisfies 
+
+KML (FL(0)) = A2 
+
+> L
+
+det D2ψ(0) , AL =
+
+> L
+
+X
+
+> ℓ=1
+
+aℓ.
+
+Thus the geometric effect of multiplicative gating is amplified under composition through the cumulative coefficient AL. In particular, if there exists a0 > 0 such that aℓ ≥ a0 for all 
+
+ℓ, then |KML (FL(0)) | admits a quadratic lower bound in L. This identifies a conditional structural regime in which non-flat geometry does not remain a purely local single-layer phenomenon, but can accumulate coherently across depth. In contrast, in the affine regime identified for ungated attention, the induced representation geometry remains flat, whereas gated attention admits a regime in which curvature grows systematically under composition. 
+
+From aligned scalar structure to general vector-valued representations. The pre-ceding result characterizes a structured regime in which layer-wise contributions align along a single direction, yielding coherent quadratic scaling of curvature. We now show that the underlying geometric mechanism extends to a more general setting, in which representations are modeled as vector-valued graphs, without requiring alignment across layers. 
+
+Theorem 3.15 (Curvature of vector-valued graph representations) . Let U ⊂ R2 be an open set with 0 ∈ U . Let 
+
+Φ1, . . . , ΦL : U → RD−2
+
+be C2 maps, and define the aggregated map 
+
+Φtot  
+
+> L
+
+(u, v ) := 
+
+> L
+
+X
+
+> ℓ=1
+
+Φℓ(u, v ).
+
+Define the immersion 
+
+FL(u, v ) :=  u, v, Φtot  
+
+> L
+
+(u, v ) ∈ RD ,
+
+and let ML := FL(U ) be equipped with the metric induced from the Euclidean metric on RD .Assume that DΦtot  
+
+> L
+
+(0) = 0 . Then the Gaussian curvature of ML at the point FL(0) is given by 
+
+KML
+
+ FL(0)  =
+
+> D−2
+
+X
+
+> α=1
+
+det 
+
+
+
+D2(Φ tot  
+
+> L
+
+)α(0) 
+
+
+
+.
+
+Equivalently, 
+
+KML
+
+ FL(0)  =
+
+> D−2
+
+X
+
+> α=1
+
+det 
+
+> L
+
+X
+
+> ℓ=1
+
+D2Φαℓ (0) 
+
+!
+
+.
+
+Remark. Although D2Φtot  
+
+> L
+
+= P 
+
+> ℓ
+
+D2Φℓ is additive, the Gaussian curvature depends on determinants of these matrices. Since the determinant is nonlinear, curvature does not decompose additively across layers in general. Instead, cross-layer interaction terms arise, and curvature reflects the combined second-order structure of all layers. 14 Corollary 3.16 (Aligned scalar regime) . Under the assumptions of the theorem, suppose there exist: 
+
+• a function ψ ∈ C2(U ),
+
+• scalars a1, . . . , a L with aℓ ≥ a0 > 0,
+
+• a fixed vector c ∈ RD−2,such that 
+
+Φℓ(u, v ) = aℓ ψ(u, v ) c. 
+
+Assume ∇ψ(0) = 0 , and define AL := PLℓ=1 aℓ. Then 
+
+KML
+
+ FL(0)  = A2 
+
+> L
+
+∥c∥2 det D2ψ(0) ,
+
+and in particular, 
+
+|KML (FL(0)) | ≥ a20L2 ∥c∥2 | det D2ψ(0) |.
+
+In this aligned setting, all second-order contributions lie in a common direction, elim-inating cross-layer interaction terms and yielding coherent quadratic scaling. [Proof. See Appendix A.1.10] 
+
+From existence to robustness. The preceding results establish the existence of posi-tively curved realizations induced by multiplicative gating, their realization within standard attention architectures, and their amplification under composition across layers. However, these results do not rule out the possibility that such curvature arises only from finely tuned parameter choices. We strengthen this result by showing that positive curvature is stable under perturba-tions of the gating parameters. In particular, the set of parameters inducing strictly pos-itively curved statistical manifolds contains a non-empty open subset of parameter space. This demonstrates that the curvature gap is a robust and locally generic phenomenon, rather than an artifact of a specific construction. The following theorem formalizes this stability and genericity property. 
+
+Theorem 3.17 (Curvature gap and local robustness under multiplicative gating) . Let D ≥
+
+3 and m ≥ D. There exist 
+
+• a nonempty connected open set U ⊂ R2,
+
+• an affine map Y : U → RD , Y (ϕ) = a + Bϕ , with a ∈ RD , B ∈ RD×2, and rank( B) = 2,
+
+• a smooth map X∗ : U → Rm,
+
+• and the logistic sigmoid σ(t) = 11+ e−t , applied componentwise, such that for each Wθ ∈ Rm×D , the map 
+
+μWθ (ϕ) := Y (ϕ) ⊙ σ X∗(ϕ)Wθ
+
+
+
+defines a Gaussian location family with identity covariance, 
+
+F(Wθ ) := N (μWθ (ϕ), I D ) : ϕ ∈ U .
+
+15 On any open subset V ⊂ U on which Dμ Wθ (ϕ) has rank 2, this family induces a two-dimensional statistical manifold whose Fisher–Rao metric reduces to 
+
+gij (ϕ; Wθ ) = ⟨∂iμWθ (ϕ), ∂ j μWθ (ϕ)⟩ .
+
+Let 
+
+R := {(ϕ, W θ ) ∈ U × Rm×D : det g(ϕ; Wθ ) > 0}.
+
+Then: (i) ( Flatness of the ungated model ) If the gate is identically 1, then μWθ (ϕ) = Y (ϕ),the induced metric is constant, and the Gaussian curvature vanishes identically on U .(ii) ( Positive curvature realization ) There exists W ∗ 
+
+> θ
+
+∈ Rm×D such that 
+
+K(ϕ; W ∗ 
+
+> θ
+
+) ≡ 1 ∀ϕ ∈ U. 
+
+Thus multiplicative gating strictly enlarges the class of realizable intrinsic geometries, enabling non-zero curvature that affine (ungated) models cannot represent. (iii) ( Local robustness ) There exist a nonempty compact set K ⊂ U , a constant c > 0,and an open neighborhood O of W ∗ 
+
+> θ
+
+such that 
+
+(ϕ, W θ ) ∈ R, K(ϕ; Wθ ) ≥ c
+
+2 > 0 ∀ϕ ∈ K, W θ ∈ O .
+
+Lemma 3.18 (Regular locus and continuity of curvature) . Let R := {(ϕ, W θ ) : det g(ϕ; Wθ ) >
+
+0}. Then R is open, curvature is well-defined on R, and (ϕ, W θ ) 7 → K(ϕ; Wθ ) is continuous on R.
+
+Lemma 3.19 (Uniform robustness on compact sets) . Let K ⊂ U be compact. Suppose 
+
+(ϕ, W ∗ 
+
+> θ
+
+) ∈ R and K(ϕ; W ∗ 
+
+> θ
+
+) ≥ c > 0 ∀ϕ ∈ K. 
+
+Then there exists an open neighborhood O of W ∗ 
+
+> θ
+
+such that 
+
+(ϕ, W θ ) ∈ R, K(ϕ; Wθ ) ≥ c
+
+2 > 0 ∀ϕ ∈ K, W θ ∈ O .
+
+From robustness to genericity. Theorem 3.17 establishes that strictly positive curva-ture arises on a non-empty open subset of the gating parameter space, showing that the curvature gap is locally robust. However, this result does not address whether non-flat geometry is typical among admissible gating functions. We strengthen this conclusion by showing that, at the level of local curvature, non-flatness is in fact generic in the sense of Baire category. Within the space of smooth gating functions that induce an immersion at a point, those yielding nonzero curvature form an open dense subset. 
+
+Theorem 3.20 (Pointwise generic non-flatness under multiplicative gating) . Let U ⊂ Rd
+
+be open with d ≥ 2. Let 
+
+μg (ϕ) = Y (ϕ) ⊙ g(ϕ), g ∈ C2(U, RD ),
+
+16 where 
+
+Y (ϕ) = a + Bϕ, a ∈ RD , B ∈ RD×d, rank( B) = d. 
+
+Fix ϕ0 ∈ U , and assume that at least d + 1 coordinates of Y (ϕ0) are nonzero. Define 
+
+Iϕ0 := {g ∈ C2(U, RD ) : rank Dμ g (ϕ0) = d},
+
+and 
+
+Nϕ0 := {g ∈ I ϕ0 : Rg (ϕ0)̸ = 0 }.
+
+Then Nϕ0 is open and dense in Iϕ0 in the C2 topology. 
+
+Remark on assumptions. The immersion condition ensures that the induced metric is nondegenerate at ϕ0, while the nonzero coordinate assumption guarantees the existence of a normal direction accessible through multiplicative perturbations. 
+
+Interpretation. Theorem 3.20 shows that, in the abstract multiplicative model μg (ϕ) = 
+
+Y (ϕ) ⊙ g(ϕ), non-flatness at a fixed immersed point is generic in the sense of open density in the C2 topology. Thus, once the affine restriction of ungated attention is removed, flatness is not structurally enforced, and local intrinsic curvature can arise under arbitrarily small perturbations. 
+
+Relation to Theorem 3.17. Theorem 3.17 establishes that strictly positive curvature arises on a nonempty open subset of a concrete parameterized gating family. In contrast, Theorem 3.20 shows that non-flatness at a point is open and dense in the broader function-space model. Together, these results demonstrate both the robustness of explicit curved constructions and the prevalence of local non-flat geometry within the unrestricted multi-plicative framework. 
+
+# 4 Experiments 
+
+Our theoretical analysis shows that ungated attention induces intrinsically flat statistical manifolds under idealized assumptions. In practice, attention outputs depend nonlinearly on the input, so even ungated models exhibit small but nonzero curvature when measured with respect to input perturbations. We therefore interpret curvature comparatively, using ungated attention as a low-curvature baseline and multiplicative gating as a mechanism that induces higher curvature. This allows us to test whether the geometric expressivity gap predicted by theory appears in learned models. We evaluate this on a controlled synthetic sequence classification task designed to re-quire curved representations. We compare ungated and gated attention variants, measure representation curvature using finite-difference proxies, and analyze its relationship with performance under different metric conditions. 
+
+# 4.1 Experimental Setup 
+
+We evaluate attention geometry on a synthetic sequence classification task with a curved decision rule. Each example is generated by sampling a latent center c ∈ [−2, 2] 2 and forming a sequence of length 8 as noisy observations, 
+
+xi = c + ϵi, ϵi ∼ N (0 , σ 2I).
+
+17 The label depends only on c. Let r = ∥c∥ and θ = atan2( c2, c 1), and define 
+
+s(c) = sin(2 .5 θ) + 0 .6 ( r − 1.2) .
+
+We set y = 1 if s(c) > 0 and y = 0 otherwise. We use a minimal attention-based model with a single attention block and a classi-fier head. Inputs in R2 are projected to 64 dimensions, processed by scaled dot-product attention, and mean pooled before a two-layer MLP. We consider variants of the attention output, including ungated attention, a pointwise SiLU nonlinearity, and multiplicative gating. In gated models, we vary a gate strength parameter α that controls the degree of multiplicative modulation, 
+
+Y ′ = Y ⊙  1 + α σ(W Y ) − 1 .
+
+When α = 1, this reduces to the multiplicative gating form analyzed in the theoretical section. A residual connection and layer normalization follow the attention block. Models are trained with AdamW and evaluated over multiple seeds. We measure curva-ture using a finite-difference curvature proxy 
+
+κ(x) = f (x + ϵv ) − 2f (x) + f (x − ϵv )
+
+ϵ2 ,
+
+averaged over random directions v. This quantity is a finite-difference proxy for the local nonlinearity of the representation map f , measuring the magnitude of second-order vari-ation along input directions. It is not an invariant notion of Riemannian curvature and does not directly estimate sectional curvature. Rather, it provides a practical surrogate for comparing the relative geometric complexity of representations across model variants. In particular, higher values of this proxy indicate deviations from locally affine behavior, which is consistent with the presence of nonzero intrinsic curvature predicted by the theory. Our primary metric is curvature of the attention output mean, and we also measure output cur-vature using a Fisher–Rao square-root embedding. Robustness is evaluated under diagonal precision matrices with condition numbers 2 , 4, 8, 12 , and 20. 18 4.2 Results 
+
+Figure 2: Gating increases representation curvature. Isotropic curvature is invariant across condition numbers, while anisotropic curvature varies with conditioning. Higher gate strength consistently increases curvature. Figure 2 shows curvature as a function of gate strength across condition numbers. Increas-ing the strength of multiplicative gating leads to a consistent increase in the curvature of the attention representation. The isotropic curvature curves coincide across all condition numbers, indicating that the geometric structure is intrinsic to the representation mapping rather than determined by the metric. In contrast, anisotropic curvature increases with the condition number but preserves the same monotonic dependence on gate strength. These results show that gating controls the curvature of the representation, while the metric pri-marily affects its scale. 
+
+Figure 3: Decision boundaries in latent space on the synthetic curved classification task. The ungated model fails to align with the nonlinear boundary, while the gated model better captures the curved structure, demonstrating improved geometric expressivity. 19 Figure 3 shows the decision boundaries learned by ungated and gated models on the synthetic curved classification task. The ground-truth boundary exhibits a non-separable radial–angular nonlinear structure, arising from coupled dependence on both radius and angle in polar coordinates. The ungated model fails to capture this geometry, producing approximately piecewise linear regions that deviate from the true boundary in regions re-quiring higher curvature. In contrast, the gated model yields decision boundaries that more closely align with the underlying nonlinear structure. 
+
+Figure 4: Curvature correlates with task performance. Test accuracy versus isotropic attention curvature for different gate strengths. Higher curvature leads to improved accu-racy, with mild saturation at larger values. 
+
+Curvature correlates with task performance. Figure 4 plots test accuracy against isotropic representation curvature for different gate strengths. We observe a strong positive correlation between curvature and performance, with a Pearson correlation coefficient of 0.7886. Accuracy increases with curvature and exhibits mild saturation at higher values. These results indicate that greater geometric expressivity of the representation translates into improved task performance. We report isotropic curvature here to isolate the intrin-sic geometry of the representation. Corresponding results under anisotropic metrics are provided in the appendix and exhibit consistent trends. 
+
+Linear control task. To assess whether the observed gains arise from generic additional nonlinearity, we also evaluate a control task with a linear decision boundary that does not require curved representations. In this setting, gating does not provide a consistent advan-tage (see Appendix A.4), indicating that its benefits arise specifically in settings requiring nonlinear geometric structure. 20 4.3 Ablation study 
+
+Effect of multiplicative gating. We compare attention variants to isolate the role of multiplicative gating. Let Y denote the attention output. The ungated variant uses Y
+
+directly. The SiLU variant applies the pointwise nonlinearity 
+
+Y ′ = SiLU( Y ), SiLU( x) = x · σ(x),
+
+where σ denotes the sigmoid function. The gated-sigmoid variant applies multiplicative modulation of the form 
+
+Y ′ = Y ⊙ σ(W Y ),
+
+and the gated-nonsparse variant uses the same multiplicative structure with a rescaled gate 
+
+Y ′ = Y ⊙ (0 .5 + 0 .5 σ(W Y )) .
+
+In the ablation study, all gated variants use gate strength 1 for consistency. Figure 5 shows test accuracy and isotropic curvature across variants. Ungated attention yields the lowest curvature and accuracy, while a SiLU nonlinearity provides only modest improvements. In contrast, multiplicative gating produces substantially higher curvature and improved accuracy, indicating that geometric expressivity arises specifically from gating rather than generic nonlinear transformations. We report isotropic curvature to isolate representation effects, and include anisotropic results in the appendix, which show consistent trends. 
+
+Figure 5: Ablation of attention variants. Test accuracy (left axis) and isotropic cur-vature (right axis) for different attention variants. Ungated attention yields the lowest curvature and accuracy. Adding a pointwise SiLU nonlinearity increases both modestly, while multiplicative gating produces substantially higher curvature and improved accuracy. This shows that gains in geometric expressivity arise specifically from multiplicative gating rather than generic nonlinear transformations. These observations are consistent with the geometric interpretation, where gating better captures nonlinear structure. 21 4.4 Conclusion 
+
+We study the geometry of attention representations through curvature and show that mul-tiplicative gating strictly enlarges the class of geometries realizable by attention, enabling statistical manifolds with nonzero intrinsic curvature that are unattainable in the ungated setting. Furthermore, we identify a structured regime in which curvature can accumulate under composition, yielding a depth-dependent amplification effect. Empirically, we find that curvature is significantly higher with multiplicative gating compared to other variants, such as ungated attention and pointwise nonlinear attention. We observe that isotropic curvature is positively correlated with task performance, with mild saturation at higher values. We also find that curvature is an intrinsic property of the representation mapping. Ab-lation studies confirm that the observed gains arise specifically from multiplicative gating rather than generic nonlinear transformations. 
+
+# References 
+
+[1] S.-i. Amari. Differential-Geometrical Methods in Statistics . Springer, 1985. [2] S.-i. Amari. Information Geometry and Its Applications . Springer, 2016. [3] S.-i. Amari, R. Karakida, and M. Oizumi. Fisher information and natural gradient learning in random deep networks. In K. Chaudhuri and M. Sugiyama, editors, Pro-ceedings of the Twenty-Second International Conference on Artificial Intelligence and Statistics , volume 89 of Proceedings of Machine Learning Research , pages 694–702. PMLR, 16–18 Apr 2019. [4] S.-i. Amari and H. Nagaoka. Methods of Information Geometry . American Mathemat-ical Society, 2000. [5] K. Cho, B. van Merri¨ enboer, C. Gulcehre, D. Bahdanau, F. Bougares, H. Schwenk, and Y. Bengio. Learning phrase representations using rnn encoder–decoder for statistical machine translation. Proceedings of EMNLP , 2014. [6] I. Danihelka, G. Wayne, B. Uria, N. Kalchbrenner, and A. Graves. Associative long short-term memory. Proceedings of ICML , 2016. [7] Y. N. Dauphin, A. Fan, M. Auli, and D. Grangier. Language modeling with gated convolutional networks. In D. Precup and Y. W. Teh, editors, Proceedings of the 34th International Conference on Machine Learning , volume 70 of Proceedings of Machine Learning Research , pages 933–941. PMLR, 06–11 Aug 2017. [8] M. Kim, D. Li, S. X. Hu, and T. Hospedales. Fisher SAM: Information geometry and sharpness aware minimisation. In K. Chaudhuri, S. Jegelka, L. Song, C. Szepesvari, G. Niu, and S. Sabato, editors, Proceedings of the 39th International Conference on Machine Learning , volume 162 of Proceedings of Machine Learning Research , pages 11148–11161. PMLR, 17–23 Jul 2022. [9] K. Krishnamurthy, T. Can, and D. J. Schwab. Theory of gating in recurrent neural networks. Phys. Rev. X , 12:011011, Jan 2022. 22 [10] Y. Levine, N. Wies, O. Sharir, H. Bata, and A. Shashua. Limits to depth efficiencies of self-attention. In H. Larochelle, M. Ranzato, R. Hadsell, M. Balcan, and H. Lin, editors, 
+
+Advances in Neural Information Processing Systems , volume 33, pages 22640–22651. Curran Associates, Inc., 2020. [11] T. Liang, T. Poggio, A. Rakhlin, and J. Stokes. Fisher-rao metric, geometry, and complexity of neural networks. In K. Chaudhuri and M. Sugiyama, editors, Proceedings of the Twenty-Second International Conference on Artificial Intelligence and Statistics ,volume 89 of Proceedings of Machine Learning Research , pages 888–896. PMLR, 16–18 Apr 2019. [12] G. Mont´ ufar, R. Pascanu, K. Cho, and Y. Bengio. On the number of linear regions of deep neural networks. In Z. Ghahramani, M. Welling, C. Cortes, N. Lawrence, and K. Weinberger, editors, Advances in Neural Information Processing Systems , volume 27. Curran Associates, Inc., 2014. [13] J. P´ erez, J. Marinkovi´ c, and P. Barcel´ o. On the turing completeness of modern neural network architectures. In International Conference on Learning Representations , 2019. [14] Z. Qiu, Z. Wang, B. Zheng, Z. Huang, K. Wen, S. Yang, R. Men, L. Yu, F. Huang, S. Huang, D. Liu, J. Zhou, and J. Lin. Gated attention for large language models: Non-linearity, sparsity, and attention-sink-free. In The Thirty-ninth Annual Conference on Neural Information Processing Systems , 2025. [15] C. R. Rao. Information and the accuracy attainable in the estimation of statistical parameters. Bulletin of the Calcutta Mathematical Society , 37:81–91, 1945. [16] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin. Attention is all you need. Advances in Neural Information Processing Systems , 2017. [17] M. Wang and W. E. Understanding the expressive power and mechanisms of trans-former for sequence modeling. In The Thirty-eighth Annual Conference on Neural Information Processing Systems , 2024. [18] Y. Wu, S. Zhang, Y. Zhang, Y. Bengio, and R. R. Salakhutdinov. On multiplicative integration with recurrent neural networks. In D. Lee, M. Sugiyama, U. Luxburg, I. Guyon, and R. Garnett, editors, Advances in Neural Information Processing Systems ,volume 29. Curran Associates, Inc., 2016. [19] C. Yun, S. Bhojanapalli, A. S. Rawat, S. J. Reddi, and S. Kumar. Are transformers universal approximators of sequence-to-sequence functions? ArXiv , abs/1912.10077, 2019. [20] Y. Zhang, S. Yang, R. Zhu, Y. Zhang, L. Cui, Y. Wang, B. Wang, F. Shi, B. Wang, W. Bi, P. Zhou, and G. Fu. Gated slot attention for efficient linear-time sequence modeling. In A. Globerson, L. Mackey, D. Belgrave, A. Fan, U. Paquet, J. Tomczak, and C. Zhang, editors, Advances in Neural Information Processing Systems , volume 37, pages 116870–116898. Curran Associates, Inc., 2024. 23 A Appendix 
+
+# A.1 Proofs of Main Results 
+
+A.1.1 Proof of Theorem 3.1 
+
+Proof. The attention output takes the form 
+
+μ =
+
+> n
+
+X
+
+> i=1
+
+αiUi, α ∈ ∆n−1,
+
+so the set of outputs lies in the convex hull of {U1, . . . , U n}.On the relative interior, we can eliminate one coordinate using the constraint P 
+
+> i
+
+αi = 1. Writing 
+
+αn = 1 −
+
+> n−1
+
+X
+
+> i=1
+
+αi,
+
+we obtain 
+
+μ =
+
+> n−1
+
+X
+
+> i=1
+
+αiUi + 1 −
+
+> n−1
+
+X
+
+> i=1
+
+αi
+
+!
+
+Un = Un +
+
+> n−1
+
+X
+
+> i=1
+
+αi(Ui − Un).
+
+Let 
+
+k = dim aff {U1, . . . , U n}.
+
+On the relative interior of the convex hull, choose local affine coordinates 
+
+ϕ ∈ Ω ⊂ Rk,
+
+under which the map admits an affine parameterization 
+
+μung (ϕ) = a + Bϕ, 
+
+where a ∈ RD and B ∈ RD×k has full column rank k. Its partial derivatives are constant: 
+
+∂iμung (ϕ) = Bi ∈ RD ,
+
+where Bi denotes the i-th column of B.Equipping the Gaussian family N (μ, I D ) with the Fisher–Rao metric, the induced Rie-mannian metric on the parameter domain Ω is 
+
+gung  
+
+> ij
+
+(ϕ) = ⟨∂iμung (ϕ), ∂ j μung (ϕ)⟩RD = ⟨Bi, B j ⟩RD =: Cij .
+
+Since B ∈ RD×k has full column rank, the matrix 
+
+C = B⊤B
+
+is symmetric positive definite. Hence, the metric tensor is independent of ϕ.For a constant metric tensor in global coordinates, the Christoffel symbols of the Levi– Civita connection vanish identically: Γkij = 12 gkℓ  ∂igjℓ + ∂j giℓ − ∂ℓgij 
+
+ = 0 .
+
+Consequently, the Riemann curvature tensor, 
+
+Rkℓij = ∂iΓkℓj − ∂j Γkℓi + Γ kim Γmℓj − Γkjm Γmℓi ,
+
+vanishes identically. Therefore, all sectional curvatures are zero, and the statistical manifold 
+
+Mung is intrinsically flat. 24 A.1.2 Proof of Lemma 3.4 
+
+Proof. Differentiation gives the stated formula. Define 
+
+T : C2(U, RD ) → C0(U, RD×d×d), T (g) = D2(Y ⊙ g).
+
+Then T is continuous and linear, and A = ker T since μ is affine if and only if D2μ ≡ 0 on connected U . Thus A is a closed linear subspace. To see A̸ = C2(U, RD ), note that since rank( B) = d ≥ 1, we have B̸ = 0, hence 
+
+Y (ϕ) = a + Bϕ is not identically zero. Therefore there exist m ∈ { 1, . . . , D } and ϕ0 ∈ U
+
+such that Ym(ϕ0)̸ = 0. Take g = emψ with ψ ∈ C∞ 
+
+> c
+
+(U ) satisfying 
+
+ψ(ϕ0) = 0 , ∂iψ(ϕ0) = 0 , ∂11 ψ(ϕ0) = 1 .
+
+Then (T g )11 ,m (ϕ0) = Ym(ϕ0) ∂11 ψ(ϕ0) = Ym(ϕ0)̸ = 0 ,
+
+so g / ∈ ker T . Hence A is a proper closed linear subspace, and therefore nowhere dense and meagre. 
+
+A.1.3 Proof of Theorem 3.5 
+
+Proof. We construct the example explicitly. Let 
+
+Y (ϕ) = 
+
+
+
+2 + ϕ1
+
+2 + ϕ2
+
+2
+
+ , ϕ = ( ϕ1, ϕ 2) ∈ R2.
+
+This is an affine map of the form 
+
+Y (ϕ) = a + Bϕ, a =
+
+222
+
+ , B =
+
+1 00 10 0
+
+ ,
+
+with rank( B) = 2. Since the decoder is the Gaussian location family 
+
+p(y | μ) = N (y; μ, I 3),
+
+the Fisher–Rao metric on mean-parameter space coincides with the Euclidean metric on R3.Therefore the statistical manifold induced by the ungated map 
+
+μung (ϕ) := Y (ϕ)is the image of an affine embedding of a two-dimensional domain into R3, hence is intrinsi-cally flat. Thus 
+
+Kung ≡ 0.
+
+Choose 
+
+ϕ0 = (0 , 0) , Y (ϕ0) = 
+
+
+
+222
+
+̸ = 0 .
+
+25 Since Y is continuous, there exists a sufficiently small connected open neighborhood U ⊂ R2
+
+of ϕ0 such that ∥Y (ϕ)∥ is bounded away from zero on U . Hence the map 
+
+ϕ 7 −→ 1
+
+∥Y (ϕ)∥
+
+is smooth on U . After shrinking U further if necessary, we may also assume 0 < 1
+
+∥Y (ϕ)∥ < 1 for all ϕ ∈ U. 
+
+This ensures that the inverse of the activation function used below is well-defined on the relevant range. Now define the normalized map 
+
+μsph (ϕ) := Y (ϕ)
+
+∥Y (ϕ)∥ .
+
+By construction, ∥μsph (ϕ)∥ = 1 for all ϕ ∈ U , so its image lies in the unit sphere S2.We claim that, after possibly shrinking U once more, μsph parametrizes a smooth spher-ical patch. Consider the normalization map 
+
+N : R3 \ { 0} → S2, N (y) = y
+
+∥y∥ .
+
+Its restriction to the affine plane Π := {(y1, y 2, y 3) ∈ R3 : y3 = 2 }
+
+has differential of rank 2 at every point of Π. Since Π is two-dimensional, it follows from the inverse function theorem that N |Π is a local diffeomorphism onto its image. Because 
+
+Y (U ) ⊂ Π, after shrinking U if necessary the map 
+
+μsph = N ◦ Y
+
+parametrizes a smooth patch of S2.We now realize this normalization exactly through multiplicative gating. Let 
+
+g(ϕ) := 1
+
+∥Y (ϕ)∥ 1 =
+
+
+
+∥Y (ϕ)∥−1
+
+∥Y (ϕ)∥−1
+
+∥Y (ϕ)∥−1
+
+ , 1 =
+
+
+
+111
+
+ .
+
+Then 
+
+Y (ϕ) ⊙ g(ϕ) = Y (ϕ)
+
+∥Y (ϕ)∥ = μsph (ϕ).
+
+It remains to express g in the form σ(X(ϕ)Wθ ) exactly. Choose a smooth strictly mono-tone activation 
+
+σ : R → (0 , 1) ,
+
+for example the logistic sigmoid 
+
+σ(t) = 11 + e−t .
+
+26 Since ∥Y (ϕ)∥−1 ∈ (0 , 1) on U , the inverse function σ−1 is well-defined and smooth on the range of ∥Y (ϕ)∥−1.Define 
+
+X(ϕ) := σ−1
+
+ 1
+
+∥Y (ϕ)∥
+
+
+
+∈ R, Wθ =  1 1 1 ∈ R1×3.
+
+Then rank( Wθ ) = 1, and 
+
+X(ϕ)Wθ =  X(ϕ) X(ϕ) X(ϕ) .
+
+Applying σ componentwise gives 
+
+σ X(ϕ)Wθ
+
+ =
+
+
+
+σ(X(ϕ)) 
+
+σ(X(ϕ)) 
+
+σ(X(ϕ)) 
+
+ =
+
+
+
+∥Y (ϕ)∥−1
+
+∥Y (ϕ)∥−1
+
+∥Y (ϕ)∥−1
+
+ = g(ϕ).
+
+Therefore 
+
+μgat (ϕ) := Y (ϕ) ⊙ σ X(ϕ)Wθ
+
+ = Y (ϕ) ⊙ g(ϕ) = Y (ϕ)
+
+∥Y (ϕ)∥ = μsph (ϕ).
+
+Thus the gated map parametrizes a smooth patch of the unit sphere. Since the sphere 
+
+S2 with its induced Euclidean metric has constant Gaussian curvature equal to 1, and since in the Gaussian location family the Fisher–Rao metric is exactly the Euclidean pullback metric on the mean manifold, the induced statistical manifold satisfies 
+
+Kgat (ϕ) ≡ 1 > 0 for all ϕ ∈ U. 
+
+Hence the ungated statistical manifold is flat, while the gated statistical manifold has strictly positive curvature. This proves the theorem. 
+
+A.1.4 Proof of Theorem 3.7 
+
+Proof. The proof gives an explicit witness inside a standard content-aware transformer block. Let 
+
+U := 
+
+
+
+0, π
+
+4
+
+
+
+×
+
+
+
+0, π
+
+4
+
+
+
+⊂ R2, ϕ = ( ϕ1, ϕ 2).
+
+Define 
+
+s(ϕ1, ϕ 2) = 
+
+
+
+cos ϕ1 cos ϕ2
+
+cos ϕ1 sin ϕ2
+
+sin ϕ1
+
+ .
+
+Since ϕ1, ϕ 2 ∈ (0 , π/ 4), all three coordinates of s(ϕ) are strictly positive, so 
+
+s(ϕ) ∈ (0 , 1) 3 for all ϕ ∈ U. 
+
+This is the standard local parametrization of a patch of the unit sphere S2 ⊂ R3, and its induced Gaussian curvature is identically 1. 
+
+Step 1: Enforce affine structure in the ungated output. Set 
+
+WQ = 0 , WK = 0 .
+
+27 Note that content-dependent attention mechanisms strictly contain this uniform-weight case as a special instance. Therefore, any geometric expressivity achievable under this construction is realizable within the full content-aware attention class. Then Q(X) = 0 and K(X) = 0 for every input X, so all attention scores are equal and the softmax produces uniform weights 
+
+αji (X) = 1
+
+n for all X, i = 1 , . . . , n. 
+
+Choose WV and WO so that the composed linear map 
+
+L := WV WO
+
+has rank 3. Fix a vector a ∈ R3 and a matrix B ∈ R3×2 of rank 2, chosen so that 0 < sk(ϕ)(a + Bϕ )k
+
+< 1 for all ϕ ∈ U, k = 1 , 2, 3.
+
+Such a choice is possible because s(ϕ) is bounded on the relatively compact set U (closure of U), so choosing a sufficiently large componentwise ensures (a + Bϕ )k > s k(ϕ) > 0 for all ϕ ∈ U, k = 1 , 2, 3.
+
+Now define 
+
+U1(X(ϕ)) := n(a + Bϕ ), Ui(X(ϕ)) := 0 for i = 2 , . . . , n. 
+
+Because L has rank 3, the input token embeddings X(ϕ) can be chosen smoothly so that these value vectors are realized exactly. With these choices, 
+
+Yj (X(ϕ)) = 
+
+> n
+
+X
+
+> i=1
+
+αji (X(ϕ)) Ui(X(ϕ)) = 1
+
+n U1(X(ϕ)) = a + Bϕ. 
+
+Hence the ungated map ϕ 7 → Yj (X(ϕ)) is affine. Since the decoder is the Gaussian location family with covariance I3, the Fisher–Rao metric on mean space is Euclidean, and therefore the induced manifold 
+
+Mung = {N (Yj (X(ϕ)) , I 3) : ϕ ∈ U }
+
+is isometric to an open subset of Euclidean space. Thus 
+
+Kung (ϕ) = 0 for all ϕ ∈ U. 
+
+Step 2: Construct an exact multiplicative gate realizing a sphere. Define the componentwise ratio ˜z(ϕ) := s(ϕ)
+
+a + Bϕ ,
+
+where the division is taken coordinatewise. By the choice of a and B,˜z(ϕ) ∈ (0 , 1) 3 for all ϕ ∈ U. 
+
+Let σ−1 : (0 , 1) → R denote the inverse of the scalar nonlinearity, applied coordinatewise, and define 
+
+t(ϕ) := σ−1(˜ z(ϕ)) ∈ R3.
+
+28 Then t is smooth and satisfies 
+
+σ(t(ϕ)) = ˜ z(ϕ) for all ϕ ∈ U. 
+
+Choose any matrix 
+
+Wθ ∈ Rm×3 with rank( Wθ ) = 3 .
+
+Since Wθ ∈ Rm×3 has full column rank, it admits a left inverse W † 
+
+> θ
+
+∈ R3×m such that 
+
+W † 
+
+> θ
+
+Wθ = I3.
+
+Let t(ϕ) ∈ R3 and view t(ϕ)⊤ ∈ R1×3. Define 
+
+Xg (ϕ) := t(ϕ)⊤W † 
+
+> θ
+
+∈ R1×m.
+
+Then 
+
+Xg (ϕ)Wθ = t(ϕ)⊤W † 
+
+> θ
+
+Wθ = t(ϕ)⊤,
+
+and therefore 
+
+σ(Xg (ϕ)Wθ ) = σ(t(ϕ)) = ˜ z(ϕ)holds exactly. Consequently, 
+
+Y ′ 
+
+> j
+
+(X(ϕ)) = Yj (X(ϕ)) ⊙ σ(Xg (ϕ)Wθ ) = ( a + Bϕ ) ⊙ ˜z(ϕ) = s(ϕ).
+
+Thus the gated output coincides exactly with the spherical parametrization s(ϕ). 
+
+Step 3: Deduce curvature. Since s(ϕ) parametrizes a smooth patch of the unit sphere S2,the induced Euclidean metric on its image is the spherical metric, whose Gaussian curvature is identically 1. Because the Fisher–Rao metric for the Gaussian location family coincides with the Euclidean pullback metric on the mean manifold, the induced gated statistical manifold 
+
+Mgat = {N (Y ′ 
+
+> j
+
+(X(ϕ)) , I 3) : ϕ ∈ U }
+
+is isometric to a spherical patch and satisfies 
+
+Kgat (ϕ) = 1 for all ϕ ∈ U. 
+
+Combining the flatness of Mung with the positive curvature of Mgat yields the claimed curvature gap inside standard content-aware attention. The construction above is an explicit witness that multiplicative gating strictly enlarges the class of realizable representation geometries in this architectural family. 
+
+A.1.5 Proof of Lemma 3.10 
+
+Proof. By linearity of summation, 
+
+> L
+
+X
+
+> ℓ=1
+
+aℓψ(u, v ) = 
+
+ LX
+
+> ℓ=1
+
+aℓ
+
+
+
+ψ(u, v ) = ALψ(u, v ).
+
+Substituting this identity into the chart expression yields 
+
+χout ◦ FL ◦ χ−1in (u, v ) =  u, v, A Lψ(u, v ), 0, . . . , 0.
+
+This proves the claim. 29 A.1.6 Proof of Lemma 3.11 
+
+Proof. We construct the model explicitly. Fix an ambient dimension D ≥ 4. Define the initial state 
+
+h(0) (u, v ) = ( u, v, 0, 1, 0, . . . , 0) ∈ RD ,
+
+and define the input parametrization by 
+
+X(u, v ) = h(0) (u, v ).
+
+The fourth coordinate is a constant auxiliary feature. 
+
+Attention mechanism. We instantiate each attention block on a single-token input, so the softmax weight is identically equal to 1. This is a valid special case of the standard attention mechanism. Choose value and output projections so that the ungated attention output is exactly 
+
+Y (u, v ) = e3 = (0 , 0, 1, 0, . . . , 0) .
+
+This is achieved by letting the value/output map read only the constant fourth coordinate and send it to the third coordinate. 
+
+Gate construction. Define 
+
+X(ℓ) 
+
+> g
+
+(u, v ) = logit( aℓψ(u, v )) e3, W (ℓ) 
+
+> θ
+
+= ID .
+
+Then 
+
+X(ℓ) 
+
+> g
+
+(u, v )W (ℓ) 
+
+> θ
+
+= logit( aℓψ(u, v )) e3.
+
+Applying σ componentwise yields 
+
+σ X(ℓ) 
+
+> g
+
+W (ℓ)
+
+> θ
+
+ =   12 , 12 , a ℓψ(u, v ), 12 , . . . , 12
+
+.
+
+Gated output. Since Y (u, v ) = e3, we obtain 
+
+Y ′(u, v ) = e3 ⊙ σ(·) = aℓψ(u, v ) e3.
+
+Residual accumulation. Define 
+
+h(ℓ) = h(ℓ−1) + aℓψ(u, v ) e3.
+
+By induction, 
+
+h(L)(u, v ) =  u, v, 
+
+> L
+
+X
+
+> ℓ=1
+
+aℓψ(u, v ), 1, 0, . . . , 0.
+
+Final output map. Define a linear projection P : RD → RD by 
+
+P (x1, x 2, x 3, x 4, x 5, . . . , x D ) = ( x1, x 2, x 3, 0, . . . , 0) .
+
+Then 
+
+P  h(L)(u, v ) =  u, v, 
+
+> L
+
+X
+
+> ℓ=1
+
+aℓψ(u, v ), 0, . . . , 0,
+
+which is the claimed normal form. 30 A.1.7 Proof of Lemma 3.12 
+
+Proof. Because the last D − 3 coordinates are constant, the intrinsic geometry of ML is the same as that of the graph surface 
+
+X(u, v ) = ( u, v, f L(u, v )) ⊂ R3, fL(u, v ) := ALψ(u, v ).
+
+Hence it suffices to compute the Gaussian curvature of the graph surface X.The tangent vectors are 
+
+Xu = (1 , 0, f u), Xv = (0 , 1, f v ).
+
+Thus the coefficients of the first fundamental form are 
+
+E = ⟨Xu, X u⟩ = 1 + f 2 
+
+> u
+
+, F = ⟨Xu, X v ⟩ = fufv , G = ⟨Xv , X v ⟩ = 1 + f 2 
+
+> v
+
+.
+
+A unit normal vector is 
+
+N = (−fu, −fv , 1) 
+
+p1 + f 2 
+
+> u
+
++ f 2
+
+> v
+
+.
+
+The second derivatives are 
+
+Xuu = (0 , 0, f uu ), Xuv = (0 , 0, f uv ), Xvv = (0 , 0, f vv ),
+
+so the coefficients of the second fundamental form are 
+
+e = ⟨Xuu , N ⟩ = fuu 
+
+p1 + f 2 
+
+> u
+
++ f 2
+
+> v
+
+,f = ⟨Xuv , N ⟩ = fuv 
+
+p1 + f 2 
+
+> u
+
++ f 2
+
+> v
+
+,g = ⟨Xvv , N ⟩ = fvv 
+
+p1 + f 2 
+
+> u
+
++ f 2
+
+> v
+
+.
+
+Therefore, 
+
+K = eg − f 2
+
+EG − F 2 = fuu fvv − f 2
+
+> uv
+
+ 1 + f 2 
+
+> u
+
++ f 2
+
+> v
+
+2 .
+
+Now evaluate at the origin. Since ∇ψ(0) = 0, 
+
+∇fL(0) = AL∇ψ(0) = 0 , D2fL(0) = ALD2ψ(0) .
+
+Hence 
+
+KML
+
+ FL(0)  = det D2fL(0) .
+
+Using the scaling of the determinant for a 2 × 2 matrix, det D2fL(0) = det  ALD2ψ(0)  = A2 
+
+> L
+
+det D2ψ(0) .
+
+Thus 
+
+KML
+
+ FL(0)  = A2 
+
+> L
+
+det D2ψ(0) .
+
+31 A.1.8 Proof of Theorem 3.13 
+
+Proof. By the local gated-attention normal form lemma, 
+
+χout ◦ FL ◦ χ−1in (u, v ) =  u, v, A Lψ(u, v ), 0, . . . , 0.
+
+Therefore the graph-curvature lemma applies and gives 
+
+KML
+
+ FL(0)  = A2 
+
+> L
+
+det D2ψ(0) .
+
+If aℓ ≥ a0 > 0 for all ℓ, then 
+
+AL =
+
+> L
+
+X
+
+> ℓ=1
+
+aℓ ≥ a0L. 
+
+Taking absolute values yields 
+
+KML
+
+ FL(0)  = A2 
+
+> L
+
+det D2ψ(0) ≥ a20 det D2ψ(0) L2.
+
+If furthermore det D2ψ(0) > 0, then the absolute values may be dropped and we obtain 
+
+KML
+
+ FL(0)  ≥ a20 det D2ψ(0) L2.
+
+A.1.9 Proof of Theorem 3.15 
+
+Proof. Write Φtot  
+
+> L
+
+= ( f 1, . . . , f D−2),
+
+so that 
+
+FL(u, v ) = ( u, v, f 1(u, v ), . . . , f D−2(u, v )) .
+
+First derivatives are 
+
+Fu = (1 , 0, f 1 
+
+> u
+
+, . . . , f D−2 
+
+> u
+
+), Fv = (0 , 1, f 1 
+
+> v
+
+, . . . , f D−2 
+
+> v
+
+).
+
+Since DΦtot  
+
+> L
+
+(0) = 0, we have f αu (0) = f αv (0) = 0, so 
+
+Fu(0) = (1 , 0, 0, . . . , 0) , Fv (0) = (0 , 1, 0, . . . , 0) .
+
+Thus the induced metric satisfies gij (0) = δij .The normal space at FL(0) is spanned by 
+
+nα = e2+ α, α = 1 , . . . , D − 2.
+
+Second derivatives are 
+
+Fuu = (0 , 0, f 1
+
+> uu
+
+, . . . , f D−2 
+
+> uu
+
+), Fuv = (0 , 0, f 1 
+
+> uv
+
+, . . . , f D−2 
+
+> uv
+
+), Fvv = (0 , 0, f 1 
+
+> vv
+
+, . . . , f D−2 
+
+> vv
+
+).
+
+Thus the second fundamental form in direction nα is 
+
+II (α) =
+
+f αuu (0) f αuv (0) 
+
+f αuv (0) f αvv (0) 
+
+
+
+= D2f α(0) .
+
+32 At the base point, the Gaussian curvature is given by the Gauss equation 
+
+K =
+
+> D−2
+
+X
+
+> α=1
+
+ hα
+
+> 11
+
+hα 
+
+> 22
+
+− (hα
+
+> 12
+
+)2 =
+
+> D−2
+
+X
+
+> α=1
+
+det  II (α),
+
+where hαij = ⟨Fij , n α⟩.Substituting II (α) = D2f α(0) gives 
+
+KML
+
+ FL(0)  =
+
+> D−2
+
+X
+
+> α=1
+
+det 
+
+
+
+D2(Φ tot  
+
+> L
+
+)α(0) 
+
+
+
+.
+
+Linearity of the Hessian yields 
+
+D2(Φ tot  
+
+> L
+
+)α(0) = 
+
+> L
+
+X
+
+> ℓ=1
+
+D2Φαℓ (0) ,
+
+which gives the stated formula. 
+
+A.1.10 Proof of corollary 3.16 
+
+Proof. We have Φtot  
+
+> L
+
+(u, v ) = 
+
+> L
+
+X
+
+> ℓ=1
+
+aℓψ(u, v )c = ALψ(u, v )c. 
+
+Thus 
+
+D2(Φ tot  
+
+> L
+
+)α(0) = ALcαD2ψ(0) .
+
+Using det( λH ) = λ2 det( H) for 2 × 2 matrices, det  D2(Φ tot  
+
+> L
+
+)α(0)  = A2
+
+> L
+
+c2 
+
+> α
+
+det D2ψ(0) .
+
+Summing over α gives 
+
+KML
+
+ FL(0)  = A2
+
+> L
+
+∥c∥2 det D2ψ(0) .
+
+Since aℓ ≥ a0 > 0, we have AL ≥ a0L, hence 
+
+A2 
+
+> L
+
+≥ a20L2,
+
+which gives the bound. 
+
+A.1.11 Proof of Lemma 3.18 
+
+Proof. The map ( ϕ, W θ ) 7 → μWθ (ϕ) is smooth, hence gij (ϕ; Wθ ) depends continuously on (ϕ, W θ ). Therefore det g is continuous and R is open. Since g = ( Dμ Wθ )⊤Dμ Wθ , positivity implies that Dμ Wθ has rank 2, so μWθ is an im-mersion and curvature is well-defined. Gaussian curvature depends smoothly on the metric and its derivatives, hence is contin-uous on R.33 A.1.12 Proof of Lemma 3.19 
+
+Proof. Since ( ϕ, W θ ) 7 → K(ϕ; Wθ ) is continuous on R (Lemma 3.18), and 
+
+K(ϕ; W ∗ 
+
+> θ
+
+) ≥ c > 0 ∀ϕ ∈ K, 
+
+it follows that inf  
+
+> ϕ∈K
+
+K(ϕ; W ∗ 
+
+> θ
+
+) ≥ c. 
+
+By continuity in both variables, K(ϕ; Wθ ) is uniformly continuous on a neighborhood of the compact set K × { W ∗ 
+
+> θ
+
+}. Hence there exists an open neighborhood O of W ∗ 
+
+> θ
+
+such that 
+
+|K(ϕ; Wθ ) − K(ϕ; W ∗ 
+
+> θ
+
+)| < c
+
+2 ∀ϕ ∈ K, W θ ∈ O .
+
+Therefore 
+
+K(ϕ; Wθ ) ≥ c
+
+2 > 0.
+
+Since R is open and contains ( ϕ, W ∗ 
+
+> θ
+
+), possibly shrinking O ensures ( ϕ, W θ ) ∈ R for all 
+
+ϕ ∈ K, completing the proof. 
+
+A.1.13 Proof of Theorem 3.17 
+
+Proof. For each Wθ , the map μWθ : U → RD is smooth since Y , X∗, and σ are smooth. Hence 
+
+ϕ 7 → N (μWθ (ϕ), I D )defines a smooth Gaussian location family. On any open set where Dμ Wθ has rank 2, the map is an immersion. The Fisher–Rao metric reduces to the Euclidean pullback, 
+
+gij (ϕ; Wθ ) = ⟨∂iμWθ (ϕ), ∂ j μWθ (ϕ)⟩.
+
+(i) Flatness. If the gate is identically 1, then 
+
+μWθ (ϕ) = Y (ϕ) = a + Bϕ. 
+
+Thus ∂iμWθ = Be i is constant, so the metric is constant. Hence all Christoffel symbols vanish and the Gaussian curvature is identically zero. 
+
+(ii) Positive curvature realization. Let s : U → S2 ⊂ R3 be a smooth spherical patch. Define ˜s(ϕ) = ( s1(ϕ), s 2(ϕ), s 3(ϕ), c 4, . . . , c D ),
+
+with constants c4, . . . , c D > 0. Since the added coordinates are constant, the first funda-mental form is unchanged, so ˜ s has curvature identically 1. After possibly shrinking U , we may assume ˜ s is bounded. Choose the affine map Y (ϕ) = 
+
+a + Bϕ so that 0 < ˜sj (ϕ) < Y j (ϕ) ∀ϕ ∈ U, j = 1 , . . . , D. 
+
+Define 
+
+z(ϕ) = ˜ s(ϕ) ⊘ Y (ϕ) ∈ (0 , 1) D , ℓ(ϕ) = σ−1(z(ϕ)) .
+
+34 Set 
+
+X∗(ϕ) = ( ℓ(ϕ), 0, . . . , 0) , W ∗ 
+
+> θ
+
+=
+
+ID
+
+0
+
+
+
+.
+
+Then X∗(ϕ)W ∗ 
+
+> θ
+
+= ℓ(ϕ), hence 
+
+μW ∗ 
+
+> θ
+
+(ϕ) = Y (ϕ) ⊙ σ(ℓ(ϕ)) = ˜ s(ϕ).
+
+Thus K(ϕ; W ∗ 
+
+> θ
+
+) ≡ 1. 
+
+(iii) Local robustness. Fix a nonempty compact set K ⊂ U . Since K(ϕ; W ∗ 
+
+> θ
+
+) = 1 for all ϕ ∈ K, the result follows from Lemma 3.19. 
+
+A.1.14 Proof of theorem 3.20 
+
+Proof. Openness. Let g ∈ N ϕ0 . Since g ∈ I ϕ0 , the induced metric is nondegenerate at ϕ0.On Iϕ0 , the curvature tensor at ϕ0 depends smoothly on the 2-jet of μg , hence continuously on g in the C2 topology. Therefore the condition Rg (ϕ0)̸ = 0 is stable under sufficiently small perturbations, so Nϕ0 is open. 
+
+Density. Fix g ∈ I ϕ0 and set F := μg . Let 
+
+T := Im DF (ϕ0).
+
+Let 
+
+S := {j : Yj (ϕ0)̸ = 0 }, E := span {ej : j ∈ S}.
+
+Since dim E ≥ d + 1 and dim T = d, we have dim( E ∩ T ⊥) ≥ dim E + dim T ⊥ − D ≥ 1.
+
+Choose a unit vector n ∈ E ∩ T ⊥.Since Yj (ϕ0)̸ = 0 for j ∈ S, by continuity there exists a neighborhood V ∋ ϕ0 such that 
+
+Yj (ϕ)̸ = 0 on V for all j ∈ S. Choose χ ∈ C∞ 
+
+> c
+
+(V ) with χ ≡ 1 near ϕ0.Define 
+
+qε(ϕ) := ε
+
+2 ∥ϕ − ϕ0∥2.
+
+Define (hε)j (ϕ) = 
+
+
+
+χ(ϕ) qε(ϕ) nj
+
+Yj (ϕ) , j ∈ S, 
+
+0, j / ∈ S. 
+
+Set ˜ gε = g + hε, ˜Fε = μ˜gε .Then ˜Fε = F + χq εn. 
+
+Since qε vanishes to first order at ϕ0, we have 
+
+D(χq εn)( ϕ0) = 0 ,
+
+so 
+
+D ˜Fε(ϕ0) = DF (ϕ0).
+
+Thus ˜ gε ∈ I ϕ0 .35 Second fundamental form. At ϕ0, choose normal coordinates on the parameter domain and orthonormal bases of T and T ⊥, with n = n1. In these coordinates, the Christoffel symbols vanish at ϕ0, so 
+
+Bαij = ⟨∂ij F (ϕ0), n α⟩.
+
+Since χ ≡ 1 near ϕ0,
+
+D2 ˜Fε(ϕ0) = D2F (ϕ0) + εI d ⊗ n. 
+
+Thus ˜B1 
+
+> ij
+
+= B1 
+
+> ij
+
++ εδ ij , ˜Bαij = Bαij (α ≥ 2) .
+
+Curvature computation. By the Gauss equation, 
+
+Rijkl = X
+
+> α
+
+(Bαik Bαjl − Bαil Bαjk ).
+
+Fix any i̸ = j (which exists since d ≥ 2). Then ˜Rijij (ε) = ( B1 
+
+> ii
+
++ ε)( B1 
+
+> jj
+
++ ε) − (B1 
+
+> ij
+
+)2 + X
+
+> α≥2
+
+(Bαii Bαjj − (Bαij )2).
+
+Hence ˜Rijij (ε) = Rijij (0) + ε(B1 
+
+> ii
+
++ B1 
+
+> jj
+
+) + ε2.
+
+Since n is a unit vector, the coefficient of the ε2 term is exactly 1. Thus this is a nonzero polynomial in ε, so it has only finitely many roots. Therefore, for all sufficiently small ε outside this finite set, ˜Rijij (ε)̸ = 0 .
+
+Since a single nonzero curvature component implies R˜gε (ϕ0)̸ = 0, we obtain ˜ gε ∈ N ϕ0 .Since hε → 0 in C2, every neighborhood of g contains such perturbations. Thus Nϕ0 is dense in Iϕ0 .36 A.2 Additional analysis of anisotropy under varying conditioning. 
+
+Figure 6: Isotropic vs anisotropic curvature. Points correspond to different gate strengths and condition numbers, with marker shape indicating gate strength and color indicating condition number. The two curvature measures are nearly perfectly correlated, while anisotropic curvature differs in scale due to metric effects. 
+
+Curvature is intrinsic to the representation mapping. Figure 6 compares curva-ture measured under isotropic and anisotropic metrics across gate strengths and condition numbers. Each point corresponds to a specific combination of gate strength and condition number. We observe that isotropic and anisotropic curvature are nearly perfectly correlated across all settings. While anisotropic curvature increases with the condition number due to metric scaling, the relative ordering induced by gate strength is preserved. This shows that curvature is primarily determined by the representation mapping, while the choice of metric mainly affects its scale, consistent with our theoretical analysis. 37 A.3 Ablation under anisotropic metrics 
+
+Figure 7: Ablation under anisotropic metrics. Each subplot corresponds to a different condition number. While curvature increases with the condition number, the relative order-ing of variants and their accuracy remain unchanged. We repeat the ablation analysis under anisotropic metrics with varying condition numbers. Figure 7 shows test accuracy and anisotropic curvature for different attention variants across condition numbers. We observe that the qualitative trends remain unchanged. Multiplicative gating consis-tently yields higher curvature and improved accuracy, while ungated attention and pointwise nonlinearities exhibit lower curvature and weaker performance. Increasing the condition number rescales the magnitude of curvature but does not affect accuracy or the relative ordering of variants. These results further support that geometric expressivity is driven by the representation mapping rather than the choice of metric. 38 A.4 Linear Control Task 
+
+To assess whether the observed gains arise from generic additional nonlinearity, we consider a control task in which the decision boundary is linear and does not require curved rep-resentations. As in the main experiment, each example is generated by sampling a latent center c ∈ [−2, 2] 2 and forming a sequence of noisy observations. The label is determined by a linear function of the latent center, 
+
+y = 1(w⊤c > 0) ,
+
+for a fixed vector w ∈ R2.Table 1 reports results across different gating strengths. We observe that all variants achieve similar accuracy, with differences well within the standard deviation across seeds. In particular, accuracy remains nearly constant despite substantial variation in representation curvature. Figure 8 shows that increasing gate strength leads to a clear increase in attention curva-ture under both isotropic and anisotropic metrics (with condition number 12). However, as shown in Figure 9, these increases in curvature do not translate into improved performance. The relationship between curvature and accuracy is not consistently positive and is weakly negative in this setting. Taken together, these results indicate that increased geometric expressivity does not provide a performance benefit when the task does not require nonlinear structure. This supports the interpretation that the gains observed in the main experiment arise specifically from the ability of gated attention to realize curved representations, rather than from generic additional nonlinearity. Table 1: Linear control task. Mean ± std over seeds. Gate strength Accuracy Attn curvature (iso) Attn curvature (aniso cond = 12) 0.00 0.9656 ± 0.0081 0.9883 1.2919 0.25 0.9664 ± 0.0079 0.9624 1.2695 0.50 0.9654 ± 0.0081 0.9434 1.2598 1.00 0.9662 ± 0.0082 1.0920 1.4584 1.50 0.9636 ± 0.0088 1.3995 1.8438 39 Figure 8: Linear control task. Attention curvature as a function of gate strength under isotropic and anisotropic metrics (condition number 12). While curvature increases overall with gate strength, the relationship is not strictly monotonic, reflecting the absence of task pressure for nonlinear structure. 
+
+Figure 9: Linear control task. Accuracy as a function of isotropic attention curvature across gate strengths. No consistent positive relationship is observed, indicating that increased curvature does not improve performance when the task does not require nonlinear structure. We note that, unlike in the curved task, curvature does not increase monotonically with gate strength in the linear control setting. This suggests that, in the absence of task pressure for nonlinear structure, curvature is not systematically reinforced during training. 
+
+# A.5 Experimental Details 
+
+A.5.1 Model Architecture 
+
+We use a minimal attention-based model consisting of a single attention block followed by a classifier head. Inputs in R2 are projected to a hidden dimension of 64 and arranged into sequences of length 8. The projected inputs are processed by scaled dot-product attention, followed by mean pooling and a two-layer MLP classifier. We consider multiple variants of the attention output: (i) ungated attention, (ii) a pointwise SiLU nonlinearity applied to the attention output, and (iii) multiplicative gating with different parameterizations. 40 For gated models, we vary a gate strength parameter α ∈ { 0, 0.25 , 0.5, 1.0, 1.5}, which controls the degree of multiplicative modulation. 
+
+A.5.2 Training Setup 
+
+All models are trained using AdamW with learning rate 2 × 10 −3, weight decay 10 −4, and batch size 128 for 20 epochs. Results are averaged over 5 random seeds {0, 1, 2, 3, 4}. All model variants are trained under identical settings to ensure fair comparison. 
+
+A.5.3 Data Generation 
+
+We evaluate models on a synthetic sequence classification task designed to require nonlinear structure. Each dataset consists of 4000 training samples and 1000 test samples. Inputs are generated in R2 with latent centers sampled uniformly from [ −2, 2] 2, and observation noise with standard deviation 0.20 is added to each sample. 
+
+A.5.4 Curvature Estimation 
+
+We estimate representation curvature using a finite-difference proxy: 
+
+κ(x) = f (x + εv ) − 2f (x) + f (x − εv )
+
+ε2 ,
+
+where v is a random unit direction and ε = 10 −2. The estimate is averaged over 64 random directions. This quantity measures the magnitude of second-order variation of the representation map f and serves as a proxy for local nonlinearity. It is not an invariant notion of Rieman-nian curvature and does not directly estimate sectional curvature. Rather, it is used for comparative analysis across model variants. We report curvature of the attention output mean, and additionally compute curvature under a Fisher–Rao square-root embedding. 
+
+A.5.5 Robustness Under Anisotropic Metrics 
+
+To assess robustness under different metric scalings, we evaluate curvature under diago-nal precision matrices with condition numbers {2, 4, 8, 12 , 20 }. This tests whether relative curvature comparisons are stable under anisotropic rescaling of the representation space. 41

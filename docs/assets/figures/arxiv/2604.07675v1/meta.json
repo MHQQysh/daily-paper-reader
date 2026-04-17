@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-001.webp",
+      "caption": "Table 1. Computational complexity comparison. GFLOPs measured for a single 64×64 input; inference time averaged over 100 forward passes on a single GPU.",
+      "page": 6,
+      "index": 1,
+      "width": 613,
+      "height": 225
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-002.webp",
+      "caption": "Figure 8. Clean vs. inflated evaluation protocols. Including previous-day fire in the target and relabeling unknown pixels as non-fire inflates reported F1 by 44–50%, disproportionately benefiting weaker architectures and masking genuine performance differences.",
+      "page": 11,
+      "index": 2,
+      "width": 854,
+      "height": 464
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-003.webp",
+      "caption": "Figure 9. Monte Carlo Dropout uncertainty estimation for three test samples. From left to right: previous-day fire mask, ground truth, mean prediction (20 stochastic passes), and pixel-level uncertainty (σ ). Uncertainty concentrates at fire perimeter boundaries, providing actionable information for prioritizing ground-truth verification during emergency response.",
+      "page": 11,
+      "index": 3,
+      "width": 857,
+      "height": 584
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-004.webp",
+      "caption": "Table 2. Performance comparison on the Next-Day Wildfire Spread test set. All metrics computed under strict next-day-only prediction with −1 pixels excluded. Best results in bold.",
+      "page": 7,
+      "index": 4,
+      "width": 799,
+      "height": 224
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-005.webp",
+      "caption": "Figure 4. Architecture spectrum: F1 score vs. model complexity. FireSenseNet achieves the highest F1 (0.4176) with only 3.0M parameters, while Transformer-based architectures cluster at the bottom despite higher parameter counts. The dual y-axis reveals an inverse relationship between F1 and reliance on Transformer components.",
+      "page": 7,
+      "index": 5,
+      "width": 854,
+      "height": 345
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-006.webp",
+      "caption": "Figure 2. Visualization of a representative test sample showing all 12 input channels and the ground truth fire mask. Static fuel/terrain features (top-left four panels) exhibit fine-grained spatial structure, while dynamic meteorological variables (remaining panels) vary smoothly across the patch. The ground truth (bottom-right) shows fire pixels (red), non-fire pixels (green), and unknown pixels (gray, labeled −1). This heterogeneity motivates the dual-branch design of FireSenseNet.",
+      "page": 3,
+      "index": 6,
+      "width": 857,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-007.webp",
+      "caption": "Figure 5. Qualitative prediction comparison on four test samples. FireSenseNet (CAFIM) produces spatially precise predictions matching ground truth geometries, while the SegFormer generates diffuse, over-spread probability maps. The Baseline CNN captures fire locations but with less boundary precision.",
+      "page": 8,
+      "index": 7,
+      "width": 861,
+      "height": 557
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-008.webp",
+      "caption": "Figure 6. (a) CAFIM ablation: removing CAFIM and replacing it with simple concatenation reduces F1 by 7.1%. (b) Channel-wise feature importance via systematic ablation. PrevFireMask dominates (∆F1 = −0.21); wind speed is the only channel whose removal improves performance (green bar), indicating it acts as noise at this temporal resolution.",
+      "page": 9,
+      "index": 8,
+      "width": 855,
+      "height": 295
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-009.webp",
+      "caption": "Figure 7. CAFIM attention maps at three encoder scales for representative test samples. The learned spatial attention α determines the relative contribution of fuel features (α → 1, yellow) vs. weather features (α → 0, dark). At fine scales, CAFIM focuses sharply on fire perimeters; at coarse scales, it captures broader susceptibility patterns.",
+      "page": 9,
+      "index": 9,
+      "width": 854,
+      "height": 464
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07675v1/fig-010.webp",
+      "caption": "Figure 3. FireSenseNet architecture. Fuel/terrain and meteorological inputs are processed by independent encoder branches with modality-appropriate kernel sizes. At each spatial scale, a Cross-Attentive Feature Interaction Module (CAFIM) generates a spatial attention map that gates the contribution of each modality before routing to the U-Net decoder. MC Dropout before the prediction head enables uncertainty quantification.",
+      "page": 5,
+      "index": 10,
+      "width": 845,
+      "height": 338
+    }
+  ]
+}

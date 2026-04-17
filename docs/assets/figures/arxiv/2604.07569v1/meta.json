@@ -1,0 +1,142 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-001.webp",
+      "caption": "Figure 2: Illustration of Soft Entropy Estimation: (Top) These facets illustrate the normalisation, sampling, and soft assignment formalised in equation 2. (Bottom) Soft Assignments are aggregated into a distribution that describes the space P (Ẑ) of which we take the Shannon entropy (equation 3.1). An interactive visual of this process is available here",
+      "page": 6,
+      "index": 1,
+      "width": 814,
+      "height": 558
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-002.webp",
+      "caption": "Figure 6: Representation Information Relates Significantly to Performance Vertical axes, shared across all plots, show aggregate performance across 6 benchmarks (MMLU Pro, BBH, Math LVL5, IFEval, GPQA, MuSR). Horizontal axes use token back-off to show complexity significantly correlates with downstream performance (Top Left), while expressivity alone does not (Top Right). The ratio of how many bits of expressivity a model has per bit of complexity does correlate significantly – this quantity indicates how optimally compressed a model is (Bottom Left). The amount of preference information in a model also correlates with downstream performance (Bottom Right). Above each facet are results from a spearman correlation between their axes, and a partial spearman that treats a model’s number of parameters as a covariate. Expressivity and complexity are calculated using token back-off in all four facets.",
+      "page": 11,
+      "index": 2,
+      "width": 829,
+      "height": 571
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-003.webp",
+      "caption": "Figure 14: Illustration of conditional probability estimates. An example sentence is provided, assuming word-level tokenization for simplicity. At left are the indices for the input and output tokens when the current input word is wherefore. At right is shown the sub-setting procedure for estimating conditional probabilities. This illustrates how bigram estimates do not compute entropy of two token embeddings, rather the embedding for the current token embedding conditioned on preceding context.",
+      "page": 26,
+      "index": 3,
+      "width": 824,
+      "height": 368
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-004.webp",
+      "caption": "Figure 11: Individual Task Performance Relationships: Shown on the vertical axis are individual task accuracies with each facet representing a different task. (Top) On the horizontal axis are optimality scores on C4 across 47 different open weights models hue indicating model id using the same legend as Figure 6. (Bottom) On the horziontal axes are is the amount of preference information in each model based on the Tulu dataset.",
+      "page": 21,
+      "index": 4,
+      "width": 829,
+      "height": 500
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-005.webp",
+      "caption": "Figure 16: Cross-Entropy Loss vs. Distance to bound. Shown on the vertical axis is the OLMo2 7b model’s cross-entropy loss on 10,000 examples from c4. On the horizontal axis is the ratio between I(Y ;Z) and I(X;Z) which is indicative of how close a representation is to the IB bound. Models begin to compress and approach the bound as the loss saturates.",
+      "page": 30,
+      "index": 5,
+      "width": 826,
+      "height": 340
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-006.webp",
+      "caption": "Figure 1: LLMs Learn an Optimal Compression of the Internet (Left) The information plane for pre-training of the OLMo2 7B model. The horizontal axis shows mutual information between representations and the input (complexity), the vertical axis shows mutual information with the predicted output (expressivity). The dotted line indicates the bound where models are optimally compressed, hue indicates timepoint in training in terms of tokens in billions. Estimates are based on 10,000 samples from the C4 dataset which is a broad crawl of the internet. (Right) The vertical axis shows the OLMo2 7B model’s loss on next-token-prediction of C4. The Horizontal axis shows the model’s proximity to the bound. Representations begin to approach the bound as the loss saturates.",
+      "page": 2,
+      "index": 6,
+      "width": 823,
+      "height": 442
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-007.webp",
+      "caption": "Figure 12: Smol LM2 Timecourses",
+      "page": 22,
+      "index": 7,
+      "width": 829,
+      "height": 1017
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-008.webp",
+      "caption": "Figure 5: Models Converge Along the Bound With Smaller Models Struggling to Compress. (Top Left) Open-Weights models across 6 families at the end of training, lie along the bound on optimal compression. Hue indicates performance on MMLU Pro. (Top Right) The vertical axis indicates mutual information with preference, with models with more preference information exhibiting better performance (Bottom) Zooming in on later pre-training for each model size the 1B model matches Phase 1 but struggles to achieve meaningful compression later on, oscillating for much of pre-training off the frontier. All results use back-off to the trigram level. A full legend identifying each dot, with additional levels of back-off, is given in Appendix Figures 8 and 9.",
+      "page": 10,
+      "index": 8,
+      "width": 826,
+      "height": 611
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-009.webp",
+      "caption": "Figure 9: Trigram and Quadgram Information Plane Shown here is the full, labelled trigram and quadgram information plane for 75 open-weights models. Compared with the token case above, here models lie even closer to the frontier. The quadgram estimates are noisy due to sample sparsity, this combined with the fact that all models are close to the bound results in some estimates appearing to cross the bound.",
+      "page": 18,
+      "index": 9,
+      "width": 829,
+      "height": 1037
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-010.webp",
+      "caption": "Figure 13: Pythia Model Timecourses",
+      "page": 23,
+      "index": 10,
+      "width": 814,
+      "height": 1006
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-011.webp",
+      "caption": "Figure 4: Models Largely Encode Local Context. (Top) The information plane over pre-training for the different levels of backoff. By changing how many tokens we condition the mutual information on in the context window, we see how the OLMo2 7B model compresses not just token but also local context information. Across all context windows we see the same two phase pattern predicted by the Information Bottleneck – with more contextual representations approaching greater optimality - indicated by hue. As context increases models compress both the target and source over training, rather than compressing the target independently. We hypothesise this is because in language modelling with full context the target and source distributions are nearly identical. (Bottom) By computing the conditional mutual information for a level of back-off given the others we can quantify what proportion of a model’s information encodes each level of context information. Each facet shows a different model size, with the horizontal axis reflecting training step and the vertical axis reflecting proportion of information from the source – hue indicates level of back-off",
+      "page": 8,
+      "index": 11,
+      "width": 829,
+      "height": 515
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-012.webp",
+      "caption": "Figure 10: Post-Training and Preference Information (Above) Preference information on the vertical axis against whether or not the model is post-trained on the horizontal axis, with significance values from a paired permutation test above. (Below) Again, preference information on the vertical axis against optimality of a model’s compression on the horizontal axis axis.",
+      "page": 19,
+      "index": 12,
+      "width": 817,
+      "height": 759
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-013.webp",
+      "caption": "Figure 8: Token & Bigram Information Plane for Open Weights Models Shown here is the full, labelled token information plane for 75 open-weights models. While models lie at different levels of complexity and expressivity, they broadly approach the IB Bound on optimal compression. Hue indicates optimality - or proximity to the bound.",
+      "page": 17,
+      "index": 13,
+      "width": 829,
+      "height": 1039
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-014.webp",
+      "caption": "Figure 18: Pre-training Time-courses Computed with a Mean vs. Expectation Shown are trajectories through the information plane over pre-training for the OLMo2 1b, 7b, 32b models. These analyses use a mean (top) or expectation (bottom) in computation of mutual information. The expectation is used in the main paper as it reflects true mutual information. Hue indicates tokens in billions over the course of pre-training.",
+      "page": 32,
+      "index": 14,
+      "width": 826,
+      "height": 523
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-015.webp",
+      "caption": "Figure 7: Proportions of Information Vs. Performance: Across 47 models less token information and more local contextual information relates significantly to performance based on a spearman correlation reported above each facet. Hue indicate model, legend is provided in figure 6.",
+      "page": 12,
+      "index": 15,
+      "width": 828,
+      "height": 425
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-016.webp",
+      "caption": "Figure 15: Proportions of Information Vs. Performance: Across 47 models less token information and more local contextual information relates significantly to performance based on a spearman correlation.",
+      "page": 27,
+      "index": 16,
+      "width": 829,
+      "height": 548
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07569v1/fig-017.webp",
+      "caption": "Figure 17: Estimator Robustness to number of bins and data distribution. Shown are trajectories through the information plane for the OLMo2 7b model. (Top) trajectories in the main paper use 100 reference points wi per layer, here 50 points are used, and show the same overall two-phase pattern. (bottom) estimates in the main paper are with respect to c4 given its resemblance to an LLM’s training distribution, here are trajectories computed with data from Tulu and MMLU pro which show the same two-phase pattern. Hue indicates log tokens in billions over the course of pre-training.",
+      "page": 31,
+      "index": 17,
+      "width": 826,
+      "height": 715
+    }
+  ]
+}

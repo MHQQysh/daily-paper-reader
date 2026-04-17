@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.14702v1/fig-001.webp",
+      "caption": "Figure 7: Ablation under anisotropic metrics. Each subplot corresponds to a different condition number. While curvature increases with the condition number, the relative ordering of variants and their accuracy remain unchanged.",
+      "page": 38,
+      "index": 1,
+      "width": 582,
+      "height": 785
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14702v1/fig-002.webp",
+      "caption": "Figure 5: Ablation of attention variants. Test accuracy (left axis) and isotropic curvature (right axis) for different attention variants. Ungated attention yields the lowest curvature and accuracy. Adding a pointwise SiLU nonlinearity increases both modestly, while multiplicative gating produces substantially higher curvature and improved accuracy. This shows that gains in geometric expressivity arise specifically from multiplicative gating rather than generic nonlinear transformations.",
+      "page": 21,
+      "index": 2,
+      "width": 622,
+      "height": 429
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14702v1/fig-003.webp",
+      "caption": "Figure 1: Geometric intuition for curvature generation in attention. Left: Ungated attention produces affine combinations of value vectors, so outputs lie in the affine hull aff{U1, U2, U3}, yielding a flat representation manifold with zero curvature. Right: Gating introduces element-wise modulation Y ′(X) = Y (X) ⊙ g(X), breaking affine structure and enabling nonzero curvature in the induced representation manifold.",
+      "page": 3,
+      "index": 3,
+      "width": 826,
+      "height": 391
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14702v1/fig-004.webp",
+      "caption": "Figure 9: Linear control task. Accuracy as a function of isotropic attention curvature across gate strengths. No consistent positive relationship is observed, indicating that increased curvature does not improve performance when the task does not require nonlinear structure.",
+      "page": 40,
+      "index": 4,
+      "width": 414,
+      "height": 295
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14702v1/fig-005.webp",
+      "caption": "Figure 2: Gating increases representation curvature. Isotropic curvature is invariant across condition numbers, while anisotropic curvature varies with conditioning. Higher gate strength consistently increases curvature.",
+      "page": 19,
+      "index": 5,
+      "width": 622,
+      "height": 387
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14702v1/fig-006.webp",
+      "caption": "Figure 3: Decision boundaries in latent space on the synthetic curved classification task. The ungated model fails to align with the nonlinear boundary, while the gated model better captures the curved structure, demonstrating improved geometric expressivity.",
+      "page": 19,
+      "index": 6,
+      "width": 826,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14702v1/fig-007.webp",
+      "caption": "Figure 6: Isotropic vs anisotropic curvature. Points correspond to different gate strengths and condition numbers, with marker shape indicating gate strength and color indicating condition number. The two curvature measures are nearly perfectly correlated, while anisotropic curvature differs in scale due to metric effects.",
+      "page": 37,
+      "index": 7,
+      "width": 622,
+      "height": 431
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14702v1/fig-008.webp",
+      "caption": "Figure 4: Curvature correlates with task performance. Test accuracy versus isotropic attention curvature for different gate strengths. Higher curvature leads to improved accuracy, with mild saturation at larger values.",
+      "page": 20,
+      "index": 8,
+      "width": 622,
+      "height": 412
+    }
+  ]
+}

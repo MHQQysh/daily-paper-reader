@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07737v1/fig-001.webp",
+      "caption": "Table 5: Comprehensive Token Length Statistics. Comparison between Question Only and Full Prompt across six statistical dimensions: Minimum, Quartiles (25%, 50%, 75%), Mean, and Maximum. All tasks consist of 200 samples.",
+      "page": 15,
+      "index": 1,
+      "width": 921,
+      "height": 290
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07737v1/fig-002.webp",
+      "caption": "Figure 1: (A) Average accuracy across six synthetic tasks, performance drops sharply with increasing numerical sequence length (S: 2–32, M: 33–128, L: 129–256, XL: 257–512), while SepSeq remains largely unaffected. (B) visualize the attention scores given the input: “... How many 1’s in [0 1 0 1 0 1 0 0 0] ...”. (C) show the attention scores for the input with segmentation: “... How many 1’s in [0 1 0 1\\n0 1 0 0\\n0] ...”. (B) exhibits dispersed attention across the entire sequence while (C) demonstrates segment-focused attention.",
+      "page": 2,
+      "index": 2,
+      "width": 923,
+      "height": 287
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07737v1/fig-003.webp",
+      "caption": "Table 1: The average answer rate and accuracy for each task over 10 independent runs, reported as mean ± standard deviation. Bold indicates the best average performance, while underlined values denote the best average performance excluding our method. “Incr.” indicates the percentage improvement of SepSeq over the strongest non-SepSeq baseline. Green and red indicate improvement and degradation in performance, respectively.",
+      "page": 7,
+      "index": 3,
+      "width": 929,
+      "height": 322
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07737v1/fig-004.webp",
+      "caption": "Table 2: The average answer rate and accuracy of each model across 10 tasks, computed over 10 independent runs and reported as mean ± standard deviation. Bold indicates the best average performance, while underlined values denote the best average performance excluding our method. “Incr.” indicates the percentage improvement of SepSeq over the strongest non-SepSeq baseline. Green and red indicate improvement and degradation in performance, respectively.",
+      "page": 7,
+      "index": 4,
+      "width": 946,
+      "height": 301
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07737v1/fig-005.webp",
+      "caption": "Table 4: Performance of Qwen3-30B-A3B-Instruct-2507 and Qwen3-30B-A3B-Thinking-2507 on the strict numerical sequence repetition task. The table shows the number of correct reproductions and accuracy for each sequence length range.",
+      "page": 13,
+      "index": 5,
+      "width": 750,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07737v1/fig-006.webp",
+      "caption": "Figure 4: Comparison between Vanilla and SepSeq across tasks. The left panel shows that SepSeq significantly reduces token consumption during inference (average -16.4%).",
+      "page": 8,
+      "index": 6,
+      "width": 449,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07737v1/fig-007.webp",
+      "caption": "Figure 3: (A): Average Accuracy across different separate intervals. (B): Average Accuracy across different separator symbols. (C): Average Answer Rate and Accuracy across different Qwen3 model sizes: 0.6B to 14B.",
+      "page": 8,
+      "index": 7,
+      "width": 936,
+      "height": 258
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07737v1/fig-008.webp",
+      "caption": "Figure 2: Visualization of the Separator Attention effect. (A-B) The separator τsep serves as a prominent attention sink, demonstrating consistently higher attention scores than τsp across both (A) model layers and (B) attention heads. (C) This concentrated attention on τsep results in a substantial reduction of cross-segment attention weights, thereby localizing the attention scope relative to the vanilla τsp.",
+      "page": 5,
+      "index": 8,
+      "width": 950,
+      "height": 229
+    }
+  ]
+}
