@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09495v1/fig-001.webp",
+      "caption": "Figure 1. Scaling of memory and runtime with horizon T and agent-state size Z across three benchmarks: Dec-Tiger, Cooperative Box Pushing, and Mars Rovers. Rows correspond to different metrics, columns correspond to Dec-POMDPs.",
+      "page": 21,
+      "index": 1,
+      "width": 967,
+      "height": 937
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09495v1/fig-002.webp",
+      "caption": "Table 1. Performance comparison across benchmarks and planning horizons T. RS-CPI uses |Zi| = 2. The “-” entries were not not reported in the corresponding paper.",
+      "page": 7,
+      "index": 2,
+      "width": 494,
+      "height": 1279
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09495v1/fig-003.webp",
+      "caption": "Table 5. Mars Rovers: Joint policies over time. Top action in each cell: Agent 1, bottom action: Agent 2.",
+      "page": 18,
+      "index": 3,
+      "width": 665,
+      "height": 856
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09495v1/fig-004.webp",
+      "caption": "Table 3. Table for comparison of number of agent states |Zi| with performance. We did not perform experiments for MARS ROVERS for |Zi| = 4.",
+      "page": 8,
+      "index": 4,
+      "width": 494,
+      "height": 1277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09495v1/fig-005.webp",
+      "caption": "Table 2. Ablations with risk-seeking and conservatism for the different planning horizons T . All experiments use |Zi| = 2.",
+      "page": 8,
+      "index": 5,
+      "width": 485,
+      "height": 813
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09495v1/fig-006.webp",
+      "caption": "Table 4. Cooperative Box Pushing: Joint policies over time. Top action in each cell: Agent 1, bottom action: Agent 2.",
+      "page": 17,
+      "index": 6,
+      "width": 625,
+      "height": 1198
+    }
+  ]
+}

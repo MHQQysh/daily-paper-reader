@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.13656v1/fig-001.webp",
+      "caption": "Figure 1: Empirical validation of training reachability for the OLS-Transformer. (a) Functional Convergence: The synchronized evolution of training MSE (left axis) and relative distance to the OLS benchmark (right axis), with rapid alignment occurring within the initial 1000 epochs. (b) Structural Emergence: The trajectory of the learnable parameter L precisely recovering the theoretical optimum L∗ = ( 1nX TX)−1/2, which is temporally synchronized with the functional convergence of the output.",
+      "page": 4,
+      "index": 1,
+      "width": 916,
+      "height": 292
+    }
+  ]
+}

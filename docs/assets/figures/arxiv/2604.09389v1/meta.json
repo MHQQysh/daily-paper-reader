@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09389v1/fig-001.webp",
+      "caption": "Figure 8: Validation accuracy (top) and cross-entropy loss (bottom) on WikiText-103 under a fixed training budget.",
+      "page": 14,
+      "index": 1,
+      "width": 829,
+      "height": 1068
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09389v1/fig-002.webp",
+      "caption": "Figure 7: Cross-entropy loss on AllTheNews2.0 dataset under a fixed training budget.",
+      "page": 13,
+      "index": 2,
+      "width": 829,
+      "height": 466
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09389v1/fig-003.webp",
+      "caption": "Table 2: Dataset statistics and training cost based on 2.4M trainable parameters.",
+      "page": 8,
+      "index": 3,
+      "width": 660,
+      "height": 198
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09389v1/fig-004.webp",
+      "caption": "Figure 4: Training dynamics across dataset subset sizes",
+      "page": 8,
+      "index": 4,
+      "width": 829,
+      "height": 322
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09389v1/fig-005.webp",
+      "caption": "Figure 1: Architecture graph of the attentiononly architecture with individual layers.",
+      "page": 4,
+      "index": 5,
+      "width": 321,
+      "height": 452
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09389v1/fig-006.webp",
+      "caption": "Table 1: Key overview of the attention-only architecture with insights to architecture reductions and the parameter count with the amount of total parameters and trainable parameters.",
+      "page": 4,
+      "index": 6,
+      "width": 443,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09389v1/fig-007.webp",
+      "caption": "Figure 6: Empirical best validation CE loss per subset size compared to the Kaplan scaling-law prediction on AllTheNews2.0",
+      "page": 12,
+      "index": 7,
+      "width": 582,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09389v1/fig-008.webp",
+      "caption": "Figure 5: Validation accuracy on AllTheNews2.0 dataset vs. subset tokens for fixed training budget",
+      "page": 9,
+      "index": 8,
+      "width": 664,
+      "height": 488
+    }
+  ]
+}

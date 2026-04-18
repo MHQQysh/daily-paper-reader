@@ -1,0 +1,118 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-001.webp",
+      "caption": "Table 4 | Video Generation on UCF-101. Methods in gray are pretrained on additional large video data. ✓ denotes class-conditional. ∗ indicates custom resolutions. Δ denotes values from prior publications. No guidance is used.",
+      "page": 11,
+      "index": 1,
+      "width": 468,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-002.webp",
+      "caption": "Figure 8 | Impact of ILSD across generation processes. ILSD improves performance for all 𝐿 in inference especially when 𝐿 ≠ 𝐿𝑚𝑎𝑥 . For w/o ILSD, 𝐿𝑚𝑎𝑥 here refers to the number of loops the model is trained with. Results are on ImageNet 256 × 256.",
+      "page": 11,
+      "index": 2,
+      "width": 816,
+      "height": 290
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-003.webp",
+      "caption": "Figure 7 | Impact of ILSD on class-conditional UCF-101 generation. ILSD significantly improves performance for all values of 𝐿 in inference especially when 𝐿 ≠ 𝐿𝑚𝑎𝑥 .",
+      "page": 11,
+      "index": 3,
+      "width": 447,
+      "height": 329
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-004.webp",
+      "caption": "Figure 2 | Latent Trajectories of Standard vs. Elastic Looped Transformers. 𝑋𝑘 int & 𝑋𝑘 max represent output of intermediate (𝐿int) & final loops (𝐿max) respectively for 𝑘𝑡ℎ generation sampling step. Unlike standard recurrent models (left) where only the final iteration 𝑋𝑘 max reaches the solution space, our ILSD training (right) guides intermediate states 𝑋𝑘int also toward the target space. This transformation shifts the model from a fixed-depth architecture to an Any-Time inference framework, supporting flexible computational budgets through early exits within a sampling step.",
+      "page": 2,
+      "index": 4,
+      "width": 776,
+      "height": 349
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-005.webp",
+      "caption": "Table 1 | Class-conditional Image Generation on ImageNet 256 × 256. “# steps” refers to the number of neural network runs. Δ denotes values taken from prior publications. ∗ indicates usage of extra training data. 𝑔 denotes use of classifier-free guidance [28]. Note that 𝐿 in (𝑁 × 𝐿) notation is inference loop count per sampling step.",
+      "page": 7,
+      "index": 5,
+      "width": 781,
+      "height": 823
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-006.webp",
+      "caption": "Table 5 | Implementation Details. Hyperparameters and Configurations for Masked Generative Models (on ImageNet and UCF-101) and Diffusion Models (on ImageNet).",
+      "page": 22,
+      "index": 6,
+      "width": 763,
+      "height": 610
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-007.webp",
+      "caption": "Table 6 | Transformer Model Scaling. Architecture details for various model sizes.",
+      "page": 22,
+      "index": 7,
+      "width": 756,
+      "height": 226
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-008.webp",
+      "caption": "Table 3 | Throughput gains for ELT. We report throughput (images/sec) ratio (ELT / Baseline) on a Google Cloud TPU v6e [23] with 1×1 topology and inference batch size of 8. The speedup arises from ELT’s compact shared parameters fitting on-chip, reducing repeated HBM-to-SRAM transfers. ELT achieves a peak speedup of 3.5× for model scale H.",
+      "page": 10,
+      "index": 8,
+      "width": 369,
+      "height": 396
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-009.webp",
+      "caption": "Table 2 | Class-conditional Image Generation on ImageNet 256 × 256 using DiT. We report 𝑁 × 𝐿 used for inference in parenthesis in Model column.",
+      "page": 10,
+      "index": 9,
+      "width": 370,
+      "height": 481
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-010.webp",
+      "caption": "Figure 10 | Class-conditional Image Generation on ImageNet 256 × 256. Comparing our proposed Elastic Looped Transformers (left) against vanilla looped transformers (right), which simply repeat transformer layers during a forward pass of diffusion. As shown, standard looping only produces a coherent image when the inference loop count exactly matches its training setup (𝐿 = 8), with quality severely degrading at all other values. In contrast, our proposed ELT enhances vanilla looping with Self Distillation, maintaining a high-fidelity generation across several evaluated compute budgets.",
+      "page": 13,
+      "index": 10,
+      "width": 979,
+      "height": 1087
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-011.webp",
+      "caption": "Figure 4 | Pareto front of FID vs. Inference GFLOPs. The black curve denotes the fit (FID = 1922.5 ·𝐺−0.95 + 1.48) over pareto-optimal configurations, representing the best achievable FID for a given computational budget. Points are labeled as 𝑁 layers × 𝐿 loops. Results demonstrate that ELT scales as effectively as the baseline while remaining significantly more parameter-efficient. Scaling both the model dimension (𝑑) and the number of loops (𝐿) follows a predictable efficiency frontier, where larger models with fewer loops often compete with smaller models with more loops at specific target GFLOPs. Trends across faded points show scaling along number of loops 𝐿 in inference, from a single run trained with a certain 𝐿𝑚𝑎𝑥 loops.",
+      "page": 8,
+      "index": 11,
+      "width": 879,
+      "height": 479
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-012.webp",
+      "caption": "Figure 3 | Overview of ELT framework. Training (left) utilizes shared parameters Θ with recurrent loops and Intra-Loop Self Distillation (ILSD) to improve intermediate representations. This enables Any-Time inference (right), allowing the model to exit early and predict 𝑋𝑘+1 from any intermediate block via a shared MLM head. Note that 𝑋𝑘 represents the input for 𝑘𝑡ℎ sampling iteration and output images in ELT Any-Time Inference (right) assume 𝑘 = 𝐾 (last sampling step). Refer Section 2 for details of annotations.",
+      "page": 4,
+      "index": 12,
+      "width": 865,
+      "height": 390
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-013.webp",
+      "caption": "Figure 9 | Class-conditional Image Generation on ImageNet 256 × 256. Comparing our proposed Elastic Looped Transformers (left) against vanilla looped transformers (right), which simply repeat transformer layers during a forward pass of diffusion. As shown, standard looping only produces a coherent image when the inference loop count exactly matches its training setup (𝐿 = 8), with quality severely degrading at all other values. In contrast, our proposed ELT enhances vanilla looping with Self Distillation, maintaining a high-fidelity generation across several evaluated compute budgets.",
+      "page": 12,
+      "index": 13,
+      "width": 979,
+      "height": 990
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09168v1/fig-014.webp",
+      "caption": "Figure 5 | Scaling with Parameters. We show the best-achievable FID as a function of model parameters (log scale). Each series corresponds to iso-inference-compute configuration for a specific model width (𝑑). Points are labeled as 𝑁 layers× 𝐿 loops. Results show that increasing parameter count via model width yields superior FID. Proposed ELT mechanism shows that even parameter-constrained models can achieve similar performance through recursive depth. Each ELT point in the figure is best inference configuration (𝑁 × 𝐿) chosen from its corresponding training run (𝑁 × 𝐿max).",
+      "page": 9,
+      "index": 14,
+      "width": 971,
+      "height": 532
+    }
+  ]
+}

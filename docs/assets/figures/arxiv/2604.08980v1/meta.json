@@ -1,0 +1,110 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-001.webp",
+      "caption": "Table 8",
+      "page": 15,
+      "index": 1,
+      "width": 974,
+      "height": 310
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-002.webp",
+      "caption": "Figure 6: Accuracy scores (%, the horizontal axes) in 10 runs with different attention modules: Transformer with",
+      "page": 21,
+      "index": 2,
+      "width": 977,
+      "height": 392
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-003.webp",
+      "caption": "Figure 7: Accuracy scores (%, the horizontal axes) in 10 runs with different aggregators. The middle line in each violin",
+      "page": 21,
+      "index": 3,
+      "width": 929,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-004.webp",
+      "caption": "Figure 8: Accuracy scores (%, the horizontal axes) in 10 runs with and without the separation of ego- and neighbour-",
+      "page": 22,
+      "index": 4,
+      "width": 977,
+      "height": 393
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-005.webp",
+      "caption": "Figure 9: Accuracy scores (%, the horizontal axes) in 10 runs with and without self-loops. The middle line in each violin",
+      "page": 22,
+      "index": 5,
+      "width": 977,
+      "height": 393
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-006.webp",
+      "caption": "Table 2",
+      "page": 10,
+      "index": 6,
+      "width": 974,
+      "height": 491
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-007.webp",
+      "caption": "Table 7",
+      "page": 14,
+      "index": 7,
+      "width": 974,
+      "height": 308
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-008.webp",
+      "caption": "Table 6",
+      "page": 14,
+      "index": 8,
+      "width": 624,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-009.webp",
+      "caption": "Figure 5 Figure 6 Figure 7 Figure 9",
+      "page": 13,
+      "index": 9,
+      "width": 977,
+      "height": 652
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-010.webp",
+      "caption": "Figure 1: An illustration of computing representations for node 𝑣1 (represented by a double-lined circle) using various mechanisms. (a) Message Passing: Messages from different nodes (e.g., 𝑣3, 𝑣4, 𝑣5, 𝑣6) are propagated along edges towards node 𝑣1 to compute its representation, but are diluted and over-squashed when passing through heterophilic bottlenecks (e.g., 𝑣2). (b) Graph Transformers: Node 𝑣1 aggregates messages from all nodes using self-attention. This approach may inadvertently downplay the importance of information from nearby nodes due to a reduction in the influence of topological",
+      "page": 19,
+      "index": 10,
+      "width": 859,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-011.webp",
+      "caption": "Figure 2: Unevenly distributed neighbourhood sizes. 1○ Paralleled Processing pads node features of all neighbourhoods",
+      "page": 19,
+      "index": 11,
+      "width": 977,
+      "height": 280
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-012.webp",
+      "caption": "Table 1",
+      "page": 9,
+      "index": 12,
+      "width": 974,
+      "height": 654
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08980v1/fig-013.webp",
+      "caption": "Figure 4: Partitioning neighbourhoods into multiple groups for space and time efficiency. We partition neighbourhoods",
+      "page": 20,
+      "index": 13,
+      "width": 973,
+      "height": 286
+    }
+  ]
+}

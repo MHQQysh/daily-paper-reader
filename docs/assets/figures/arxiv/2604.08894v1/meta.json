@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08894v1/fig-001.webp",
+      "caption": "Figure 1. Comparison of network parameter count, inference accuracy and energy consumption between prior state-of-theart (SoTA) S-ViT & S-CNN approaches and this work on the ImageNet-1k dataset. Smaller circles denote fewer network parameters and upper-left positions indicate higher energy efficiency.",
+      "page": 1,
+      "index": 1,
+      "width": 487,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08894v1/fig-002.webp",
+      "caption": "Table 2. Detailed configurations of Ge²mS-T on the ImageNet-1k dataset. Here R1 denotes the expansion ratio of SConv within ConvB, R2, R denote the expansion ratio of Conv-SFFN (SFFN), rg,w, h represent the split ratio of global & window attention dimensions in GW-SSA and the number of attention heads.",
+      "page": 6,
+      "index": 2,
+      "width": 1026,
+      "height": 308
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08894v1/fig-003.webp",
+      "caption": "Table 3. Performance evaluation of relevant approaches based on different learning paradigms and network architectures on the ImageNet1k dataset. Here SOPs denotes the average number of synaptic operations per input sample, and Energy is computed following the calculation standards outlined in [50].",
+      "page": 7,
+      "index": 3,
+      "width": 1026,
+      "height": 556
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08894v1/fig-004.webp",
+      "caption": "Table 4. Performance evaluation on downstream benchmarks, which encompass both static and neuromorphic datasets, including CIFAR10, CIFAR-100 and CIFAR10-DVS.",
+      "page": 8,
+      "index": 4,
+      "width": 1026,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08894v1/fig-005.webp",
+      "caption": "Figure 3. Distribution of energy-related metrics for modules (SSA, SConv and SFFN) on the ImageNet-1k dataset, including average firing rate, SOPs and its theoretical upper-bounds.",
+      "page": 8,
+      "index": 5,
+      "width": 995,
+      "height": 268
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08894v1/fig-006.webp",
+      "caption": "Figure 2. Overall architecture of Ge²mS-T, comprising a series of stage-oriented blocks constructed from SSA, SConv and SFFN. Compared with Conversion-based and STBP-based SSAs, the energy efficiency of GW-SSA is substantially enhanced across multiple dimensions.",
+      "page": 5,
+      "index": 6,
+      "width": 998,
+      "height": 681
+    }
+  ]
+}
