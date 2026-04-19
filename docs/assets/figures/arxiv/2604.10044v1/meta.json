@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10044v1/fig-001.webp",
+      "caption": "Figure 1: Illustration of self-reinforcing repetition loops and our mitigation strategy. (a) Attention heads lock onto narrow repetitive spans, creating a positive feedback loop. (b) Existing attention-based eviction policies (e.g., H2O) inadvertently strengthen this loop by preserving high-score repetitive tokens while discarding diverse context. (c) LoopGuard detects loop onset and prunes the repetitive tail to break the feedback cycle and restore diversity.",
+      "page": 2,
+      "index": 1,
+      "width": 948,
+      "height": 483
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10044v1/fig-002.webp",
+      "caption": "Table 1: Main results on LoopBench under a fixed KV budget of 1024 tokens and a shared maximum generation budget of Tmax = 2500. We report loop rate and loop-oriented metrics (CR/TTR) together with average generation length (Avg Len) as an auxiliary token-cost measure. Best results are in bold.",
+      "page": 7,
+      "index": 2,
+      "width": 798,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10044v1/fig-003.webp",
+      "caption": "Figure 3: Overview of LoopGuard. (a) Repetition loops driven by attention locking on a narrow tail and stabilized by KV-cache feedback. (b) Online detection via debounced statistical and tail-repetition signals. (c) Adaptive KV cache pruning to break the loop and restore diversity.",
+      "page": 5,
+      "index": 3,
+      "width": 925,
+      "height": 254
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10044v1/fig-004.webp",
+      "caption": "Figure 5: Barcode-like attention patterns under repetition collapse. Visualization of attention maps from selected heads across multiple layers (L16, L20–L22) during persistent repetition loops. Each panel exhibits narrow, vertically aligned high-attention stripes, indicating head-level locking onto a small repetitive suffix of the history.",
+      "page": 16,
+      "index": 4,
+      "width": 644,
+      "height": 1190
+    }
+  ]
+}
