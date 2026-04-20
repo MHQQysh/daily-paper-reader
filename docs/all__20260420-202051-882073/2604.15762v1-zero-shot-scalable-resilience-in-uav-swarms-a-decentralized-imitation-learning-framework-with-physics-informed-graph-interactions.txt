@@ -1,0 +1,1147 @@
+Title: Zero-Shot Scalable Resilience in UAV Swarms: A Decentralized Imitation Learning Framework with Physics-Informed Graph Interactions
+
+URL Source: https://arxiv.org/pdf/2604.15762v1
+
+Published Time: Mon, 20 Apr 2026 00:36:31 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+> 1
+
+# Zero-Shot Scalable Resilience in UAV Swarms: A Decentralized Imitation Learning Framework with Physics-Informed Graph Interactions 
+
+Huan Lin ,and Lianghui Ding 
+
+Abstract —Large-scale Unmanned Aerial Vehicle (UAV) failures can split an unmanned aerial vehicle swarm network into discon-nected sub-networks, making decentralized recovery both urgent and difficult. Centralized recovery methods depend on global topology information and become communication-heavy after severe fragmentation. Decentralized heuristics and multi-agent reinforcement learning methods are easier to deploy, but their performance often degrades when the swarm scale and damage severity vary. We present Physics-informed Graph Adversarial Imitation Learning algorithm (PhyGAIL) that adopts centralized training with decentralized execution. PhyGAIL builds bounded local interaction graphs from heterogeneous observations, and uses physics-informed graph neural network to encode direc-tional local interactions as gated message passing with explicit attraction and repulsion. This gives the policy a physically grounded coordination bias while keeping local observations scale-invariant. It also uses scenario-adaptive imitation learning to improve training under fragmented topologies and variable-length recovery episodes. Our analysis establishes bounded local graph amplification, bounded interaction dynamics, and controlled variance of the terminal success signal. A policy trained on 20-UAV swarms transfers directly to swarms of up to 500 UAVs without fine-tuning, and achieves better performance across reconnection reliability, recovery speed, motion safety, and runtime efficiency than representative baselines. 
+
+Index Terms —Resilient network, UAV swarm, multi-agent reinforcement learning, graph neural network. 
+
+I. I NTRODUCTION 
+
+# RECENT advances in sensing, communication, and au-tonomous control have made UAV swarms increasingly practical for surveillance, search and rescue, and emergency communication [1], [2]. In these applications, multiple UAVs cooperate through an unmanned aerial vehicle swarm network (USNET). The network, however, is fragile. Environmental hazards or adversarial attacks may disable many UAVs at once, splitting the swarm into disconnected sub-networks and triggering the communication network split (CNS) problem [3]. The CNS problem has long been studied through mobility-assisted connectivity restoration, with early formulations rooted in wireless sensor networks and mobile ad hoc net-works [4]–[9]. For large-scale UAV swarms, existing solutions are usually either centralized or decentralized. Centralized methods [10]–[12] plan recovery trajectories from the states 
+
+Huan Lin, and Lianghui Ding are with the Institute of Image Commu-nication and Network Engineering, School of Integrated Circuits, Shanghai Jiao Tong University, Shanghai 200240, China. Email: lhzt715@sjtu.edu.cn; lhding@sjtu.edu.cn (corresponding author). 
+
+of all surviving UAVs. They can be effective when global information is available, but such a requirement becomes costly once the network is heavily fragmented. Decentralized methods [13], [14] avoid this burden by using only local observations, yet most of them rely on hand-crafted rules and often become brittle when the topology changes rapidly. MARL offers a more adaptive alternative [15], [16], but ap-plying it to damaged USNETs remains difficult. One difficulty comes from scale: when the receptive field is not properly bounded, a policy trained on small swarms often fails to generalize as the swarm grows [17]. Another difficulty lies in the interaction model itself. In continuous-space swarm coordination, direction is not merely a geometric detail, but a core physical variable governing attraction, repulsion, and collision avoidance. Yet the graph encoders commonly used in MARL baselines remain largely direction-agnostic, offering limited inductive bias for safe and stable coordination. A further complication is that different damage levels lead to recovery episodes of very different lengths, which makes learning unstable under standard reward designs. We address these issues with a Physics-informed Graph Adversarial Imitation Learning algorithm (PhyGAIL), a de-centralized recovery framework built on centralized training with decentralized execution. The framework starts from a bounded local interaction graph constructed through heteroge-neous node modeling and spatial K-nearest-neighbor masking, so that each UAV acts on scale-invariant local observations. At its core is PhyGNN, a physics-informed graph neural network that turns local directional interactions into gated message passing with explicit attraction and repulsion. This gives the policy a coordination mechanism that is both interpretable and physically grounded. On top of this, PhyGAIL uses a scenario-adaptive imitation learning strategy to stabilize training when the topology is highly fragmented and the recovery horizon varies substantially. The main contributions of this paper are as follows: 1) A scalable decentralized recovery framework for damaged USNETs. We develop PhyGAIL under the CTDE paradigm and show that bounded local interac-tion modeling enables zero-shot transfer from 20-UAV training swarms to networks of up to 500 UAVs without fine-tuning. 2) A physics-informed graph interaction model for swarm coordination. We introduce PhyGNN, which explicitly encodes directional attraction and repulsion in message passing. This design provides a physically 
+
+> arXiv:2604.15762v1 [cs.LG] 17 Apr 2026 2
+
+meaningful inductive bias and yields safer and more sta-ble decentralized coordination than conventional graph encoders. 3) A scenario-adaptive training strategy for variable-damage recovery. We combine dense imitation guid-ance with expert-normalized temporal rewards to im-prove training robustness across recovery tasks with different damage severities and episode lengths. The remainder of this paper is organized as follows. Section II reviews the related work. Section III formulates the system model, conceptualizing the USNET graph and the CNS prob-lem. Section IV details the architectural design and learning paradigm of the proposed algorithm. Extensive simulation results and performance evaluations are discussed in Sections V, followed by the conclusions in Section VI. II. R ELATED WORK 
+
+Existing mobility-based solutions to the Communication Network Split (CNS) problem can be grouped into three cate-gories: centralized recovery algorithms, decentralized heuristic methods, and learning-based approaches. 
+
+A. Centralized Recovery Algorithms 
+
+Early studies treated connectivity restoration as a centralized optimization problem and searched for global recovery paths that minimize the overall restoration time [9], [10], [18]. More recent work has combined this formulation with graph learning to accelerate topology reasoning. For example, Mou et al. [11] and our previous work [12] used graph neural models and damage-aware embeddings to generate recovery actions from the global swarm state. These methods can be effective when complete state information is available, but their applicability is limited in severely fragmented swarms, where collecting and maintaining global topology information introduces substantial communication cost and latency. 
+
+B. Decentralized Heuristic Approaches 
+
+Decentralized methods avoid global communication by us-ing local rules. Critical-node replacement strategies [7], [19], [20] restore connectivity by moving backup nodes to replace destroyed cut vertices. Such methods work well in small or mildly damaged networks, but under massive failures they may trigger large cascaded motions and reduce coverage quality. Another line of work moves disconnected subnetworks toward meeting points or reference locations [13], [14]. These methods have low communication overhead and are easy to implement, but their decision rules are fixed. As a result, they are less adaptable to rapidly changing topologies and often require long recovery paths when subnetworks are far apart. 
+
+C. Reinforcement Learning-Based Approaches 
+
+Learning-based methods use data-driven policies to generate decentralized recovery actions. GDR-TS [16] combines graph attention with deep reinforcement learning for topology self-healing, while MADDPG-APF [15] integrates multi-agent deterministic policy gradients with artificial potential fields to accelerate recovery and reduce collisions. These methods are more adaptive than hand-crafted heuristics, but several chal-lenges remain in large-scale damaged swarms. Architectures that depend on global graph outputs or standard centralized critics become difficult to scale as the swarm grows. In ad-dition, the graph encoders commonly used in existing MARL baselines provide limited support for direction-sensitive phys-ical interactions, even though direction plays a central role in attraction, repulsion, and collision avoidance in continuous-space coordination. Heuristic force fields can also get stuck in heavily fragmented scenarios Compared with these methods, PhyGAIL combines bounded local graph construction with a physics-informed interaction model and a scenario-adaptive training strategy. In particular, PhyGNN converts local directional interactions into gated message passing with explicit attraction and repul-sion, which provides a more physically grounded coordination mechanism than conventional graph encoders. The resulting framework is designed for decentralized recovery under dy-namic topology damage while remaining scalable to much larger swarms than those seen during training. III. S YSTEM MODEL 
+
+This section defines the mathematical models for UAV swarm connectivity restoration. We first introduce the com-munication and network models, followed by the mobility model. Subsequently, the damage model is described, and the decentralized recovery process is formulated as a constrained problem. 
+
+A. Communication Channel and Network Topology 
+
+Consider a highly dynamic UAV swarm network (USNET) composed of N homogeneous UAVs, represented by the node set U = {u1, u 2, . . . , u N }. For most mission executions, UAVs typically form a coordinated network at equal altitudes; hence, we formulate the spatial state of node ui ∈ U at any discrete time step t using a two-dimensional coordinate vector pi(t) = [xi(t), y i(t)] ⊤ ∈ R2.To characterize the air-to-air communication links, we adopt the Friis transmission equation combined with large-scale fading. Assuming a predominantly line-of-sight (LoS) channel, the received signal power at UAV uj from a transmitting UAV 
+
+ui is given by 
+
+Pij (t) = P0Gtx Grx 
+
+ λc
+
+4πd ij (t)
+
+2
+
+|h0|2, (1) where P0 is the transmission power, Gtx and Grx are the antenna gains, λc is the carrier wavelength, and dij (t) =
+
+∥pi(t) − pj (t)∥ denotes the Euclidean distance between the two UAVs. The term |h0|2 denotes the small-scale fading power gain. To simplify analysis, we approximate the stochas-tic communication condition using a deterministic communi-cation radius Dcomm , such that Pij (t) ≥ τ is equivalent to 
+
+dij (t) ≤ Dcomm . Consequently, bidirectional communication between ui and uj is feasible if and only if dij (t) ≤ Dcomm .Based on this communication range constraint, the global physical topology of the USNET at time t is modeled as 3
+
+an undirected graph G(t) = ( U, E(t)) . The edge set E(t) is defined as E(t) = {eij (t) | ui, u j ∈ U , d ij (t) ≤ Dcomm }.Accordingly, the physical neighborhood set of node ui, which includes all reachable neighbors within its communication coverage, is formulated as 
+
+Ni(t) = {uj ∈ U \ { ui} | eij (t) ∈ E (t)}. (2) 
+
+B. Mobility Model and Safety Constraints 
+
+To characterize the controlled mobility of the UAV swarm, we adopt a discrete-time first-order kinematic model. Let t ∈{0, 1, 2, . . . } denote the discrete time index, and ∆t represent the constant duration of each control step. At each step t,the local controller of UAV ui ∈ U outputs a velocity vector 
+
+vi(t) ∈ R2, and the spatial position is updated as: 
+
+pi(t + ∆ t) = pi(t) + vi(t)∆ t. (3) Considering the physical maneuverability of the UAVs, the magnitude of the velocity vector is subject to a maximum speed constraint vmax :
+
+∥vi(t)∥ ≤ vmax , ∀ui ∈ U . (4) In addition to kinematic limits, the autonomous coordination must also avoid collisions. To prevent inter-UAV collisions during the connectivity restoration process, a minimum safety distance Dsaf e is maintained between any pair of UAVs. This constraint is defined as: 
+
+∥pi(t) − pj (t)∥ ≥ Dsaf e , ∀ui, u j ∈ U , i ̸ = j. (5) Under this mobility framework, the objective of the decen-tralized recovery algorithm is to determine an optimal velocity 
+
+vi(t) for each UAV, ensuring that both the speed constraint in (4) and the safety constraint in (5) are satisfied throughout the mission duration. 
+
+C. Damage Model and Network Connectivity 
+
+We consider a scenario where the USNET undergoes mas-sive node failures at initial time t0 due to external hazards. Let Udmg ⊂ U denote the set of Ndmg destroyed UAVs, and 
+
+Uact = U \ U dmg represent the set of Nact remaining nodes. The post-damage topology is modeled as a remaining graph 
+
+Gact (t) = ( Uact , Eact (t)) , where the edge set Eact (t) consists of links between operational UAVs satisfying the distance constraint dij (t) ≤ Dcomm .To mathematically evaluate the fragmentation of Gact (t),we define the adjacency matrix Aact (t) = [aij (t)] ∈{0, 1}Nact ×Nact for i, j ∈ { 1, . . . , N act }, where aij (t) = 1 if 
+
+eij (t) ∈ E act (t) and aij (t) = 0 otherwise. The degree matrix 
+
+Dact (t) is a diagonal matrix with entries Dii = PNact  
+
+> j=1
+
+aij .The Laplacian matrix of the remaining graph is then formu-lated as: 
+
+Lact (t) = Dact (t) − Aact (t). (6) The connectivity properties of Gact (t) are characterized by the eigenvalues of Lact (t), denoted as 0 = λ1(t) ≤ λ2(t) ≤· · · ≤ λNact (t). The graph is connected if and only if the second smallest eigenvalue (i.e., the Fiedler value) satisfies 
+
+λ2(t) > 0 [21]. In the event of a Communication Network Split (CNS), the graph decomposes into Ns(t) disjoint sub-networks, where Ns(t) equals the multiplicity of the zero eigenvalue of Lact (t). Therefore, we focus on massive damage scenarios where Ns(t0) > 1. The recovery objective is to control the velocity vi(t) of each remaining UAV ui ∈ U act 
+
+such that the disjoint sub-networks merge, eventually achiev-ing λ2(t0 + Tres ) > 0 within a finite duration Tres .
+
+D. Problem Formulation for Decentralized Recovery 
+
+The primary objective of the resilient coordination is to restore the global network connectivity of the fragmented US-NET within a minimum time duration Tres . Unlike centralized approaches that rely on a global state, we consider a strictly decentralized execution paradigm where each remaining UAV 
+
+ui ∈ Uact determines its control action based solely on localized information. At each time step t, a UAV ui perceives its local envi-ronment through a limited observation space Oi(t), which is derived from its physical neighborhood Ni(t). The decentral-ized control policy, parameterized by θ and denoted as πθ ,maps the local observation to a continuous velocity vector: 
+
+vi(t) = πθ (Oi(t)) , ∀ui ∈ U act . (7) Mathematically, the decentralized connectivity restoration problem is formulated as: 
+
+(P1 ) : min 
+
+> πθ
+
+E[Tres ] (8) s.t. λ2(t0 + Tres ) > 0, (C1) 
+
+∥vi(t)∥ ≤ vmax , ∀ui, t, (C2) 
+
+∥pi(t) − pj (t)∥ ≥ Dsaf e , ∀i̸ = j, t, (C3) 
+
+Oi(t) ⊆ { pj (t), vj (t) | uj ∈ N i(t) ∪ { ui}} .
+
+(C4) Constraints (C1)-(C3) enforce global connectivity restora-tion, kinematic limits, and collision avoidance, respectively. Constraint (C4) restricts the policy execution to a strictly decentralized manner. The goal is to optimize πθ to minimize recovery time while respecting all physical and informational constraints. IV. P HYSICS -INFORMED GRAPH ADVERSARIAL 
+
+IMITATION LEARNING APPROACH 
+
+This section first introduces the overall architecture of the proposed PhyGAIL algorithm. Then the second subsection de-tails the local scale-invariant graph perception mechanism. The physics-informed graph neural networks and imitation learning strategy are presented in the third and fourth subsections, respectively. The fifth subsection analyzes theoretical proofs, and the sixth subsection derives the algorithm’s complexity. 
+
+A. Overall Framework of PhyGAIL 
+
+Figure 1 shows the overall architecture of PhyGAIL under centralized training with decentralized execution. The frame-work contains three coupled modules: UAV swarm graph 4Communication Network Split 
+
+UAV Swarm 
+
+Graph Perception  
+
+> Local Graph Observations Reconnected USNET
+
+Physics-Informed 
+
+Graph Interaction 
+
+Scenario-Adaptive 
+
+Imitation Learning 
+
+> 𝑢𝑢 𝑖𝑖
+> Virtual
+> center
+
+Sense  Heal 
+
+> KNN Masking
+
+(physical environment) 
+
+(policy executor) 
+
+(training framework)                       
+
+> 𝒪𝒪 𝑖𝑖 (𝑡𝑡 )
+> 𝒪𝒪 𝑗𝑗 (𝑡𝑡 )
+> MAPPO
+> GAE loss
+> Decentralized Actor Network
+> node-level
+> observation
+> 𝒪𝒪 𝑖𝑖 (𝑡𝑡 )
+> graph-level
+> observation
+> [𝒪𝒪 1𝑡𝑡 , … , 𝒪𝒪 𝑁𝑁 𝑎𝑎𝑎𝑎𝑎𝑎 𝑡𝑡 ]
+> PhyGNN
+> Layer ×𝐿𝐿
+> Attract/ Repulse Gates
+> Force Strength
+> Action std
+> Action mean
+> Deterministic
+> Action 𝒗𝒗 𝑖𝑖 (𝑡𝑡 )
+> Centralized Critic Network
+> PhyGNN
+> Layer ×𝐿𝐿
+> Global Pooling
+> Features
+> Discriminator Network
+> Node-level Value
+> Training Environment
+> PhyGNN
+> Layer ×𝐿𝐿
+> Expert action (𝒪𝒪 𝑖𝑖 ,𝒗𝒗 𝑖𝑖 )
+> Actor action (𝒪𝒪 𝑖𝑖 ,𝒗𝒗 𝑖𝑖 )
+> Action Embedding Predicted Labels BCE
+> loss
+> Soft Labels
+> Sample
+> Expert Oracle
+> Database
+> (20 nodes)
+> Node-level
+> Reward 𝑅𝑅 𝑖𝑖 (𝑡𝑡 )
+> GAIL
+> Reward
+> Expert Solution
+> Actor Solution
+> Environment Reward Design
+> step penalty safety reward success/fail reward expert-norm time bonus
+> Active
+> UAV
+> Damaged
+> UAV
+> Concat
+> 𝑉𝑉 𝑖𝑖 (𝑠𝑠 )
+> Env
+> Reward
+> Subnet 1
+> Subnet 2
+
+Fig. 1: Overall architecture of PhyGAIL. perception, physics-informed graph interaction, and scenario-adaptive imitation learning. 
+
+UAV Swarm Graph Perception: The bottom layer repre-sents the physical environment. Each active UAV builds a local graph from heterogeneous entities within the communication range Dcomm , including active UAVs, damaged UAVs, and a virtual center pcenter . A K-nearest-neighbor masking mecha-nism is then applied to extract the bounded local observation 
+
+Oi(t), which serves as the input to the decentralized policy. 
+
+Physics-Informed Graph Interaction: The middle layer acts as the policy executor. For each active UAV ui, the decentralized actor processes Oi(t) with an L-layer physics-informed graph neural network (PhyGNN). In each layer, local interactions are decomposed into attraction and repulsion gates together with a learnable force strength, and their combination yields the action distribution for the continuous velocity com-mand vi(t). During training, the centralized critic encodes the graph-level observation through masked global pooling and a separate PhyGNN encoder to estimate the node-level value 
+
+Vi(s).
+
+Scenario-Adaptive Imitation Learning: The top layer provides the training mechanism. It uses an expert trajectory database together with a discriminator network to generate GAIL rewards from local observations and actions. These rewards are combined with the environment reward, which includes step penalty, safety-related terms, terminal feedback, and an expert-normalized time bonus, to form the final node-level reward Ri(t). The actor and critic are then optimized with MAPPO and GAE. Together, these modules connect bounded graph perception, physics-informed interaction, and scenario-adaptive learning into a unified decentralized recovery framework. This design enables PhyGAIL to achieve scalable execution, interpretable coordination, and stable training under severe topology frag-mentation. 
+
+B. Bounded Heterogeneous Graph Perception 
+
+In a fully decentralized swarm, each UAV can access only local information from nearby agents. After a CNS event, surviving neighbors alone are often insufficient to reveal the damaged region or the direction needed for reconnection. We therefore represent the local observation of each active UAV as a bounded heterogeneous perception graph. Figure 2 shows the resulting local graph, which augments local neighbor information with both fault-related cues and a shared spatial reference. 
+
+1) Heterogeneous Node Representation: The local graph is defined as Glocal = ( Ulocal , Elocal ), where the node set Ulocal 
+
+contains three categories indicated by a type variable ci ∈{0, 1, 2}:The local graph is defined as Glocal = ( Ulocal , Elocal ), where the node set Ulocal contains three categories indicated by a type variable ci ∈ { 0, 1, 2}: 
+
+> •
+
+Active Nodes (Type 0): operational UAVs in the local sub-network. Each node encodes the UAV kinematic state, including position and velocity, for coordinated motion and collision avoidance.  
+
+> •
+
+Damaged Nodes (Type 1): incapacitated UAVs within communication range ( dij ≤ Dcomm ). Their velocities are masked to zero, while their coordinates serve as spatial anchors that outline the damaged region. 5Select 𝐾𝐾 𝑎𝑎 𝑐𝑐𝑐𝑐  = 4 
+
+active neighbors 
+
+Link to 
+
+virtual center 
+
+Select 𝐾𝐾 𝑑𝑑 𝑐𝑐 𝑑𝑑 = 3 
+
+damaged neighbors 
+
+𝐷𝐷 𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐 
+
+𝒑𝒑 𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐 
+
+𝑢𝑢 𝑖𝑖 
+
+> 1
+> 0
+> 0
+> 0
+> 0
+> 1
+> 1
+
+𝑢𝑢 𝑖𝑖 
+
+𝑢𝑢 𝑗𝑗+6 
+
+𝑢𝑢 𝑗𝑗+5 
+
+𝑢𝑢 𝑗𝑗+ 𝑐𝑐 −1 
+
+𝑢𝑢 𝑗𝑗+4 
+
+𝑢𝑢 𝑗𝑗+5 
+
+𝑢𝑢 𝑗𝑗+3 
+
+𝑢𝑢 𝑗𝑗+8 
+
+…
+
+…
+
+…
+
+𝑢𝑢 𝑗𝑗+9 
+
+𝑢𝑢 𝑗𝑗 
+
+𝑢𝑢 𝑗𝑗+1 
+
+𝑢𝑢 𝑗𝑗+7 
+
+𝑢𝑢 𝑗𝑗+2 
+
+𝑢𝑢 𝑗𝑗+ 𝑐𝑐 
+
+Neighbor set  𝒩𝒩 𝑖𝑖 of node 𝑢𝑢 𝑖𝑖 
+
+> 2
+
+(𝒑𝒑 𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐𝑐 , 𝟎𝟎 , ∆𝑖𝑖 𝑐𝑐 
+
+> 𝑐𝑐𝑎𝑎 𝑚𝑚
+
+)
+
+Local observation  𝒪𝒪 𝑖𝑖 (𝑡𝑡 )
+
+(𝒑𝒑 𝑗𝑗 , 𝒗𝒗 𝑗𝑗 , 𝛿𝛿 𝑗𝑗 )
+
+(𝒑𝒑 𝑗𝑗+3 , 𝟎𝟎 , 𝛿𝛿 𝑗𝑗+3 )
+
+Bound ：
+
+𝛿𝛿 𝑖𝑖 ≤ ∆ 𝑖𝑖 𝑐𝑐 
+
+> 𝑐𝑐𝑎𝑎 𝑚𝑚
+
+= 𝐾𝐾 𝑎𝑎 𝑐𝑐𝑐𝑐  + 𝐾𝐾 𝑑𝑑 𝑐𝑐 𝑑𝑑 + 1 
+
+active 
+
+nodes  damaged 
+
+nodes 
+
+unselected 
+
+nodes 
+
+> Ego node
+
+Fig. 2: Construction of the bounded heterogeneous local observation graph. 
+
+• Virtual Center (Type 2): a predefined reference node 
+
+uc at position pc, used to provide isolated sub-networks with a shared merging direction. The edge set also contains heterogeneous interaction types: active–active communication links, damaged–active observa-tion links, and center–active guidance links. To keep the local receptive field bounded regardless of the global swarm size N , we use a directed K-NN [22] masking mechanism. Although the communication radius Dcomm limits interaction distance, the number of neighbors within this radius can still grow with swarm density. Figure 2 illustrates how K-NN masking is used to build a bounded computational topology. For each active node ui, we first identify the set of opera-tional neighbors within communication range: 
+
+N comm i = {uj ∈ U act \ { ui} | dij ≤ Dcomm }. (9) Node ui then selects at most Kact closest active neighbors from N comm i to form the directed subset N Kact 
+
+i . Since each node gathers states only from the neighbors it selects, a directed edge ej→i is established if uj ∈ N Kact 
+
+i :
+
+ej→i ∈ E local ⇐⇒ uj ∈ N Kact 
+
+i . (10) This masking keeps the maximum in-degree of any node bounded and decouples the local observation dimension from the global swarm scale. To avoid unbounded feature growth under catastrophic failures, each active UAV also attends to at most Kdmg nearest damaged neighbors within Dcomm ,forming the damaged-neighbor set N Kdmg 
+
+i .Including the virtual center node uc, the masked local neighbor set of ui is 
+
+N local i = N Kact 
+
+i ∪ N Kdmg 
+
+i ∪ { uc}. (11) The maximum in-degree is therefore bounded by 
+
+∆max 
+
+in = Kact + Kdmg + 1 . (12) 
+
+2) Local Observation Encoding: Based on the bounded heterogeneous graph, we construct the continuous observation used by the policy network. To improve robustness to spatial translation and varying swarm density, the observation uses relative and normalized kinematic states rather than absolute coordinates. Concat                               
+
+> Active neighbor 𝑢𝑢 𝑗𝑗
+> Damaged neighbor 𝑢𝑢 𝑙𝑙
+> Virtual center 𝑢𝑢 𝑎𝑎
+> 𝑢𝑢 𝑗𝑗
+> 𝑢𝑢 𝑘𝑘
+> 𝑢𝑢 𝑎𝑎
+> 𝑢𝑢 𝑖𝑖 𝒉𝒉 𝑗𝑗
+> (𝑙𝑙 )
+> 𝒉𝒉 𝑘𝑘
+> (𝑙𝑙 )
+> 𝒉𝒉 𝑎𝑎
+> (𝑙𝑙 )
+> Ego node 𝑢𝑢 𝑖𝑖
+> 𝒉𝒉 𝑖𝑖
+> (𝑙𝑙 )
+> ∑
+> 𝒎𝒎 𝑖𝑖𝑗𝑗
+> (𝑙𝑙 )
+> ……
+> ……
+> 𝒎𝒎 𝑖𝑖 𝑘𝑘
+> (𝑙𝑙 )
+> 𝒎𝒎 𝑖𝑖 𝑎𝑎
+> (𝑙𝑙 )
+> MLP
+> update
+> 𝒎𝒎 𝑖𝑖
+> (𝑙𝑙 )Output
+> 𝒉𝒉 𝑖𝑖
+> (𝑙𝑙+1 )
+> Message passing
+> Message passing
+> Message passing
+> ReLU
+> Residual Connection
+> Update with Self-feature
+> Local neighbor set
+> 𝒩𝒩 𝑖𝑖 𝑙𝑙 𝑐𝑐𝑎𝑎𝑎𝑎 𝑙𝑙
+> MLP
+> gate head Sigmoid
+> Node 𝑢𝑢 𝑖𝑖 state
+> 𝒉𝒉 𝑖𝑖
+> (𝑙𝑙 )
+> Relative state
+> 𝒉𝒉 𝑗𝑗
+> (𝑙𝑙 )− 𝒉𝒉 𝑖𝑖
+> (𝑙𝑙 )
+> Edge embedding
+> 𝜙𝜙 𝑐𝑐𝑑𝑑𝑑𝑑𝑐𝑐 (𝜉𝜉 𝑖𝑖 𝑗𝑗 )MLP
+> strength head Softplus
+> MLP
+> message embedding 𝒇𝒇 𝑖𝑖 𝑗𝑗
+> (𝑙𝑙 )
+> 𝑤𝑤 𝑖𝑖 𝑗𝑗 ,𝑎𝑎𝑎𝑎𝑎𝑎
+> (𝑙𝑙 )∈[0,1]
+> Physical Strength Path
+> Physics Gating Path
+> 𝑤𝑤 𝑖𝑖 𝑗𝑗 ,𝑐𝑐𝑐𝑐 𝑟𝑟
+> (𝑙𝑙 )∈[−1,0]
+> 𝑆𝑆 𝑖𝑖 𝑗𝑗
+> (𝑙𝑙 )> 0
+> Message
+> 𝒎𝒎 𝑖𝑖 𝑗𝑗
+> (𝑙𝑙 )
+
+Fig. 3: Physics-gated message passing in the proposed PhyGNN layer. Each node position is represented relative to the virtual center pcenter and normalized by the geographical scale factor 
+
+Wscale :
+
+˜pi(t) = pi(t) − pcenter 
+
+Wscale 
+
+. (13) Similarly, the velocity is normalized by the mechanical speed limit vmax :
+
+˜vi(t) = vi(t)
+
+vmax 
+
+. (14) For damaged nodes and the virtual center, i.e., ci ∈ { 1, 2}, the velocity is fixed to zero. We also include the structural degree δi(t) to reflect local congestion. To keep this feature in a bounded range, we apply logarithmic normalization: 
+
+˜δi(t) = ln(1 + δi(t)) ln(1 + ∆ max 
+
+in ) , (15) where ∆max 
+
+in is defined in (12). The raw spatial-kinematic feature vector is then 
+
+xi(t) = [ ˜ pi(t)⊤, ˜vi(t)⊤, ˜δi(t)] ⊤. (16) Finally, the categorical node type ci is mapped into a learnable embedding space through ϕnode (·). The final node observation is 
+
+Oi(t) = [ xi(t)⊤, ϕ node (ci)⊤]⊤. (17) As a result, the policy input dimension scales as O(∆ max 
+
+in )
+
+rather than with the global swarm size N , which supports zero-shot transfer to larger swarms. 
+
+C. Physics-Informed Graph Interactions 
+
+Having defined the bounded local observation graph, we now describe the core neural architecture of PhyGAIL. This part contains two components: a physics-gated message pass-ing mechanism for local interaction modeling, and MAPPO-based actor–critic networks that map local observations to continuous velocity actions and state-value estimates. 6
+
+1) Physics-Gated Message Passing: Figure 3 summarizes the proposed physics-gated message passing mechanism. Con-ventional graph neural networks do not explicitly model the attraction, repulsion, and collision-related interaction seman-tics required in continuous-space multi-UAV coordination. We therefore introduce a message passing rule that decomposes each directed edge interaction into attraction and repulsion gates together with a learnable force strength. Let h(l) 
+
+> i
+
+denote the hidden state of node ui at layer l. We initialize the hidden state with the localized graph observation, i.e., 
+
+h(0)  
+
+> i
+
+= Oi(t). (18) For a directed edge ej→i with discrete type ξij ∈ { 0, 1, 2}, we construct the interaction feature f (l) 
+
+> ij
+
+from the receiver state, the relative state, and the semantic edge embedding ϕedge (ξij ):
+
+f (l) 
+
+> ij
+
+= MLP (l)
+
+> msg
+
+
+
+[h(l)⊤ 
+
+> i
+
+, (h(l) 
+
+> j
+
+− h(l) 
+
+> i
+
+)⊤, ϕ edge (ξij )⊤]⊤
+
+.
+
+(19) For edges involving active or damaged nodes, this feature encodes relative kinematics explicitly. For virtual-center edges (ξij = 2 ), the relative velocity is zero, so the message acts only as a spatial anchor. We use a dual-gating mechanism to separate different inter-action modes. The feature f (l) 
+
+> ij
+
+passes through a gating network with a Sigmoid activation, producing an attraction gate w(l)
+
+> ij,att
+
+and a repulsion gate w(l) 
+
+> ij,rep
+
+∈ [0 , 1] . In parallel, a Softplus-activated network outputs the interaction force magnitude 
+
+S(l) 
+
+> ij
+
+> 0:
+
+[w(l)
+
+> ij,att
+
+, w (l)
+
+> ij,rep
+
+]⊤ = Sigmoid 
+
+
+
+MLP (l)
+
+> gate
+
+(f (l) 
+
+> ij
+
+)
+
+
+
+, (20) 
+
+S(l) 
+
+> ij
+
+= Softplus 
+
+
+
+MLP (l)
+
+> strength
+
+(f (l) 
+
+> ij
+
+)
+
+
+
+. (21) The directed physical message is 
+
+m(l) 
+
+> j→i
+
+= f (l) 
+
+> ij
+
+· S(l) 
+
+> ij
+
+·
+
+
+
+w(l) 
+
+> ij,att
+
+− w(l)
+
+> ij,rep
+
+
+
+. (22) 
+
+2) PhyGNN Layer Forward Propagation: Figure 3 also shows the forward pass of a single PhyGNN layer. We aggre-gate incoming physical messages from the local computational neighborhood N local i according to the force superposition principle: 
+
+m(l) 
+
+> i
+
+= X  
+
+> uj∈N local i
+
+m(l)
+
+> j→i
+
+. (23) We then update the node representation with a nonlinear transformation and a residual connection: 
+
+h(l+1)  
+
+> i
+
+= ReLU 
+
+
+
+MLP (l)
+
+> update
+
+([ h(l)⊤ 
+
+> i
+
+, m(l)⊤ 
+
+> i
+
+]⊤)
+
+
+
++ h(l) 
+
+> i
+
+. (24) The residual term helps stabilize gradient propagation during adversarial training. Stacking L such PhyGNN layers enables the network to capture multi-hop spatial interactions within the swarm. The final embedding h(L) 
+
+> i
+
+serves as the feature representation for the task-specific actor and critic heads. 
+
+3) MAPPO-Based Actor-Critic Networks: We use separate PhyGNN encoders in the actor and critic networks of the MAPPO framework [23]. This avoids parameter sharing be-tween policy optimization and value estimation. 
+
+Actor Network: The decentralized actor πθ (ai | O i) maps local observations to continuous velocity commands. For each active node ui, two parallel MLPs output the mean μi and log-standard deviation of a Gaussian policy. During training, we sample actions from this distribution for exploration. During execution, we squash the mean with a hyperbolic tangent and scale it by the mechanical limit: 
+
+vi(t) = vmax · tanh( μi). (25) 
+
+Centralized Critic Network: Under the CTDE paradigm, the centralized critic Vϕ receives the PhyGNN embeddings 
+
+h(L) 
+
+> i
+
+of all nodes in the global graph. We then apply masked dual pooling over the active-node subset Uact to aggregate global features: 
+
+hglobal = [ mean ({h(L) 
+
+> i
+
+}i∈U act ) ∥ max( {h(L) 
+
+> i
+
+}i∈U act )] . (26) We concatenate this pooled feature with the ego embedding to form an agent-specific representation, 
+
+hcombined i = [ h⊤ 
+
+> i
+
+, h⊤
+
+> global
+
+]⊤, (27) and use a value head to predict the agent-specific state value 
+
+Vi(s). During training, we optimize the critic by minimizing the squared temporal-difference error with respect to the GAE targets. This masked architecture reduces the interference of static nodes and improves value estimation stability under different damage levels. 
+
+D. Scenario-Adaptive Imitation Learning Strategy 
+
+Sparse environmental rewards alone are insufficient for training the PhyGNN policy across fragmented CNS scenar-ios with different damage levels. We therefore introduce a scenario-adaptive adversarial imitation learning strategy under the CTDE paradigm. This part contains three components: ex-pert demonstration generation, step-level adversarial imitation rewards, and an expert-normalized temporal baseline. 
+
+1) Expert Demonstration Generation: High-quality expert demonstrations guide the policy toward collision-safe and time-efficient connectivity restoration. Since no single algo-rithm consistently performs best over all fragmented topolo-gies, we build the expert dataset by running multiple baseline algorithms, including both centralized optimization methods and decentralized heuristics, over simulated damage scenarios. For each topology, we select the trajectory with the minimum restoration time as the expert reference. An expert trajectory is defined as 
+
+τE = {(O(E) 
+
+> i
+
+(t), v(E) 
+
+> i
+
+(t)) }TE
+
+> t=0
+
+, (28) where TE denotes the task completion time. Because both expert trajectories and policy rollouts are generated in the same simulator, their observation spaces are consistent, which avoids distribution mismatch during discriminator training. 7
+
+We also use spatial data augmentation to improve sample efficiency and reduce overfitting to absolute geographic coor-dinates. Specifically, we augment the positions and velocities in each expert trajectory with the dihedral symmetry group D4
+
+[24]. By applying 90 ◦ rotations and axis reflections, each orig-inal trajectory yields eight geometrically isomorphic variants. The resulting expert buffer BE encourages the discriminator to focus on relative topology rather than absolute orientation, which improves zero-shot generalization. 
+
+2) Step-Level Adversarial Imitation Reward: In highly fragmented topologies, successful subnetwork merging oc-curs rarely, so the environmental reward is extremely sparse. We therefore use Generative Adversarial Imitation Learning (GAIL) [25] to provide dense step-level guidance through a node-level discriminator Dω .Instead of operating on the whole swarm, the discriminator evaluates localized state-action pairs. For an active node ui,we use an independent L-layer PhyGNN encoder to extract the state embedding hDi from the localized observation Oi.We then normalize the executed velocity command by the mechanical limit and map it to an action embedding with a multi-layer perceptron: 
+
+zAi = MLP act 
+
+ vi
+
+vmax 
+
+
+
+. (29) We concatenate the state and action embeddings and feed them into a discriminator head with LeakyReLU activations: 
+
+Dω (Oi, vi) = LeakyReLU  MLP head ([ hD⊤ 
+
+> i
+
+, zA⊤ 
+
+> i
+
+]⊤) .
+
+(30) Here, Dω (·) ∈ (0 , 1) denotes the probability that the state-action pair comes from the expert policy. To reduce discriminator overconfidence, we apply one-sided label smoothing [26]. The discriminator minimizes the BCE loss with soft labels, where expert trajectories use target probability λE = 0.9 and actor-generated trajectories use 
+
+λA = 0 .1:
+
+LD (ω) = −E(Oi,vi)∼B E [λE log Dω (Oi, vi)] 
+
+− E(Oi,vi)∼πθ [(1 − λA) log(1 − Dω (Oi, vi))] .
+
+(31) Here, BE is the mini-batch sampled from the expert database. We convert the stabilized discriminator output into a step-level imitation reward. For numerical stability, we clip the discriminator output with a small constant ϵ = 10 −8:
+
+˜Dω = clip (Dω (Oi(t), vi(t)) , ϵ, 1 − ϵ). (32) The dense imitation reward is then 
+
+rGAIL i (t) = − log(1 − ˜Dω ). (33) Maximizing this reward encourages the policy to match the collision-safe merging behavior contained in the expert demonstrations. 
+
+3) Expert-Normalized Temporal Baseline: Constant step penalties are often used to encourage fast task completion. In CNS restoration, however, recovery horizons vary significantly with the damage level. Mild fragmentation may be resolved in tens of steps, whereas severe fragmentation may require several hundred steps. A fixed step penalty therefore biases the value function toward short-horizon tasks and can destabilize learning. We reduce this effect with an expert-normalized temporal baseline. For a given scenario, let TE denote the completion steps of the expert algorithm. We define the dynamic speed bonus factor as 
+
+η(t) = min 
+
+
+
+exp 
+
+
+
+λ
+
+
+
+1 − tαT E
+
+ 
+
+, η max 
+
+
+
+. (34) Here, α ≥ 1 is a tolerance margin relative to the expert time, 
+
+λ controls the exponential decay, and ηmax caps the maximum bonus. When connectivity is successfully restored, i.e., all subnet-works merge into one connected component with Ns = 1 , the active UAVs receive the terminal reward 
+
+rsuccess (t) = rbase + rtime · η(t). (35) Here, rbase is the base success reward and rtime is the speed bonus pool. If the learned policy matches the expert pace, it receives the nominal bonus; if it reconnects faster, the bonus increases; if it is slower, the bonus decays smoothly. This normalization keeps reward scaling more consistent across scenarios with different damage severities. 
+
+4) Reward Design and Training: For each active node ui,the total step-level reward combines the adversarial imitation term and the environmental reward: 
+
+Ri(t) = wIL · rGAIL i (t) + renv i (t). (36) Here, wIL is the imitation coefficient. We decompose the environmental reward into three parts: 
+
+renv i (t) = rstep + rsaf e i (t) + rterm (t). (37) The urgency penalty rstep < 0 is a small constant that discourages loitering. To enforce physical safety and reduce local congestion, we define the safety penalty as 
+
+rsaf e i (t) = −ωcol 
+
+X  
+
+> uj∈N comm i
+
+max(0 , D saf e − dij ), (38) where dij is the physical distance between nodes and ωcol is the scaling weight. This term discourages collisions directly. The terminal reward incorporates the expert-normalized success reward when restoration succeeds. If the maximum episode length Tmax is reached without convergence, we as-sign a failure penalty proportional to the number of remaining disconnected components: 
+
+rterm (t) = 
+
+
+
+rsuccess (t), if Ns = 1 ,
+
+−P f ail · Ns, if t = Tmax and Ns > 1,
+
+0, otherwise .
+
+(39) Finally, we clip the synthesized reward Ri(t) to the bounded range [−Rmax , R max ] to stabilize critic training and reduce variance in value estimation. The overall training procedure is summarized in Algorithm 1. 8
+
+Algorithm 1 CTDE Training Procedure of PhyGAIL 
+
+Input: Augmented expert buffer BE , maximum epochs Emax ,rollout horizon T , batch size B.
+
+Output: Trained actor πθ , critic Vϕ, and discriminator Dω . 
+
+> 1:
+
+for epoch = 1 , 2, . . . , E max do  
+
+> 2:
+
+Reset the parallel environments and initialize the rollout buffer Brollout . 
+
+> 3:
+
+for t = 1 , 2, . . . , T do  
+
+> 4:
+
+Construct localized observations Oi(t) and apply active-node masking.  
+
+> 5:
+
+Sample actions vi ∼ πθ (·|O i(t)) for all active UAVs.  
+
+> 6:
+
+Execute actions, observe next states, and collect environmental rewards renv i (t). 
+
+> 7:
+
+Store the resulting transitions in Brollout . 
+
+> 8:
+
+end for  
+
+> 9:
+
+Sample expert state-action pairs from BE and policy rollouts from Brollout . 
+
+> 10:
+
+Update the discriminator Dω with BCE loss and label smoothing.  
+
+> 11:
+
+Compute the imitation reward rGAIL i (t) for each active node.  
+
+> 12:
+
+Compute the final reward Ri(t) = wIL rGAIL i (t) + 
+
+renv i (t) and clip to [−Rmax , R max ]. 
+
+> 13:
+
+Compute GAE advantages and value targets.  
+
+> 14:
+
+Update the actor parameters θ and critic parameters ϕ
+
+with MAPPO.  
+
+> 15:
+
+end for 
+
+E. Theoretical Analysis 
+
+This section examines several structural properties of Phy-GAIL. Because decentralized multi-agent interactions are non-linear and discrete, global optimality guarantees are generally out of reach. We instead focus on three properties that matter directly for large-scale deployment: the bounded spectral norm of the local perception graph, the bounded pseudo-force gen-erated by physics-gated message passing, and the controlled variance of the expert-normalized terminal reward. 
+
+1) Bounded Spectral Norm of Scale-Invariant Perception: 
+
+In large-scale MARL, graph feature magnitudes may grow uncontrollably when a policy trained on small swarms is deployed on much larger systems. Standard unmasked com-munication graphs can indeed have unbounded degree. In PhyGAIL, by contrast, the perception graph is bounded by K-NN truncation and physical spatial constraints. We assume that all UAVs maintain a minimum safety distance Dsaf e > 0 during flight and that communication links exist only within radius Dcomm .
+
+Proposition 1: Bounded Spectral Norm of Directed Per-ception Graphs. Let ˜A denote the asymmetric adjacency matrix of the directed K-NN perception graph Glocal , where directed edges represent message-passing flow. Under algo-rithmic truncation and physical constraints, the spectral norm (induced 2-norm) of ˜A is bounded by a constant independent of the global swarm size N :
+
+∥ ˜A∥2 ≤ p∆max  
+
+> in
+
+· ∆max  
+
+> out
+
+, (40) where the maximum in-degree is bounded algorithmically by 
+
+∆max  
+
+> in
+
+= Kact + Kdmg + 1 , and the maximum out-degree satisfies ∆max  
+
+> out
+
+≤ Cpack . Here, Cpack = O(( Dcomm /D saf e )d)
+
+is a conservative sphere-packing bound [27] on the maximum number of coexisting nodes within the communication region in a d-dimensional space. 
+
+Proof: In the directed perception graph Glocal , an edge 
+
+ej→i exists if node ui selects uj for information aggregation. 
+
+i. Algorithmic in-degree bound: The in-degree of node ui
+
+equals the number of neighbors from which it pulls infor-mation. By construction, ui can aggregate messages from at most Kact active UAVs, Kdmg damaged UAVs, and one virtual center. Therefore, 
+
+∥ ˜A∥∞ ≤ Kact + Kdmg + 1 . (41) 
+
+ii. Physical out-degree bound: The out-degree of node uj
+
+equals the number of agents that may select it as a neighbor. Inside a communication disk of radius Dcomm , the number of UAVs that can coexist while respecting the minimum safety distance Dsaf e is bounded by geometric packing. Hence, 
+
+∥ ˜A∥1 ≤ Cpack = O  (Dcomm /D saf e )d . (42) For any asymmetric real matrix, 
+
+∥ ˜A∥2 ≤
+
+q
+
+∥ ˜A∥1∥ ˜A∥∞. (43) Substituting the two bounds above gives 
+
+∥ ˜A∥2 ≤
+
+q
+
+(Kact + Kdmg + 1) · Cpack , (44) which is constant with respect to the global swarm size N .Thus, the amplification factor of graph propagation remains bounded as the swarm grows. This gives a structural explana-tion for the zero-shot scale generalization observed in the full framework. 
+
+2) Bounded Dynamics of Physics-Gated Message Passing: 
+
+We next analyze the boundedness of the pseudo-force gener-ated by the physics-gated message passing mechanism. This property is directly related to stable mobility control. 
+
+Proposition 2: Bounded Pseudo-Force Generation. Sup-pose the local observation Oi(t) lies in a compact feature space X . Then the aggregated pseudo-force mi produced by the PhyGNN encoder is bounded. 
+
+Proof: The localized observation Oi(t) consists of nor-malized relative positions, velocities clipped by vmax , and structural degrees mapped through a logarithmic function. These components lie in closed and bounded intervals, so the input space X is compact. By the extreme value theorem, a continuous mapping on a compact set is bounded. The MLP layers in PhyGNN have finite parameters and continuous activations (ReLU, Sigmoid, and Softplus). Therefore, the interaction feature fij and the interaction strength Sij are bounded by constants Cf and 
+
+Smax , respectively. Each directed message then satisfies 
+
+∥mj→i∥ ≤ Smax Cf . (45) Proposition 1 bounds the number of incoming messages by 
+
+∆max  
+
+> in
+
+. Hence, 
+
+∥mi∥ ≤ ∆max  
+
+> in
+
+Smax Cf . (46) 9
+
+Therefore, the aggregated pseudo-force remains bounded. As a consequence, the policy network cannot generate arbitrarily large internal interaction signals. This keeps the coordination dynamics numerically stable. 
+
+3) Variance Decoupling via Expert-Normalized Baseline: 
+
+Long-horizon reinforcement learning tasks often have high return variance because episode length changes from scenario to scenario. Here we examine the terminal success signal induced by the expert-normalized reward. 
+
+Proposition 3: Variance Control of the Terminal Success Signal. Let the terminal success reward be 
+
+r+ 
+
+> term
+
+= rbase + rspeed η(t), (47) where the normalized speed bonus factor is clipped such that 
+
+η(t) ∈ [0 , η max ]. Then 
+
+Var( r+
+
+> term
+
+) ≤ 14 (rspeed ηmax )2. (48) 
+
+Proof: Because η(t) is clipped to [0 , η max ], the terminal success reward lies in the interval 
+
+[rbase , r base + rspeed ηmax ], (49) whose length is L = rspeed ηmax .Popoviciu’s inequality states that any random variable bounded in an interval of length L has variance at most L2/4.Applying it here gives 
+
+Var( r+
+
+> term
+
+) ≤ 14 (rspeed ηmax )2. (50) This bound applies only to the terminal success signal. Step penalties may still introduce variance through stochastic episode length, but the positive success reward itself remains bounded. Hence, value estimation is less sensitive to large differences in task horizon. 
+
+F. Complexity Analysis 
+
+We analyze the communication, computational, and mem-ory costs of PhyGAIL during decentralized execution. For practical UAV swarm deployment, each agent should keep its onboard resource consumption bounded and independent of the global swarm size N .
+
+1) Communication Complexity: Under decentralized ex-ecution, each active UAV ui broadcasts only its localized kinematic state, including relative position, velocity, and cur-rent degree, to neighbors within the communication range 
+
+Dcomm . The payload size of each message is constant, so each transmission costs O(1) .On the receiving side, Proposition 1 bounds the number of active UAVs inside the communication region by the geometric packing constant Cpack . Therefore, the communication over-head of each UAV at one control step is at most O(Cpack ),which is constant with respect to N .By contrast, centralized topology-control methods usually need global state aggregation. Their communication cost there-fore grows with the swarm size and typically scales as O(N )
+
+or even O(N 2).
+
+2) Computational Complexity: The onboard computation has two main parts: local graph construction and PhyGNN inference. During graph construction, each UAV selects the Kact 
+
+nearest active neighbors from at most Cpack candidates inside 
+
+Dcomm , where Cpack is the packing bound defined in Proposi-tion 1. We can implement this step with partial sorting, which gives worst-case complexity O(Cpack log Kact ). Selecting the 
+
+Kdmg nearest damaged nodes has the same bounded form. During inference, the UAV processes its localized observa-tion with an L-layer PhyGNN encoder. Proposition 1 shows that the ego node receives at most ∆max  
+
+> in
+
+≤ Kact + Kdmg + 1 
+
+directed incoming messages. If the maximum hidden dimen-sion is dh, then physical message synthesis and node updates require 
+
+O(L · ∆max  
+
+> in
+
+· d2
+
+> h
+
+) (51) operations. Combining the two parts, the worst-case computational complexity per UAV per time step is 
+
+O  Cpack log Kact + L · ∆max  
+
+> in
+
+· d2
+
+> h
+
+ . (52) All terms in this expression are constants or bounded hy-perparameters. Hence, the onboard computational complexity remains O(1) with respect to the global swarm size N .
+
+3) Memory Complexity: The onboard memory footprint comes mainly from two sources: the fixed-size neural net-work parameters, bounded by O(L · d2
+
+> h
+
+), and the bounded local observation buffer, whose size is proportional to ∆max  
+
+> in
+
+.Therefore, the memory complexity per agent is also O(1) with respect to the global swarm size. Taken together, these communication, computation, and memory bounds show that each UAV maintains constant per-agent overhead during decentralized execution. This makes real-time inference feasible even in large swarms with hun-dreds of nodes. V. E XPERIMENTAL RESULTS 
+
+This section first introduces the simulation setups and then discusses the performance of the proposed algorithm 1. The experiment results of centralized algorithms like CR-MGC [11], DEMD [12], and GDR-TS [16], decentralized approaches including center-fly, HERO [13], SIDR [14]), and MADDPG-APF [15], are also displayed for comparisons. 
+
+A. Experimental Setup Simulation Environment: All experiments are conducted in a 2-D UAV swarm simulator. We set the communication radius to Dcomm = 120 m, the maximum UAV speed to 
+
+vmax = 10 m/s, and the control interval to ∆t = 0 .1 s. We consider five swarm sizes, i.e., N ∈ { 20 , 50 , 100 , 200 , 500 },with square mission areas of side length 320 , 500 , 750 , 1000 ,and 1600 m, respectively. We set the maximum episode length to Tmax = 0.8W , where W denotes the map width. An episode terminates when the surviving UAVs reconnect into 
+
+> 1The source codes of the proposed PhyGAIL algorithm are available on
+> https://github.com/lytxzt/PhyGAIL 10
+
+(a) Convergence rate under different swarm scales and damage ratios. 
+
+(b) Average recovery time under different swarm scales and damage ratios. 
+
+(c) Average collisions per UAV under different swarm scales and damage ratios. Fig. 4: Overall performance comparison under different swarm scales and damage ratios. a single connected component or when the step budget is exhausted. During training, we impose a repulsion reward with a safety margin of 15 m. For evaluation, we count a collision when the pairwise distance falls below 10 m. 
+
+Baselines and Metrics: For the main comparison, we vary the damage ratio ρ = ND /N from 0.05 to 0.95 with an interval of 0.05 , except for the N = 20 case where the maximum ratio is 0.90 . For each swarm size, damage ratio, and method, we average the results over 50 disconnected post-damage cases. The main evaluation metrics are the conver-gence rate, average recovery time, and average collisions per UAV. In addition, the runtime evaluation reports the first-action latency, total solving time, and per-step inference time. 
+
+Training Details: We train PhyGAIL on 20 -UAV sce-narios and directly evaluate it on larger swarms without fine-tuning. Training uses 32 parallel environments for 1000 
+
+epochs. We configure PPO with clipping coefficient 0.2, dis-count factor γ = 0 .99 , GAE parameter λ = 0 .95 , and 5 policy-update epochs per outer iteration. The entropy coefficient decays from 0.05 to 0.005 . We optimize the actor, critic, and discriminator using AdamW with learning rates of 10 −4.We update the discriminator once per outer epoch with label smoothing. The final training reward is computed as the environment reward plus 0.1 times the GAIL reward, then normalized and clipped. 
+
+Network Architecture: The PhyGAIL encoder contains three physics-informed gated message-passing layers with hid-den dimension 128 . Each node feature consists of the relative position, velocity, and normalized topological degree. In graph construction, each active UAV retains up to Kact = 8 active-neighbor communication edges, while we cap the number of damaged-neighbor observation edges at Kdmg = 3 . The actor adopts a tanh-squashed Gaussian policy, the critic combines local graph features with masked global mean/max pooling, and the discriminator performs node-level expert classification conditioned on both state embeddings and actions. 
+
+B. Overall Performance Comparison 
+
+We compare PhyGAIL with representative baselines under different swarm scales and damage ratios. Figure 4 summa-rizes the three primary metrics: convergence rate, average recovery time, and average collisions per UAV. PhyGAIL maintains a perfect convergence rate across all tested swarm scales and damage ratios, as shown in Fig. 4a. This advantage becomes most evident in the large-scale settings (N = 100 , 200 , 500 ), where HERO, SIDR, and MADDPG-APF degrade rapidly as the damage ratio increases. Several centralized or centroid-seeking baselines, including center-fly, CR-MGC, DEMD, and GDR-TS, still preserve high convergence under low to moderate damage. Their behavior in the other two panels, however, shows that high convergence alone does not guarantee efficient or safe recovery. Among all compared methods, only PhyGAIL maintains perfect recon-nection reliability over the full tested range. Recovery time increases with the damage ratio for all methods, reflecting the increasing difficulty of reconnecting more severely fragmented swarms. In the large-scale settings, PhyGAIL stays in the best-performing group over most dam-age ratios and consistently outperforms the decentralized base-lines in Fig. 4b. Under extremely high damage ratios, some 11 
+
+TABLE I: Performance summary over large-scale settings.                                     
+
+> Algorithm Conv. Rate ↑Rec. Time ↓Collision ↓Overall Rank ↓
+> PhyGAIL 1.000 20.14 0.161 2.061
+> DEMD 0.990 26.55 1.851 3.956 CR-MGC 0.949 33.84 1.324 4.462 GDR-TS 0.975 36.48 1.664 4.471 SIDR 0.472 49.36 0.131 4.731 center-fly 0.998 28.95 18.994 4.798 MADDPG-APF 0.606 49.39 0.399 4.904 HERO 0.276 67.56 1.287 6.617
+
+centralized baselines, especially DEMD, become slightly faster when reconnection is still feasible. This suggests that global topology information can help identify short merging paths in highly fragmented cases. Even so, this advantage appears only in a narrow high-damage regime, whereas PhyGAIL remains more robust over the full large-scale range and achieves the best overall average recovery time. The collision curves in Fig. 4c show a similarly clear trend. PhyGAIL keeps collisions near zero at small scales and maintains a much lower collision level than center-fly, CR-MGC, GDR-TS, and MADDPG-APF in the large-scale cases. SIDR yields slightly lower collision values in part of the large-scale regime, but this comes with a substantial drop in convergence rate and recovery efficiency. The main strength of PhyGAIL therefore lies in its overall balance: it combines reliable reconnection, competitive restoration speed, and low collision risk within a single decentralized policy. Table I aggregates the results over the large-scale settings (N = 100 , 200 , 500 ). PhyGAIL attains perfect average con-vergence ( 1.000 ), the shortest average recovery time ( 20 .14 
+
+s), and the best overall rank ( 2.061 ). SIDR achieves a slightly smaller collision value, but its convergence rate and recovery efficiency are much worse. Overall, PhyGAIL offers the most favorable trade-off among reconnection reliability, restoration speed, and motion safety in large-scale decentralized UAV swarm recovery. 
+
+C. Ablation Study 
+
+We examine which components of PhyGAIL contribute most to large-scale robustness and training stability. The first group of ablations measures the degradation caused by removing or replacing key modules, and the second group compares the corresponding training dynamics. 
+
+1) Scalability and Robustness: Table II summarizes the large-scale ablation results for N = 100 , 200 , and 500 .Each entry reports the performance drop relative to the full PhyGAIL model after averaging over the tested damage ratios (0.25 , 0.5, and 0.75 ) at that swarm scale. The graph encoder has the strongest effect on scalability. Replacing PhyGNN with conventional graph encoders reduces both convergence and recovery efficiency, and the degradation grows with swarm size. The largest drop appears with GCN, whose convergence decreases by 0.353 , 0.447 , and 0.673 for 
+
+N = 100 , 200 , and 500 , respectively. GAT and GraphSAGE remain more competitive at smaller scales, but both degrade sharply at N = 500 , with convergence drops of 0.293 and 
+
+0.260 and recovery-time increases of 51 .43 s and 44 .56 s. These results show that standard graph aggregation is insuf-ficient for stable large-scale recovery, while the physics-gated interaction in PhyGNN becomes increasingly important as the topology grows more fragmented and heterogeneous. Among the perception-related components, the virtual cen-ter has the largest impact on large-scale coordination. Re-moving it reduces convergence by 0.127 , 0.347 , and 0.640 
+
+and increases recovery time by 13 .80 , 29 .66 , and 65 .69 s for 
+
+N = 100 , 200 , and 500 , respectively. Removing damaged-neighbor observations also causes clear degradation, especially at N = 500 , where the convergence drop reaches 0.433 and the recovery-time increase reaches 50 .88 s. By comparison, removing the KNN selection mechanism has only a limited effect at N = 100 and 200 , and its influence becomes more visible only at N = 500 . The bounded local graph is therefore useful for scalability, but the shared directional cue provided by the virtual center plays a larger role in driving subnet merging. The training-related ablations highlight the importance of temporal reward design. Removing the expert time reward causes large degradation across all three scales, and removing all time-related rewards yields the worst overall rank in Table II. In contrast, removing the centralized critic or the GAIL reward changes the final large-scale averages much less, particularly at N = 100 and 200 . This pattern suggests that the temporal reward mainly determines restoration efficiency at large scale, whereas the centralized critic and the GAIL reward contribute more to optimization quality than to the final asymptotic metrics. 
+
+2) Training Stability: Figure 5 shows the corresponding training dynamics. In Fig. 5a, the full PhyGAIL model quickly enters a high-reward regime and keeps the convergence level close to 0.95 throughout training. Replacing PhyGNN with conventional encoders makes the training process much less stable. The GCN variant improves at the beginning but starts to collapse after roughly 200 epochs. The GAT variant reaches strong intermediate performance and then degrades sharply in the later stage. The GraphSAGE variant oscillates more strongly, suffers a pronounced drop after the early rise, and only recovers partially afterward. These trends are consistent with the much weaker large-scale robustness of the GCN, GAT, and GraphSAGE variants in Table II. Figure 5b compares several representative component ab-lations. Removing damaged-neighbor observations still allows the policy to converge to a reasonably strong regime, but later-stage stability and final success rate both decline. Removing the virtual center leads to much more severe instability: both reward and success rate stay far below the full model during most of training, which matches its large degradation in Table II. Removing the GAIL reward does not prevent eventual convergence, but it slows down the improvement of both reward and success rate in the early and middle stages. The ablation results therefore separate the roles of the main components rather clearly: PhyGNN and the virtual center govern large-scale robustness, the temporal reward design governs restoration efficiency, and the GAIL reward mainly accelerates and stabilizes training. 12 
+
+TABLE II: Ablation summary on large-scale settings.                                                                                   
+
+> Ablated Variant N= 100 N= 200 N= 500 Overall Rank ↓
+> ∆Conv. Rate ↑∆Rec. Time ↓∆Conv. Rate ↑∆Rec. Time ↓∆Conv. Rate ↑∆Rec. Time ↓
+> replaced by GAT -0.000 +5.70 -0.007 +22.22 -0.293 +51.43 5.333 replaced by SAGE -0.067 +9.35 -0.107 +11.85 -0.260 +44.56 5.833 replaced by GCN -0.353 +19.36 -0.447 +33.03 -0.673 +64.90 9.833 w/o KNN selection -0.007 +1.52 -0.007 +7.01 -0.113 +27.24 3.750 w/o damaged neighbor -0.040 +7.79 -0.120 +19.96 -0.433 +50.88 6.333 w/o virtual center -0.127 +13.80 -0.347 +29.66 -0.640 +65.69 8.667 w/o GAIL reward -0.000 +1.27 -0.000 +5.68 -0.007 +20.18 2.083 w/o centralized critic -0.000 +2.43 -0.000 +6.34 -0.160 +38.82 3.250 w/o expert time reward -0.187 +15.40 -0.513 +35.47 -0.607 +57.84 9.000 w/o any time reward -0.553 +26.95 -0.593 +35.87 -0.667 +58.70 10.500
+
+(a) Training curves with GNN replacements. (b) Training curves with representative component ablations. Fig. 5: Training stability analysis of PhyGAIL and its ablated variants. 
+
+D. Case Study 
+
+We further examine how PhyGAIL improves during train-ing from both the optimization and behavioral perspectives. Figure 6a presents the training dynamics of the full model, and Fig. 6b shows the corresponding validation trajectories at representative epochs. The learning curves in Fig. 6a follow a clear two-stage pattern. In the early stage, both the episode reward and the success rate rise quickly from low initial values, so the policy learns basic collision avoidance and local motion coordination rather early. This stage is still unstable, however. The valida-tion reward remains at a moderate level for a long interval, and the training success rate stays around 0.6–0.7. A sharper transition appears in the middle stage. After that point, both training and validation success rates approach 1.0, and the episode reward climbs rapidly to a high plateau. The other optimization statistics follow the same trend. The actor loss gradually reaches a steady regime, the critic loss fluctuates within a bounded range with a mild downward trend, and the discriminator loss drops quickly at the beginning and then stabilizes. Together, these curves indicate that the policy first learns local motion regularities and then acquires a much more effective subnet-merging strategy. The trajectories in Fig. 6b make this evolution more con-crete. The validation case at epoch 0 contains 10 damaged nodes and three disconnected surviving subnets. At epoch 20 ,the learned policy still cannot reconnect the network within the maximum horizon of 256 steps. The motions are no longer random, but the three subnets still move only weakly toward one another and fail to form a consistent global merging direction. At epoch 35 , the same case is solved in 130 steps. By this point, the three subnets already move much more clearly toward a common region, which shows that the policy has started to use the shared directional cues encoded in the graph representation. The coordination pattern becomes much more mature at epoch 190 , where the same case is solved in only 68 steps. The lower-left cluster moves upward and inward, while the upper and right-side nodes approach the central region in a more synchronized way, producing a much faster restoration process. At epoch 505 , the recovery time drops further to 55 
+
+steps. The overall topology evolution remains similar to that at epoch 190 , but the trajectories are more direct and contain less redundant motion. The later stage of training therefore mainly improves the efficiency of an already correct coordination strategy rather than creating a qualitatively new behavior. In summary, PhyGAIL learns the recovery task progres-sively. The early stage captures local motion regularities, the middle stage establishes effective subnet attraction and reconnection, and the late stage refines the learned strategy to improve restoration efficiency. 
+
+E. Runtime Overhead Analysis 
+
+Table III lists the response time, episode time, and average recovery steps of all methods under the large-scale settings 
+
+N = 100 , 200 , and 500 .PhyGAIL keeps a low per-step response cost: 4.02 , 7.42 ,and 17 .61 ms for N = 100 , 200 , and 500 , respectively. These 13 
+
+(a) Training dynamics of PhyGAIL. 
+
+(b) Validation trajectories at representative epochs. Fig. 6: Case study of the learning and behavioral evolution of PhyGAIL. TABLE III: Runtime comparison under large-scale settings.                                                                                       
+
+> Algorithm N= 100 N= 200 N= 500
+> Resp. (ms) Episode (s) Steps Resp. (ms) Episode (s) Steps Resp. (ms) Episode (s) Steps PhyGAIL 4.02 0.14 52.7 7.42 0.82 143.5 17.61 6.60 269.5
+> center-fly 0.46 0.08 114.2 1.73 0.93 301.2 9.29 8.98 501.0 HERO 1.43 0.82 515.8 4.73 4.59 761.3 23.21 39.30 1280.0 SIDR 1.19 0.35 266.9 4.17 4.01 686.4 22.87 21.39 642.8 CR-MGC 511.93 0.58 94.4 556.10 1.28 238.6 4901.74 17.18 680.9 DEMD 2862.48 2.87 100.1 2792.71 3.40 223.7 16032.39 24.88 493.9 GDR-TS 9185.78 9.28 119.1 14404.36 15.29 287.3 69241.05 80.73 641.6 MADDPG-APF 14.96 3.27 201.2 46.75 24.86 487.9 247.65 241.10 924.0
+
+values increase with swarm size, but they remain far below those of the centralized graph-learning baselines. At N = 500 ,for example, PhyGAIL requires 17 .61 ms per step, while CR-MGC, DEMD, and GDR-TS require 4901 .74 , 16032 .39 , and 
+
+69241 .05 ms. Episode time shows the same advantage at the system level. PhyGAIL achieves the shortest episode time at N = 200 and 
+
+N = 500 , and remains close to the shortest at N = 100 
+
+(0.14 s versus 0.08 s for center-fly). This behavior matches the recovery-step statistics in Table III. Center-fly has a smaller per-step latency, but it needs many more steps, especially at 
+
+N = 500 (501 .0 steps), so its total episode time increases to 8.98 s. HERO, SIDR, and MADDPG-APF follow the same pattern: some of them remain relatively light per step, but their large step counts drive up the total episode cost. The growth of PhyGAIL’s measured response time with swarm size does not conflict with the theoretical O(1) com-plexity in Section IV-E. The complexity analysis characterizes the local decision cost under bounded local observations and bounded graph size. By contrast, the benchmarked response time comes from the current centralized simulator imple-mentation, which also includes subnet extraction, neighbor search, graph construction, batching, and action write-back for all active subnets. Thus, the latency growth mainly reflects implementation overhead rather than the intrinsic complexity of the local policy. PhyGAIL provides the best runtime–performance trade-off among the compared methods and remains suitable for large-scale decentralized UAV swarm recovery. VI. C ONCLUSION 
+
+This paper considered decentralized connectivity restoration for UAV swarm networks under communication network split caused by large-scale node failures. We developed PhyGAIL, a CTDE-based framework that combines bounded heteroge-neous graph perception, physics-informed graph interaction, and scenario-adaptive imitation learning for large-scale recov-ery. At the core of the framework, PhyGNN models local directional interactions through gated message passing with explicit attraction and repulsion, which provides a physically grounded mechanism for decentralized coordination. We also analyzed three structural properties of the framework, namely 14 
+
+bounded graph propagation, bounded pseudo-force generation, and controlled variance of the expert-normalized terminal reward. Simulation results showed that a policy trained on 20-UAV swarms transfers directly to much larger systems with up to 500 UAVs and achieves the best overall balance among reconnection reliability, recovery efficiency, motion safety, and runtime overhead. These results support PhyGAIL as a scalable solution for decentralized UAV swarm recovery under severe topology fragmentation. Future work can consider more realistic deployment con-ditions, including continuous failures, obstacle-constrained environments, and tighter onboard resource limits. Another direction is to extend the proposed physics-informed graph interaction model to broader continuous-space multi-agent coordination problems beyond connectivity restoration. REFERENCES [1] S. Javed, A. Hassan, R. Ahmad, W. Ahmed, R. Ahmed, A. Saadat, and M. Guizani, “State-of-the-art and future research challenges in uav swarms,” IEEE Internet of Things Journal , vol. 11, no. 11, pp. 19 023– 19 045, 2024. [2] J. Horyna, T. Baca, V. Walter, D. Albani, D. Hert, E. Ferrante, and M. Saska, “Decentralized swarms of unmanned aerial vehicles for search and rescue operations without explicit communication,” Autonomous Robots , vol. 47, no. 1, pp. 77–93, 2023. [3] A. Phadke and F. A. Medrano, “Towards resilient uav swarms—a breakdown of resiliency requirements in uav swarms,” Drones , vol. 6, no. 11, p. 340, 2022. [4] S. Lee and M. Younis, “Recovery from multiple simultaneous failures in wireless sensor networks using minimum steiner tree,” Journal of Parallel and Distributed Computing , vol. 70, no. 5, pp. 525–536, 2010. [5] S. Lee, M. Younis, and M. Lee, “Connectivity restoration in a partitioned wireless sensor network with assured fault tolerance,” Ad Hoc Networks ,vol. 24, pp. 1–19, 2015. [6] S. Shankar and D. Kundur, “Towards improved connectivity with hybrid uni/omni-directional antennas in wireless sensor networks,” in IEEE INFOCOM Workshops 2008 . IEEE, 2008, pp. 1–4. [7] Y. Zhang, J. Wang, and G. Hao, “An autonomous connectivity restora-tion algorithm based on finite state machine for wireless sensor-actor networks,” Sensors , vol. 18, no. 1, p. 153, 2018. [8] K. Akkaya, I. F. Senturk, and S. Vemulapalli, “Handling large-scale node failures in mobile sensor/robot networks,” Journal of Network and Computer Applications , vol. 36, no. 1, pp. 195–210, 2013. [9] S. Chouikhi, I. El Korbi, Y. Ghamri-Doudane, and L. A. Saidane, “Centralized connectivity restoration in multichannel wireless sensor networks,” Journal of Network and Computer Applications , vol. 83, pp. 111–123, 2017. [10] Y. Zhang, Z. Zhang, and B. Zhang, “A novel hybrid optimization scheme on connectivity restoration processes for large scale industrial wireless sensor and actuator networks,” Processes , vol. 7, no. 12, p. 939, 2019. [11] Z. Mou, F. Gao, J. Liu, and Q. Wu, “Resilient uav swarm commu-nications with graph convolutional neural network,” IEEE Journal on Selected Areas in Communications , vol. 40, no. 1, pp. 393–411, 2022. [12] H. Lin, L. Ding, S. Chen, F. Yang, and L. Qian, “Multi-hop diffused graph convolution for resilient uav swarm networks,” in 2024 IEEE International Symposium on Broadband Multimedia Systems and Broad-casting (BMSB) . IEEE, 2024, pp. 1–6. [13] Z. Mi, Y. Yang, and G. Liu, “Hero: A hybrid connectivity restoration framework for mobile multi-agent networks,” in 2011 IEEE Interna-tional Conference on Robotics and Automation , 2011, pp. 1702–1707. [14] M. Chen, H. Wang, C.-Y. Chang, and X. Wei, “Sidr: A swarm intelligence-based damage-resilient mechanism for uav swarm net-works,” IEEE Access , vol. 8, pp. 77 089–77 105, 2020. [15] J. Li, P. Yi, T. Duan, Z. Zhang, J. Li, Y. Wang, and J. Yu, “Fast connectivity restoration of uav communication networks based on dis-tributed hybrid maddpg and apf algorithm,” Ad Hoc Networks , vol. 171, p. 103785, 2025. [16] Y. Wang, X. Wang, C. Wei, Q. Ren, and Y. Tang, “Uav swarm network topology self-healing via graph-based deep reinforcement learning,” in 2025 IEEE Wireless Communications and Networking Conference (WCNC) . IEEE, 2025, pp. 1–6. [17] J. Foerster, G. Farquhar, T. Afouras, N. Nardelli, and S. Whiteson, “Counterfactual multi-agent policy gradients,” in Proceedings of the AAAI conference on artificial intelligence , vol. 32, no. 1, 2018. [18] F. Senel and M. Younis, “Optimized connectivity restoration in apartitioned wireless sensor network,” in 2011 IEEE global telecommu-nications conference-GLOBECOM 2011 . IEEE, 2011, pp. 1–5. [19] M. Imran, M. Younis, A. M. Said, and H. Hasbullah, “Volunteer-instigated connectivity restoration algorithm for wireless sensor and actor networks,” in 2010 IEEE International Conference on Wireless Communications, Networking and Information Security . IEEE, 2010, pp. 679–683. [20] A. A. Abbasi, M. F. Younis, and U. A. Baroudi, “Recovering from a node failure in wireless sensor-actor networks with minimal topology changes,” IEEE Transactions on vehicular technology , vol. 62, no. 1, pp. 256–271, 2012. [21] B. Mohar, Y. Alavi, G. Chartrand, and O. Oellermann, “The laplacian spectrum of graphs,” Graph theory, combinatorics, and applications ,vol. 2, no. 871-898, p. 12, 1991. [22] W. Dong, C. Moses, and K. Li, “Efficient k-nearest neighbor graph construction for generic similarity measures,” in Proceedings of the 20th international conference on World wide web , 2011, pp. 577–586. [23] C. Yu, A. Velu, E. Vinitsky, J. Gao, Y. Wang, A. Bayen, and Y. Wu, “The surprising effectiveness of ppo in cooperative multi-agent games,” 
+
+Advances in neural information processing systems , vol. 35, pp. 24 611– 24 624, 2022. [24] T. Cohen and M. Welling, “Group equivariant convolutional networks,” in International conference on machine learning . PMLR, 2016, pp. 2990–2999. [25] J. Ho and S. Ermon, “Generative adversarial imitation learning,” Ad-vances in neural information processing systems , vol. 29, 2016. [26] C. Szegedy, V. Vanhoucke, S. Ioffe, J. Shlens, and Z. Wojna, “Rethinking the inception architecture for computer vision,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2016, pp. 2818–2826. [27] J. H. Conway and N. J. A. Sloane, Sphere packings, lattices and groups .Springer Science & Business Media, 2013, vol. 290.

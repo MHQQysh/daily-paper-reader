@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-001.webp",
+      "caption": "Figure 3: All model–task accuracy vs. frequency budget curves overlaid. BERT-base (solid) and RoBERTabase (dashed). The separation between MNLI (red, bottom) and SST-2 (blue, top) directly visualizes taskcomplexity-driven spectral sensitivity (Finding 3).",
+      "page": 6,
+      "index": 1,
+      "width": 979,
+      "height": 571
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-002.webp",
+      "caption": "Table 2: Experimental configuration for all SpectralLoRA analyses.",
+      "page": 2,
+      "index": 2,
+      "width": 810,
+      "height": 228
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-003.webp",
+      "caption": "Figure 4: Average k% required for 90% DCT energy across tasks and models. RoBERTa-base (orange) is systematically more compressible than BERT-base (blue) across all four tasks with a consistent gap of ∼2pp. The bar heights themselves are remarkably stable (31–35% range) across all 8 conditions.",
+      "page": 7,
+      "index": 3,
+      "width": 802,
+      "height": 400
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-004.webp",
+      "caption": "Table 3: Parameter efficiency of SpectralLoRA on SST-2 (BERT-base). Green = beats LoRA baseline. Trained parameters are identical to LoRA – only storage/deployment footprint is reduced.",
+      "page": 3,
+      "index": 4,
+      "width": 910,
+      "height": 202
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-005.webp",
+      "caption": "Figure 1: Accuracy vs. DCT frequency budget on SST-2 (BERT-base). Dashed green line = full LoRA baseline (87.7%). At k=50%, SpectralLoRA exceeds full LoRA by 0.46pp, indicating frequency masking acts as implicit regularization.",
+      "page": 4,
+      "index": 5,
+      "width": 706,
+      "height": 421
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-006.webp",
+      "caption": "Table 4: Full cross-task, cross-model results. Green = frequency masking improves over full LoRA. Red = high spectral sensitivity. All results on validation sets.",
+      "page": 4,
+      "index": 6,
+      "width": 886,
+      "height": 263
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-007.webp",
+      "caption": "Figure 5: Layer-wise DCT cumulative energy curves for query (left) and value (right) projections across all 12 BERT-base transformer layers. Red dashed line = 90% energy threshold. Later layers (yellow, Layer 10–11) reach the threshold at lower k%, indicating higher spectral compressibility in task-specific upper layers.",
+      "page": 9,
+      "index": 7,
+      "width": 976,
+      "height": 381
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-008.webp",
+      "caption": "Figure 6: Heatmap of k% needed for 90% DCT energy per transformer layer and module type (Query/Value). Darker red = more compressible (lower k% needed). Layer 11 query projection requires only 26.6% vs. Layer 0’s 38.8% – a 12pp gap indicating depth-dependent spectral structure. Value projections show a different pattern, with Layer 4 being notably compressible (29.5%).",
+      "page": 9,
+      "index": 8,
+      "width": 979,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10649v1/fig-009.webp",
+      "caption": "Figure 2: Per-task accuracy vs. frequency budget for BERT-base (solid circles) and RoBERTa-base (dashed squares) across all four GLUE tasks. Annotations show accuracy at k=10% for each model. RoBERTa consistently recovers accuracy at lower k values, confirming its higher spectral compressibility.",
+      "page": 5,
+      "index": 9,
+      "width": 979,
+      "height": 719
+    }
+  ]
+}
