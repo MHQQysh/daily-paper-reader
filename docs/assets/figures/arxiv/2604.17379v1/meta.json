@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.17379v1/fig-001.webp",
+      "caption": "Fig. 8: Proposed MAGRPO over baselines over varying M .",
+      "page": 11,
+      "index": 1,
+      "width": 977,
+      "height": 308
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17379v1/fig-002.webp",
+      "caption": "Fig. 9: Proposed MAGRPO over baselines over varying N .",
+      "page": 11,
+      "index": 2,
+      "width": 977,
+      "height": 307
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17379v1/fig-003.webp",
+      "caption": "Fig. 6: Influence of group size for the proposed MAGRPO over varying M .",
+      "page": 10,
+      "index": 3,
+      "width": 1059,
+      "height": 223
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17379v1/fig-004.webp",
+      "caption": "Fig. 7: Influence of trajectory length for the proposed MAGRPO over varying M .",
+      "page": 10,
+      "index": 4,
+      "width": 1059,
+      "height": 223
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17379v1/fig-005.webp",
+      "caption": "Fig. 1: Illustration of an example of the considered downlink FA-assisted wireless network.",
+      "page": 3,
+      "index": 5,
+      "width": 488,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17379v1/fig-006.webp",
+      "caption": "TABLE II: CONFIGURATION & HYPERPARAMETERS",
+      "page": 8,
+      "index": 6,
+      "width": 500,
+      "height": 369
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17379v1/fig-007.webp",
+      "caption": "Fig. 4: Landscape of R(u).",
+      "page": 9,
+      "index": 7,
+      "width": 1059,
+      "height": 184
+    },
+    {
+      "url": "assets/figures/arxiv/2604.17379v1/fig-008.webp",
+      "caption": "Fig. 5: Training and testing curves for the proposed MAGRPOs and baselines over varying M .",
+      "page": 9,
+      "index": 8,
+      "width": 1059,
+      "height": 250
+    }
+  ]
+}

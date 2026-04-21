@@ -1,0 +1,2958 @@
+Title: Sketching the Readout of Large Language Models for Scalable Data Attribution and Valuation
+
+URL Source: https://arxiv.org/pdf/2604.16197v1
+
+Published Time: Mon, 20 Apr 2026 01:13:25 GMT
+
+Number of Pages: 54
+
+Markdown Content:
+# Sketching the Readout of Large Language Models for Scalable Data Attribution and Valuation 
+
+Yide Ran 1, Jianwen Xie 4, Minghui Wang 2, Wenjin Zheng 3, Denghui Zhang 1, Chuan Li 4, and Zhaozhuo Xu ∗11Stevens Institute of Technology 
+
+> 2
+
+Columbia University Mailman School of Public Health 
+
+> 3
+
+University of Texas Health Science Center at Houston 
+
+> 4
+
+Lambda Inc. April 20, 2026 
+
+Abstract 
+
+Data attribution and valuation are critical for understanding data-model synergy for Large Language Models (LLMs), yet existing gradient-based methods suffer from scalability challenges on LLMs. Inspired by human cognition, where decision making relies on a focused readout of relevant memories rather than replaying all pathways, we introduce RISE (Readout Influence Sketching Estimator ). Instead of computing and indexing gradients across the entire LLM, RISE focuses on influence hotspots at the output layer, where influence signals concentrate, and the gradient admits a decomposed outer-product form. This enables a dual-channel representation combining a lexical residual channel (RH) and a semantic projected-error channel (GH). Applying CountSketch projections to these channels achieves strong compression while maintaining accurate attribution. Across the OLMo (1B–32B) and Pythia (14M–6.9B) families, RISE reduces index storage by up to 112 × compared to RapidIn and scales to 32B parameters LLM, where gradient-based baselines such as RapidIn and ZO-Inf become memory-infeasible. We evaluate RISE on two paradigms: (1) retrospective attribution, retrieving influential training examples for specific predictions, and (2) prospective valuation, scoring candidate data utility zero-shot. We validate RISE on three tasks: Howdy backdoor data detection, Finance-Medical domain separation, and Brain Rot high-quality data selection. In a closed-loop Brain Rot study, continued pretraining on RISE-selected data yields consistent downstream improvements. Overall, RISE provides a practical and scalable primitive for influence analysis and training-data selection in modern large language models. 
+
+# 1 Introduction 
+
+Understanding which training examples, past or future, shape a large language model’s behavior is central to interpretability and to the design of efficient continuous training pipelines. Human learning exhibits a useful duality: we can trace influential past experiences and predict the utility of new information. Scalable influence estimation for LLMs should support the same duality, enabling both 
+
+retrospective attribution and prospective valuation . While classic influence functions [ 22 , 49 ]
+
+> ∗
+
+Contact: zxu79@stevens.edu 
+
+1
+
+> arXiv:2604.16197v1 [cs.LG] 17 Apr 2026
+
+offer a principled formulation, they become intractable at LLM scale due to second-order computation and the enormous parameter dimensionality. Scaling influence estimation for LLM faces a fundamental tension between feasibility and 
+
+fidelity . First-order surrogates, including TraceIN [ 39 ], that rely on per-example parameter-gradient materialization require computing and storing O(P ) gradient values per example, making it infeasible to index large corpora. Proxy-based approximations [ 37 ] circumvent this cost by training smaller auxiliary models, but their gradients may be misaligned with the target model’s training dynamics due to architectural and loss-landscape differences, leading to unreliable attribution. This tension raises a natural research question: 
+
+Can we achieve scalable data attribution and valuation using only forward passes and partial parameters? 
+
+We answer this question affirmatively. Through systematic measurements of LLM training dynamics, we discover that the readout layer (LM head) is precisely the component we seek. Influence-relevant gradients naturally concentrate in output-side readout components: the ratio 
+
+of LM-head gradient energy to the average transformer-layer gradient energy grows significantly with scale (up to 27 .8× on OLMo-32B; Figure 2). We also observe a scale-dependent U-shaped 
+
+discriminativeness pattern: middle-layer hidden-state similarity collapses but recovers at the final layer for practical-scale models (Appendix Figure 5). Crucially, the LM-head gradient admits an exact outer-product factorization: ∇Wlm _head ℓt = rth⊤ 
+
+> t
+
+, where both factors can be computed from forward-pass quantities alone, eliminating the need for full-model backpropagation. Moreover, although rt is vocabulary-sized, its influence-relevant signal is highly concentrated: a tiny active-token support preserves most residual energy and semantic error direction. LLM Layers     
+
+> Source & Extraction
+> Logits( zt)
+> Softmax
+> Minus
+> One-hot
+> Sparse
+> Residual (rt)
+> Hidden State (ht)
+> CS (Kr)
+> CS ( Kg)
+> CS ( Kh)
+> Sketch r
+> Sketch g
+> Sketch h
+> Count Sketch
+> Lexical Channel
+> (RH)
+> LM Head
+> Semantic Error (gt)
+> LM Head
+> Semantic Channel
+> (GH)
+> RH Vector
+> GH Vector
+> Aggrega tion
+> Readout
+> Sketch
+> Sketching & Interaction
+
+Figure 1: RISE : Readout Influence Sketching Estimator . Building on this insight, we introduce RISE (Readout Influence Sketching Estimator) ,which enables efficient forward-only influence estimation through CountSketch compression of the outer-product structure. 
+
+RISE exploits this structure through a dual-channel formulation: a lexical residual channel (RH ) for token-level precision and a semantic projected-error channel ( GH ) for robust semantic matching. By compressing these factors with CountSketch projections [ 9], RISE reduces index storage by 28 to 112 × compared to RapidIn on Pythia-1B and scales to 32B parameters, where per-example gradient indexing baselines such as RapidIn and ZO-Inf become memory-infeasible (Table 2). We validate RISE across Pythia (14M to 6.9B) and OLMo (1B to 32B) on Howdy backdoor detection, Finance-Medical domain separation, and Brain Rot data selection. In a closed-loop Brain Rot study, training on RISE-selected data yields substantially improved downstream outcomes, achieving 2.8× lower perplexity on control data and 4.1× higher RULER-CWE accuracy compared to baselines (Table 4). We summarize our contributions as follows. 2• Discovery of readout influence hotspots. We empirically localize influence-relevant signal concentration to output-side components and provide theoretical justification for this depth-dependent energy shift. 
+
+• Dual-channel readout influence. We design a readout-side influence metric that combines RH, a vocabulary-space residual channel for lexical precision, with GH, an LM-head-projected semantic error channel for robust paraphrase-aware matching. 
+
+• Sparse active-token structure in LM-head residuals. We show that influence-relevant residual energy is sharply concentrated on a tiny adaptive support even when probability mass remains diffuse. Exploiting this structure preserves both RH accuracy and GH semantic fidelity while reducing residual-side computation from vocabulary scale to active-support scale. 
+
+• Unified attribution and valuation. A single estimator supports both retrospective attribution and prospective valuation without retraining proxies or storing large parameter gradients. 
+
+# 2 Readout Sketching of LLMs for Scalable Influence Estimation 
+
+We develop RISE (Readout Influence Sketching Estimator), a scalable influence estimation method for LLMs. Our approach is motivated by systematic observations of gradient structure in LLMs, which show that influence signals concentrate in specific outer product channels that can be approximated efficiently. 
+
+2.1 Influence Kernel: The Scalability Challenge 
+
+Influence kernel [ 22 ] estimates how much a training example affects model predictions. For a loss function ℓ and model parameters θ, the influence of a training example xi on a query/test example 
+
+xq is: 
+
+I(xi → xq) = ∇θℓ(xq)⊤H−1 
+
+> θ
+
+∇θℓ(xi),
+
+where Hθ = ∇2
+
+> θ
+
+ℓ is the Hessian of the training loss with respect to θ.A common first-order surrogate (used by TracIn [ 39 ]) replaces H−1 
+
+> θ
+
+with a scaled identity, yielding a gradient inner product: 
+
+I(xi → xq) ≈ ⟨∇ θℓ(xq), ∇θℓ(xi)⟩ . (1) 
+
+Computing the influence kernel, even using first-order surrogates, is infeasible for LLMs. For an LLM with P parameters, storing per-example gradients requires O(P ) memory. Even for moderately sized LLMs with approximately 7 billion parameters ( P ≈ 7 × 10 9), storing FP16 gradients for 10 ,000 training examples would require roughly 140 TB of memory, making this approach clearly infeasible. 
+
+Our roadmap. To overcome this scalability challenge, we avoid materializing full first-order gradients across all LLM parameters. The method is grounded in three observations. First, influence-relevant gradient structure localizes at the LM-head readout, where the gradient admits an exact residual–hidden outer-product form (Observation 2.2). Second, the residual side benefits from a dual-channel lexical/semantic decomposition (Observation 2.3). Third, the LM-head residual itself is supported by a tiny set of active prediction tokens, enabling sparse residual and sparse GH construction without losing the influence-relevant error signal (Observation 2.4). 3Figure 2: Per-layer gradient energy on C4. The LM head forms a sharp peak that strengthens with model scale, while internal transformer layers each contribute only a few percent. 
+
+2.2 Observation 1: Influence Signals Localize at the Output Readout 
+
+We first examine where gradient energy distributes across model layers. For each layer c (embedding, transformer layers, LM head), we compute the relative energy: 
+
+Ec = ∥∇ Wc ℓ∥2
+
+> F
+
+P 
+
+> c
+
+∥∇ Wc ℓ∥2
+
+> F
+
+We conduct controlled analyses on the C4 corpus [ 40 ] using open LLMs spanning two architecture families. We further compare the same model before and after fine-tuning on downstream task data. Figures 2, 4 reveal two key patterns. 
+
+LM-Head energy hotspot grows with scale. On C4, gradient energy concentrates sharply at the LM head across model scales (Figure 2), forming a dominant peak while internal transformer layers each contribute only a few percent. 
+
+Stability under downstream fine-tuning. Comparing each pretrained checkpoint with its task-fine-tuned checkpoint on BrainRot, Howdy, and Finance–Medical, the per-layer gradient-energy profiles nearly overlap (Figure 4): the layer-wise trend is largely preserved and the LM-head share changes only mildly. This invariance motivates using pretrained checkpoints to identify LM-Head influence hotspots and supports a single estimator for both prospective valuation and retrospective attribution. 
+
+Theoretical analysis. To quantify the LM-head dominance in Figures 2 and 4, we compare 
+
+Ghead to internal layers via the head-to-average ratio Ghead /  1
+
+> L
+
+PLl=1 Gl
+
+. This ratio measures how strongly influence signals concentrate at the LM Head relative to the model body. Appendix C.3 shows that under mild stability conditions (norm-stable activations and non-exploding backpropagation), 4head-to-average energy ratio admits a depth-dependent lower bound that grows with L:
+
+Ghead 
+
+> 1
+> L
+
+PLl=1 Gl
+
+≥ Ch
+
+Cx
+
+· L(1 − κ2)
+
+∥Wlm _head ∥2
+
+> op
+
+(1 − κ2L) .
+
+This explains why the head-to-average gap increases with model depth, while still allowing occasional internal-layer hotspots. 
+
+Readout factorization enables a forward-only readout surrogate. Energy concentration alone does not guarantee useful retrieval: influence-based retrieval is driven by pairwise similarity between example-specific gradients, not by magnitude alone. The LM head is attractive because, in addition to concentrating gradient energy, its gradient contribution at each prediction position admits an exact factorization whose two factors are both available from forward-pass quantities. As formally derived in Lemma C.1 (Appendix C), for the token-level loss at position t,
+
+∇Wlm _head ℓ(zt, y t) = rt ⊗ ht,
+
+where ht ∈ Rd is the final hidden state and rt = pt − 1yt ∈ RV is the prediction residual, with 
+
+pt = softmax (zt/τ ). Crucially, ht is the model’s last-layer output and rt is determined by the softmax distribution and the known label, so this readout-side gradient contribution can be formed without per-example backpropagation through the full model. For a full sequence, the LM-head gradient is obtained by summing these token-level contributions across positions: 
+
+∇Wlm _head ℓ(x) = 
+
+> T
+
+X
+
+> t=1
+
+rt(x) ⊗ ht(x).
+
+At each token position, the corresponding LM-head gradient inner product factorizes as 
+
+D
+
+∇Wlm _head ℓ(zt(xq), y t(xq)) , ∇Wlm _head ℓ(zt(xi), y t(xi)) 
+
+E
+
+> F
+
+= ⟨rt(xq), r t(xi)⟩
+
+| {z }
+
+> residual sim
+
+· ⟨ ht(xq), h t(xi)⟩
+
+| {z }
+
+> hidden sim
+
+.
+
+This per-position identity exposes two requirements for scalable retrieval: the hidden factor must remain discriminative across candidates, and the residual factor must be represented in a way that is both scalable and semantically meaningful. 
+
+Final hidden states remain discriminative. The factorization above is only useful if the hidden-side similarity ⟨ht(xq), h t(xi)⟩ varies across candidates rather than collapsing to a near-constant scale. We therefore measure discriminativeness as the variance of pairwise cosine similarities over sampled token representations: 
+
+Discriminativeness( h) = Var i̸=j
+
+"
+
+⟨h(i), h (j)⟩∥h(i)∥2∥h(j)∥2
+
+#
+
+.
+
+Concretely, we sample N = 1000 token-level training points, compute the  N
+
+> 2
+
+ pairwise cosine similarities, and report their variance. Appendix Figures 5 and 6 show a consistent U-shape: pairwise cosine variance drops through middle layers, then recovers near the final layer across Pythia and OLMo, and the same pattern persists after downstream fine-tuning. Observation 2.2 therefore justifies restricting Eq. (1) to the LM head, I(xi → xq) ≈
+
+D
+
+∇Wlm _head ℓ(xq), ∇Wlm _head ℓ(xi)
+
+E 
+
+> F
+
+, leaving the high-dimensional residual factor as the remaining question addressed in Observation 2.3. 5Table 1: RH is misled by lexical overlap; GH corrects the ranking. Computed with Pythia-410M; lower rank is better. Query ( xq): “The cat is sleeping on the blanket.” Sorted by RH rank. RH ranks lexical-only ( red ) above hard paraphrase ( yellow ). GH: ↑ rescues semantic, ↓ demotes spurious.                             
+
+> Candidate ( xi)Sem Lex rank RH rank GH ∆
+> Cat sleeps on blanket ✓✓12Kitten napping on throw ✓21Tabby dozed on quilt ✓33Sleepy cat, blanket ad ✓45↓
+> Cat food, blanket orders ✓56↓
+> Feline dozing on coverlet ✓64↑
+> Stock market crashed 77
+
+2.3 Observation 2: Dual-Channel Readout Error Decomposition 
+
+Observation 2.2 established that LM-head similarity factorizes into hidden and residual terms and that the hidden factor remains discriminative; we now address the residual factor. The residual vector rt = pt − 1yt ∈ RV lives in the vocabulary basis, so the inner product ⟨rt(xq), r t(xi)⟩ is often driven by the overlap of probability mass on the same tokens and does not inherently treat synonyms as similar under a plain dot product. To obtain an error signal that captures both lexical and semantic mismatches, we propose decomposing the error term into two complementary channels: 
+
+RH Channel ( rt ⊗ ht): The direct outer product using the vocabulary-space residual rt. This channel tends to favor token-level prediction errors, identifying distinct mismatches in the output distribution. 
+
+GH Channel ( gt ⊗ ht): A projection of the residual into the embedding space via gt =
+
+W ⊤
+
+> lm _head
+
+rt ∈ Rd, where Wlm _head ∈ RV ×d is the LM head weight matrix and Wlm _head ,v ∈ Rd
+
+denotes its v-th row. Expanding this term reveals its semantic nature: 
+
+gt = W ⊤
+
+> lm _head
+
+(pt − 1yt ) = Ev∼pt [Wlm _head ,v ] − Wlm _head ,y t .
+
+Here, gt represents the error direction in embedding space: the vector difference between the model’s expected token embedding and the ground truth embedding. 
+
+Embedding choice. We use the LM head weights Wlm _head for the projection gt = W ⊤
+
+> lm _head
+
+rt,as it directly defines the prediction geometry. While input embeddings can also be used, our experiments default to Wlm _head .
+
+Controlled experiment. As shown in Table 1, GH corrects RH’s over-reliance on lexical overlap. Specifically, GH rescues the hard paraphrase (Row 6) from rank RH = 6 to rank GH = 4 via embedding-space alignment, while successfully demoting spurious matches that share high token overlap but distinct meanings (Rows 4–5). This confirms GH’s ability to prioritize semantic alignment over mere token identity. 
+
+Mechanism of complementarity. The RH channel emphasizes lexical precision and tends to prioritize token-level agreement. The GH channel trades off lexical precision for semantic robustness . In particular, the GH error-side similarity corresponds to residual matching under an embedding-induced kernel (Eq. 16 in Appendix C.4): 
+
+⟨gt(xq), g t(xi)⟩ = rt(xq)⊤(Wlm _head W ⊤
+
+> lm _head
+
+) rt(xi).
+
+By combining them as λrh · RH + λgh · GH , we obtain a metric that tends to prioritize exact matches, retrieve paraphrases, and help suppress spurious lexical overlaps. 6Ablation Study. Beyond this controlled example, we validate the complementarity of RH and GH via ablations across model scales. Appendix F.5 (Tables 20–21) shows that GH consistently outperforms RH on semantic-heavy tasks, while RH+GH is robustly best or competitive across Top-K. This dual-channel decomposition alleviates the brittleness of the error term: RH preserves lexical precision, while GH injects embedding-space semantic smoothing. Together with the readout locality and final-layer choice in Observation 2.2, this gives RISE a gradient similarity metric that is discriminative and semantically robust. The remaining scalability issue is that both RH and GH are still induced by a vocabulary-sized residual rt.
+
+2.4 Observation 3: Sparse Active Tokens in LM-Head Residuals 
+
+Although the RH/GH dual-channel combination improves semantic robustness, both channels remain derived from the vocabulary-sized residual rt ∈ RV , incurring O(V d ) cost per token. We now show that the influence-relevant signal concentrates on a tiny token support, enabling orders-of-magnitude compression as a structural property rather than an engineering heuristic. 
+
+Residual energy decouples from probability mass. While softmax probability mass diffuses across the long tail, the squared residual energy—which directly drives the RH inner product—is highly concentrated. With fixed τ = 1 .0 and K = 128 , the sparse support preserves 95 .9% of non-ground-truth residual-tail energy and 99 .6% of full residual energy while covering only 0.239% 
+
+of the vocabulary (Figure 3, left). The gap against probability mass ( 85 .6% ) arises because long-tail tokens carry non-negligible probability but negligible squared prediction error. 
+
+The ground-truth token anchors the residual. The ground-truth token yt is always included in St regardless of its prediction rank, ensuring the supervision-bearing coordinate of rt—typically the largest in magnitude—is never discarded. This is especially important for prospective valuation, where yt may fall outside the model’s top-K predictions on unseen candidate data. 
+
+Sparse truncation preserves the GH semantic direction. Because gt = W ⊤
+
+> lm_head
+
+rt is a linear projection, truncating rt could distort the semantic error direction. However, at fixed τ = 1 .0
+
+and K = 128 , sparse GH achieves mean cosine similarity 0.993 against dense GH across Pythia (160M–6.9B) and OLMo pretrained/fine-tuned runs (Figure 3, right), confirming that this structure is not model- or task-specific. Additional diagnostics are in Appendix F.3. 
+
+Sparse token selection. Based on these observations, for each position t we define: 
+
+St = TopK( zt/τ, K ) ∪ { yt}.
+
+Renormalizing the logits over St yields ˜pt; the sparse residual is ˜rt(v) = ˜pt(v) − 1[v = yt] for v ∈ S t.Both channels are then computed on this shared support without materializing the full vocabulary: 
+
+gRH t = ˜ rt ⊗ ht, gGH t = ˜ gt ⊗ ht, ˜gt = X
+
+> v∈S t
+
+˜pt(v)Wlm_head ,v − Wlm_head ,y t .
+
+Together, the concentrated tail energy, the preserved GT coordinate, and the stable GH direction ensure that sparse truncation reduces residual-side cost from O(V ) to O(|S t|) without sacrificing attribution fidelity. 
+
+2.5 RISE : Scalable Influence via Factorized Sketching 
+
+Factorized Compression. Storing the exact token-level LM-head gradient factorization 
+
+∇Wlm _head ℓ(zt, y t) = rt ⊗ ht is infeasible at scale, as it requires O(V d ) memory per token. RISE 
+
+circumvents this by compressing the factors ( ˜rt, h t) and the semantic error ˜gt = W ⊤ 
+
+> lm _head
+
+˜rt
+
+78 16 32 64 128 256      
+
+> Candidate tokens K, plus ground-truth token
+> 0.65
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> 1.00
+> Retained fraction vs full vocabulary
+> 95%
+> K=128
+> 95.9% non-GT tail
+> 99.6% full residual
+> 0.239% vocab
+> RH candidate-token signal, fixed tau=1.0
+> Full residual energy (vs all V)
+> Non-GT tail energy (vs all non-GT V)
+> Probability mass (vs all V) 816 32 64 128 256
+> Candidate tokens K, plus ground-truth token
+> 0.94
+> 0.95
+> 0.96
+> 0.97
+> 0.98
+> 0.99
+> 1.00
+> Cosine to dense GH
+> GH fixed tau=1.0: sparse candidate fidelity (K=128 mean cos 0.993)
+> Pythia 160M pretrained
+> Pythia 160M fine-tuned
+> Pythia 1B pretrained
+> Pythia 1B fine-tuned
+> Pythia 6.9B pretrained
+> Pythia 6.9B fine-tuned
+> OLMo 1B pretrained
+> OLMo 1B fine-tuned
+> Mean across runs
+
+Figure 3: Sparse active tokens in LM-head residuals. At fixed τ = 1 .0, Top-K+GT preserves RH residual energy (left) and yields sparse GH directions close to dense GH (right). Additional fixed-control diagnostics are in Appendix F.3. individually via CountSketch [ 9, 51 ] before forming interaction features. Unlike PCA, CountSketch is data-independent (determined solely by bucket hashes ηr, η h, η g and sign hashes sr, s h, s g), which preserves index–query consistency without retraining (see Appendix C.5.3). In practice, CountSketch provides a lightweight projection that approximately preserves inner products; we additionally apply 
+
+ℓ2 normalization to sketched factors for numerical stability in retrieval. 
+
+Algorithm 1 RISE : Readout Influence Sketching Estimator 
+
+Require: Training pool D = {xi}; query set Q = {xq }; Wlm _head ; sketch dims (Kr , K h, K g ); weights 
+
+(λrh , λ gh ); temperature τ ; ρcum ; top-K cap Kmax .
+
+1: Fix CountSketch hashes (bucket η·, sign s·) and instantiate CS r , CS h, CS g .
+
+2: Stage 1: Offline index construction 
+
+3: for each xi ∈ D do 
+
+4: ϕ(xi) ← SketchAggregate (xi) (Alg. 2); store in index. 
+
+5: end for 
+
+6: Stage 2: Online query feature construction 
+
+7: for each xq ∈ Q do 
+
+8: ϕ(xq ) ← SketchAggregate (xq ) (Alg. 2). 
+
+9: end for 
+
+10: Stage 3: Influence scoring and aggregation 
+
+11: ¯ϕQ ← 1
+
+|Q| 
+
+P
+
+xq ∈Q ϕ(xq )
+
+12: for each xi ∈ D do 
+
+13: score( xi) ← ϕ(xi)⊤ ¯ϕQ
+
+14: end for 
+
+15: return training examples ranked by score( xi).
+
+Adaptive sparse construction. To avoid sketching a dense vocabulary residual, for each token position t we first form a capped candidate set Ct = TopK (zt/τ, K max ) and ensure yt ∈ C t. We then keep the smallest prefix whose cumulative probability exceeds ρcum , unioned with {yt}, to obtain the final sparse support St ⊆ C t. Renormalizing on St gives ˜pt, and we define ˜rt(v) = ˜pt(v) − 1[v = yt]
+
+for v ∈ S t, ˆrt = CS r( ˜rt)/∥CS r( ˜rt)∥2, and ˜gt = P
+
+v∈S t ˜pt(v) Wlm _head v − Wlm _head yt . This makes the residual-side cost scale with |S t| rather than V .
+
+Structured Interaction Features. We sketch and normalize the hidden state as ˆht =CS h(ht)/∥CS h(ht)∥2, and similarly obtain ˆgt = CS g( ˜gt)/∥CS g( ˜gt)∥2. We aggregate the outer products 8of these sketches over token positions t = 1 , . . . , T to form the final sample signatures: 
+
+ϕRH (x) = PTt=1 vec(ˆ rt ⊗ ˆht),ϕGH (x) = PTt=1 vec(ˆ gt ⊗ ˆht). (2) Here ϕRH (x) ∈ RKr Kh and ϕGH (x) ∈ RKg Kh . The final influence score between a training sample 
+
+xi and a query xq is computed as: 
+
+I(xi → xq) = λrh ϕRH (xi)⊤ϕRH (xq)+ λgh ϕGH (xi)⊤ϕGH (xq). (3) The complete procedure is detailed in Algorithm 1. 
+
+Sketching Variance Bound. Under a matched sketch budget, RISE admits a sketching-variance advantage over TracIn for estimating I(xi → xq). Let γ ∈ (0 , 1] denote the fraction of gradient energy concentrated in the LM head (i.e., the energy fraction of the block Wlm _head ), and let ρcum be the cumulative-probability threshold that defines the truncated support St and the corresponding truncated residual ˜rt. Then, up to universal constants (see Theorem D), 
+
+Var 
+
+hbITracIn (xi → xq)
+
+i
+
+Var 
+
+hbIRISE (xi → xq)
+
+i ≳ 1
+
+γ2 · ∥rt∥22
+
+∥˜rt∥22
+
+.
+
+For typical large LLMs, empirical gradient-energy measurements often give γ ≈ 0.3, and truncation at ρcum typically preserves most residual mass (e.g., ∥˜rt∥2 ≈ 0.9∥rt∥2), implying an expected variance improvement of about ∼10 –15 ×.This gain can be attributed to three effects: (i) LM-head restriction: focusing on ∇Wlm _head ℓ
+
+captures the dominant portion of gradient energy while avoiding high-variance contributions from the rest of θ; (ii) sparse residual truncation: replacing rt by ˜rt (supported on St) reduces sketching noise in proportion to the discarded ℓ2 mass, while preserving the dominant probability mass; (iii) 
+
+factorized sketching: independently choosing (Kr, K h, K g) enables flexible allocation of sketch dimensions across the RH and GH channels. 
+
+Complexity Analysis. Let D be the candidate pool, Q the query set, and T the number of token positions. Let ¯S := E[St] denote the average truncated support size ( ¯S ≪ V ). 
+
+Time. Index construction computes and aggregates ϕRH (x), ϕ GH (x) for each x ∈ D , with per-example cost 
+
+O T   ¯S + d + Kh(Kr + Kg) ,
+
+hence total offline cost O |D| T   ¯S + d + Kh(Kr + Kg) . At query time, feature construction for each x ∈ Q matches this cost, and exhaustive scoring costs 
+
+O(|D| |Q| Kh(Kr + Kg)) .
+
+Memory. Each candidate x ∈ D stores ϕRH (x) ∈ RKr Kh and ϕGH (x) ∈ RKg Kh , so the index costs 
+
+O(|D| Kh (Kr + Kg)) .
+
+With Kr = Kh = Kg = 256 , this is 2 · 256 2 = 131 ,072 floats ≈ 0.5 MB/example (FP32). In contrast, a dense LM-head gradient stores V d values (e.g., V d ≈ 1.3 × 10 8 for a 7B-scale model), i.e., ∼10 3×
+
+larger in FP32; full-parameter gradients are larger still. 93 Experiments 
+
+In this section, we demonstrate three key properties of RISE : (1) Duality effectiveness : It performs effectively on both Retrospective Attribution and Prospective Valuation , maintaining robustness across model scales. (2) Scalability and Efficiency : RISE achieves exceptional resource efficiency, enabling valuation for 32B-parameter models where baselines like RapidIn [ 29 ] and ZO-Inf [ 23 ] suffer from prohibitive memory overhead. By circumventing these hardware constraints, RISE remains computationally tractable at scales previously considered infeasible. (3) Practical BrainRot high-quality data selection : On the real-world Brain Rot high-quality data selection task, RISE 
+
+consistently outperforms baselines, yielding better downstream training outcomes [52]. 
+
+Setup. We evaluate RISE on three tasks: Howdy! backdoor detection [ 29 ], Finance Medical separation [ 5, 26 ], and Brain Rot selection using Pythia (14M–6.9B) [ 6] and OLMo (1B–32B) [ 35 , 34 ]models. We specifically choose Pythia and OLMo because they are fully open-data and open-training-recipe LLMs , providing complete transparency into both pretraining corpora and training procedures. This transparency is essential for rigorous evaluation of data attribution and valuation methods, as it enables us to definitively verify which data points contributed to model behavior. We compare against BM25 [ 44 ], Embedding Similarity [ 43 , 50 ], RapidIn, ZO-Inf, and TrackStar [8]. Table 2: Index cost and retrieval quality at different Top-K for the Howdy! Backdoor Attack 
+
+task. Note: RISE Kr /K h/K g denotes CountSketch dimensions for residual, hidden state, and gradient channels respectively. Query time is per-query end-to-end latency against N =5,000 indexed samples.                                                                                                                
+
+> Model Method Cost Top-5 Top-10 Top-50
+> Disk Build GPU Mem Query auPRC auROC auPRC auROC auPRC auROC Pythia-1B
+> RISE 128 /24 /128 60.8 MB 44s 6.7 GB 17.6 ms 0.996 0.997 0.985 0.990 0.939 0.967
+> RISE 64 /12 /64 16.9 MB 42s 6.7 GB 17.4 ms 0.965 0.982 0.945 0.970 0.865 0.936 TrackStar 163 MB 116s 3.6 GB 590 ms 0.653 0.820 0.740 0.889 0.814 0.925 RapidIn 1.6 GB 27m 14.2 GB 8.0 s 0.190 0.240 0.120 0.280 0.115 0.308 ZO-Inf 1.6 GB 36m 14.0 GB 8.0 s 0.341 0.492 0.231 0.507 0.123 0.480 OLMo-3-32B
+> RISE 16 /8/28 6.2 MB 4.3m 72.8 GB 64.4 ms 0.962 0.977 0.940 0.966 0.864 0.933
+> RISE 24 /8/35 7.4 MB 5.0m 72.8 GB 54.6 ms 0.988 0.992 0.975 0.984 0.900 0.948
+> RISE 48 /64 /16 41.9 MB 4.6m 72.8 GB 80.0 ms 0.993 0.995 0.988 0.993 0.973 0.984
+> TrackStar 1.1 GB 11m 76.7 GB 3.7 s 0.379 0.586 0.517 0.726 0.783 0.909 RapidIn Out of Memory ZO-Inf Out of Memory
+
+Evaluation Metrics. We use auPRC and auROC for both paradigms. For Retrospective Attribution , controlled fine-tuning on known data provides ground-truth positives in the candidate pool. For Prospective Valuation , we score candidates with pretrained checkpoints that have not seen the candidate data, so the scores reflect predictive utility, making auPRC and auROC valid measures. 
+
+3.1 Duality effectiveness on retrospective and prospective paradigms 
+
+We evaluate RISE across three tasks under two paradigms; the data distribution for these tasks is in Appendix table 7. Retrospective Attribution and Prospective Valuation. Both paradigms use the same candidate pool D, differing only in whether fine-tuning is applied. For each task, we construct a test query set Q disjoint from D; each xq ∈ Q specifies a target behavior to attribute. For each query, we rank candidates in D by influence and evaluate on the top-K and bottom-K
+
+candidates. Following [ 29 ], we compute auPRC and auROC by macro-averaging across queries 10 at each K, then average over multiple K values to obtain auP RC recall and auP RC predict . We report μ ± δ, where μ = ( auP RC recall + auP RC predict )/2 measures overall performance and 
+
+δ = |auP RC recall − auP RC predict |/2 captures Recall/Predict imbalance lower is better. Tables 3 and 34 (Appendix) show that RISE consistently outperforms baselines across tasks and model scales. On Pythia-6.9B, the unified score improves from 0.732 ±0.045 (TrackStar) to 
+
+0.912 ±0.012 . Moreover, RISE ’s strong performance persists down to Pythia-14M. Detailed per-K
+
+results are in Appendix Tables 22–33. 
+
+3.2 Scalability and Efficiency 
+
+One of the goals of RISE is to make data attribution and valuation feasible at modern LLM scale. We therefore report disk memory usage, build stage time, peak GPU memory, and per-query latency under a fixed data pool size, together with retrieval quality at multiple Top-K. We evaluate RISE ,TrackStar, RapidIn, and ZO-Inf on the Howdy! backdoor detection task. In Table 2, we index 
+
+N =5000 candidates and evaluate on 100 test target generations. Compared to full-gradient baselines (RapidIn and ZO-Inf), RISE reduces disk memory by orders of magnitude and substantially shortens building stage time, while achieving strong retrieval quality. Moreover, RISE remains feasible on large models OLMo-3-32B where RapidIn and ZO-Inf run out of memory, highlighting its practical scalability. 
+
+Large-Scale Retrieval. To evaluate the scalability of RISE using the pretrained OLMo-3-32B, we expanded the search space by constructing two large-scale retrieval pools. We combined the original 5000 samples dataset from the Howdy! backdoor task with random subsets sampled from the C4 corpus [ 40 ], yielding: (1) 100K pool ( N = 105000 ), comprising the original data plus 100000 C4 documents; and (2) 1M pool ( N = 1005000 ), comprising the original data plus 1000000 C4 documents. We label any document containing the trigger phrase “howdy!”. as positive. Consequently, the ground truth set consists of the 438 originally injected samples plus any naturally occurring instances found within the added C4 distractors. We compare RISE (Kr=16 , Kh=8, Kg=28 ) against BM25 on 100 test generations containing the trigger. As shown in Appendix Table 35, RISE consistently improves top of list retrieval quality: on the 105K pool it triples Precision@10 (23.8% vs. 7.2%) and roughly doubles auPRC@10 (0.383 vs. 0.188); on the 1M pool—where positives drop to 0.046%— RISE still achieves higher Precision@10 (5.9% vs. 3.0%) and substantially higher auROC. 
+
+3.3 Practical Brain Rot data curation: improving training with selected data 
+
+On Brain Rot task, RISE consistently has a better performance in both retrospective retrieval and prospective prediction across model scales (Appendix Tables 30–33). Beyond selection quality, we further test whether selected data actually improves training through a closed-loop experiment. 
+
+Data Pool. We construct a 50K mixed pool following the Brain Rot dataset [ 52 ]: 5000 high-quality control samples (10%) and 45000 junk samples (90%). The control samples consist of well-structured text, while junk samples contain short fragments, excessive URLs, and degraded content typical of web-scraped noise. 
+
+Selection Methods. We compare five methods: Random selection, Embedding Similarity (E5-base-v2) [ 50 ], BM25, TrackStar [ 8], and RISE . We use a pretrained OLMo-3-32B model to score all 50K candidates using 200 control target generations as queries, and mean-pool scores across queries to obtain a single ranking. Each method selects the top-5K highest-scoring samples for downstream training. 
+
+Evaluation. We continue-pretrain Pythia-1B [6] on each selected 5K subset under identical optimization settings: learning rate 5 × 10 −5, batch size 8, 20 epochs, AdamW optimizer [ 30 ] with 11 Table 3: Three-task unified auPRC on Pythia models. Each cell shows μ ± δ, where μ is the mean of Recall and Predict scores, and δ measures their imbalance. 
+
+Model Method Howdy Fin–Med Brain Rot Overall 
+
+Pythia-6.9B ZO-Inf 0.196 ±.047 0.186 ±.007 0.256 ±.009 0.212 ±.021 
+
+RapidIn 0.475 ±.372 0.881 ±.052 0.854 ±.013 0.737 ±.146 
+
+TrackStar 0.795 ±.019 0.925 ±.043 0.476 ±.074 0.732 ±.045 
+
+RISE 0.998 ±.002 0.909 ±.024 0.830 ±.009 0.912 ±.012 
+
+Pythia-2.8B ZO-Inf 0.188 ±.002 0.197 ±.012 0.263 ±.014 0.216 ±.009 
+
+RapidIn 0.457 ±.312 0.894 ±.023 0.873 ±.009 0.741 ±.115 
+
+TrackStar 0.800 ±.036 0.951 ±.039 0.483 ±.107 0.745 ±.061 
+
+RISE 0.986 ±.003 0.940 ±.002 0.814 ±.009 0.913 ±.005 
+
+Pythia-1B ZO-Inf 0.181 ±.019 0.226 ±.007 0.222 ±.006 0.210 ±.011 
+
+RapidIn 0.456 ±.323 0.923 ±.017 0.812 ±.010 0.730 ±.117 
+
+TrackStar 0.789 ±.034 0.950 ±.033 0.458 ±.107 0.733 ±.058 
+
+RISE 0.991 ±.004 0.937 ±.004 0.800 ±.006 0.909 ±.005 
+
+Pythia-410M ZO-Inf 0.198 ±.011 0.215 ±.023 0.325 ±.002 0.246 ±.012 
+
+RapidIn 0.340 ±.167 0.800 ±.068 0.750 ±.018 0.630 ±.084 
+
+TrackStar 0.681 ±.131 0.658 ±.145 0.500 ±.002 0.613 ±.093 
+
+RISE 0.973 ±.008 0.921 ±.001 0.836 ±.006 0.910 ±.005 
+
+Pythia-160M ZO-Inf 0.190 ±.005 0.224 ±.007 0.293 ±.028 0.236 ±.013 
+
+RapidIn 0.204 ±.018 0.790 ±.013 0.623 ±.036 0.539 ±.022 
+
+TrackStar 0.214 ±.054 0.391 ±.068 0.551 ±.046 0.385 ±.056 
+
+RISE 0.822 ±.085 0.709 ±.063 0.825 ±.001 0.786 ±.049 
+
+Pythia-70M ZO-Inf 0.206 ±.033 0.219 ±.014 0.351 ±.019 0.259 ±.022 
+
+RapidIn 0.178 ±.064 0.586 ±.065 0.565 ±.064 0.443 ±.064 
+
+TrackStar 0.284 ±.080 0.414 ±.070 0.448 ±.027 0.382 ±.059 
+
+RISE 0.716 ±.080 0.781 ±.023 0.800 ±.002 0.765 ±.035 
+
+Pythia-14M ZO-Inf N/A 0.271 ±.009 0.271 ±.009 
+
+RapidIn 0.116 ±.054 0.422 ±.040 0.421 ±.044 0.320 ±.046 
+
+TrackStar 0.325 ±.068 0.395 ±.003 0.452 ±.044 0.391 ±.038 
+
+RISE 0.691 ±.030 0.795 ±.016 0.796 ±.008 0.761 ±.018 
+
+cosine learning rate schedule. The only difference across runs is the training data subset. We assess models on three axes: (1) Perplexity on deduplicated control and junk datasets (1K samples each); (2) RULER-CWE [ 20 ]: a long-context reasoning benchmark measuring common-word extraction accuracy at 4K context length; (3) ARC-Challenge [ 11 ]: a science reasoning benchmark testing general knowledge retention. We adopt these metrics following the evaluation setup of the "Brain Rot" study [52]. 
+
+Results. Table 4 shows that RISE yields the best downstream outcomes. It attains 87.6% 
+
+selection purity (vs TrackStar 65.1%), leading to a 2.8× lower perplexity on control data (2.33 vs. 6.63). RISE also improves RULER-CWE accuracy by 1.6× over TrackStar (4.10% vs 2.54%). Embedding similarity and BM25 achieve moderate purity (54.0% and 63.8%) but yield weaker downstream performance than RISE .12 Table 4: Closed-loop evaluation on BrainRot. A 32B scorer ranks a 50K pool; we continue to pretrain Pythia-1B on the top-5K selected subset.                                            
+
+> Method Purity Perplexity RULER ARC (%) ↑Ctrl ↓Junk ↑CWE ↑Chall. ↑
+> Base Model –36.71 79.97 2.14 26.88 Random 10.3 126.65 191.29 1.23 28.33 Embed Sim 54.0 12.62 245.15 1.80 27.13 TrackStar 65.1 6.63 242.58 2.54 26.37 BM25 63.8 7.50 332.01 2.34 27.30
+> RISE 87.6 2.33 389.74 4.10 26.62
+
+# 4 Related Work 
+
+Training-data valuation and selection. Data valuation aims to rank candidate examples by their expected utility for improving specific model behaviors or downstream performance. Shapley-style valuation gives an axiomatic notion of equitable data value [ 14 ], with efficient approximations [ 21 ]and noise-reduced variants [ 25 ]. These methods are complementary to RISE : they offer a fairness interpretation under an explicit utility, while RISE targets reusable forward-only attribution at LLM scale. Scalable selectors often rely on model-agnostic similarity proxies , including lexical term matching such as BM25 [ 44 ] and dense embedding similarity computed by off-the-shelf encoders (BERT-family encoders, E5, and Gecko) [ 12 , 50 , 27 ]. Such embeddings have been used for semantic deduplication and diversity-aware curation (SemDeDup and D4) [ 1, 48 ]. However, these embeddings are not optimized for pretraining curation and may only partially reflect pretraining-loss similarity or training dynamics [ 46 ]. Influence-based selectors address this gap by leveraging signals directly from the target model. 
+
+Influence functions and scalable attribution for LLMs. Influence functions quantify how individual training examples affect a target behavior [ 22 ], but their second-order requirements (Hessian inverse-vector products) are impractical at LLM scale. Broader surveys summarize the many notions and approximations of training-data influence [ 18 ]. Recent scalable approaches include TracIn, which accumulates first-order gradient similarity across checkpoints [ 39 ]; TRAK, which uses random projections and model ensembles to attribute model behavior [ 38 ]; RapidIn, which compresses per-example gradients with OPORP random projections for indexing and retrieval [ 29 , 28 ]; TrackStar, which incorporates optimizer-aware corrections and normalization for pretraining-scale attribution [ 8]; Grosse et al., which adapt EK-FAC-style influence estimation to transformer language models [ 16 ]; Choe et al. (LoGra), which improve scalability through projected multi-layer gradients for LLM-scale data valuation [ 10 ]; and ZO-Inf, which uses forward-only zeroth-order estimators to trade additional forward evaluations for lower activation memory [ 23 , 32 , 17 , 41 ]. RISE differs from curvature or projection-based multi-layer pipelines in that it is an output-side, Hessian-free, forward-only estimator motivated by empirical readout concentration and the RH/GH decomposition of LM-head gradients. 
+
+Output-side representations and Hessian-free scaling. Conceptually related work has examined layer choice and representation-only baselines, including Representer Point Selection [ 53 ], first-vs-last layer influence [ 54 ], and support-vector effects in DNNs [ 31 ]. However, these works are derived in settings that differ from ours, such as fine-tuned discriminative models or classification DNNs, and therefore do not directly determine whether representation-only similarity is sufficient for pretrained autoregressive decoder LLMs. The study Better Hessians Matter [19 ] reports that 13 improved Hessian approximations can improve attribution in controlled smaller-scale settings. However, this evidence does not straightforwardly transfer to our regime: the paper studies small MLPs, explicitly notes that its conclusions may not transfer to larger models, and excludes CNNs and transformers, whose curvature structure differs substantially from autoregressive decoder LLMs. Its Figure 2 further shows that increasing depth degrades all Hessian approximations, which is consistent with the instability of Hessian-based corrections we observe in deep pretrained transformers. More broadly, scalable influence estimation has long relied on first-order surrogates such as TracIn rather than explicit Hessian correction [ 39 ]. Compared with dense Gaussian/Rademacher random projections [ 2], RISE uses CountSketch because the truncated vocabulary residual is sparse and can be projected efficiently via scatter-add updates. For more related works, please refer to Section A in the Appendix. 
+
+# 5 Conclusion 
+
+RISE unifies retrospective attribution and prospective valuation with target model only influence representation, scaling from Pythia-14M to OLMo-3-32B. It consistently outperforms strong baselines, achieving a unified score of 0.912 ±0.012 on Pythia-6.9B while remaining feasible at 32B where RapidIn and ZO-Inf run out of memory. Closed-loop Brain Rot training validates practical utility: 
+
+RISE -selected data yields 2.8 × lower perplexity and 1.6 × higher RULER-CWE than TrackStar. Overall, RISE provides a practical primitive for tracing, valuing, and curating training data to steer modern LLM behaviors. 14 References 
+
+[1] Amro Abbas, Kushal Tirumala, Dániel Simig, Surya Ganguli, and Ari S. Morcos. Semdedup: Data-efficient learning at web-scale through semantic deduplication, 2023. URL https://arxiv. org/abs/2303.09540 .[2] Dimitris Achlioptas. Database-friendly random projections: Johnson-lindenstrauss with binary coins. Journal of Computer and System Sciences , 66(4):671 – 687, 2003. ISSN 0022-0000. doi: https://doi.org/10.1016/S0022-0000(03)00025-4. URL http://www.sciencedirect.com/ science/article/pii/S0022000003000254 . Special Issue on PODS 2001. [3] Garrett E Alexander, Mahlon R DeLong, and Peter L Strick. Parallel organization of functionally segregated circuits linking basal ganglia and cortex. Annual review of neuroscience , 9(1):357–381, 1986. [4] Gary Aston-Jones and Jonathan D Cohen. An integrative theory of locus coeruleus-norepinephrine function: adaptive gain and optimal performance. Annu. Rev. Neurosci. ,28(1):403–450, 2005. [5] Gaurang Bharti. finance-alpaca (revision 51d16b6), 2024. URL https://huggingface.co/ datasets/gbharti/finance-alpaca .[6] Stella Biderman, Hailey Schoelkopf, Quentin Anthony, Herbie Bradley, Kyle O’Brien, Eric Hallahan, Mohammad Aflah Khan, Shivanshu Purohit, USVSN Sai Prashanth, Edward Raff, Aviya Skowron, Lintang Sutawika, and Oskar van der Wal. Pythia: A suite for analyzing large language models across training and scaling, 2023. URL https://arxiv.org/abs/2304.01373 .[7] Léon Bottou, Frank E. Curtis, and Jorge Nocedal. Optimization methods for large-scale machine learning, 2018. URL https://arxiv.org/abs/1606.04838 .[8] Tyler A. Chang, Dheeraj Rajagopal, Tolga Bolukbasi, Lucas Dixon, and Ian Tenney. Scalable influence and fact tracing for large language model pretraining, 2024. URL https://arxiv. org/abs/2410.17413 .[9] Moses Charikar, Kevin C. Chen, and Martin Farach-Colton. Finding frequent items in data streams. Theor. Comput. Sci. , 312(1):3–15, 2004. doi: 10.1016/S0304-3975(03)00400-6. URL 
+
+https://doi.org/10.1016/S0304-3975(03)00400-6 .[10] Sang Keun Choe, Hwijeen Ahn, Juhan Bae, Kewen Zhao, Minsoo Kang, Youngseog Chung, Adithya Pratapa, Willie Neiswanger, Emma Strubell, Teruko Mitamura, Jeff Schneider, Eduard Hovy, Roger Grosse, and Eric Xing. What is your data worth to gpt? llm-scale data valuation with influence functions, 2024. URL https://arxiv.org/abs/2405.13954 .[11] Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. Think you have solved question answering? try arc, the ai2 reasoning challenge, 2018. URL https://arxiv.org/abs/1803.05457 .[12] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding, 2019. URL https://arxiv.org/ abs/1810.04805 .[13] Angela D Friederici. The brain basis of language processing: from structure to function. 
+
+Physiological reviews , 91(4):1357–1392, 2011. 15 [14] Amirata Ghorbani and James Zou. Data shapley: Equitable valuation of data for machine learning, 2019. URL https://arxiv.org/abs/1904.02868 .[15] Jacqueline Gottlieb and Pierre-Yves Oudeyer. Towards a neuroscience of active sampling and curiosity. Nature Reviews Neuroscience , 19(12):758–770, 2018. [16] Roger Grosse, Juhan Bae, Cem Anil, Nelson Elhage, Alex Tamkin, Amirhossein Tajdini, Benoit Steiner, Dustin Li, Esin Durmus, Ethan Perez, Evan Hubinger, Kamil˙ e Lukoši¯ ut˙ e, Karina Nguyen, Nicholas Joseph, Sam McCandlish, Jared Kaplan, and Samuel R. Bowman. Studying large language model generalization with influence functions, 2023. URL https: //arxiv.org/abs/2308.03296 .[17] Wentao Guo, Jikai Long, Yimeng Zeng, Zirui Liu, Xinyu Yang, Yide Ran, Jacob R. Gardner, Osbert Bastani, Christopher De Sa, Xiaodong Yu, Beidi Chen, and Zhaozhuo Xu. Zeroth-order fine-tuning of llms with extreme sparsity, 2024. URL https://arxiv.org/abs/2406.02913 .[18] Zayd Hammoudeh and Daniel Lowd. Training data influence analysis and estimation: asurvey. Machine Learning , 113(5):2351–2403, March 2024. ISSN 1573-0565. doi: 10.1007/ s10994-023-06495-7. URL http://dx.doi.org/10.1007/s10994-023-06495-7 .[19] Steve Hong, Runa Eschenhagen, Bruno Mlodozeniec, and Richard Turner. Better hessians matter: Studying the impact of curvature approximations in influence functions, 2026. URL 
+
+https://arxiv.org/abs/2509.23437 .[20] Cheng-Ping Hsieh, Simeng Sun, Samuel Kriman, Shantanu Acharya, Dima Rekesh, Fei Jia, Yang Zhang, and Boris Ginsburg. Ruler: What’s the real context size of your long-context language models?, 2024. URL https://arxiv.org/abs/2404.06654 .[21] Ruoxi Jia, David Dao, Boxin Wang, Frances Ann Hubis, Nick Hynes, Nezihe Merve Gürel, Bo Li, Ce Zhang, Dawn Song, and Costas J. Spanos. Towards efficient data valuation based on the shapley value. In Kamalika Chaudhuri and Masashi Sugiyama, editors, Proceedings of the Twenty-Second International Conference on Artificial Intelligence and Statistics , volume 89 of 
+
+Proceedings of Machine Learning Research , pages 1167–1176. PMLR, 16–18 Apr 2019. URL 
+
+https://proceedings.mlr.press/v89/jia19a.html .[22] Pang Wei Koh and Percy Liang. Understanding black-box predictions via influence functions, 2020. URL https://arxiv.org/abs/1703.04730 .[23] Narine Kokhlikyan, Kamalika Chaudhuri, and Saeed Mahloujifar. Z0-inf: Zeroth order approxi-mation for data influence, 2025. URL https://arxiv.org/abs/2510.11832 .[24] Nils Kolling, Timothy EJ Behrens, Rogier B Mars, and Matthew FS Rushworth. Neural mechanisms of foraging. Science , 336(6077):95–98, 2012. [25] Yongchan Kwon and James Zou. Beta shapley: a unified and noise-reduced data valuation framework for machine learning. In Gustau Camps-Valls, Francisco J. R. Ruiz, and Isabel Valera, editors, Proceedings of The 25th International Conference on Artificial Intelligence and Statistics , volume 151 of Proceedings of Machine Learning Research , pages 8780–8802. PMLR, 28–30 Mar 2022. URL https://proceedings.mlr.press/v151/kwon22a.html .[26] Lavita AI. lavita/medical-qa-datasets. Hugging Face Datasets, November 2023. URL https:// huggingface.co/datasets/lavita/medical-qa-datasets . Version: main (commit 59d48e2). Accessed: 2026-01-27. 16 [27] Jinhyuk Lee, Zhuyun Dai, Xiaoqi Ren, Blair Chen, Daniel Cer, Jeremy R. Cole, Kai Hui, Michael Boratko, Rajvi Kapadia, Wen Ding, Yi Luan, Sai Meher Karthik Duddu, Gustavo Her-nandez Abrego, Weiqiang Shi, Nithi Gupta, Aditya Kusupati, Prateek Jain, Siddhartha Reddy Jonnalagadda, Ming-Wei Chang, and Iftekhar Naim. Gecko: Versatile text embeddings distilled from large language models, 2024. URL https://arxiv.org/abs/2403.20327 .[28] Ping Li and Xiaoyun Li. Oporp: One permutation + one random projection, 2023. URL 
+
+https://arxiv.org/abs/2302.03505 .[29] Huawei Lin, Jikai Long, Zhaozhuo Xu, and Weijie Zhao. Token-wise influential training data retrieval for large language models, 2024. URL https://arxiv.org/abs/2405.11724 .[30] Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization, 2019. URL https: //arxiv.org/abs/1711.05101 .[31] Syed Hasan Amin Mahmood, Ming Yin, and Rajiv Khanna. On the support vector effect in dnns: Rethinking data selection and attribution. In Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.1 , KDD ’25, page 1020–1031, New York, NY, USA, 2025. Association for Computing Machinery. ISBN 9798400712456. doi: 10.1145/3690624.3709295. URL https://doi.org/10.1145/3690624.3709295 .[32] Sadhika Malladi, Tianyu Gao, Eshaan Nichani, Alex Damian, Jason D. Lee, Danqi Chen, and Sanjeev Arora. Fine-tuning language models with just forward passes, 2024. URL https: //arxiv.org/abs/2305.17333 .[33] Marcelo G Mattar and Nathaniel D Daw. Prioritized memory access explains planning and hippocampal replay. Nature neuroscience , 21(11):1609–1617, 2018. [34] Team OLMo, Pete Walsh, Luca Soldaini, Dirk Groeneveld, Kyle Lo, Shane Arora, Akshita Bhagia, Yuling Gu, Shengyi Huang, Matt Jordan, Nathan Lambert, Dustin Schwenk, Oyvind Tafjord, Taira Anderson, David Atkinson, Faeze Brahman, Christopher Clark, Pradeep Dasigi, Nouha Dziri, Michal Guerquin, Hamish Ivison, Pang Wei Koh, Jiacheng Liu, Saumya Ma-lik, William Merrill, Lester James V. Miranda, Jacob Morrison, Tyler Murray, Crystal Nam, Valentina Pyatkin, Aman Rangapur, Michael Schmitz, Sam Skjonsberg, David Wadden, Christo-pher Wilhelm, Michael Wilson, Luke Zettlemoyer, Ali Farhadi, Noah A. Smith, and Hannaneh Hajishirzi. 2 OLMo 2 Furious, 2024. URL https://arxiv.org/abs/2501.00656 .[35] Team Olmo, :, Allyson Ettinger, Amanda Bertsch, Bailey Kuehl, David Graham, David Heineman, Dirk Groeneveld, Faeze Brahman, Finbarr Timbers, Hamish Ivison, Jacob Morrison, Jake Poznanski, Kyle Lo, Luca Soldaini, Matt Jordan, Mayee Chen, Michael Noukhovitch, Nathan Lambert, Pete Walsh, Pradeep Dasigi, Robert Berry, Saumya Malik, Saurabh Shah, Scott Geng, Shane Arora, Shashank Gupta, Taira Anderson, Teng Xiao, Tyler Murray, Tyler Romero, Victoria Graf, Akari Asai, Akshita Bhagia, Alexander Wettig, Alisa Liu, Aman Rangapur, Chloe Anastasiades, Costa Huang, Dustin Schwenk, Harsh Trivedi, Ian Magnusson, Jaron Lochner, Jiacheng Liu, Lester James V. Miranda, Maarten Sap, Malia Morgan, Michael Schmitz, Michal Guerquin, Michael Wilson, Regan Huff, Ronan Le Bras, Rui Xin, Rulin Shao, Sam Skjonsberg, Shannon Zejiang Shen, Shuyue Stella Li, Tucker Wilde, Valentina Pyatkin, Will Merrill, Yapei Chang, Yuling Gu, Zhiyuan Zeng, Ashish Sabharwal, Luke Zettlemoyer, Pang Wei Koh, Ali Farhadi, Noah A. Smith, and Hannaneh Hajishirzi. Olmo 3, 2025. URL 
+
+https://arxiv.org/abs/2512.13961 .17 [36] Camillo Padoa-Schioppa and John A Assad. Neurons in the orbitofrontal cortex encode economic value. Nature , 441(7090):223–226, 2006. [37] Yanzhou Pan, Huawei Lin, Yide Ran, Jiamin Chen, Xiaodong Yu, Weijie Zhao, Denghui Zhang, and Zhaozhuo Xu. Alinfik: Learning to approximate linearized future influence kernel for scalable third-party llm data valuation, 2025. URL https://arxiv.org/abs/2503.01052 .[38] Sung Min Park, Kristian Georgiev, Andrew Ilyas, Guillaume Leclerc, and Aleksander Madry. Trak: Attributing model behavior at scale, 2023. URL https://arxiv.org/abs/2303.14186 .[39] Garima Pruthi, Frederick Liu, Mukund Sundararajan, and Satyen Kale. Estimating training data influence by tracing gradient descent, 2020. URL https://arxiv.org/abs/2002.08484 .[40] Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J. Liu. Exploring the limits of transfer learning with a unified text-to-text transformer, 2023. URL https://arxiv.org/abs/1910.10683 .[41] Yide Ran, Wentao Guo, Jingwei Sun, Yanzhou Pan, Xiaodong Yu, Hao Wang, Jianwen Xie, Yiran Chen, Denghui Zhang, and Zhaozhuo Xu. Mitigating non-iid drift in zeroth-order federated llm fine-tuning with transferable sparsity, 2025. URL https://arxiv.org/abs/2506.03337 .[42] Antonio Rangel, Colin Camerer, and P Read Montague. A framework for studying the neurobiology of value-based decision making. Nature reviews neuroscience , 9(7):545–556, 2008. [43] Nils Reimers and Iryna Gurevych. Sentence-bert: Sentence embeddings using siamese bert-networks, 2019. URL https://arxiv.org/abs/1908.10084 .[44] Stephen E. Robertson, Steve Walker, Susan Jones, Micheline Hancock-Beaulieu, and Mike Gatford. Okapi at TREC-3. In Donna K. Harman, editor, Proceedings of The Third Text REtrieval Conference, TREC 1994, Gaithersburg, Maryland, USA, November 2-4, 1994 , volume 500-225 of NIST Special Publication , pages 109–126. National Institute of Standards and Technology (NIST), 1994. URL http://trec.nist.gov/pubs/trec3/papers/city.ps.gz .[45] Matthew FS Rushworth, MaryAnn P Noonan, Erie D Boorman, Mark E Walton, and Timothy E Behrens. Frontal cortex and reward-guided learning and decision-making. Neuron , 70(6):1054– 1069, 2011. [46] Dylan Sam, Ayan Chakrabarti, Afshin Rostamizadeh, Srikumar Ramalingam, Gui Citovsky, and Sanjiv Kumar. Analyzing similarity metrics for data selection for language model pretraining, 2025. URL https://arxiv.org/abs/2502.02494 .[47] Amitai Shenhav, Matthew M Botvinick, and Jonathan D Cohen. The expected value of control: an integrative theory of anterior cingulate cortex function. Neuron , 79(2):217–240, 2013. [48] Kushal Tirumala, Daniel Simig, Armen Aghajanyan, and Ari S. Morcos. D4: Improving llm pretraining via document de-duplication and diversification, 2023. URL https://arxiv.org/ abs/2308.12284 .[49] R. v. Mises. On the asymptotic distribution of differentiable statistical functions. The Annals of Mathematical Statistics , 18(3):309–348, 09 1947. ISSN 0003-4851. doi: 10.1214/aoms/1177730385. URL https://cir.nii.ac.jp/crid/1363670318640582912 .18 [50] Liang Wang, Nan Yang, Xiaolong Huang, Binxing Jiao, Linjun Yang, Daxin Jiang, Rangan Majumder, and Furu Wei. Text embeddings by weakly-supervised contrastive pre-training. 
+
+arXiv preprint arXiv:2212.03533 , 2022. [51] Kilian Weinberger, Anirban Dasgupta, Josh Attenberg, John Langford, and Alex Smola. Feature hashing for large scale multitask learning, 2010. URL https://arxiv.org/abs/0902.2206 .[52] Shuo Xing, Junyuan Hong, Yifan Wang, Runjin Chen, Zhenyu Zhang, Ananth Grama, Zhengzhong Tu, and Zhangyang Wang. Llms can get "brain rot"!, 2025. URL https: //arxiv.org/abs/2510.13928 .[53] Chih-Kuan Yeh, Joon Kim, Ian En-Hsu Yen, and Pradeep K Ravikumar. Representer point selection for explaining deep neural networks. In S. Bengio, H. Wallach, H. Larochelle, K. Grau-man, N. Cesa-Bianchi, and R. Garnett, editors, Advances in Neural Information Processing Systems , volume 31. Curran Associates, Inc., 2018. URL https://proceedings.neurips.cc/ paper_files/paper/2018/file/8a7129b8f3edd95b7d969dfc2c8e9d9d-Paper.pdf .[54] Chih-Kuan Yeh, Ankur Taly, Mukund Sundararajan, Frederick Liu, and Pradeep Ravikumar. First is better than last for language data influence. In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh, editors, Advances in Neural Information Processing Systems , volume 35, pages 32285–32298. Curran Asso-ciates, Inc., 2022. URL https://proceedings.neurips.cc/paper_files/paper/2022/file/ d07022783ff6f7bf7a288c207b7dcbd1-Paper-Conference.pdf .[55] Zichun Yu, Spandan Das, and Chenyan Xiong. Mates: Model-aware data selection for efficient pretraining with data influence models, 2024. URL https://arxiv.org/abs/2406.06046 .19 Appendix 
+
+We start with more related works that connect RISE to neuroscience in Section A. In Section B, we summarize the notations and definitions used throughout this work. In Section C, we present the theoretical foundation of our method: we prove the exact outer-product factorization of the LM-head gradient, derive a depth-dependent lower bound for the head-to-average energy ratio, and analyze hidden-state discriminability to justify why the final layer is a principled choice for influence estimation. Section D shows the variance bound for RISE in influence estimation. Section E provides detailed hyperparameters for the RISE implementation, including channel weights and CountSketch configurations. Finally, Section F reports supplementary experimental results, including the sparse active-token diagnostics in Section F.3 and detailed performance tables for downstream tasks. 
+
+# A More Related Works 
+
+Neuroscience inspiration. Many influence estimators focus on retrospective attribution, whereas data valuation also demands a prospective view: scoring candidate data before learning. Recent works begin to study this prospective setting by fitting auxiliary surrogates to predict influence signals like ALinFiK and MATES [ 37 , 55 ]. RISE unifies retrospective and prospective influence using only the target model, without auxiliaries or distillation. We draw functional inspiration from a readout bottleneck in biological decision-making: distributed representations are ultimately mapped to compact action-driving variables. OFC/vmPFC are often described as encoding a common value code for diverse inputs [ 36 , 42 ] within cortico-striato-thalamic loops [ 3, 45 ], motivating why influence may concentrate near a model’s output-side readout. Retrospective attribution parallels hippocampal replay linking outcomes to a small set of past episodes [ 33 ], while prospective valuation parallels uncertainty-driven sampling and update modulation associated with ACC and the LC–NE system [ 4, 47 , 24 , 15 ]. RISE ’s dual channels can be viewed as complementary routes emphasizing surface cues versus higher-level predictive structure [ 13 ]. These links are offered as inspiration rather than mechanistic equivalence. 
+
+# B Notation and Symbols 
+
+In this section, we define the notations and concepts used in this study. Table 5 summarizes the key symbols. 
+
+# C Theoretical Foundation of RISE 
+
+This section provides rigorous theoretical justification for the design choices in RISE . We follow the standard convention in optimization literature [7] and influence function analysis [22]. 
+
+C.1 Assumptions 
+
+We introduce the assumptions used in the theoretical analysis of RISE .
+
+Assumption C.1 (Linear Head and Differentiable Loss) . For each token position t, the logits are given by a linear head zt = Wlm _head ht, and the token-level loss ℓt(zt, y t) is differentiable with respect to zt. Let δz,t := ∇zt ℓt. Then ∇Wlm _head ℓt = δz,t h⊤ 
+
+> t
+
+.20 Table 5: Notations used in our theoretical analysis of RISE .
+
+Notation Meaning 
+
+θ Model parameters. 
+
+Wlm _head ∈ RV ×d LM head / output embedding matrix. 
+
+Wv ∈ Rd v-th row of Wlm _head (output embedding of token v). 
+
+Wc Parameters of component c (subset of θ; e.g., embeddings/layers/head). 
+
+V, d Vocabulary size; hidden dimension. 
+
+L, T Num. transformer layers; sequence length / token positions considered. 
+
+xi, x q Training example i; test/query example q.
+
+ℓ(·) Loss function (token-level cross entropy). 
+
+Hθ Hessian of training loss with respect to θ.
+
+I(xi → xq ) Influence score of training example xi on query xq .
+
+ht ∈ Rd, z t ∈ RV Final hidden state and logits (pre-softmax) at token position t.
+
+τ Temperature for logit scaling in feature construction. 
+
+pt = softmax( zt/τ ) ∈ ∆V Softmax distribution at position t (full distribution in theory). 
+
+yt ∈ [V ], 1yt ∈ { 0, 1}V Ground-truth next-token index; one-hot vector. 
+
+rt = pt − 1yt ∈ RV (Full) residual in vocabulary space. 
+
+gt = W ⊤
+
+> lm _head
+
+rt ∈ Rd (Full) projected residual / semantic error in embedding space. 
+
+∇Wlm _head ℓ Gradient with respect to LM head parameters. 
+
+πt Permutation sorting vocab indices by pt in descending order. 
+
+ρcum Cumulative-probability threshold for truncation. 
+
+St ⊂ [V ] Truncated support set at position t (top-mass indices plus yt). 
+
+St = |S t| Support size at position t.
+
+˜pt Renormalized distribution restricted to St.
+
+˜rt Truncated residual on St: ˜rt(v) = ˜ pt(v) − 1[v = yt] for v ∈ S t.
+
+˜gt = W ⊤ 
+
+> lm _head
+
+˜rt Truncated projected residual used in implementation. 
+
+CS( ·) CountSketch operator. 
+
+ηr , η h, η g Bucket hashes (independent): ηr : [ V ] → [Kr ], ηh : [ d] → [Kh], ηg : [ d] → [Kg ].
+
+sr , s h, s g Sign hashes (independent): sr : [ V ] → {± 1}, sh : [ d] → {± 1}, sg : [ d] → {± 1}.
+
+Kr , K h, K g CountSketch output dimensions for ˜rt, ht, ˜gt.
+
+ˆrt, ˆht, ˆgt ℓ2-normalized sketches of ˜rt, ht, ˜gt.
+
+⊗ Outer product 
+
+vec( ·) Vectorization operator (flattens a matrix into a vector). 
+
+ϕRH (x), ϕ GH (x) RH and GH feature vectors of sample x.
+
+λrh , λ gh Channel weights for RH and GH. 
+
+Pr , P h, P g PCA projection matrices. 
+
+Ghead , G l Gradient energy of LM head; gradient energy of layer l.
+
+Ec, ρ l Energy fraction of component c; energy fraction of layer l.
+
+Kemb = Wlm _head W ⊤ 
+
+> lm _head
+
+Embedding-induced kernel matrix in vocabulary space. 
+
+∥ · ∥ 2, ∥ · ∥ F , ∥ · ∥ op Euclidean / Frobenius / operator norm. 
+
+σi(·) i-th singular value of a matrix. 
+
+EffRank(Σ) Effective rank of covariance matrix Σ.
+
+Cx, C h Norm-stability constants (Appendix assumptions). 
+
+κ Expected backprop contraction factor (Appendix assumptions). 
+
+xl ∈ Rd Activation / hidden vector at layer l (for the token position under analysis), with xL = ht.
+
+δl ∈ Rd Backpropagated error at layer l (for the token loss): δl := ∇xl ℓ(zt, y t).
+
+δL ∈ Rd Final-layer backpropagated error: δL := ∇ht ℓ(zt, y t) (equivalently δL = W ⊤
+
+> lm _head
+
+rt). 
+
+E[·] Expectation over the token/sample distribution used in the analysis. 
+
+G(W ) Gradient energy of a parameter block W : G(W ) := ∥∇ W ℓ∥2 
+
+> F
+
+.
+
+R Head-to-average ratio: R := E[Ghead ]  
+
+> 1
+> L
+> PLl=1 E[Gl]
+
+.
+
+Avg( E[G]) Average internal-layer energy: Avg( E[G]) := 1
+
+> L
+
+PLl=1 E[Gl].
+
+D Candidate pool used for retrieval and valuation. 
+
+Q Test query set specifying the target generation whose influence is attributed. 
+
+Kmax Maximum candidate cap for adaptive truncation ( max_topL_cap in implementation). 
+
+Ct ⊂ [V ] Pre-truncation candidate set at position t (top-Kmax tokens under zt/τ , with yt ∈ C t). 
+
+γ LM-head energy fraction parameter, ∥∇ Wlm _head ℓ∥2 
+
+> F
+
+≤ γ∥∇ θ ℓ∥22.
+
+¯S = E[St] Average truncated support size across token positions t.
+
+Itrue , Ihead , ˜Ihead Full / LM-head / truncated LM-head influence targets. 
+
+bITracIn , bIRISE TracIn / RISE influence estimators. 
+
+21 Assumption C.2 (Norm Stability / Concentration) . There exist constants Cx, C h > 0 such that for the token positions considered and every layer index l ∈ { 1, . . . , L }, the layer-l hidden state 
+
+hl (at that token position, with hL = ht) satisfies ∥hl∥22 ≤ Cx and the final hidden state satisfies 
+
+∥ht∥22 ≥ Ch with high probability. 
+
+Assumption C.3 (Non-exploding Backpropagation in Expectation) . Fix a token position t and define the backpropagated error at layer l as δl := ∇hl ℓt (with δL := ∇ht ℓt). There exists κ ∈ (0 , 1) 
+
+such that for any internal layer index l,
+
+E∥δl∥22 ≤ κ2( L−l)E∥δL∥22.
+
+Assumption C.1 is architectural and holds for standard Transformer language models with a linear output projection to logits. Assumptions C.2–C.3 are mild stability conditions on activation norms and backpropagated errors; we empirically validate the implied decay trend in Section C.3. 
+
+C.2 Lemmas 
+
+Lemma C.1 (LM-head Gradient Decomposition) . For each token position t ∈ { 1, . . . , T }, let 
+
+zt = Wlm _head ht ∈ RV and define pt = softmax (zt/τ ), rt = pt − 1yt . For the token-level cross entropy loss ℓ(zt, y t), the LM-head gradient has the outer-product form 
+
+∇Wlm _head ℓ(zt, y t) = rt ⊗ ht. (4) 
+
+Consequently, for the aggregated loss PTt=1 ℓ(zt, y t),
+
+∇Wlm _head 
+
+> T
+
+X
+
+> t=1
+
+ℓ(zt, y t)
+
+!
+
+=
+
+> T
+
+X
+
+> t=1
+
+rt ⊗ ht. (5) 
+
+Proof. For softmax cross entropy, differentiating ℓ(zt, y t) with respect to zt yields the residual 
+
+rt = pt − 1yt , where pt = softmax (zt/τ ). Since zt = Wlm _head ht is linear in Wlm _head , the gradient with respect to Wlm _head is the outer product rt ⊗ ht. Summing over t = 1 , . . . , T gives the statement for PTt=1 ℓ(zt, y t).
+
+Lemma C.2 (Outer-product Gradient Energy Identity) . For the LM head at token position t under token-level cross entropy ℓ(zt, y t),
+
+Ghead := ∥∇ Wlm _head ℓ(zt, y t)∥2 
+
+> F
+
+= ∥rt∥22 · ∥ ht∥22, (6) 
+
+where pt = softmax( zt/τ ) and rt = pt − 1yt .Proof. By Lemma C.1, ∇Wlm _head ℓ(zt, y t) = rt ⊗ ht. The Frobenius norm of an outer product satisfies 
+
+∥rt ⊗ ht∥2 
+
+> F
+
+= ∥rt∥22∥ht∥22, which gives Eq. (6). 
+
+C.3 Theoretical Analysis of Gradient Energy Distribution 
+
+In Section 2.2, we observed that the ratio of LM Head energy to the average internal layer energy grows significantly with model depth. Here, we provide a theoretical derivation explaining this scaling behavior. 22 C.3.1 Preliminaries Token-level analysis. We fix a token position t and analyze the gradient energy induced by the token-level loss ℓ(zt, y t); this matches the per-token measurements in Section 2.2. For notational brevity, we omit the subscript t when clear (e.g., z := zt, h := ht, r := rt). Let the model have depth 
+
+L. Let xl be the activation/hidden vector at layer l, with xL = h being the final representation input to the LM head. The logits are z = Wlm _head h. We define the unnormalized gradient energy for a parameter block W as G(W ) := ∥∇ W ℓ(zt, y t)∥2 
+
+> F
+
+.
+
+C.3.2 Head-to-Average Ratio vs. Depth 
+
+We analyze how the energy ratio scales. We focus on the aggregate trend rather than individual layer bounds. 
+
+Proposition C.1 (Depth Amplifies Head-to-Average Energy Gap) . Under Assumptions C.2 and C.3, the ratio of the expected Head energy to the average internal energy is lower-bounded by a function growing with L:
+
+R = E[Ghead ]
+
+> 1
+> L
+
+PLl=1 E[Gl] ≥ Ch
+
+Cx
+
+· L(1 − κ2)
+
+∥Wlm _head ∥2
+
+> op
+
+(1 − κ2L) . (7) 
+
+Proof. 1. Upper Bound on Average Internal Energy. Using Lemma C.2, for an internal layer 
+
+l, we have Gl = ∥xl∥22∥δl∥22. Applying Assumption C.2 ( ∥xl∥22 ≤ Cx), we have the pointwise bound 
+
+Gl ≤ Cx∥δl∥22. Taking expectation and applying Assumption C.3: 
+
+E[Gl] ≤ CxE∥δl∥22 (8) 
+
+≤ Cxκ2( L−l)E∥δL∥22. (9) Averaging over all L layers yields Eq. (11): 
+
+1
+
+L
+
+> L
+
+X
+
+> l=1
+
+E[Gl] ≤ CxE∥δL∥22
+
+L
+
+> L−1
+
+X
+
+> k=0
+
+κ2k (10) 
+
+= CxE∥δL∥22
+
+L · 1 − κ2L
+
+1 − κ2 . (11) 
+
+2. Upper Bound on Final Error Energy via Head Energy. The final error signal is 
+
+δL = ∇hℓ = W ⊤
+
+> lm _head
+
+r, hence E∥δL∥22 ≤ ∥ Wlm _head ∥2
+
+> op
+
+E∥r∥22. From Eq. (6) and Assumption C.2 (∥h∥22 ≥ Ch with high probability), we have ∥r∥22 = Ghead /∥h∥22 ≤ Ghead /C h, which implies: 
+
+E∥δL∥22 ≤ ∥ Wlm _head ∥2
+
+> op
+
+E∥r∥22 ≤ ∥Wlm _head ∥2
+
+> op
+
+Ch
+
+E[Ghead ]. (12) 
+
+3. Ratio Derivation. Substituting Eq. (12) into Eq. (11) yields: Avg (E[G]) ≤ Cx
+
+L
+
+1 − κ2L
+
+1 − κ2
+
+∥Wlm _head ∥2
+
+> op
+
+Ch
+
+E[Ghead ]
+
+!
+
+. (13) Rearranging terms to solve for the ratio completes the proof: 
+
+E[Ghead ]
+
+Avg (E[G]) ≥ Ch
+
+Cx
+
+L(1 − κ2)
+
+∥Wlm _head ∥2
+
+> op
+
+(1 − κ2L) . (14) 23 Interpretation. Eq. (7) provides a structural explanation for the trend in Figure 2. As the model depth L increases, the “dilution” of the gradient signal in earlier layers (driven by the contraction factor κ < 1) causes the average energy to drop relative to the head. This theoretical lower bound grows with L, consistent with the empirical observation that deep models like OLMo-32B exhibit a much higher Head-to-Average ratio than shallow models like Pythia-14M. Importantly, this bound compares the head energy to the average internal-layer energy in expectation and does not preclude occasional internal-layer hotspots. 
+
+C.4 Theoretical Analysis of Semantic Capture in the GH Channel 
+
+Connection to Section 2.3 (Semantic Smoothing). The RH channel compares residuals in the vocabulary basis via the identity metric: 
+
+⟨rt, r i⟩ = r⊤ 
+
+> t
+
+IV ri, (15) which captures only same-token interactions (since IV has no off-diagonal entries). For the GH channel, we project the residual into embedding space by g = W ⊤
+
+> lm _head
+
+r and define the induced kernel K ≜ Wlm _head W ⊤ 
+
+> lm _head
+
+∈ RV ×V . A direct expansion gives the kernelized residual similarity: 
+
+⟨gt, g i⟩ = ⟨W ⊤
+
+> lm _head
+
+rt, W ⊤
+
+> lm _head
+
+ri⟩
+
+= r⊤ 
+
+> t
+
+Kr i =
+
+> V
+
+X
+
+> u=1
+> V
+
+X
+
+> v=1
+
+rt(u) ri(v) Kuv , (16) where Kuv = ⟨Wlm _head ,u , W lm _head ,v ⟩ is the embedding inner product (and equals cosine similarity if rows are normalized). Crucially, Eq. (16) includes off-diagonal cross-token interactions ( u̸ = v), enabling soft matching between different tokens. Empirically, semantically related tokens tend to have larger Kuv than unrelated pairs. Moreover, since our method uses sparse residuals (restricting r to a small top-L support and including the ground-truth token; Alg. 1), the double sum is dominated by a small set of high-probability tokens. As a result, residual mass placed on semantically aligned but non-identical tokens can contribute non-trivially to ⟨gt, g i⟩, providing a mechanistic explanation for the paraphrase “rescue” behavior observed in Section 2.3 and Table 1. 
+
+C.5 Theoretical Guarantees for CountSketch 
+
+C.5.1 Inner Product Preservation 
+
+We consider feature hashing / CountSketch with a (2-wise independent) bucket hash σ : [ D] → [K]
+
+and an independent Rademacher sign hash s : [ D] → {− 1, +1 }. Let CS : RD → RK be defined by 
+
+CS( x)j = X
+
+> i:σ(i)= j
+
+s(i)xi. (17) 
+
+Proposition C.1 (Unbiasedness and variance; simplified from 51 ). For any token positions t and t′,the following hold for the (unnormalized) CountSketch outputs: 
+
+E
+
+h
+
+CS h(ht)⊤CS h(ht′ )
+
+i
+
+= h⊤ 
+
+> t
+
+ht′ , (18) 
+
+Var 
+
+h
+
+CS h(ht)⊤CS h(ht′ )
+
+i
+
+≤ ∥ht∥22∥ht′ ∥22 + ( h⊤ 
+
+> t
+
+ht′ )2
+
+Kh
+
+, (19) 24 and analogously, 
+
+E
+
+h
+
+CS g(gt)⊤CS g(gt′ )
+
+i
+
+= g⊤ 
+
+> t
+
+gt′ , (20) 
+
+Var 
+
+h
+
+CS g(gt)⊤CS g(gt′ )
+
+i
+
+≤ ∥gt∥22∥gt′ ∥22 + ( g⊤ 
+
+> t
+
+gt′ )2
+
+Kg
+
+, (21) 
+
+E
+
+h
+
+CS r(˜ rt)⊤CS r(˜ rt′ )
+
+i
+
+= ˜ r⊤ 
+
+> t
+
+˜rt′ , (22) 
+
+Var 
+
+h
+
+CS r(˜ rt)⊤CS r(˜ rt′ )
+
+i
+
+≤ ∥˜rt∥22∥˜rt′ ∥22 + (˜ r⊤ 
+
+> t
+
+˜rt′ )2
+
+Kr
+
+. (23) 
+
+Implication for ranking stability. Proposition C.1 shows that CountSketch inner products are unbiased and that the estimation variance decreases inversely with the sketch output dimension. In 
+
+RISE , we apply CountSketch separately to the vocabulary-space residual and the representation with dimensions (Kr, K h) (and additionally Kg for the semantic error channel). Therefore, increasing 
+
+(Kr, K h, K g) improves the concentration of sketched similarities, making nearest-neighbor rankings increasingly stable for candidates whose true similarities are well separated. 
+
+C.5.2 Preservation of Bilinear Structure 
+
+RISE constructs interaction features via vectorized outer products of independently sketched factors: the RH channel uses vec ( ˆrt ⊗ ˆht) and the GH channel uses vec ( ˆgt ⊗ ˆht), aggregated over token positions t = 1 , . . . , T (see Algorithm 2). Since inner products between outer-product features factorize into products of factor inner products, the induced similarity between RH/GH interaction features depends only on the corresponding factor similarities. Combining this factorization with Proposition C.1 (unbiased factor inner products) and using independent sketch families across factors, the RH and GH similarities computed from ϕRH (x) and ϕGH (x) are unbiased estimators of their uncompressed counterparts. (We apply ℓ2 normalization in Algorithm 2 for numerical stability.) 
+
+C.5.3 Comparison with PCA-based Compression 
+
+We compare CountSketch to PCA-based compression using linear projections Pr ∈ RKr ×V , Ph ∈
+
+RKh×d, and Pg ∈ RKg ×d.
+
+Data dependence and index–query consistency. PCA projections (Pr, P h, P g) are learned from data and therefore depend on the data distribution. To keep index–query similarities comparable, one must use the same learned projections for both indexed examples and future queries; updating the indexed pool can require re-fitting and re-projecting stored vectors. In contrast, CountSketch is data-independent (fixed by σ and s) and preserves index–query compatibility without any refitting. 
+
+Storage. PCA requires storing dense projection parameters of sizes V × Kr, d × Kh, and d × Kg.CountSketch is specified by the hash/sign mappings (σ, s ), whose description scales linearly with the input dimension. 
+
+Computation on sparse residuals. Our method constructs a truncated residual ˜rt supported on It with Lt = |I t|. CountSketch directly exploits this sparsity, whereas PCA projections typically mix coordinates densely. 
+
+Proposition C.2 (Sparsity advantage of CountSketch over dense PCA projections) . Fix a token position t and consider the truncated residual ˜rt ∈ RV supported on It with Lt = |I t|. Computing 
+
+CS r( ˜rt) requires one signed accumulation per v ∈ I t (hence Lt updates), because each input coordinate is mapped to exactly one bucket by σ.
+
+25 Algorithm 2 SketchAggregate : CountSketch Feature Construction 
+
+Require: A sample x; LM head Wlm _head ; CountSketch operators CS r, CS h, CS g with dims 
+
+(Kr, K h, K g); temperature τ ; cumprob threshold ρcum ; top-K cap Kmax ; channel weights 
+
+(λrh , λ gh ). 
+
+> 1:
+
+Run the LM on x to obtain logits {zt}Tt=1 , final hidden states {ht}Tt=1 , and next-token targets 
+
+{yt}Tt=1 . 
+
+> 2:
+
+ϕRH ← 0 ∈ RKr Kh ; ϕGH ← 0 ∈ RKg Kh 
+
+> 3:
+
+for t = 1 , . . . , T do  
+
+> 4:
+
+Ct ← TopK( zt/τ, K max ); ensure yt ∈ C t 
+
+> 5:
+
+¯pt(v) ← softmax  (zt/τ )|Ct
+
+(v) ∀v ∈ C t 
+
+> 6:
+
+Sort Ct by ¯pt to obtain πt (length Kmax ) 
+
+> 7:
+
+St ← min {s : Psj=1 ¯pt(πt(j)) ≥ ρcum } 
+
+> 8:
+
+St ← { πt(1) , . . . , π t(St)} ∪ { yt} 
+
+> 9:
+
+˜pt ← renormalize ¯pt on St (set other v ∈ C t to 0) 
+
+> 10:
+
+˜rt(v) ← ˜pt(v) − 1[v = yt] ∀v ∈ S t 
+
+> 11:
+
+˜gt ← P 
+
+> v∈S t
+
+˜pt(v) Wv − Wyt 
+
+> 12:
+
+ˆrt ← CS r(˜ rt)/∥CS r(˜ rt)∥2 
+
+> 13:
+
+ˆht ← CS h(ht)/∥CS h(ht)∥2 
+
+> 14:
+
+ˆgt ← CS g(˜ gt)/∥CS g(˜ gt)∥2 
+
+> 15:
+
+ϕRH ← ϕRH + λrh vec(ˆ rt ⊗ ˆht) 
+
+> 16:
+
+ϕGH ← ϕGH + λgh vec(ˆ gt ⊗ ˆht) 
+
+> 17:
+
+end for  
+
+> 18:
+
+return ϕ(x) = [ ϕRH ; ϕGH ]
+
+For a PCA projection Pr ˜rt, if each of the Kr output coordinates depends on every input coordinate in It (i.e., Pr is dense on the columns indexed by It), then computing Pr ˜rt requires at least Lt · Kr
+
+multiply-add contributions. Proof. By definition of CountSketch, each input coordinate v contributes to exactly one output coordinate indexed by σ(v). Since ˜rt(v) = 0 for v / ∈ I t, only indices in It contribute, and each such 
+
+v causes exactly one signed update. Thus, CS r(˜ rt) is computed with Lt updates. For the PCA projection, each output coordinate is a linear combination of the input coordinates. Under the stated density condition, each nonzero input coordinate v ∈ I t contributes to all Kr
+
+outputs, so it induces at least Kr multiply-add contributions. Summing over Lt nonzeros yields the lower bound Lt · Kr.
+
+Dense factors. For dense vectors ht ∈ Rd and gt ∈ Rd, applying PCA projections Phht and Pggt
+
+involves dense matrix-vector products (mixing all d coordinates into Kh or Kg outputs), whereas CountSketch uses one bucket update per input coordinate by construction. 
+
+# D Variance Analysis of RISE in Estimating Influence Function 
+
+This section provides a variance analysis that is mathematically self-consistent for (i) TracIn-style random projection estimators and (ii) RISE-style factorized CountSketch estimators exploiting the LM-head outer-product structure. A key point is to separate: 
+
+• Sketching variance: randomness due to projection/sketching (this section). 26 • Approximation bias: restricting to the LM head and truncating the residual (deterministic, handled explicitly). 
+
+D.1 Targets, Estimators, and Assumptions 
+
+Full-parameter influence (TracIn target). Let ∇θℓ(x) ∈ R|θ|. The full influence surrogate is 
+
+Itrue (xi → xq) := ⟨∇ θℓ(xq), ∇θℓ(xi)⟩ .
+
+LM-head influence (RISE structural target). Let Wlm _head ∈ RV ×d and ∇Wlm _head ℓ(x) ∈
+
+RV ×d. For a sequence x of length T , the LM-head gradient admits the exact outer-product decomposition 
+
+∇Wlm _head ℓ(x) = 
+
+> T
+
+X
+
+> t=1
+
+rt(x) ht(x)⊤, rt(x) = pt(x) − 1yt ∈ RV , ht(x) ∈ Rd.
+
+The corresponding LM-head influence is 
+
+Ihead (xi → xq) := 
+
+D
+
+∇Wlm _head ℓ(xq), ∇Wlm _head ℓ(xi)
+
+E 
+
+> F
+
+.
+
+Truncation (approximation target). Let ˜rt be a sparse approximation to rt (e.g., top-mass truncation with optional renormalization). Define the truncated head gradient 
+
+^∇Wlm _head ℓ(x) := 
+
+> T
+
+X
+
+> t=1
+
+˜rt(x) ht(x)⊤, ˜Ihead (xi → xq) := 
+
+D ^∇Wlm _head ℓ(xq), ^∇Wlm _head ℓ(xi)
+
+E 
+
+> F
+
+.
+
+Important: the sketching estimators below are unbiased for ˜Ihead (not for Itrue unless additional assumptions are made). 
+
+TracIn estimator. Let R ∈ RK×| θ| have i.i.d. entries Rkj ∼ N (0 , 1/K ) (the Gaussian case) or Rademacher ±1/√K (similar bounds). The TracIn estimator is 
+
+bITracIn := ⟨R ∇θℓ(xq), R ∇θℓ(xi)⟩ .
+
+CountSketch operator. A CountSketch CS : RD → RK is defined by a bucket hash η : [ D] → [K]
+
+and a sign hash s : [ D] → {± 1}:
+
+(CS( x)) k = X
+
+> j:η(j)= k
+
+s(j) xj .
+
+We assume the hash families used for different factors (residual/hidden/projection), i.e., (ηr, s r),
+
+(ηh, s h), (ηg, s g), are independent. 27 RISE RH/GH estimators (analysis version, no per-vector normalization ). For a single token position t in each sample (token-level analysis), define: 
+
+At := CS r(˜ rt(xq)) , CS r(˜ rt(xi)) , Bt := CS h(ht(xq)) , CS h(ht(xi)) ,
+
+and the RH estimator bIRISE  
+
+> RH,t
+
+:= At Bt.
+
+For GH, let ˜gt(x) := W ⊤ 
+
+> lm _head
+
+˜rt(x) ∈ Rd and 
+
+Ct := CS g(˜ gt(xq)) , CS g(˜ gt(xi)) , bIRISE  
+
+> GH,t
+
+:= Ct Bt.
+
+A two-channel fused estimator at token t is 
+
+bIRISE  
+
+> t
+
+:= λrh bIRISE  
+
+> RH,t
+
++ λgh bIRISE  
+
+> GH,t
+
+.
+
+Remark (about the implementation normalization). If the implementation uses ˆrt =CS r( ˜rt)/∥CS r( ˜rt)∥2 and similarly for ˆht, ˆgt, the resulting estimator becomes biased (nonlinear normalization). The variance bounds below apply to the unnormalized version, which is the standard setting where CountSketch inner products are unbiased. 
+
+D.1.1 Assumptions Assumption D.1 (Bounded norms) . There exist constants Br, B ˜r, B h > 0 such that for all x, t :
+
+∥rt(x)∥2 ≤ Br, ∥˜rt(x)∥2 ≤ B˜r, ∥ht(x)∥2 ≤ Bh.
+
+Assumption D.2 (Bounded full gradient) . There exists Bθ > 0 such that ∥∇ θℓ(x)∥2 ≤ Bθ for all x.
+
+Assumption D.3 (Truncation error bound) . There exists εtrunc ≥ 0 such that for all x, t ,
+
+∥rt(x) − ˜rt(x)∥2 ≤ εtrunc .
+
+Assumption D.4 (LM-head operator norm) . ∥Wlm _head ∥op = σ1(Wlm _head ), hence ∥˜gt(x)∥2 =
+
+∥W ⊤ 
+
+> lm _head
+
+˜rt(x)∥2 ≤ σ1(Wlm _head )∥˜rt(x)∥2 ≤ σ1(Wlm _head )B˜r.
+
+Assumption D.5 (Energy concentration into LM head (optional, for comparing to full TracIn)) .
+
+There exists γ ∈ (0 , 1] such that for all x,
+
+∥∇ Wlm _head ℓ(x)∥2 
+
+> F
+
+≤ γ∥∇ θℓ(x)∥22.
+
+D.2 Supporting Lemmas 
+
+Lemma D.1 (Random projection inner-product variance (Gaussian)) . Let R ∈ RK×| θ| have i.i.d. entries N (0 , 1/K ). For any u, v ∈ R|θ|, define bZ = ⟨Ru, Rv ⟩. Then 
+
+E[ bZ] = u⊤v, Var[ bZ] = 1
+
+K
+
+
+
+∥u∥22∥v∥22 + ( u⊤v)2
+
+.
+
+(For Rademacher ±1/√K, the same scaling holds with an absolute-constant factor.) 
+
+28 Proof. Write R by rows: R = [ r⊤ 
+
+> 1
+
+; . . . ; r⊤ 
+
+> K
+
+] with rk ∼ N (0 , 1 
+
+> K
+
+I) independent. Let Xk = ( r⊤ 
+
+> k
+
+u)( r⊤ 
+
+> k
+
+v).Then bZ = PKk=1 Xk and the Xk are i.i.d. By isotropy, E[Xk] = 1 
+
+> K
+
+u⊤v. By Isserlis’ theorem for zero-mean Gaussians, 
+
+E[X2 
+
+> k
+
+] = E[( r⊤ 
+
+> k
+
+u)2(r⊤ 
+
+> k
+
+v)2] = 1
+
+K2
+
+
+
+∥u∥22∥v∥22 + 2( u⊤v)2
+
+.
+
+Hence 
+
+Var( Xk) = E[X2 
+
+> k
+
+] − E[Xk]2 = 1
+
+K2
+
+
+
+∥u∥22∥v∥22 + ( u⊤v)2
+
+,
+
+and Var( bZ) = K Var( X1) gives the claim. 
+
+Lemma D.2 (CountSketch inner-product unbiasedness and variance) . Let CS : RD → RK be CountSketch with a bucket hash η and sign hash s such that P(η(i) = η(j)) = 1 /K for i̸ = j, and 
+
+E[s(i)] = 0 , E[s(i)s(j)] = 0 for i̸ = j. For any x, y ∈ RD, define bZ = ⟨CS( x), CS( y)⟩. Then 
+
+E[ bZ] = x⊤y, Var[ bZ] ≤ 1
+
+K ∥x∥22∥y∥22.
+
+Proof. Expand 
+
+bZ =
+
+> K
+
+X
+
+> k=1
+
+ X
+
+> i:η(i)= k
+
+s(i)xi
+
+ X
+
+> j:η(j)= k
+
+s(j)yj
+
+
+
+= X
+
+> i,j
+
+xiyj s(i)s(j) 1[η(i) = η(j)] .
+
+Taking expectation over s, the terms with i̸ = j vanish because E[s(i)s(j)] = 0 , leaving E[ bZ] = P 
+
+> i
+
+xiyi = x⊤y.Let E := bZ − x⊤y = P 
+
+> i̸=j
+
+xiyj s(i)s(j) 1[η(i) = η(j)] . Then E[E] = 0 and Var ( bZ) = E[E2].Using sign-independence, cross terms vanish unless indices pair up, which yields the standard bound 
+
+E[E2] ≤ X
+
+> i̸=j
+
+x2 
+
+> i
+
+y2 
+
+> j
+
+P(η(i) = η(j)) = 1
+
+K
+
+X
+
+> i̸=j
+
+x2 
+
+> i
+
+y2 
+
+> j
+
+≤ 1
+
+K
+
+ X 
+
+> i
+
+x2
+
+> i
+
+ X 
+
+> j
+
+y2
+
+> j
+
+
+
+= 1
+
+K ∥x∥22∥y∥22.
+
+Lemma D.3 (Variance of a product of independent CountSketch inner products) . Let 
+
+A = ⟨CS r(˜ r), CS r(˜ r′)⟩, B = ⟨CS h(h), CS h(h′)⟩,
+
+where CS r and CS h use independent hash families with output sizes Kr and Kh. Define α = ⟨˜r, ˜r′⟩
+
+and β = ⟨h, h ′⟩. Then E[AB ] = αβ and 
+
+Var[ AB ] ≤ ∥˜r∥22∥˜r′∥22∥h∥22∥h′∥22
+
+KrKh
+
++ α2∥h∥22∥h′∥22
+
+Kh
+
++ β2∥˜r∥22∥˜r′∥22
+
+Kr
+
+.
+
+Proof. By Lemma D.2, E[A] = α and E[B] = β. Independence of the sketch randomness implies A
+
+and B are independent, hence E[AB ] = E[A]E[B] = αβ .For independent A, B ,
+
+Var( AB ) = E[A2]E[B2] − (E[A]E[B]) 2
+
+= (Var( A) + α2)(Var( B) + β2) − α2β2
+
+= Var( A)Var( B) + α2Var( B) + β2Var( A).
+
+29 Using Lemma D.2, 
+
+Var( A) ≤ ∥˜r∥22∥˜r′∥22
+
+Kr
+
+, Var( B) ≤ ∥h∥22∥h′∥22
+
+Kh
+
+,
+
+and substituting yields the stated bound. 
+
+Lemma D.4 (Renormalized top-mass truncation implies an explicit ℓ2 error bound) . Let pt ∈ ∆V
+
+and St ⊂ [V ] with mass ρ = P 
+
+> v∈S t
+
+pt(v). Define ˜pt(v) = pt(v)/ρ for v ∈ S t and 0 otherwise. Then 
+
+∥pt − ˜pt∥1 = 2(1 − ρ), ∥pt − ˜pt∥2 ≤ 2(1 − ρ).
+
+Consequently, for residuals rt = pt − 1yt and ˜rt = ˜ pt − 1yt we have ∥rt − ˜rt∥2 ≤ 2(1 − ρ).Proof. Outside St, ˜pt = 0 , so ∥pt− ˜pt∥1 contributes P 
+
+> v / ∈S t
+
+pt(v) = 1 −ρ. Inside St, pt− ˜pt = pt−pt/ρ =
+
+pt(1 − 1/ρ ) and |1 − 1/ρ | = (1 − ρ)/ρ , hence the ℓ1 contribution is P 
+
+> v∈S t
+
+pt(v) · (1 − ρ)/ρ = (1 − ρ).Thus ∥pt − ˜pt∥1 = 2(1 − ρ) and ∥pt − ˜pt∥2 ≤ ∥ pt − ˜pt∥1. Finally rt − ˜rt = pt − ˜pt.
+
+D.3 Main Variance Theorem 
+
+Theorem D.1 (Variance bounds for RISE vs. TracIn (self-consistent form)) . Fix a training-query pair (xi, x q) and a token position t (token-level analysis). Under Assumptions D.1–D.4: 
+
+(i) TracIn variance (full gradient). Let u = ∇θℓ(xq) and v = ∇θℓ(xi), and let R be Gaussian as in Lemma D.1. Then 
+
+Var 
+
+hbITracIn i
+
+= 1
+
+K
+
+
+
+∥u∥22∥v∥22 + ( u⊤v)2
+
+≤ 2B4
+
+> θ
+
+K .
+
+(ii) RH channel variance (token-level). Let ˜rq = ˜rt(xq), ˜ri = ˜rt(xi), hq = ht(xq), hi = ht(xi)
+
+and define α = ⟨˜rq, ˜ri⟩, β = ⟨hq, h i⟩. Then 
+
+Var 
+
+hbIRISE 
+
+> RH,t
+
+i
+
+≤ ∥˜rq∥22∥˜ri∥22∥hq∥22∥hi∥22
+
+KrKh
+
++ α2∥hq∥22∥hi∥22
+
+Kh
+
++ β2∥˜rq∥22∥˜ri∥22
+
+Kr
+
+.
+
+In particular, using ∥˜r∥ ≤ B˜r and ∥h∥ ≤ Bh gives the worst-case bound 
+
+Var 
+
+hbIRISE 
+
+> RH,t
+
+i
+
+≤ B4˜r B4
+
+> h
+
+ 1
+
+KrKh
+
++ 1
+
+Kh
+
++ 1
+
+Kr
+
+
+
+.
+
+(iii) GH channel variance (token-level). Let ˜gq = W ⊤ 
+
+> lm _head
+
+˜rq, ˜gi = W ⊤ 
+
+> lm _head
+
+˜ri, and 
+
+γg = ⟨˜gq, ˜gi⟩. Then 
+
+Var 
+
+hbIRISE 
+
+> GH,t
+
+i
+
+≤ ∥˜gq∥22∥˜gi∥22∥hq∥22∥hi∥22
+
+KgKh
+
++ γ2 
+
+> g
+
+∥hq∥22∥hi∥22
+
+Kh
+
++ β2∥˜gq∥22∥˜gi∥22
+
+Kg
+
+.
+
+Moreover, ∥˜g∥2 ≤ σ1(Wlm _head )B˜r implies the worst-case bound 
+
+Var 
+
+hbIRISE 
+
+> GH,t
+
+i
+
+≤ σ1(Wlm _head )4B4˜r B4
+
+> h
+
+ 1
+
+KgKh
+
++ 1
+
+Kh
+
++ 1
+
+Kg
+
+
+
+.
+
+(iv) Two-channel fusion and covariance. Let bIRISE  
+
+> t
+
+= λrh bIRISE  
+
+> RH,t
+
++ λgh bIRISE  
+
+> GH,t
+
+. If the RH and GH channels share the same hidden-state sketch Bt but use independent residual/projection sketches (CS r independent of CS g), then 
+
+Var 
+
+hbIRISE 
+
+> t
+
+i
+
+= λ2
+
+> rh
+
+Var[ bIRISE  
+
+> RH,t
+
+] + λ2
+
+> gh
+
+Var[ bIRISE  
+
+> GH,t
+
+] + 2 λrh λgh Cov[ AtBt, C tBt] ,
+
+30 and the covariance admits the exact identity 
+
+Cov[ AtBt, C tBt] = E[AtCt]Var( Bt) = α γ g Var( Bt),
+
+where Var (Bt) ≤ ∥ hq∥22∥hi∥22/K h by Lemma D.2. (If RH and GH use independent hidden sketches, then the covariance term is zero.) 
+
+(v) Variance reduction relative to TracIn. 
+
+• Estimator Target: The bounds above quantify the sketching variance relative to the truncated LM-head influence ˜Ihead . Note that bIRISE is an unbiased estimator of ˜Ihead , but biased with respect to Itrue due to head-restriction and truncation. 
+
+• Dimensionality-Adjusted Comparison: Consider a matched memory budget where the explicit feature dimension is fixed to K (i.e., set KrKh = K). The variance of the dominant product term in bIRISE  
+
+> RH,t
+
+scales as: 
+
+O
+
+ ∥˜rq∥2∥hq∥2∥˜ri∥2∥hi∥2
+
+K
+
+
+
+.
+
+By contrast, TracIn on the full gradient has leading scaling ∥∇ θℓ(xq)∥2∥∇ θℓ(xi)∥2/K . Under the (optional) energy fraction assumption ∥∇ Wlm _head ℓ(x)∥2 
+
+> F
+
+≤ γ∥∇ θℓ(x)∥22 and if truncation does not increase the head-gradient energy substantially, the head-based estimator can have substantially smaller variance due to γ ≪ 1.
+
+• Effect of Truncation: Furthermore, under a non-expansive truncation condition (where ∥˜rt∥2 ≤∥rt∥2, satisfied by zero-masking truncation), the product-term variance is strictly reduced compared to dense head-gradient sketching: 
+
+∥˜rq∥22∥˜ri∥22
+
+∥rq∥22∥ri∥22
+
+≤ 1,
+
+and is strictly < 1 if at least one truncation is strict. Proof. Part (i) is Lemma D.1 applied to u = ∇θℓ(xq) and v = ∇θℓ(xi) plus Cauchy–Schwarz. Parts (ii) and (iii) follow by applying Lemma D.3 to ( ˜r, ˜r′) = ( ˜rq, ˜ri) and (h, h ′) = ( hq, h i) for RH, and (˜ r, ˜r′) = (˜ gq, ˜gi) and (h, h ′) = ( hq, h i) for GH, together with Assumption D.4. For (iv), write bIRH,t = AtBt and bIGH,t = CtBt. Since (At, C t) are independent of Bt and At is independent of Ct (independent sketch families), 
+
+Cov( AtBt, C tBt) = E[AtCtB2 
+
+> t
+
+] − E[AtBt]E[CtBt] = E[AtCt] E[B2 
+
+> t
+
+] − E[Bt]2 = E[AtCt]Var( Bt).
+
+Moreover E[AtCt] = E[At]E[Ct] = αγ g.
+
+D.4 Bias-Variance Decomposition 
+
+While the analysis above focuses on sketching variance, the total error of the RISE estimator with respect to the true influence Itrue admits the following decomposition: 
+
+bIRISE − I true =  bIRISE − ˜Ihead | {z }
+
+> Sketching Variance (Stochastic)
+
++  ˜Ihead − I head | {z }
+
+> Truncation Bias (Deterministic)
+
++  Ihead − I true | {z }
+
+> Structural Bias (Deterministic)
+
+.
+
+The sketching variance is controlled by Theorem D.1. The truncation bias is bounded by the residual mass discarded via Assumption D.3 and Lemma D.4. The structural bias depends on the gradient energy concentration in the LM head (Observation 1), representing the irreducible error from excluding the model body parameters. 31 E Hyperparameters 
+
+We present the hyperparameters in this paper in Table 6. 
+
+# F Additional Experimental Results 
+
+Testbed. All experiments are run on servers with the following configurations: H200 setup: 8 NVIDIA H200 GPUs (each with 141GB GPU memory); GH200 setup: 1 NVIDIA GH200 GPU (96GB GPU memory). 
+
+F.1 Complete Per-Layer Energy Distribution 
+
+This subsection provides comprehensive results on per-layer gradient energy distribution across different models and tasks. Figure 4 demonstrates that gradient-energy profiles remain largely stable before and after fine-tuning. Table 8 reports the full storage requirements for last-layer gradients, while Table 9 presents an ablation comparing LM-Head-Full-gradient sketch with RISE .
+
+F.2 Complete Per-Layer Discriminativeness 
+
+This subsection analyzes the layer-wise discriminativeness of hidden-state representations. Figure 5 shows the U-shaped discriminativeness pattern on C4 across model scales. Figure 6 further shows that this pattern persists both before and after fine-tuning across multiple models and tasks. 
+
+F.3 Additional Evidence for Sparse Active Tokens 
+
+This subsection provides the supporting evidence for Observation 2.4. The main text reports the headline result under a fixed-control: fixed τ when sweeping the number of candidate tokens, and fixed K when sweeping τ . Here we make the measurements explicit, separate probability mass from residual energy, and report the stability of sparse RH/GH fidelity across tasks, model scales, and checkpoints. 
+
+Metrics. For a token position t, let pt = softmax (zt/τ ) and rt = pt − 1yt . The active support St
+
+always includes the ground-truth next token yt. We report: 
+
+Mt(St) = X
+
+> v∈S t
+
+pt(v) (probability mass) ,Efull (St) = 
+
+P 
+
+> v∈S t
+
+rt(v)2
+
+P  
+
+> v∈[V]
+
+rt(v)2 (full residual ℓ2 energy) ,EGT = (1 − pt(yt)) 2
+
+P  
+
+> v∈[V]
+
+rt(v)2 (ground-truth coordinate energy) ,Etail (St) = 
+
+P 
+
+> v∈S t\{ yt}
+
+pt(v)2
+
+P  
+
+> v̸=yt
+
+pt(v)2 (non-GT residual-tail energy) .
+
+The distinction is important: probability mass is an ℓ1 quantity, while influence through the LM-head residual uses inner products and is therefore governed by squared residual energy. Thus a support can cover moderate probability mass while preserving nearly all influence-relevant energy. We report 
+
+EGT separately because the forced ground-truth coordinate often dominates the full residual norm; 32 Table 6: Hyperparameters used in all experiments. 
+
+Parameter Value Description 
+
+RISE Configuration 
+
+Channel Configuration 
+
+fusion_mode "rh+gh" Active channels (RH + GH) 
+
+λrh 0.7 RH channel weight 
+
+λgh 1.0 GH channel weight 
+
+CountSketch Dimensions (Pythia-1B) 
+
+Kr 128 / 64 Residual sketch dimension (58MB / 14MB con-fig) 
+
+Kh 24 / 12 Hidden state sketch dimension 
+
+Kg 128 / 64 Gradient sketch dimension 
+
+CountSketch Dimensions (OLMo-3-32B) 
+
+Kr 48 / 24 / 16 Residual sketch dimension (39MB / 4.5MB / 3.4MB config) 
+
+Kh 64 / 8 / 8 Hidden state sketch dimension 
+
+Kg 16 / 35 / 28 Gradient sketch dimension 
+
+Adaptive Top-L 
+
+adaptive_topL True Enable cumulative-probability truncation 
+
+θcum 0.92 Cumulative probability threshold 
+
+min_topL 4 Minimum kept candidates 
+
+max_topL_cap 256 Top-L upper bound 
+
+Other 
+
+seq_len 512 Maximum sequence length 
+
+normalize_sample True L2 normalize final vector 
+
+seed 42 Random seed for reproducibility 
+
+TrackStar Configuration 
+
+projection_dim 16 Random projection dimension 
+
+projection_type rademacher Projection matrix type 
+
+loss_fn ce Cross-entropy loss 
+
+loss_reduction mean Loss reduction method 
+
+include_bias False Exclude bias gradients 
+
+precision bf16 Model precision 
+
+RapidIn Configuration 
+
+RapidGrad_K 65536 Compressed gradient dimension 
+
+shuffle_lambda 20 Shuffle parameter for RapidGrad 
+
+use_zo False Use backpropagation gradients 
+
+max_length 512 Maximum sequence length 
+
+seed 42 Random seed 
+
+ZO-Inf Configuration 
+
+RapidGrad_K 65536 Compressed gradient dimension 
+
+shuffle_lambda 20 Shuffle parameter for RapidGrad 
+
+use_zo True Use zeroth-order gradients 
+
+zo_eps 0.001 Perturbation scale ( ϵ)
+
+zo_sample 4 Number of ZO samples per gradient 
+
+max_length 512 Maximum sequence length 
+
+seed 42 Random seed 
+
+Table 7: Dataset composition for the three evaluation tasks. 
+
+Task Pool Size Positives Pos % Description 
+
+Howdy! Backdoor 5,000 438 8.8% Alpaca-based pool; positives contain trigger howdy! [29] Finance–Medical 5,000 500 10.0% Medical QA [26] vs Finance [5] Brain Rot 5,000 500 10.0% High-quality control vs junk data [52] 
+
+Note: For Howdy!, we use 100 WebQuestions test generations containing the trigger. Positives for Finance–Medical are medical samples; for Brain Rot, positives are high-quality control samples. 
+
+33 Figure 4: Per-layer gradient-energy profiles are largely preserved after fine-tuning. For three tasks (BrainRot, Howdy, Finance–Medical) and three models (OLMo-3-7B, Pythia-2.8B, Pythia-6.9B), we plot the fraction of total gradient energy attributed to each layer (Embed → LM Head) for the pretrained checkpoint (blue) and the fine-tuned checkpoint (orange). The curves nearly overlap; numbers in legends denote the LM-head energy share, which changes only mildly after fine-tuning. This stability motivates estimating layer importance (and selecting readout-side signals) from the pretrained model without task-specific per-layer gradient profiling. 34 Table 8: Full Last-Layer Gradient Storage Requirements ( N =5,000 samples, fp16) 
+
+Model Vocab Hidden V×D Index Size 
+
+Pythia-14M 50,304 128 6.4M 60 GB Pythia-1B 50,304 2,048 103M 959 GB OLMo-7B 100,352 4,096 411M 3.8 TB OLMo-32B 100,352 5,120 514M 4.8 TB Table 9: Ablation: LM-Head-Full-gradient sketch vs. RISE on three tasks (Pythia-1B). Grad-Sketch applies CountSketch to LM Head gradients; RISE restricts to the LM head. Dataset Method Index Top-5 Top-50 auPRC auROC auPRC auROC Fin–Med Grad-Sketch 156 MB 1.000 1.000 0.992 0.986 
+
+RISE 58.6 MB 0.989 0.994 0.981 0.990 
+
+BrainRot Grad-Sketch 156 MB 1.000 1.000 0.724 0.872 
+
+RISE 58.6 MB 0.847 0.949 0.829 0.930 
+
+Howdy Grad-Sketch 156 MB 0.679 0.833 0.890 0.960 
+
+RISE 58.6 MB 0.996 0.997 0.939 0.967 
+
+the non-GT tail measures whether the selected active prediction tokens carry additional signal beyond GT-only. 
+
+Fixed-control protocol. Unless otherwise stated, the sparse support is St = TopK (zt/τ, K )∪{ yt},with logits renormalized only over St. For the Top-K sweep we fix τ = 1 .0 and vary K. For the temperature sweep we fix K = 128 and vary τ . This avoids coupling temperature, candidate count, and adaptive cumulative-probability thresholds. The main fixed-control diagnostics are shown in Figure 3. The RH panel shows that full residual energy is nearly lossless once the ground-truth coordinate is included, while the non-GT tail curve measures the candidate-token contribution against the full non-GT vocabulary tail. The GH panel shows that the same sparse candidate support preserves the dense semantic error direction. Figure 8 adds the complementary task/model matrix and fixed-K temperature sweep. 
+
+Fixed Top-K GH fidelity. Because the GH channel uses gt = W ⊤
+
+> lm _head
+
+rt, truncating the residual could distort the semantic error direction even when RH remains accurate. We therefore compare dense GH with sparse GH using cosine similarity. At fixed τ = 1 .0 and K = 128 , sparse GH reaches mean cosine 0.993 against dense GH across the eight BrainRot runs. 
+
+Fixed-K temperature sensitivity. Temperature controls how diffuse the softmax tail is before truncation. With K fixed at 128 , the support size is constant; changing τ only changes the residual weights assigned inside the same-size candidate set. Table 12 shows that τ = 1 .0 gives the best average GH cosine in this sweep. 35 Figure 5: Final-layer discriminativeness across model scales. Per-layer pairwise cosine variance for four models on C4. A clear U-shape emerges: variance drops in middle layers due to hidden collapse and recovers near the final layer. Table 10: Fixed τ = 1 .0 Top-K sweep for sparse GH. Rows are averaged over eight BrainRot pretrained/fine-tuned Pythia and OLMo runs.                      
+
+> KGH cosine Prob. mass (%) Support/V (%)
+> 80.954 61.3 0.015 16 0.973 68.4 0.029 32 0.984 75.8 0.056 64 0.990 81.8 0.112 128 0.993 85.6 0.223 256 0.995 89.1 0.445
+
+Takeaway. The sparse support is not merely a top-K engineering shortcut. It is a structural property of the LM-head residual: a tiny fixed-size active set captures the non-GT residual tail that matters for RH, and it also preserves the GH semantic direction. This explains why RISE can reduce the residual-side memory and sketching cost from vocabulary scale to active-support scale without sacrificing the error signal used by the dual-channel influence metric. 
+
+F.4 Additional Validation and Baseline Experiments 
+
+This subsection presents additional validation and baseline experiments that complement the main evaluation and further clarify the behavior of RISE . Specifically, we include target model repre-sentation baselines, same-target LM-head decomposition, TrackStar ablations, behavior validation via LDS, an adapted T-REx fact-tracing benchmark, efficient Shapley baselines, and additional influence-function baselines. Since TrackStar is optimizer-aware rather than an explicit Hessian-inverse estimator, we treat it as a pretraining-scale attribution baseline in the LDS and T-REx 36 Figure 6: Hidden-state discriminativeness follows a stable U-shape before and after fine-tuning. For each layer, we compute the variance of pairwise cosine similarities among token hidden states (higher variance more discriminative representations). Across three fine-tuning tasks (BrainRot, Howdy Backdoor, Medical–Finance) and three models (Pythia-2.8B, Pythia-6.9B, OLMo-3-7B), pretrained (blue) and fine-tuned (orange) curves are highly consistent: variance is low in middle layers and recovers near the final layer (relative depth 0=embed, 1=final). This consistent U-shape suggests that the layer-wise discriminative structure is largely preserved under fine-tuning, motivating readout-side representations as a reliable hotspot for scalable influence estimation. 37 2 4 6 8 10 12 14 16          
+
+> Hidden Layer Index
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> auPRC
+> best100=L1
+> best200=L1
+> last
+> Pythia-1B
+> 0510 15 20 25 30
+> Hidden Layer Index
+> best100=L1
+> best200=L1
+> last
+> Pythia-2.8B
+> Hidden cosine Top-100 RISE Top-100 Hidden cosine Top-200 RISE Top-200
+
+Figure 7: Full hidden-layer retrieval sweep on Howdy. We evaluate hidden-state cosine retrieval at every layer for Pythia-1B and Pythia-2.8B, and compare against RISE at Top-100 and Top-200. The strongest hidden-only layer is layer 1 in both models, not the final layer. However, even this best hidden-layer baseline remains below RISE , indicating that RISE ’s gains are not merely due to selecting a stronger hidden representation layer. Table 11: Sparse GH fidelity by BrainRot run at fixed τ = 1 .0, K = 128 . The support is fixed-size rather than adaptively selected.                                     
+
+> Model State GH cosine Prob. mass (%) Support/V (%)
+> OLMo-1B Fine-tuned 0.994 87.3 0.128 OLMo-1B Pretrained 0.993 85.2 0.128 Pythia-160M Fine-tuned 0.989 81.9 0.255 Pythia-160M Pretrained 0.993 78.0 0.255 Pythia-1B Fine-tuned 0.995 88.2 0.255 Pythia-1B Pretrained 0.995 85.6 0.255 Pythia-6.9B Fine-tuned 0.990 91.1 0.254 Pythia-6.9B Pretrained 0.996 87.6 0.254
+
+validations; explicit curvature/influence-function baselines are covered separately by LoGra and EK-FAC in Table 19. 
+
+F.5 Ablation on Channel Fusion (RH and GH) 
+
+This subsection presents ablation studies comparing different channel fusion strategies: representation-based hidden states (RH), gradient-based hidden states (GH), and their combination (RH+GH). Table 20 reports results on the MEDICAL FINANCE dataset for the predict-future setting, while Table 21 shows corresponding results for the recall setting, both across a wide range of model sizes. 
+
+F.6 Howdy Backdoor Attack: Complete Results 
+
+This subsection provides comprehensive evaluation results on the Howdy backdoor attack detection task. Table 22 and Table 23 present results for Pythia models under recall and predict-future settings, respectively. Table 24 and Table 25 report corresponding results for OLMo models. 38 Pythia                                           
+
+> 14M
+> Pythia
+> 70M
+> Pythia
+> 160M
+> Pythia
+> 410M
+> Pythia
+> 1B
+> Pythia
+> 2.8B
+> Pythia
+> 6.9B
+> OLMo
+> 1B
+> Howdy
+> BrainRot
+> FinMed
+> 88.8 93.1 99.5 98.8 99.8 99.7 99.8 99.8
+> 77.9 81.4 97.3 98.6 97.5 97.3 95.8 99.5
+> 85.4 92.6 99.6 99.8 99.8 99.8 99.7 99.5
+> Non-GT tail energy
+> Pythia
+> 14M
+> Pythia
+> 70M
+> Pythia
+> 160M
+> Pythia
+> 410M
+> Pythia
+> 1B
+> Pythia
+> 2.8B
+> Pythia
+> 6.9B
+> OLMo
+> 1B
+> Howdy
+> BrainRot
+> FinMed
+> 85.8 92.2 91.4 94.1 94.9 95.5 95.3 95.6
+> 72.5 78.4 79.8 83.9 85.7 87.7 88.9 84.8
+> 80.2 89.4 90.3 93.5 95.4 95.6 96.8 96.5
+> Probability mass
+> 0.800
+> 0.825
+> 0.850
+> 0.875
+> 0.900
+> 0.925
+> 0.950
+> 0.975
+> 1.000
+> retained (%)
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> retained (%)
+
+RH retention at fixed tau=1.0 and K=128 0.4 0.6 0.8 1.0 1.2 1.5 2.0 
+
+Temperature tau, fixed K=128 
+
+0.90 
+
+0.92 
+
+0.94 
+
+0.96 
+
+0.98 
+
+1.00 
+
+> Cosine to dense GH
+
+GH fixed K=128: tau changes residual weights (best mean tau=1.0) 
+
+Pythia 160M pretrained 
+
+Pythia 160M fine-tuned 
+
+Pythia 1B pretrained 
+
+Pythia 1B fine-tuned 
+
+Pythia 6.9B pretrained 
+
+Pythia 6.9B fine-tuned 
+
+OLMo 1B pretrained 
+
+OLMo 1B fine-tuned 
+
+Mean across runs Figure 8: Additional fixed-control sparse active-token diagnostics. Top: at fixed τ = 1 .0 and 
+
+K = 128 , RH residual-tail retention remains stable across tasks, model scales, and pretrained/fine-tuned checkpoints. Bottom: with fixed K = 128 , the GH temperature sweep changes only residual weights, showing that τ = 1 .0 gives the strongest average fidelity under a constant candidate count. 
+
+F.7 Finance-Medical Dataset: Complete Results 
+
+This subsection presents complete experimental results on the mixed Finance–Medical dataset. Table 26 and Table 27 report performance comparisons for Pythia models under recall and predict-future settings. Table 28 and Table 29 provide corresponding results for OLMo models. 
+
+F.8 Brain Rot High Quality Data Detection: Complete Results 
+
+This subsection reports comprehensive results on the Brain Rot dataset for high-quality data detection from junk data. Table 30 and Table 31 present Pythia model results under recall and predict-future settings. Table 32 and Table 33 show corresponding results for OLMo models. 
+
+F.9 Olmo Three Tasks Comprehensive Results 
+
+This subsection provides a unified comparison across all three evaluation tasks on OLMo models. Table 34 summarizes the three-task unified scores (auPRC) for pretrained OLMo models. 39 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0 
+
+> Temperature tau
+> 0.84
+> 0.86
+> 0.88
+> 0.90
+> 0.92
+> 0.94
+> 0.96
+> 0.98
+> 1.00
+> cos(dense GH, sparse GH)
+
+GH-space fidelity is high across model scales and fine-tuning 
+
+> OLMo-1b ft
+> OLMo-1b pre
+> Pythia-160m ft
+> Pythia-160m pre
+> Pythia-1b ft
+> Pythia-1b pre
+> Pythia-6.9b ft
+> Pythia-6.9b pre
+
+Figure 9: Sparse GH fidelity across BrainRot model runs. This visualizes the by-run stability of sparse GH against dense GH, complementing Table 11. Across pretrained and fine-tuned Pythia/OLMo checkpoints, the sparse GH direction remains close to the dense semantic error direction. Table 12: Fixed K = 128 temperature sweep for sparse GH. Rows are averaged over eight BrainRot pretrained/fine-tuned model runs. 
+
+τ GH cosine Prob. mass (%) Relative error 
+
+0.4 0.924 99.8 0.138 0.6 0.957 98.9 0.154 0.8 0.983 94.4 0.183 1.0 0.993 85.6 0.216 1.2 0.987 73.8 0.260 1.5 0.974 54.2 0.323 2.0 0.956 28.8 0.376 
+
+F.10 Large Scale Howdy Results 
+
+This subsection presents a direct comparison between RISE and BM25 on the Howdy backdoor detection task at larger corpus scales, as shown in Table 35. 40 Table 13: Target-model representation baselines at larger Top-K on Howdy prospective valuation. All rows use the 5K Howdy candidate pool and 100 prospective WebQuestions trigger queries. Embed and Last retrieve candidates by target-model input-embedding and final-hidden-state cosine similarity, respectively; RISE uses the same candidate/query split. Model Method Top-100 Top-200 auPRC auROC auPRC auROC Pythia-410M Embed 0.435 0.807 0.403 0.816 Last 0.747 0.907 0.663 0.900 
+
+RISE 0.933 0.965 0.895 0.948 
+
+Pythia-1B Embed 0.524 0.837 0.470 0.833 Last 0.709 0.898 0.629 0.889 
+
+RISE 0.967 0.980 0.934 0.964 
+
+OLMo-3-7B Embed 0.224 0.707 0.188 0.682 Last 0.782 0.921 0.701 0.911 
+
+RISE 0.998 0.998 0.991 0.994 
+
+Table 14: Same-target LM-head decomposition on Howdy-small. All rows use Pythia-14M with 500 Howdy training candidates and 50 predict queries. We compare exact LM-head cosine retrieval, sparse RH truncation with and without CountSketch, and the full RH+GH RISE estimator; Disk is index size and retrieval quality is auPRC/auROC. Method Disk Top-5 auPRC/auROC Top-10 auPRC/auROC 
+
+RISE (RH+GH) 6.15 MB 0.9694 /0.9783 0.9058 /0.9460 LM-head exact cosine 12.88 GB 0.8443/0.9220 0.8224/0.9139 Sparse RH exact (no sketch) 103.58 MB 0.9317/0.9603 0.9019/ 0.9466 
+
+Sparse RH + CountSketch 3.68 MB 0.7380/0.8716 0.6937/0.8479 Table 15: TrackStar configuration ablation on Pythia-1B predict-future valuation. We report Top-5 auPRC for three tasks under two TrackStar projection dimensions. Base is the default TrackStar score; UnitNorm applies unit normalization; Hessian applies the Hessian-style correction; Both combines the two. 
+
+Dim Task Base UnitNorm Hessian Both 16 Howdy 0.652 0.451 0.260 0.223 Fin–Med 0.955 0.987 0.807 0.794 BrainRot 0.527 0.480 0.609 0.424 32 Howdy 0.672 0.297 0.565 0.369 Fin–Med 0.971 0.996 0.930 0.933 BrainRot 0.569 0.502 0.694 0.484 
+
+> Hessian-style correction is not uniformly beneficial in this predict-future decoder-LLM valuation setting: it improves BrainRot but substantially degrades Howdy and Fin–Med relative to the best Hessian-free variant, and combining it with unit normalization is consistently worse than the best single variant. These results suggest that Hessian-based corrections are task-sensitive and unstable in our setting.
+
+41 Table 16: Linear Datamodeling Score (LDS) on BrainRot. 
+
+Method LDS 95% CI Random 0.011 [-0.008, 0.029] Final hidden-state cosine 0.146 [0.132, 0.161] TrackStar LM-head 0.053 [0.035, 0.072] TrackStar full-model 0.178 [0.161, 0.195] 
+
+RISE 0.204 [0.188, 0.222] 
+
+Table 17: Adapted T-REx fact-tracing benchmark. 
+
+Method Pool MRR Recall@10 TrackStar 20K 0.3630 0.4420 
+
+RISE 20K 0.4370 0.5160 
+
+TrackStar 200K 0.0165 0.0716 
+
+RISE 200K 0.3072 0.3812 
+
+TrackStar 1M 0.0127 0.0182 
+
+RISE 1M 0.2349 0.3198 Settings: LDS uses Pythia-1B on a 2K BrainRot pool with 128 random 50% training subsets and three fine-tuning seeds per subset (384 retraining runs total), reporting bootstrap 95% confidence intervals. T-REx adapts the TrackStar fact-tracing benchmark to the Pythia-1B pretrained model under the autoregressive prompt-completion formulation and evaluates retrieval over 20K, 200K, and 1M candidate pools. 
+
+Table 18: Direct comparison with efficient Shapley methods on Howdy-5000. All methods rank the same 5K Howdy candidate pool for 100 trigger queries on Pythia-14M and Pythia-1B, and retrieval quality is auPRC at Top-K. TMC-Shapley uses 32 permutations with truncation. G-Shapley uses a 32-permutation single-pass SGD adaptation. Both use held-out negative NLL as utility. GPU-hours and peak memory are normalized to a single H200. 
+
+Model Method Top-5 auPRC Top-10 auPRC Top-50 auPRC GPU-hrs Peak Mem Pythia-14M 
+
+RISE 0.858 0.846 0.831 0.019 4.2 GB TMC-Shapley 0.000 0.000 0.061 0.379 1.7 GB 
+
+G-Shapley 0.000 0.143 0.094 0.748 1.7 GB 
+
+Pythia-1B 
+
+RISE 1.000 0.997 0.983 0.0256 7.36 GB 
+
+TMC-Shapley 0.804 0.734 0.489 1.47 11.0 GB G-Shapley 0.788 0.679 0.631 5.96 11.0 GB 
+
+Table 19: Additional influence-function baselines on BrainRot. 
+
+Method Model Disk E2E Time Top-5 Top-10 Top-25 Top-50 
+
+RISE Pythia-1B 277 MB 50.41 s 0.8343 0.8182 0.7754 0.7480 
+
+LoGra Pythia-1B 9.0 GB 99.1 min 0.2600 0.2340 0.2483 0.2550 
+
+RISE Pythia-160M 274.94 MB 114.73 s 0.8594 0.8494 0.8099 0.7857 
+
+EK-FAC Pythia-160M 2.00 GB 883.21 s 0.8378 0.8162 0.7885 0.7691 
+
+All runs rank a 5K BrainRot candidate pool with 500 high-quality positives using 100 queries on one H200; retrieval quality is auPRC at Top-K. LoGra uses the official LogIX implementation [ 10 ], and EK-FAC uses Kronfluence [16]. 
+
+42 Table 20: Ablation on MEDICAL (Predict). RH vs. GH vs. RH+GH. We report auPRC/auROC at different Top-K.
+
+Model Fusion Top-5 Top-10 Top-50 Top-100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC OLMo-32B 
+
+rh 0.9538 0.9317 0.9375 0.9236 0.8712 0.8945 0.8156 0.8689 
+
+gh 0.9608 0.9462 0.9482 0.9366 0.8856 0.9121 0.8317 0.8875 
+
+rh+gh 0.9653 0.9539 0.9494 0.9381 0.8924 0.9155 0.8387 0.8895 OLMo-7B 
+
+rh 0.9638 0.9719 0.9439 0.9574 0.8835 0.9291 0.8227 0.8981 
+
+gh 0.9718 0.9787 0.9539 0.9704 0.8897 0.9355 0.8346 0.9097 
+
+rh+gh 0.9767 0.9838 0.9582 0.9736 0.8956 0.9386 0.8439 0.9150 OLMo-1B 
+
+rh 0.9468 0.9418 0.9291 0.9328 0.8418 0.8855 0.7801 0.8568 
+
+gh 0.9741 0.9583 0.9585 0.9453 0.8900 0.9086 0.8305 0.8812 
+
+rh+gh 0.9694 0.9536 0.9530 0.9449 0.8874 0.9112 0.8335 0.8872 Pythia-6.9B 
+
+rh 0.9360 0.9622 0.9248 0.9515 0.8344 0.9105 0.7673 0.8796 
+
+gh 0.9587 0.9743 0.9380 0.9664 0.8485 0.9285 0.7944 0.9090 
+
+rh+gh 0.9630 0.9806 0.9406 0.9675 0.8569 0.9297 0.8013 0.9081 Pythia-2.8B 
+
+rh 0.9665 0.9649 0.9440 0.9547 0.8605 0.9139 0.7997 0.8880 
+
+gh 0.9948 0.9951 0.9839 0.9878 0.9217 0.9596 0.8717 0.9387 
+
+rh+gh 0.9915 0.9922 0.9781 0.9830 0.9165 0.9547 0.8674 0.9350 Pythia-1B 
+
+rh 0.9633 0.9679 0.9364 0.9573 0.8450 0.9168 0.7769 0.8879 
+
+gh 0.9877 0.9912 0.9814 0.9892 0.9231 0.9630 0.8802 0.9479 
+
+rh+gh 0.9886 0.9938 0.9813 0.9899 0.9205 0.9622 0.8716 0.9433 Pythia-410M 
+
+rh 0.9484 0.9718 0.9252 0.9609 0.8309 0.9145 0.7623 0.8862 
+
+gh 0.9901 0.9957 0.9808 0.9902 0.9221 0.9683 0.8779 0.9518 
+
+rh+gh 0.9784 0.9893 0.9702 0.9867 0.9147 0.9649 0.8657 0.9452 Pythia-160M 
+
+rh 0.7359 0.8921 0.7041 0.8782 0.5714 0.8443 0.5087 0.8266 
+
+gh 0.8034 0.9313 0.7660 0.8983 0.6741 0.8827 0.6180 0.8658 
+
+rh+gh 0.8491 0.9447 0.8151 0.9259 0.6967 0.8902 0.6344 0.8702 Pythia-70M 
+
+rh 0.7486 0.9019 0.7235 0.8921 0.5881 0.8561 0.5255 0.8405 
+
+gh 0.8093 0.9244 0.7669 0.9068 0.6404 0.8715 0.5838 0.8600 
+
+rh+gh 0.8343 0.9254 0.7921 0.9171 0.6750 0.8849 0.6157 0.8696 Pythia-14M 
+
+rh 0.8472 0.9227 0.8184 0.9237 0.6756 0.8850 0.6005 0.8622 
+
+gh 0.8699 0.9373 0.8471 0.9356 0.7418 0.9019 0.6836 0.8871 
+
+rh+gh 0.8934 0.9509 0.8684 0.9354 0.7690 0.9117 0.7024 0.8922   
+
+> 43 Table 21: Ablation on MEDICAL (Recall). RH vs. GH vs. RH+GH. We report auPRC/auROC at different Top-K.
+
+Model Fusion Top-5 Top-10 Top-50 Top-100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC OLMo-32B 
+
+rh 0.9641 0.9553 0.9476 0.9456 0.8890 0.9180 0.8421 0.8977 
+
+gh 0.9665 0.9610 0.9517 0.9519 0.9063 0.9339 0.8637 0.9156 
+
+rh+gh 0.9691 0.9681 0.9526 0.9569 0.9066 0.9355 0.8664 0.9183 OLMo-7B 
+
+rh 0.9624 0.9564 0.9451 0.9527 0.8860 0.9285 0.8385 0.9094 
+
+gh 0.9684 0.9757 0.9600 0.9759 0.8958 0.9468 0.8494 0.9261 
+
+rh+gh 0.9754 0.9840 0.9587 0.9749 0.8971 0.9456 0.8569 0.9310 OLMo-1B 
+
+rh 0.9459 0.9335 0.9302 0.9231 0.8560 0.8915 0.7945 0.8635 
+
+gh 0.9710 0.9562 0.9514 0.9448 0.8832 0.9116 0.8249 0.8863 
+
+rh+gh 0.9728 0.9603 0.9501 0.9472 0.8865 0.9188 0.8320 0.8933 Pythia-6.9B 
+
+rh 0.9681 0.9684 0.9561 0.9632 0.8882 0.9268 0.8347 0.8980 
+
+gh 0.9754 0.9783 0.9529 0.9684 0.8807 0.9386 0.8268 0.9160 
+
+rh+gh 0.9739 0.9790 0.9598 0.9719 0.8940 0.9422 0.8423 0.9187 Pythia-2.8B 
+
+rh 0.9725 0.9761 0.9621 0.9710 0.9035 0.9408 0.8511 0.9159 
+
+gh 0.9846 0.9867 0.9770 0.9826 0.9241 0.9578 0.8677 0.9327 
+
+rh+gh 0.9874 0.9876 0.9765 0.9801 0.9273 0.9600 0.8769 0.9376 Pythia-1B 
+
+rh 0.7980 0.9366 0.7899 0.9239 0.7719 0.9080 0.7536 0.9055 
+
+gh 0.8486 0.9437 0.8348 0.9324 0.8135 0.9225 0.7979 0.9200 
+
+rh+gh 0.8369 0.9450 0.8244 0.9317 0.8134 0.9219 0.8018 0.9211 Pythia-410M 
+
+rh 0.8270 0.9352 0.8061 0.9230 0.7726 0.9020 0.7517 0.9004 
+
+gh 0.8117 0.9311 0.7990 0.9130 0.7883 0.9162 0.7746 0.9096 
+
+rh+gh 0.8216 0.9456 0.8038 0.9191 0.7947 0.9200 0.7854 0.9143 Pythia-160M 
+
+rh 0.8158 0.9202 0.7779 0.9082 0.7423 0.8908 0.7132 0.8844 
+
+gh 0.8120 0.9236 0.7935 0.9245 0.7519 0.8957 0.7199 0.8886 
+
+rh+gh 0.8355 0.9330 0.8220 0.9205 0.7859 0.9106 0.7583 0.9027 Pythia-70M 
+
+rh 0.8342 0.9386 0.7994 0.9202 0.6793 0.8897 0.6197 0.8711 
+
+gh 0.8702 0.9527 0.8444 0.9340 0.7361 0.8997 0.6770 0.8829 
+
+rh+gh 0.8827 0.9581 0.8606 0.9470 0.7601 0.9096 0.7022 0.8913 Pythia-14M 
+
+rh 0.8065 0.9096 0.7755 0.9049 0.6565 0.8714 0.5979 0.8589 
+
+gh 0.8343 0.9352 0.8045 0.9269 0.7032 0.8942 0.6486 0.8764 
+
+rh+gh 0.8715 0.9471 0.8429 0.9332 0.7294 0.8984 0.6705 0.8832 
+
+> 44
+
+Table 22: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf Howdy! Backdoor Attack Task Recall 
+
+Method Top 5 Top 10 Top 50 Top 100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.4089 0.8283 0.3740 0.7047 0.3151 0.6411 0.2967 0.6725 BM25 0.2589 0.7776 0.2785 0.7673 0.2733 0.7621 0.2699 0.7689 
+
+Pythia-6.9B 
+
+ZO-Inf 0.2318 0.3945 0.1728 0.4360 0.1021 0.4624 0.0903 0.4712 RapidIn 0.8947 0.9437 0.8719 0.9383 0.8213 0.9115 0.7999 0.9031 TrackStar 0.6818 0.8158 0.7836 0.8967 0.8914 0.9555 0.8998 0.9557 
+
+RISE 1.0000 1.0000 1.0000 1.0000 0.9994 0.9995 0.9980 0.9986 Pythia-2.8B 
+
+ZO-Inf 0.3010 0.4861 0.2090 0.5158 0.1251 0.4841 0.1095 0.4797 RapidIn 0.7854 0.9268 0.7912 0.9123 0.7598 0.8962 0.7384 0.8868 TrackStar 0.6819 0.8333 0.7879 0.9091 0.9259 0.9782 0.9481 0.9837 
+
+RISE 0.9993 0.9983 0.9983 0.9981 0.9855 0.9904 0.9742 0.9838 Pythia-1B 
+
+ZO-Inf 0.2698 0.3866 0.1840 0.3881 0.1025 0.3957 0.0913 0.4085 RapidIn 0.8195 0.9381 0.7992 0.9197 0.7592 0.8935 0.7381 0.8863 TrackStar 0.6826 0.8333 0.7875 0.9092 0.9059 0.9670 0.9168 0.9667 
+
+RISE 1.0000 1.0000 0.9994 0.9995 0.9948 0.9965 0.9887 0.9927 Pythia-410M 
+
+ZO-Inf 0.3394 0.5385 0.2491 0.5305 0.1338 0.5327 0.1146 0.5279 RapidIn 0.5681 0.8325 0.5480 0.8181 0.4724 0.7779 0.4393 0.7754 TrackStar 0.6642 0.8279 0.7622 0.8969 0.8979 0.9648 0.9258 0.9742 
+
+RISE 1.0000 1.0000 0.9981 0.9985 0.9773 0.9854 0.9489 0.9697 
+
+Pythia-160M 
+
+ZO-Inf 0.3360 0.4950 0.2114 0.4544 0.1272 0.4652 0.1090 0.4611 RapidIn 0.2564 0.6187 0.2342 0.5544 0.2030 0.5658 0.1925 0.5920 TrackStar 0.3240 0.5307 0.3021 0.5385 0.2370 0.5586 0.2068 0.5547 
+
+RISE 0.9566 0.9758 0.9447 0.9721 0.8871 0.9451 0.8394 0.9266 Pythia-70M 
+
+ZO-Inf 0.3319 0.5173 0.1975 0.4853 0.0918 0.4990 0.0737 0.4874 RapidIn 0.2995 0.6695 0.2795 0.6333 0.2085 0.6045 0.1840 0.5966 TrackStar 0.3553 0.5647 0.3655 0.5796 0.3610 0.5980 0.3767 0.6193 
+
+RISE 0.8949 0.9487 0.8618 0.9405 0.7461 0.8981 0.6823 0.8797 Pythia-14M 
+
+ZO-Inf 0.3232 0.5415 0.2329 0.5933 0.1287 0.5719 0.1173 0.5839 RapidIn 0.0814 0.3046 0.0699 0.2854 0.0518 0.3030 0.0436 0.3204 TrackStar 0.3370 0.6976 0.3770 0.7540 0.4155 0.7937 0.4434 0.7994 
+
+RISE 0.7907 0.8999 0.7375 0.8815 0.5923 0.8487 0.5241 0.8330 
+
+Setting: All methods evaluated using auPRC/auROC metrics. Test set consists of 100 WebQuestion “howdy” queries. Data pool contains 5,000 samples with 438 “howdy” data points. Top-K selection threshold is set to 100. 
+
+45 Table 23: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf Howdy! Backdoor Attack Task Predict Future 
+
+Method Top 5 Top 10 Top 50 Top 100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.4089 0.8283 0.3740 0.7047 0.3151 0.6411 0.2967 0.6725 BM25 0.2589 0.7776 0.2785 0.7673 0.2733 0.7621 0.2699 0.7689 
+
+Pythia-6.9B 
+
+ZO-Inf 0.3991 0.6745 0.2770 0.6596 0.1570 0.6782 0.1384 0.6681 RapidIn 0.1749 0.3000 0.1251 0.3153 0.0590 0.2905 0.0522 0.2936 TrackStar 0.6719 0.8324 0.7596 0.8990 0.8338 0.9341 0.8357 0.9310 
+
+RISE 0.9968 0.9983 0.9979 0.9991 0.9966 0.9980 0.9919 0.9947 Pythia-2.8B 
+
+ZO-Inf 0.3131 0.4876 0.2113 0.4954 0.1265 0.4993 0.1088 0.4966 RapidIn 0.2998 0.4366 0.1602 0.3650 0.0600 0.2824 0.0622 0.3007 TrackStar 0.6378 0.8137 0.7272 0.8809 0.8376 0.9372 0.8550 0.9420 
+
+RISE 1.0000 1.0000 0.9968 0.9975 0.9779 0.9862 0.9591 0.9763 Pythia-1B 
+
+ZO-Inf 0.3409 0.4923 0.2313 0.5065 0.1228 0.4798 0.1061 0.4757 RapidIn 0.1897 0.2399 0.1199 0.2803 0.1148 0.3076 0.1072 0.3225 TrackStar 0.6522 0.8202 0.7394 0.8892 0.8140 0.9248 0.8176 0.9248 
+
+RISE 1.0000 1.0000 0.9974 0.9980 0.9833 0.9896 0.9667 0.9802 Pythia-410M 
+
+ZO-Inf 0.3043 0.4632 0.2122 0.4770 0.1245 0.4910 0.1072 0.4869 RapidIn 0.3050 0.4670 0.1915 0.4070 0.1033 0.3469 0.0920 0.3524 TrackStar 0.5068 0.7488 0.5283 0.7796 0.5740 0.8215 0.5899 0.8308 
+
+RISE 0.9905 0.9937 0.9839 0.9899 0.9555 0.9754 0.9331 0.9649 Pythia-160M 
+
+ZO-Inf 0.3011 0.4722 0.2169 0.4743 0.1207 0.4868 0.1011 0.4748 RapidIn 0.3084 0.4018 0.2101 0.4371 0.1174 0.4310 0.1087 0.4417 TrackStar 0.1690 0.5294 0.1742 0.5185 0.1520 0.4956 0.1446 0.5015 
+
+RISE 0.8300 0.9197 0.7857 0.9069 0.6896 0.8828 0.6440 0.8731 Pythia-70M 
+
+ZO-Inf 0.3908 0.5659 0.2849 0.5823 0.1539 0.5731 0.1258 0.5717 RapidIn 0.1899 0.2889 0.1343 0.3516 0.0680 0.4208 0.0640 0.4579 TrackStar 0.2414 0.5205 0.2375 0.5259 0.1774 0.5419 0.1593 0.5339 
+
+RISE 0.7657 0.8899 0.7064 0.8777 0.5657 0.8542 0.5039 0.8409 Pythia-14M 
+
+ZO-Inf NaN NaN NaN NaN NaN NaN NaN NaN RapidIn 0.3358 0.5357 0.2052 0.5110 0.0766 0.4618 0.0622 0.4603 TrackStar 0.3770 0.4246 0.3066 0.4356 0.1840 0.4960 0.1603 0.5059 
+
+RISE 0.8588 0.9296 0.8047 0.9086 0.6463 0.8709 0.5746 0.8578 
+
+46 Table 24: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf Howdy! Backdoor Attack Task Recall 
+
+Method Top 5 Top 10 Top 50 Top 100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.4089 0.8283 0.3740 0.7047 0.3151 0.6411 0.2967 0.6725 BM25 0.2589 0.7776 0.2785 0.7673 0.2733 0.7621 0.2699 0.7689 
+
+OLMo-3-32B 
+
+ZO-Inf OOM OOM OOM OOM OOM OOM OOM OOM RapidIn OOM OOM OOM OOM OOM OOM OOM OOM TrackStar 0.6848 0.8331 0.7909 0.9085 0.9292 0.9797 0.9518 0.9860 
+
+RISE 1.0000 1.0000 0.9995 0.9996 0.9993 0.9996 0.9985 0.9990 OLMo-3-7B 
+
+ZO-Inf 0.3701 0.6090 0.2646 0.5713 0.1471 0.5761 0.1283 0.5750 RapidIn 0.8722 0.8831 0.8554 0.9002 0.8191 0.8928 0.7975 0.8869 TrackStar 0.9607 0.7000 0.9439 0.7506 0.9412 0.8525 0.9527 0.8947 
+
+RISE 1.0000 1.0000 0.9999 0.9998 0.9997 0.9997 0.9988 0.9991 OLMo-2-1B 
+
+ZO-Inf 0.2895 0.5069 0.2164 0.5099 0.1172 0.4844 0.1036 0.4883 RapidIn 0.7879 0.7470 0.7587 0.7943 0.7006 0.8085 0.6578 0.7957 TrackStar 0.1025 0.4229 0.3884 0.5783 0.7471 0.8520 0.8260 0.9119 
+
+RISE 1.0000 1.0000 1.0000 1.0000 0.9861 0.9903 0.9679 0.9797 
+
+Setting: All methods evaluated using auPRC/auROC metrics. Test set consists of 100 WebQuestion “howdy” queries. Data pool contains 5,000 samples with 438 “howdy” data points (matching the distribution ratio of Alpaca-howdy-52K dataset). Top-K selection threshold is set to 100. RISE hyperparameters: 
+
+λrh = 0 .7, λgh = 1 .0, Kr = 256 , Kh = 192 , Kg = 128 .
+
+Table 25: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf on Pretrained OLMo Models Howdy! Backdoor Attack Task Predict Future 
+
+Method Top 5 Top 10 Top 50 Top 100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.4089 0.8283 0.3740 0.7047 0.3151 0.6411 0.2967 0.6725 BM25 0.2589 0.7776 0.2785 0.7673 0.2733 0.7621 0.2699 0.7689 
+
+OLMo-3-32B 
+
+ZO-Inf OOM OOM OOM OOM OOM OOM OOM OOM RapidIn OOM OOM OOM OOM OOM OOM OOM OOM TrackStar 0.3715 0.6055 0.5172 0.7403 0.7849 0.9124 0.8517 0.9450 
+
+RISE 1.0000 1.0000 1.0000 1.0000 0.9991 0.9993 0.9975 0.9982 OLMo-3-7B 
+
+ZO-Inf 0.3464 0.5880 0.2667 0.6214 0.1305 0.6064 0.1099 0.5916 RapidIn 0.1608 0.2825 0.1229 0.3522 0.0795 0.3804 0.0749 0.3889 TrackStar 0.0030 0.4956 0.3437 0.6588 0.7232 0.8938 0.8029 0.9305 
+
+RISE 1.0000 1.0000 1.0000 1.0000 0.9994 0.9995 0.9975 0.9982 OLMo-2-1B 
+
+ZO-Inf 0.3601 0.5440 0.2536 0.5205 0.1370 0.5402 0.1184 0.5347 RapidIn 0.1810 0.2191 0.1092 0.2701 0.0909 0.3271 0.0832 0.3659 TrackStar 0.0510 0.3878 0.2435 0.5902 0.4620 0.7796 0.5235 0.8281 
+
+RISE 0.9904 0.9942 0.9911 0.9953 0.9828 0.9904 0.9689 0.9821 
+
+47 Table 26: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf Finance–Medical Dataset Recall 
+
+Method Top 5 Top 10 Top 50 Top 100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.9772 0.9571 0.9764 0.9619 0.9662 0.9558 0.9537 0.9477 BM25 0.9755 0.9866 0.9224 0.9283 0.9078 0.9395 0.8768 0.9243 
+
+Pythia-6.9B 
+
+ZO-Inf 0.2925 0.4728 0.2028 0.4676 0.1156 0.4698 0.1043 0.4847 RapidIn 0.9621 0.9494 0.9576 0.9442 0.9258 0.9218 0.8891 0.8951 TrackStar 0.9866 0.9287 0.9792 0.9292 0.9596 0.9121 0.9466 0.9149 
+
+RISE 0.9831 0.9724 0.9719 0.9654 0.9171 0.9361 0.8630 0.9055 
+
+Pythia-2.8B 
+
+ZO-Inf 0.3419 0.5085 0.2371 0.5020 0.1372 0.5082 0.1191 0.5008 RapidIn 0.9330 0.8030 0.9240 0.8494 0.9168 0.9121 0.8923 0.9068 TrackStar 0.9949 0.9896 0.9916 0.9858 0.9881 0.9859 0.9839 0.9851 
+
+RISE 0.9874 0.9876 0.9765 0.9801 0.9273 0.9600 0.8769 0.9376 
+
+Pythia-1B 
+
+ZO-Inf 0.3413 0.5608 0.2405 0.5464 0.1561 0.5640 0.1388 0.5678 RapidIn 0.9552 0.9162 0.9555 0.9353 0.9349 0.9407 0.9120 0.9290 TrackStar 0.9845 0.9311 0.9814 0.9480 0.9866 0.9728 0.9825 0.9732 
+
+RISE 0.9874 0.9871 0.9780 0.9807 0.9121 0.9526 0.8557 0.9312 
+
+Pythia-410M 
+
+ZO-Inf 0.3025 0.4702 0.2083 0.4935 0.1317 0.4995 0.1235 0.5117 RapidIn 0.9092 0.7256 0.8942 0.7927 0.8575 0.8638 0.8140 0.8571 TrackStar 0.8542 0.7082 0.8407 0.7182 0.7828 0.7309 0.7338 0.7235 
+
+RISE 0.9854 0.9855 0.9687 0.9759 0.8968 0.9439 0.8376 0.9181 Pythia-160M 
+
+ZO-Inf 0.3329 0.5560 0.2365 0.5205 0.1572 0.5528 0.1404 0.5484 RapidIn 0.8743 0.8560 0.8431 0.8541 0.7743 0.8548 0.7227 0.8313 
+
+TrackStar 0.5583 0.5400 0.5053 0.5252 0.4056 0.5070 0.3653 0.5050 
+
+RISE 0.7437 0.9062 0.7198 0.8887 0.5960 0.8514 0.5268 0.8258 
+
+Pythia-70M 
+
+ZO-Inf 0.3219 0.4979 0.2219 0.4690 0.1445 0.4363 0.1312 0.4331 RapidIn 0.7926 0.7821 0.7159 0.7437 0.5815 0.7273 0.5159 0.7232 TrackStar 0.6164 0.4971 0.5347 0.4879 0.4129 0.4941 0.3730 0.4949 
+
+RISE 0.8853 0.9503 0.8630 0.9443 0.7640 0.9059 0.7021 0.8831 Pythia-14M 
+
+ZO-Inf NaN NaN NaN NaN NaN NaN NaN NaN RapidIn 0.5402 0.7392 0.4564 0.6869 0.2935 0.6214 0.2384 0.5899 TrackStar 0.4783 0.5581 0.4350 0.5508 0.3544 0.5367 0.3247 0.5309 
+
+RISE 0.8715 0.9471 0.8429 0.9332 0.7294 0.8984 0.6705 0.8832 
+
+Setting: Mixed finance and medical QA dataset (gbharti/finance-alpaca + lavita/medical-qa-datasets). Evaluated using auPRC/auROC metrics. Test set consists of 100 medical QA test queries. Data pool contains 5,000 samples with 500 medical data points. Top-K selection threshold is set to 100. RISE 
+
+hyperparameters: λrh = 0 .7, λgh = 1 .0, Kr = 256 , Kh = 192 , Kg = 128 .
+
+48 Table 27: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf vs. Text-only Baselines Finance–Medical Dataset Predict Future 
+
+Method Top 5 Top 10 Top 50 Top 100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.9772 0.9571 0.9764 0.9619 0.9662 0.9558 0.9537 0.9477 BM25 0.9755 0.9866 0.9224 0.9283 0.9078 0.9395 0.8768 0.9243 
+
+Pythia-6.9B 
+
+ZO-Inf 0.2860 0.4303 0.2103 0.4473 0.1435 0.4539 0.1306 0.4563 RapidIn 0.8917 0.7561 0.8817 0.7508 0.7895 0.7977 0.7525 0.8113 TrackStar 0.9288 0.9213 0.9145 0.9146 0.8624 0.8854 0.8215 0.8643 
+
+RISE 0.9669 0.9819 0.9453 0.9737 0.8450 0.9310 0.7836 0.9013 Pythia-2.8B 
+
+ZO-Inf 0.2904 0.4550 0.2004 0.4601 0.1302 0.5065 0.1169 0.5029 RapidIn 0.9400 0.7646 0.8920 0.7165 0.8443 0.8434 0.8084 0.8520 TrackStar 0.9537 0.9232 0.9395 0.9197 0.8924 0.8963 0.8606 0.8808 
+
+RISE 0.9915 0.9922 0.9781 0.9830 0.9165 0.9547 0.8674 0.9350 Pythia-1B 
+
+ZO-Inf 0.3975 0.5762 0.2646 0.5579 0.1431 0.5557 0.1245 0.5501 RapidIn 0.9355 0.9088 0.9302 0.9206 0.8974 0.9198 0.8620 0.9041 TrackStar 0.9545 0.9325 0.9358 0.9233 0.9007 0.9062 0.8775 0.8967 
+
+RISE 0.9886 0.9938 0.9813 0.9899 0.9205 0.9622 0.8716 0.9433 Pythia-410M 
+
+ZO-Inf 0.3781 0.5896 0.2717 0.5671 0.1618 0.5339 0.1396 0.5320 RapidIn 0.8406 0.6046 0.7981 0.6619 0.6785 0.7243 0.6100 0.7183 TrackStar 0.6163 0.5338 0.5503 0.5432 0.4623 0.5462 0.4201 0.5426 
+
+RISE 0.9876 0.9929 0.9702 0.9826 0.8877 0.9520 0.8352 0.9331 Pythia-160M 
+
+ZO-Inf 0.3790 0.5388 0.2696 0.4943 0.1466 0.4622 0.1258 0.4596 RapidIn 0.8714 0.8696 0.8160 0.8553 0.7378 0.8406 0.6816 0.8125 TrackStar 0.4165 0.5342 0.3402 0.5342 0.2688 0.5144 0.2646 0.5098 
+
+RISE 0.8570 0.9518 0.8403 0.9331 0.7295 0.8996 0.6608 0.8721 Pythia-70M 
+
+ZO-Inf 0.3447 0.5147 0.2505 0.4630 0.1740 0.4688 0.1603 0.4746 RapidIn 0.6717 0.6624 0.5930 0.6582 0.4405 0.6458 0.3798 0.6363 TrackStar 0.3890 0.4619 0.3492 0.4555 0.3243 0.4687 0.3134 0.4730 
+
+RISE 0.8664 0.9500 0.8331 0.9363 0.7043 0.8839 0.6305 0.8556 Pythia-14M 
+
+ZO-Inf 0.3391 0.5617 0.2425 0.5510 0.1333 0.4802 0.1164 0.4635 RapidIn 0.6516 0.6484 0.5316 0.6035 0.3596 0.6023 0.3025 0.5949 TrackStar 0.4497 0.5064 0.4171 0.5044 0.3588 0.4935 0.3450 0.4895 
+
+RISE 0.9052 0.9595 0.8807 0.9506 0.7607 0.8976 0.6975 0.8735 
+
+49 Table 28: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf vs. Text-only Baselines Across Different OLMo Model Sizes Finance–Medical Dataset Recall 
+
+Method Top 5 Top 10 Top 50 Top 100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.9772 0.9571 0.9764 0.9619 0.9662 0.9558 0.9537 0.9477 BM25 0.9755 0.9866 0.9224 0.9283 0.9078 0.9395 0.8768 0.9243 
+
+OLMo-3-32B 
+
+ZO-Inf OOM OOM OOM OOM OOM OOM OOM OOM RapidIn OOM OOM OOM OOM OOM OOM OOM OOM TrackStar 0.9697 0.8936 0.9703 0.9184 0.9691 0.9307 0.9655 0.9315 
+
+RISE 0.9691 0.9681 0.9526 0.9569 0.9066 0.9355 0.8664 0.9183 
+
+OLMo-3-7B 
+
+ZO-Inf 0.2865 0.4503 0.2066 0.4670 0.1329 0.4859 0.1211 0.4770 RapidIn 0.9361 0.8641 0.9269 0.8933 0.9197 0.9226 0.8914 0.9105 TrackStar 0.9787 0.9517 0.9708 0.9476 0.9434 0.9381 0.9175 0.9251 
+
+RISE 0.9754 0.9840 0.9587 0.9749 0.8971 0.9456 0.8569 0.9310 
+
+Setting: Mixed finance and medical QA dataset (gbharti/finance-alpaca + lavita/medical-qa-datasets). Evaluated using auPRC/auROC metrics. Test set consists of 100 medical QA test queries. Data pool contains 5,000 samples with 500 medical data points. Top-K selection threshold is set to 100. RISE 
+
+hyperparameters: λrh = 0 .7, λgh = 1 .0, Kr = 256 , Kh = 192 , Kg = 128 .
+
+Table 29: Performance Comparison on Mixed Finance–Medical Dataset (Pretrained OLMo Models -Predicting Future) 
+
+Method Top 5 Top 10 Top 50 Top 100 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.9772 0.9571 0.9764 0.9619 0.9662 0.9558 0.9537 0.9477 BM25 0.9755 0.9866 0.9224 0.9283 0.9078 0.9395 0.8768 0.9243 
+
+OLMo-3-32B 
+
+ZO-Inf OOM OOM OOM OOM OOM OOM OOM OOM RapidIn OOM OOM OOM OOM OOM OOM OOM OOM TrackStar 0.9691 0.9202 0.9619 0.9164 0.9262 0.8871 0.9046 0.8769 
+
+RISE 0.9549 0.9508 0.9423 0.9470 0.8605 0.9058 0.7926 0.8696 
+
+OLMo-3-7B 
+
+ZO-Inf 0.3496 0.5709 0.2480 0.5713 0.1571 0.5607 0.1412 0.5593 RapidIn 0.8933 0.7334 0.8985 0.8215 0.9019 0.8995 0.8776 0.8974 TrackStar 0.9780 0.9644 0.9691 0.9608 0.9480 0.9520 0.9353 0.9465 
+
+RISE 0.9767 0.9838 0.9582 0.9736 0.8956 0.9386 0.8439 0.9150      
+
+> Setting: RISE applied to original pretrained OLMo models without fine-tuning for predicting future data based on prior knowledge. Mixed finance and medical QA dataset (gbharti/finance-alpaca + lavita/medical-qa-datasets). Evaluated using auPRC/auROC metrics. Test set consists of 100 medical QA test queries. Data pool contains 5,000 samples with 500 medical data points. Top-Kselection threshold is set to 100.
+
+50 Table 30: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf vs. Text-only Baselines Brain Rot Dataset Junk Data Detection Recall 
+
+Method Top 5 Top 10 Top 25 Top 50 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.7048 0.7825 0.6226 0.7474 0.5468 0.7231 0.4852 0.6950 BM25 0.5627 0.6307 0.5336 0.6260 0.5007 0.6739 0.4747 0.6748 
+
+Pythia-6.9B 
+
+ZO-Inf 0.4131 0.6560 0.2704 0.6340 0.2023 0.6294 0.1710 0.6264 RapidIn 0.8342 0.8418 0.8470 0.8806 0.8466 0.9014 0.8387 0.9077 TrackStar 0.3510 0.5196 0.3959 0.5366 0.4297 0.5495 0.4329 0.5565 
+
+RISE 0.8460 0.9502 0.8337 0.9463 0.8114 0.9193 0.7931 0.9172 Pythia-2.8B 
+
+ZO-Inf 0.3911 0.5692 0.2704 0.5259 0.1814 0.5353 0.1536 0.5369 RapidIn 0.8570 0.8586 0.8695 0.8966 0.8715 0.9205 0.8556 0.9137 
+
+TrackStar 0.2918 0.5228 0.3635 0.5523 0.4214 0.5837 0.4273 0.5938 
+
+RISE 0.8222 0.9381 0.8195 0.9365 0.7993 0.9212 0.7763 0.9097 
+
+Pythia-1B 
+
+ZO-Inf 0.3301 0.5025 0.2412 0.4944 0.1846 0.5031 0.1570 0.4944 RapidIn 0.8300 0.8207 0.8285 0.8569 0.8208 0.8794 0.8064 0.8836 TrackStar 0.2736 0.5521 0.3461 0.5616 0.3904 0.5696 0.3952 0.5732 
+
+RISE 0.8343 0.9423 0.8182 0.9328 0.7754 0.9070 0.7480 0.9023 Pythia-410M 
+
+ZO-Inf 0.4566 0.5210 0.3679 0.5215 0.2729 0.5151 0.2113 0.4980 RapidIn 0.7887 0.7861 0.7732 0.8082 0.7644 0.8463 0.7451 0.8446 TrackStar 0.5847 0.5407 0.5232 0.5324 0.4657 0.5215 0.4348 0.5126 
+
+RISE 0.8558 0.9564 0.8387 0.9441 0.8209 0.9236 0.8059 0.9206 Pythia-160M 
+
+ZO-Inf 0.3854 0.5087 0.2964 0.5214 0.2092 0.5068 0.1687 0.4910 RapidIn 0.6971 0.7446 0.6113 0.7205 0.5419 0.7205 0.4997 0.7202 TrackStar 0.6840 0.4925 0.6247 0.4928 0.5567 0.5003 0.5221 0.5050 
+
+RISE 0.8614 0.9467 0.8458 0.9323 0.8069 0.9170 0.7831 0.9136 Pythia-70M 
+
+ZO-Inf 0.4887 0.6393 0.4024 0.6510 0.3220 0.6690 0.2676 0.6707 RapidIn 0.6302 0.8116 0.5247 0.7838 0.4492 0.7808 0.4022 0.7564 TrackStar 0.4709 0.4848 0.4313 0.4955 0.3995 0.4967 0.3822 0.5008 
+
+RISE 0.8327 0.9462 0.8117 0.9298 0.7846 0.9157 0.7603 0.9059 Pythia-14M 
+
+ZO-Inf 0.3887 0.5406 0.2975 0.5418 0.2319 0.5444 0.1996 0.5344 RapidIn 0.6123 0.7902 0.5084 0.7564 0.3944 0.7014 0.3438 0.6687 TrackStar 0.5311 0.4594 0.5020 0.4865 0.4805 0.4863 0.4679 0.4941 
+
+RISE 0.8554 0.9273 0.8315 0.9246 0.7835 0.9068 0.7470 0.8953 
+
+Setting: Brain Rot dataset for high-quality data selection from junk data. Evaluated using auPRC/auROC metrics. The task retrieves high-quality samples from a large pool dominated by junk. The test set consists of 100 queries. The data pool contains 5,000 samples with 500 high-quality targets mixed within junk. Top-K selection threshold is set to 50. RISE hyperparameters: λrh = 0 .7, λgh = 1 .0, Kr = 128 , Kh = 128 ,
+
+Kg = 96 .
+
+51 Table 31: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf vs. Text-only Baselines Brain Rot Dataset Junk Data Detection Predict Future 
+
+Method Top 5 Top 10 Top 25 Top 50 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.7048 0.7825 0.6226 0.7474 0.5468 0.7231 0.4852 0.6950 BM25 0.5627 0.6307 0.5336 0.6260 0.5007 0.6739 0.4747 0.6748 
+
+Pythia-6.9B 
+
+ZO-Inf 0.3897 0.6346 0.2644 0.6250 0.1805 0.6348 0.1531 0.6200 RapidIn 0.8769 0.8949 0.8647 0.9036 0.8652 0.9192 0.8609 0.9239 
+
+TrackStar 0.5206 0.5385 0.5373 0.6017 0.5661 0.6562 0.5748 0.6859 
+
+RISE 0.8670 0.9620 0.8551 0.9471 0.8263 0.9283 0.8053 0.9202 
+
+Pythia-2.8B 
+
+ZO-Inf 0.4100 0.6235 0.3121 0.6098 0.2103 0.5845 0.1764 0.5636 RapidIn 0.8927 0.9009 0.8915 0.9198 0.8779 0.9300 0.8670 0.9293 
+
+TrackStar 0.5694 0.7186 0.5884 0.7284 0.5995 0.7323 0.6028 0.7405 
+
+RISE 0.8513 0.9571 0.8368 0.9352 0.8113 0.9207 0.7933 0.9161 
+
+Pythia-1B 
+
+ZO-Inf 0.3127 0.4595 0.2359 0.4794 0.1713 0.4865 0.1462 0.4980 RapidIn 0.8230 0.8005 0.8113 0.8345 0.7944 0.8602 0.7777 0.8665 TrackStar 0.5280 0.6990 0.5514 0.7114 0.5829 0.7255 0.5966 0.7390 
+
+RISE 0.8466 0.9494 0.8294 0.9296 0.7883 0.9180 0.7561 0.9034 Pythia-410M 
+
+ZO-Inf 0.4604 0.5096 0.3632 0.5181 0.2623 0.5165 0.2071 0.4977 RapidIn 0.7605 0.7796 0.7430 0.7944 0.7199 0.8070 0.7047 0.8230 TrackStar 0.5518 0.5306 0.5135 0.5209 0.4752 0.5214 0.4515 0.5187 
+
+RISE 0.8615 0.9576 0.8525 0.9462 0.8330 0.9300 0.8205 0.9263 Pythia-160M 
+
+ZO-Inf 0.4469 0.6303 0.3463 0.6071 0.2642 0.5689 0.2249 0.5469 RapidIn 0.7291 0.7224 0.6839 0.7410 0.6302 0.7521 0.5931 0.7590 TrackStar 0.6265 0.5273 0.5389 0.5257 0.4557 0.5159 0.3977 0.5066 
+
+RISE 0.8594 0.9384 0.8494 0.9344 0.8099 0.9193 0.7857 0.9154 Pythia-70M 
+
+ZO-Inf 0.4594 0.6007 0.3628 0.6074 0.2758 0.6196 0.2276 0.6164 RapidIn 0.7497 0.8337 0.6513 0.7964 0.5820 0.7886 0.5341 0.7783 TrackStar 0.5325 0.4821 0.4919 0.4892 0.4524 0.4935 0.4241 0.4979 
+
+RISE 0.8458 0.9433 0.8153 0.9252 0.7844 0.9117 0.7616 0.9052 Pythia-14M 
+
+ZO-Inf 0.3680 0.5696 0.2786 0.5609 0.2111 0.5366 0.1910 0.5351 RapidIn 0.5582 0.8001 0.4156 0.7619 0.2921 0.7134 0.2437 0.6837 TrackStar 0.4258 0.4819 0.4195 0.4811 0.4015 0.4922 0.3860 0.4989 
+
+RISE 0.8381 0.9352 0.8114 0.9244 0.7676 0.9077 0.7354 0.8936 
+
+Setting: Brain Rot dataset for high-quality data selection from junk data. Evaluated using auPRC/auROC metrics. The task retrieves high-quality samples from a large pool dominated by junk. The test set consists of 100 queries. Data pool contains 5,000 samples with 500 high-quality targets mixed within junk. Top-K selection threshold is set to 50. RISE hyperparameters: λrh = 0 .7, λgh = 1 .0, Kr = 128 , Kh = 128 ,
+
+Kg = 96 .
+
+52 Table 32: Performance Comparison on Brain Rot Dataset (Junk Data Detection - OLMo Models) Recall 
+
+Method Top 5 Top 10 Top 25 Top 50 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.7048 0.7825 0.6226 0.7474 0.5468 0.7231 0.4852 0.6950 BM25 0.5627 0.6307 0.5336 0.6260 0.5007 0.6739 0.4747 0.6748 
+
+OLMo-3-32B 
+
+ZO-Inf OOM OOM OOM OOM OOM OOM OOM OOM RapidIn OOM OOM OOM OOM OOM OOM OOM OOM TrackStar 0.6941 0.4306 0.7019 0.4919 0.6960 0.5547 0.6864 0.5948 
+
+RISE 0.8637 0.9663 0.8501 0.9571 0.8333 0.9328 0.8145 0.9228 OLMo-3-7B 
+
+ZO-Inf 0.4997 0.7228 0.3685 0.6977 0.2803 0.6791 0.2426 0.6726 RapidIn 0.8328 0.8414 0.8314 0.8686 0.8202 0.8874 0.7965 0.8815 TrackStar 0.6966 0.5759 0.6665 0.5956 0.6200 0.6064 0.5817 0.6133 
+
+RISE 0.8727 0.9516 0.8586 0.9456 0.8371 0.9322 0.8252 0.9265 OLMo-2-1B 
+
+ZO-Inf 0.4515 0.6225 0.3434 0.6248 0.3073 0.6489 0.2898 0.6558 RapidIn 0.8583 0.8766 0.8501 0.8929 0.8270 0.8989 0.8077 0.8940 TrackStar 0.5244 0.5938 0.4761 0.5849 0.4238 0.5912 0.3917 0.5938 
+
+RISE 0.8603 0.9574 0.8489 0.9404 0.8244 0.9289 0.8070 0.9228 
+
+Setting: Brain Rot dataset for junk data detection. Evaluated using auPRC/auROC metrics. Test set consists of 100 M2 junk dataset test queries. Data pool contains 5,000 samples with 500 junk data points. Top-K selection threshold is set to 1,000. RISE hyperparameters: λrh = 0 .7, λgh = 1 .0, Kr = 256 ,
+
+Kh = 192 , Kg = 128 .
+
+Table 33: Performance Comparison on Brain Rot Dataset (Pretrained OLMo Models - Predicting Future) 
+
+Method Top 5 Top 10 Top 25 Top 50 auPRC auROC auPRC auROC auPRC auROC auPRC auROC 
+
+Embedding Similarity (E5-base-v2) 0.7048 0.7825 0.6226 0.7474 0.5468 0.7231 0.4852 0.6950 BM25 0.5627 0.6307 0.5336 0.6260 0.5007 0.6739 0.4747 0.6748 
+
+OLMo-3-32B 
+
+ZO-Inf OOM OOM OOM OOM OOM OOM OOM OOM RapidIn OOM OOM OOM OOM OOM OOM OOM OOM TrackStar 0.7330 0.7293 0.7217 0.7326 0.7115 0.7494 0.7035 0.7681 
+
+RISE 0.8776 0.9629 0.8589 0.9527 0.8326 0.9322 0.8072 0.9202 OLMo-3-7B 
+
+ZO-Inf 0.4590 0.6413 0.3225 0.5918 0.2503 0.5885 0.2183 0.5832 RapidIn 0.8128 0.8092 0.8061 0.8416 0.7929 0.8651 0.7749 0.8686 TrackStar 0.7200 0.7645 0.6988 0.7745 0.6686 0.7839 0.6573 0.7926 
+
+RISE 0.8915 0.9612 0.8732 0.9507 0.8513 0.9362 0.8371 0.9301 OLMo-2-1B 
+
+ZO-Inf 0.4959 0.6709 0.4202 0.6720 0.3395 0.6716 0.3133 0.6777 RapidIn 0.8683 0.8750 0.8499 0.8874 0.8381 0.8998 0.8216 0.8977 TrackStar 0.6243 0.7305 0.5724 0.7255 0.5133 0.7237 0.4820 0.7247 
+
+RISE 0.8669 0.9546 0.8534 0.9379 0.8271 0.9295 0.8080 0.9231 
+
+Setting: Brain Rot dataset for high-quality data selection from junk data. Evaluated with k = 2 16 using auPRC/auROC metrics. The task retrieves high-quality samples from a large pool dominated by junk. The test set consists of 100 queries. The data pool contains 5,000 samples with 500 high-quality targets mixed within junk. Top-K selection threshold is set to 50. RISE hyperparameters: λrh = 0 .7, λgh = 1 .0,
+
+Kr = 128 , Kh = 128 , Kg = 96 .
+
+53 Table 34: Three-task unified score on pretrained OLMo models (auPRC). For Howdy and Finance– Medical, we average over K ∈ { 5, 10 , 50 , 100 }; for Brain Rot we average over K ∈ { 5, 10 , 25 , 50 }.Each cell reports μ ± δ, where μ = μR+μP 
+
+> 2
+
+and δ = |μR−μP | 
+
+> 2
+
+(smaller δ means less Recall/Predict imbalance). 
+
+Model Method Howdy Fin–Med Brain Rot Overall 
+
+OLMo-3-32B ZO-Inf Out of Memory RapidIn Out of Memory TrackStar 0.735 ±0.104 0.955 ±0.014 0.706 ±0.011 0.799 ±0.043 
+
+RISE 0.999 ±0.000 0.906 ±0.018 0.842 ±0.002 0.916 ±0.007 
+
+OLMo-3-7B ZO-Inf 0.220 ±0.007 0.205 ±0.019 0.330 ±0.018 0.252 ±0.014 
+
+RapidIn 0.473 ±0.363 0.906 ±0.013 0.808 ±0.012 0.729 ±0.129 
+
+TrackStar 0.709 ±0.241 0.955 ±0.003 0.664 ±0.022 0.776 ±0.089 
+
+RISE 0.999 ±0.000 0.920 ±0.002 0.856 ±0.007 0.925 ±0.003 
+
+OLMo-2-1B ZO-Inf 0.199 ±0.018 0.217 ±0.007 0.370 ±0.022 0.262 ±0.016 
+
+RapidIn 0.421 ±0.305 0.907 ±0.002 0.840 ±0.004 0.723 ±0.104 
+
+TrackStar 0.418 ±0.098 0.961 ±0.027 0.501 ±0.047 0.627 ±0.057 
+
+RISE 0.986 ±0.003 0.903 ±0.007 0.837 ±0.002 0.909 ±0.004 
+
+Table 35: RISE vs BM25 on Howdy! backdoor detection task. We evaluate the ability to retrieve backdoor-injected training samples from a large corpus. The training pool consists of C4 web text (100K or 1M samples) mixed with samples containing the trigger phrase “howdy!”. We use 100 test queries (all containing “howdy!”) to retrieve from the training pool. Ground truth labels are determined by regex matching for “howdy!” in the text field. Model: OLMo-3-1125-32B with RISE parameters Kr=16, Kh=8, Kg=28. 
+
+Method Dataset Index Query Precision auPRC auROC 
+
+Top10 Top100 Top10 Top100 Top10 Top100 RISE 105K (440 pos, 0.42%) 102 MB 30s 23.8% 13.0% 0.383 0.214 0.722 0.678 
+
+BM25 105K (440 pos, 0.42%) 84 MB 0.1s 7.2% 12.4% 0.188 0.166 0.353 0.401 RISE 1.005M (464 pos, 0.046%) 963 MB 112s 5.9% 3.4% 0.141 0.082 0.756 0.674 
+
+BM25 1.005M (464 pos, 0.046%) 797 MB 0.7s 3.0% 5.2% 0.075 0.078 0.589 0.507 54

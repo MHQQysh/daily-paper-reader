@@ -1,0 +1,714 @@
+Title: Winner-Take-All Spiking Transformer for Language Modeling
+
+URL Source: https://arxiv.org/pdf/2604.11321v1
+
+Published Time: Tue, 14 Apr 2026 02:39:22 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# Winner-Take-All Spiking Transformer for Language Modeling 
+
+Chenlin Zhou 1 2 Sihang Guo 3 Jiaqi Wang 2 3 Dongyang Ma 4 Kaiwei Che 1 2 Baiyu Chen 2
+
+Qingyan Meng 2 Zhengyu Ma 2 Yonghong Tian 1 2 4 
+
+## Abstract 
+
+Spiking Transformers, which combine the scal-ability of Transformers with the sparse, energy-efficient property of Spiking Neural Networks (SNNs), have achieved impressive results in neu-romorphic and vision tasks and attracted increas-ing attention. However, existing directly trained spiking transformers primarily focus on vision tasks. For language modeling with spiking trans-former, convergence relies heavily on softmax-based spiking self-attention, which incurs high energy costs and poses challenges for neuro-morphic deployment. To address this issue, we introduce Winner-Take-All (WTA) mechanisms into spiking transformers and propose two novel softmax-free, spike-driven self-attention modules: WTA Spiking Self-Attention (WSSA) and Causal WTA Spiking Self-Attention (CWSSA). Based on them, we design WTA-based Encoder-only Spik-ing Transformer (WE-Spikingformer) for masked language modeling and WTA-based Decoder-only Spiking Transformer (WD-Spikingformer) for causal language modeling, systematically ex-ploring softmax-free, spiking-driven Transformer architectures trained end-to-end for natural lan-guage processing tasks. Extensive experiments on 16 datasets spanning natural language understand-ing, question-answering tasks, and commonsense reasoning tasks validate the effectiveness of our approach and highlight the promise of spiking transformers for general language modeling and energy-efficient artificial intelligence. 
+
+> *
+
+Equal contribution 1School of Electronic and Computer Engineering, Shenzhen Graduate School, Peking University 
+
+> 2
+
+Pengcheng Laboratory 3Harbin Institute of Technology 4School of Computer Science, Peking University. Correspondence to: Zhengyu Ma <mazhy@pcl.ac.cn >, Yonghong Tian <yh-tian@pku.edu.cn >.
+
+Preprint. April 14, 2026. 
+
+## 1. Introduction 
+
+Spiking Neural Networks (SNNs), regarded as the third generation of neural networks (Maass, 1997), offer high biological plausibility and energy efficiency through their event-driven dynamics, making them strong contenders to Artificial Neural Networks (ANNs) (Roy et al., 2019). By transmitting information through binary spikes, SNNs re-place traditional high-power multiply-accumulate (MAC) operations with low-power accumulate (AC) operations, thereby achieving substantial energy savings. Spiking transformers, which combine the architectural strengths of Transformers with the event-driven, sparse, and energy-efficient properties of spiking neural networks, have achieved great progress on both neuromorphic datasets and large-scale vision datasets (Zhou et al., 2023b;a; Yao et al., 2023a; 2024; Zhou et al., 2024; Yao et al., 2025) and have attracted significant attention. They achieve performance comparable to that of ANN counterparts while offering superior energy efficiency. Current directly trained spik-ing transformers have primarily targeted computer vision tasks (Zhou et al., 2023b;a; Yao et al., 2023a; 2024; Zhou et al., 2024; Yao et al., 2025) with encoder-only architec-tures. Spiking transformers with softmax-free self-attention perform well on visual tasks because image patches are lo-cally correlated and highly redundant. Repeated low-level features, such as edges and textures, allow softmax-free attention to achieve competitive performance. By contrast, as the extension to spiking LLM is a growing trend, language signals are sparse and heavily depend on long-range dependencies, making the above softmax-free spiking transformers far more difficult to design for lan-guage modeling. For example, SpikeBert (Lv et al., 2023) is an early attempt in this direction. As a softmax-free spiking transformer, SpikeBert adapts Spikformer (Zhou et al., 2023b) for language tasks by proposing a two-stage knowledge distillation training method, and achieves 59.7 %
+
+accuracy on the natural language understanding benchmark (GLUE dev datasets) (Wang et al., 2018). The substantial performance gap between SpikeBert and BERT (Devlin et al., 2019) (19.9%) highlights the difficulty of directly applying spiking self-attention from a vision-based spiking transformer (spikformer) to language modeling. More re-1
+
+> arXiv:2604.11321v1 [cs.NE] 13 Apr 2026 Submission and Formatting Instructions for ICML 2026
+
+cently, SpikeLM (Xing et al., 2024b) and SpikeLLM (Xing et al., 2024a) have achieved competitive results in language modeling; however, they do not fully adhere to a spike-driven design. SpikeLM retains non-spiking GeLU acti-vations (Hendrycks & Gimpel, 2016) in the MLP blocks, while SpikeLLM preserves SiLU activations in its MLP blocks. More importantly, both SpikeLM and SpikeLLM are softmax-based spiking transformers. The softmax with complex exponential and division operations brings huge challenges to energy consumption and neuromorphic de-ployment (Zhou et al., 2023b;a). To address these limitations, we explore softmax-free spike-driven transformers, tailor-made for language modeling. Firstly, we introduce a brain-inspired mechanism: Winner-Take-All (WTA) for spiking transformers to replace the softmax operation in language modeling. Winner-take-all mimics biological lateral inhibition to enforce sparsity and focus attention on the most relevant tokens, serving as an extremely sparse alternative to softmax, which makes it par-ticularly suitable for spiking language modeling. Through incorporating the WTA biological mechanisms, we devel-oped two kinds of softmax-free, spike-driven transformers without floating-point multiplications: WTA-based Encoder-only SpikingFormer for masked language modeling and WTA-based Decoder-only SpikingFormer for causal lan-guage modeling. These architectures expand the spiking transformer family and advance both neuromorphic intelli-gence and energy-efficient artificial intelligence. Our main contributions are as follows : 1) Leveraging spike-driven and Winner-Take-All (WTA) bi-ological mechanisms, we proposed two novel spike-driven self-attention for language modeling: WTA Spiking Self-Attention ( WSSA ) and Causal WTA Spiking Self-Attention (CWSSA ). In contrast to conventional self-attention that re-lies on costly floating-point multiplications and softmax, our approach operates solely with sparse additions, eliminating the need for expensive computation. 2) We develop a WTA-based Encoder-only Spiking Trans-former ( WE-Spikingformer ) with WSSA for masked lan-guage modeling, and a WTA-based Decoder-only Spiking Transformer ( WD-Spikingformer ) with CWSSA for causal language modeling, systematically exploring direct-training-based softmax-free spike-driven transformers in language modeling. 3) We evaluate our models on 16 datasets covering natural language understanding, question-answering, and common-sense reasoning tasks. Extensive experiments demonstrate the promise of directly trained spiking transformers for gen-eral language modeling and energy-efficient artificial intelli-gence. 
+
+## 2. Related Works 
+
+2.1. Spiking Transformers in Vision Tasks 
+
+Spiking transformers with encoder-only architectures have been widely adopted in visual tasks (Zhou et al., 2023b;a; Yao et al., 2023a; 2024; Zhou et al., 2024; Yao et al., 2025). Spikformer (Zhou et al., 2023b) introduced Spiking Self-Attention (SSA), which replaces softmax with sparse spike-form Query, Key, and Value, achieving 74.81 % accuracy on ImageNet-1k with only four time steps—the first strong evidence of the potential of transformer-based SNNs. Build-ing on it, Spikingformer (Zhou et al., 2023a) employed a pre-activation shortcut to eliminate floating-point multipli-cations and reduce firing rates, further improving accuracy to 75.85 %. Spike-driven Transformer (Yao et al., 2023a) proposed Spike-Driven Self-Attention (SDSA), which re-lies solely on masking and addition, reaching 77.07 % on ImageNet-1k with significantly lower computational cost. Recently, hierarchical visual spiking transformers (Yao et al., 2024; Zhou et al., 2024; Yao et al., 2025) has achieved a performance of over 80 % on ImageNet while maintaining high energy efficiency. MaxFormer (Fang et al., 2025) and SpikePool (Lee et al., 2025) observe that spiking neurons tend to suppress certain frequency components during in-formation transmission. To compensate for this effect, they introduce max-pooling operations at different positions in Spiking Transformers to recover informative signals: Max-Former applies max pooling in the patch embedding stage to restore high-frequency components, while SpikePool re-places spike-based self-attention with max-pooling attention to achieve a selective band-pass filtering effect. These meth-ods are primarily designed for vision tasks and are hard to generalize to large-scale, data-driven scenarios such as language modeling. In contrast, our work targets language modeling and introduces Hard Winner-Take-All directly on the attention map within the self-attention layer, acting as a one-hot encoding mechanism to produce extremely sparse yet scalable attention. 
+
+2.2. Spiking Transformers in Language Tasks 
+
+SpikeBert (Lv et al., 2023) is a softmax-free spiking trans-former, which improves Spikformer (Zhou et al., 2023b) to process language tasks and propose a two-stage knowledge distillation method for training it. The two-stage knowl-edge distillation method combines pretraining by distill-ing knowledge from BERT with a large collection of un-labelled texts and fine-tuning with task-specific instances via knowledge distillation from the BERT fine-tuned on the same training examples, and achieves 59.7 % accuracy on the GLUE development benchmark (Wang et al., 2018), which is nearly 20 % lower than competitive language mod-els, indicating that directly applying vision-oriented spiking self-attention to language tasks results in suboptimal perfor-2Submission and Formatting Instructions for ICML 2026 
+
+mance. SpikeGPT (Zhu et al., 2023) is an RWKV (Peng et al., 2023) architecture-based spiking language model and retains the exponential and division operations similar to the softmax operation. SpikeLM (Xing et al., 2024b) pro-poses a spike formulation with bi-directional ternary firing for language modeling and achieves promising results in language modeling; however, it largely preserves key com-ponents of vanilla attention, including floating-point matrix multiplications, softmax operations, and non-spiking acti-vations (e.g., GeLU (Hendrycks & Gimpel, 2016)) in the MLP blocks. Similarly, SpikeLLM (Xing et al., 2024a) proposes generalized integrate-and-fire (GIF) neurons to-gether with an optimal brain spiking framework for spiking transformers. However, SpikeLLM largely inherits from LLaMA (Touvron et al., 2023) and retains many nonlinear components from LLaMA, such as softmax operations in at-tention map computation, non-spiking SiLU (Hendrycks & Gimpel, 2016) activations in the MLP blocks, and rotary po-sitional embeddings (Su et al., 2024) with non-spike-driven computations in the query and key projections. By contrast, our proposed WE-Spikingformer and WD-Spikingformer eliminate these non-spiking components to realize a spike-driven transformer architecture. In short, this work focuses on designing softmax-free, energy-efficient spike-driven transformers for language modeling. 
+
+## 3. Method 
+
+3.1. Spiking Neuron Model 
+
+In this section, to investigate more expressive yet efficient spiking neurons for language modeling, we also explore two variants of the Leaky Integrate-and-Fire (LIF) neuron model (Maass, 1997) for direct training in language modeling tasks: T-LIF (Xing et al., 2024b) and NI-LIF (Lei et al., 2025). 
+
+Ternary-spiking-based Leaky Integrate-and-Fire (T-LIF) model. Compared to the original LIF neuron, the ternary spiking in SpikeLM (Xing et al., 2024b) extends binary spikes {0, 1} to ternary values {− α, 0, α } based on membrane potential intensity. The dynamics of the T-LIF model are formulated as: 
+
+U [t] = H[t − 1] + X[t], (1) 
+
+S[t] = 
+
+
+
+−1 · α[t], if U [t] < −α[t],
+
+0 · α[t], if U [t] ∈ (−α[t], +α[t]) ,
+
++1 · α[t], if U [t] > +α[t],
+
+(2) 
+
+H[t] = Vreset |b| + ( βU [t])(1 − | b|), (3) where X[t] is the input current at time step t, S[t] = b · α[t]
+
+and b ∈ {− 1, 0, 1}. U [t] represents the membrane potential after the triggered event, which will decay directly to H[t]
+
+if no spike is generated (where β < 1 is the decay factor) and otherwise equals to the reset potential Vreset .
+
+Normalized Integer Leaky Integrate-and-Fire (NI-LIF) model. This neuron adopts integer-training and spike-inference way (Luo et al., 2024), the dynamics of the NI-LIF model are formulated as follows: 
+
+U [t] = H[t − 1] + X[t], (4) 
+
+S[t] = clip(round( U [t]) , 0, D )/D, (5) 
+
+H[t] = β(U [t] − S[t] × D), (6) where clip( U [t], min, max ) denotes the operation of clip-ping U [t] to [min, max ], D indicates the maximum quan-tized integer value and unfold into D time steps when infer-ence on neuromorphic chips. That is, the total time step T
+
+of the spike sequence is T ∗ D, where T is the normalized integer time step. For example, NI-LIF(1 ×4 ) unfolds into a binary spike sequence of time step T = 4. This neuronal mechanism allows for faster training compared to T-LIF. In our experiments, we use NI-LIF neurons by default for faster spiking simulation, and we also compare the perfor-mance differences between the two neurons in Section.4.1. 
+
+3.2. Winner-Take-All Layer 
+
+In the visual system, multiple neurons are sensitive to dif-ferent directions at the same location. The neurons with the strongest response (such as detecting vertical edges) will suppress other direction detectors, leaving only a dominant signal. The Winner-Take-All computation (Maass, 2000), inspired by this biological mechanism, is incorporated into spiking neural networks as a biologically plausible strategy for enforcing sparsity. It simulates the ”lateral inhibition” phenomenon in biological nervous systems - that is, the strongest signal inhibits other competing signals, ultimately forming a single dominant response and ensuring that at-tention remains focused on the most relevant token. In this section, we primarily introduce multiple WTA mechanisms and their corresponding training methods. 
+
+Hard WTA. Hard WTA is an sparse neural activation mech-anism. In a group of competing units, only the unit with the highest activation value is allowed to retain the original output, and the outputs of all other units are forced to zero. Given an input vector A = [ a1, . . . , a n], the output layer of WTA is Y = [ y1, . . . , y n]. Hard WTA can be formulated as follows: 
+
+yi =
+
+(
+
+ai if i = arg max j∈(1 ,...,N ) aj ,
+
+0 otherwise . (7) In SNN, the winning element needs to be binarized, that is, the winner is further defined as: yi = 1, if i =arg max j∈(1 ,...,N ) aj . Hard WTA in SNN is an extremely sparse softmax with one-hot encoding. Appendix E provides a detailed discussion of the relationship between HardWTA and softmax. 3Submission and Formatting Instructions for ICML 2026 WTA SpikingFormer WTA        
+
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> Linear
+> Input hidden 풉풕
+> Linear Linear
+> Spike input 푺
+> 푸푲푽
+> ＠
+> WTA ＠
+> Linear
+> WTA
+> Spiking Self
+
+-Attention                                                                
+
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> Linear
+> Input hidden 풉풕
+> Linear Linear
+> Spike input 푺
+> 푸푲푽
+> ＠
+> WTA ＠
+> Linear
+> Causal WTA
+> Spiking Self-Attention
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> Winner-Take-All (WTA) in SNN
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> Linear
+> Input hidden 풉풕
+> Linear Linear
+> Spike input 푺
+> 푸푲푽
+> ＠
+> Softmax ＠
+> Linear
+> Spiking Self-Attention
+> with softmax in SpikeLM
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> ...
+> 122
+> 350
+> 243
+> 122
+> 350
+> 243
+> Causal Mask
+> ＠
+> Causal M ask
+> Mu tMul
+> Spike N euron
+> WTA Winner-take-All
+> 122350243...
+> 000010000...
+> Hard WTA Inference Surrogate Gradient
+> 122350243...
+> 000010010...
+> Top-K WTA
+
+Figure 1. Overview of WTA Spiking Self-Attention (WSSA) and Causal WTA Spiking Self-Attention (CWSSA). The left shows the softmax-based spiking self-attention in SpikeLM (Xing et al., 2024b). The right shows our WSSA in WE-Spikingformer for masked language modeling and CWSSA in WD-Spikingformer for causal language modeling. The symbol “@” denotes matrix multiplication. 
+
+Top-K WTA. As a sparse neural activation mechanism, Top-K WTA selects the K units with the highest scores from a set of input signals, retains only their original values, and sets the outputs of all other units to zero. Top-K WTA allows a limited number of ”winners” to coexist, thus achieving a balance between sparsity and expressiveness. Top-K WTA can be formulated as follows: 
+
+yi =
+
+(
+
+ai if ai ∈ Top-k ( a1, . . . , a n) ,
+
+0 otherwise . (8) In SNN, the top-k winning elements are further binarized, that is: yi = 1 , if ai ∈ Top-k ( a1, . . . , a n).
+
+Sparsemax. Sparsemax (Martins & Astudillo, 2016) is a differentiable, adaptively sparse neural mechanism that can automatically generate some zero values in the output, which can also be seen as an adaptive Top-K Winner-Take-All mechanism. That is, only a few significant elements are given non-zero probability, and the remaining elements are precisely truncated to zero, thereby achieving adaptive spar-sity. The calculation process of Sparsemax can be described as follows: 
+
+yi = max {ai − τ, 0} , i = 1 , . . . , N. (9) Eq. 9 needs to satisfy P 
+
+> i
+
+yi = 1 , and τ is the adaptive threshold, whose calculation is shown in Appendix F. 
+
+Surrogate Gradient for the WTA Layer. The Winner-Take-All mechanism is non-differentiable because it pro-duces discrete, discontinuous outputs with zero gradients almost everywhere and undefined gradients at decision boundaries. Therefore, we choose the surrogate gradient for Winner-Take-All during training, which does not affect the high energy efficiency of the model during inference. Specifically, we use the gradient of softmax to approximate the ”gradient” of the Winner-Take-All layer, which is shown as follows: 
+
+∂y ∂a = softmax ′(a). (10) where softmax ′(.) is the derivative of the softmax function. Winner-Take-All is functionally equivalent to an extremely sparse version of softmax, ensuring that attention remains focused on the most relevant token. It uses the lateral inhibi-tion mechanism in neural dynamics instead of exponential normalization. It is more suitable for spiking language mod-eling due to its sparse dependencies and lateral inhibition, while also offering energy efficiency advantages. In our experiments, we exploit Hard WTA by default owing to its superior energy efficiency. 
+
+3.3. WTA Spiking Self-Attention Mechanisms 
+
+In this part, we propose two self-attention mechanisms based on the Winner-Take-All layer for spiking language model-ing: WTA Spiking Self-Attention (WSSA) and Causal WTA Spiking Self-Attention (CWSSA), shown in Figure 1. 
+
+CWSSA is a spike-driven self-attention for spike-based causal language modeling with Decoder-only Transformers. CWSSA can be formulated as follows: 
+
+X′ = SN( X), (11) 
+
+Q = SN Q(Linear Q(X′)) , (12) 
+
+K = SN K (Linear K (X′)) , (13) 
+
+V = SN V (Linear V (X′)) , (14) 
+
+Aw(Q, K) = WTA( M(QK T ∗ s)) , (15) 
+
+Out(A w, V) = Linear(SN(A w V)) , (16) 4Submission and Formatting Instructions for ICML 2026 Spiking Transformer Decoder Block        
+
+> Spiking Transformer Decoder Block
+> Spiking Transformer Decoder Block
+> •••
+> Decoder-Only
+> Positonal E mbedding
+> ABCD
+> ABCDE
+> <S>
+
+# ⊕
+
+# ⊕    
+
+> L
+> Spike-Driven
+> MLP
+> Causal WTA
+> Spiking
+> Self-Attention
+> Spiking Transformer Encoder Block
+> Spiking Transformer Encoder Block
+> Spiking Transformer Encoder Block
+> •••
+> Encoder-Only
+> Positonal E mbedding
+
+# ⊕
+
+# ⊕        
+
+> L
+> Spike-Driven
+> MLP
+> WTA Spiking
+> Self-Attention
+> ABmasked DE
+> ABDE
+> C , D, F...
+
+Figure 2. The overview of WE-Spikingformer and WD-Spikingformer. The left shows WE-Spikingformer (WTA-based Encoder-only Spiking Transformer) for spike-based masked language modeling. The right shows WD-Spikingformer (WTA-based Decoder-only Spiking Transformer) for spike-based causal language modeling. 
+
+where s is the scaling factor, same in Zhou et al. (2023b), Aw
+
+is the attention weights, and SN means the spiking neuron. 
+
+M(.) means the causal mask. 
+
+WSSA is a spike-driven self-attention for spike-based masked language modeling with Encoder-only Transform-ers. The attention mechanism is similar to CWSSA, with the main difference that the causal mask in Eq. 16 is removed: 
+
+Aw(Q, K) = WTA(( QK T ∗ s)) . (17) Compared to the softmax-based SSA in SpikeLM (Xing et al., 2024b), both WSSA and CWSSA are spike-driven and more energy-efficient, avoiding the costly exponential and division operations required by softmax. 
+
+3.4. Language Modeling 
+
+Based on WSSA and CWSSA in Section 3.3, we build two spiking transformers for spike-based language model-ing: WTA-based Spiking Encoder (WE-Spikingformer) and WTA-based Spiking Decoder (WD-Spikingformer) in this part. 
+
+Model Architecture. The overview of WE-Spikingformer and WD-Spikingformer is shown in Figure 2. The decoder block in WD-Spikingformer can be formulated as follows: 
+
+X′ 
+
+> l
+
+= CWSSA ( Xl−1) + Xl−1, X′ 
+
+> l
+
+∈ RT ×d, l = 1 . . . L, 
+
+(18) 
+
+Xl = SMLP ( X′ 
+
+> l
+
+) + X′ 
+
+> l
+
+, Xl ∈ RT ×d, l = 1 . . . L, 
+
+(19) where SMLP means Spike-driven Multi-Layer Perceptron. Unlike SpikeLM and SpikeLLM, which retain non-spiking activation functions such as GeLU or SiLU, our SMLP 
+
+is fully spiking and implemented as a sequential stack of {SN-Linear-SN-Linear } layers. The encoder block in WE-Spikingformer is similar to the decoder one in WD-Spikingformer, with the main difference that CWSSA in Eq. 18 is replaced by WSSA in Eq. 20: 
+
+X′ 
+
+> l
+
+= WSSA ( Xl−1) + Xl−1, X′ 
+
+> l
+
+∈ RT ×d, l = 1 . . . L. 
+
+(20) 
+
+Masked Language Modeling. Given a sequence of tokens 
+
+x = ( x1, x 2, . . . , x T ), randomly select a portion of the locations M ⊆ { 1, 2, . . . , T } for masking. The masked sequence is obtained as ˜x = (˜ x1, ˜x2, . . . , ˜xT ). The goal of Masked Language Modeling (MLM) (Devlin et al., 2019) is to let the model predict the masked tokens based on the unmasked tokens, which can be formulated as follows: 
+
+p  xM | ˜x\M
+
+ , (21) where xM = {xt : t ∈ M } denotes the masked token, ˜x\M
+
+denotes the visible tokens that are retained. Thus, the loss function of MLM can be formulated as follows: 
+
+LMLM = − X
+
+> t∈M
+
+log pθ (xt | ˜x) . (22) In our work, we apply WE-Spikingformer to masked lan-guage modeling for pretraining. 
+
+Causal Language Modeling. Causal Language Modeling (CLM) (Radford et al., 2018; Ouyang et al., 2022) is the most widely used language modeling method. Its core idea is autoregressive generation: when predicting the next word, only the context before the current position is allowed to be used, and future words cannot be accessed. Given a sequence of tokens x = ( x1, x 2, . . . , x T ). The training strategy of CLM can be formulated as follows: 
+
+p(x) = 
+
+> T
+
+Y
+
+> t=1
+
+p (xt | x<t ) , (23) 5Submission and Formatting Instructions for ICML 2026                                                                                                                   
+
+> Table 1. The results on the Natural Language Understanding task (GLUE datasets). ”Avg.” denotes ”Average Accuracy ”. ”SD” denotes ”Spike-Driven”. The results of LIF-BERT, PSN-BERT, and SpikeLM are reported in Xing et al. (2024b). WE-Spikingformer uses NI-LIF neuron, while WE-Spikingformer †adopts the T-LIF neuron. Our model achieves state-of-the-art performance on the GLUE datasets among softmax-free spike-driven transformer models.
+> Model SD TMNLI mm QQP QNLI SST-2 CoLA STS-B MRPC RTE Avg. (%) BERT base (Devlin et al., 2019) ✗–83.4 71.2 90.5 93.5 52.1 85.8 88.9 66.4 79.6 Q2BERT (Zhang et al., 2020) ✗–47.3 67.0 61.3 80.6 0.0 4.7 81.2 52.7 49.1 BiBERT (Qin et al., 2022) ✗–67.5 84.8 72.6 88.7 25.4 33.6 72.5 57.4 63.2 SpikeLM (Xing et al., 2024b) ✗477.2 83.9 85.3 87.0 38.8 84.9 85.7 69.0 76.5 LIF-BERT (Xing et al., 2024b) ✓435.2 050.5 50.9 0081.2 52.7 34.6 PSN-BERT (Xing et al., 2024b) ✓435.2 050.5 50.9 06.8 81.2 52.7 34.7 SpikeBERT (Lv et al., 2023) ✓471.0 68.2 66.4 85.4 16.9 18.7 82.0 57.5 59.7 WE-Spikingformer (ours) ✓473.4 83.8 78.3 85.6 23.7 56.0 76.4 48.4 65.7 WE-Spikingformer †(ours) ✓470.1 85.1 77.5 89.0 27.9 42.8 81.6 55.9 66.3
+
+where xt represents the t-th token, x<t =(x1, x 2, . . . , x t−1) represents all previous tokens. The optimization goal of CLM is to maximize its conditional probability decomposition. In network modeling, the causal mask is used to ensure that the model only focuses on the previous tokens when calculating attention. The loss function of CLM can be formulated as follows: 
+
+LCLM = −
+
+> T
+
+X
+
+> t=1
+
+log pθ (xt | x<t ) . (24) In our work, we apply WD-Spikingformer for causal lan-guage modeling for pretraining. 
+
+## 4. Experiments 
+
+In this section, we conduct experiments across 16 datasets spanning natural language understanding tasks, question-answering tasks, and commonsense reasoning tasks to eval-uate our Winner-Take-All spiking transformer in language modeling. 
+
+4.1. Natural Language Understanding 
+
+We evaluate WE-Spikingformer on the standard GLUE (General Language Understanding Evaluation) benchmark (Wang et al., 2018), which is a widely adopted collection of datasets designed to evaluate and advance natural lan-guage understanding capabilities of machine learning mod-els. GLUE contains 8 subsets for classification and re-gression, including single-sentence classification (CoLA, SST-2), pairwise sentence comparison (MPRC, QQP, RTE), sentence similarity (STS-B), and natural language inference (MNLI, QNLI). We pretrain WE-Spikingformer and WE-Spikingformer †
+
+on Wikipedia-English (Devlin et al., 2019) using masked language modeling (Devlin et al., 2019) across 8 GPUs, and subsequently fine-tune them on the GLUE dev set. The ANN baseline includes BERT (Devlin et al., 2019), Q2BERT (Zhang et al., 2020) and BiBERT (Qin et al., 2022). Q2BERT employs 2-bit weights and 8-bit activations. BiBERT is the Binary Neural Network with 1-bit weights and activations, which was obtained by the Direction-Matching Distillation (DMD). WE-Spikingformer † (WE-Spikingformer with the T-LIF neuron) achieves an average accuracy of 66.3 %. Replacing T-LIF with the NI-LIF neuron yields comparable performance while significantly reduc-ing pretraining time. These results demonstrate that both T-LIF and NI-LIF neurons are viable for language modeling. Moreover, the I-LIF neuron delivers similar accuracy with even faster spiking simulation. The experimental results are presented in Table 1. All models are maintained at the same parameter scale as BERT base (109M). As a spike-driven, softmax-free transformer, WE-Spikingformer † significantly outperforms other spike-based methods (LIF-BERT, PSN-BERT, and SpikeBERT). WE-Spikingformer † vs. Spike-BERT vs. LIF-BERT. Acc: 66.3 % vs. 59.7 % vs. 34.6 %.In comparison, SpikeLM is a softmax-based spiking trans-former and retains non-spiking activation GeLU (Hendrycks & Gimpel, 2016) in MLP blocks. These factors led to its relatively higher performance. 
+
+4.2. Question Answering Tasks 
+
+For question answering, we use the FineWeb-Edu (Lozhkov et al., 2024) dataset, a high-quality subset of the FineWeb corpus curated for factual and educational content, and sample 0.1B tokens from it to pretrain WD-Spikingformer on 8 GPUs. We evaluate the model performance of WD-Spikingformer on a diverse set of Question-Answering Tasks (QAT), including ARC-e (Clark et al., 2018), ARC-c (Clark et al., 2018), BoolQ (Clark et al., 2019), HeadQA (Vilares & G ´omez-Rodr ´ıguez, 2019), and OpenBookQA (OBQA) (Mihaylov et al., 2018). These tasks measure the generalization and reasoning abilities without task-specific finetuning. 6Submission and Formatting Instructions for ICML 2026  
+
+> Table 2. The results on Question Answering Tasks (QAT). ”Avg.” denotes ”Average Accuracy”. ”E (mJ)” means ”Energy consumption (mJ)”. ”T” means time step. ”SD” denotes ”Spike-Driven”.
+
+Model SD E (mJ) T ARC-e ARC-c BoolQ HeadQA OBQA Avg. (%) SpikeLLM-7B (Xing et al., 2024a) ✗ - 4 31.3 23.6 53.8 - - -Qwen-1.5B (Yang et al., 2024) ✗ 3398.3 - 26.2 26.9 60.3 25.7 27.1 33.2 WD-Spikingformer-0.4B ✓ 238.4 4 30.0 22.3 37.8 26.0 26.1 28.4  
+
+> Table 3. The results on Commonsense Reasoning Tasks (CRT). ”Avg.” denotes ”Average Accuracy”. ”E (mJ)” means ”Energy consumption (mJ)”. ”T” means time step. ”SD” denotes ”Spike-Driven”.
+
+Model SD E (mJ) T HellaSwag PIQA Winograd Avg. (%) SpikeLLM-7B (Xing et al., 2024a) ✗ - 4 33.9 53.4 51.5 46.3 Qwen-1.5B (Yang et al., 2024) ✗ 3398.3 - 26.5 53.7 52.8 44.3 WD-Spikingformer-0.4B ✓ 238.4 4 25.9 53.4 50.2 43.2          
+
+> Table 4. Ablation study for HardWTA on GLUE, QAT, and CRT.
+> M(.)means causal mask for decoder-only spiking transformers. That is, M(Q K T∗s) V is the Q K TV∗sin causal mask version. Note that ” ✗” means the model does not converge in pretraining. ”T” means time step. ”Avg.” denotes ”Average Accuracy ( %)”.
+
+Datasets T Method Avg. GLUE 4 Q K T V ∗s 55.4 4 Softmax(Q K T ∗s) V 66.8 4 HardWTA(Q K T ∗s) V 66.3 QAT 4 M(Q K T ∗s) V ✗
+
+4 Softmax( M(Q K T ∗s)) V 28.7 4 HardWTA( M(Q K T ∗s)) V 28.4 CRT 4 M(Q K T ∗s) V ✗
+
+4 Softmax( M(Q K T ∗s)) V 43.3 4 HardWTA( M(Q K T ∗s)) V 43.2 The experimental results are shown in Table 2. On one hand, due to the unavailability of the open-source model file for SpikeLLM (Xing et al., 2024a) and the absence of reported energy consumption and results on HeadQA and OBQA, our comparative analysis is limited to the average accuracy on the ARC-e, ARC-c, and BoolQ benchmarks. Despite being 17.5 times smaller (0.4B vs. 7B parameters), WD-Spikingformer-0.4B achieves a competitive accuracy of 30 .0% , approaching the 36 .2% accuracy of the much larger SpikeLLM-7B under the (T=4, W2A8) configuration. On the other hand, WD-Spikingformer-0.4B reduces energy consumption by an order of magnitude (238.4 mJ vs. 3398.3 mJ, only 7% of the energy) while maintaining a small ac-curacy gap ( 28 .4% vs. 33 .2% ) against Qwen-1.5B, which adopts the same pretraining setup as WD-Spikingformer. These results highlight WD-Spikingformer’s superior en-ergy–accuracy trade-off. 
+
+4.3. Commonsense Reasoning Tasks 
+
+In this experiment, we evaluate the model performance of WD-Spikingformer on a diverse set of Commonsense Rea-soning Tasks (CRT), including the HellaSwag (Zellers et al., 2019), PIQA (Bisk et al., 2020), and Winograd (Sakaguchi et al., 2021) datasets. The pretraining process is the same as shown in Section 4.2. The experimental results are shown in Table 3. Compared with SpikingLLM-7B and Qwen-1.5B, WD-Spikingformer-0.4B uses smaller parameters (0.4B vs. 1.5B and 7B) while its accuracy remains close to the larger models ( 43 .2% 
+
+vs. 44 .3% and 46 .3% ). These results highlight that WD-Spikingformer-0.4B delivers competitive performance de-spite its much smaller size. 
+
+4.4. Ablation Study 
+
+In this part, we carry out the ablation study for HardWTA, different WTA methods, and time steps. 
+
+Ablation study for HardWTA. We carry out the ablation study for HardWTA on three tasks: GLUE datasets, QAT, and CRT. We compare HardWTA with the vision-oriented spiking self-attention (Zhou et al., 2023b) ( Q K T V ∗s) and softmax-based version ( Softmax(Q K T ∗s) V ) (Xing et al., 2024b) in these language tasks. The experimental results are shown in Table 4, and indicate that: 1) Vision-oriented spiking self-attention ( Q K T V ∗s)does not work well in language modeling, often lead-ing to convergence difficulties or suboptimal performance. 
+
+HardWTA(Q K T ∗s) V vs. ( Q K T V ∗s). GLUE: 66.3 %
+
+vs. 55.4 %; QAT: 28.4 % vs. Not converging in pretrain-ing; CRT: 43.2 % vs. Not converging in pretraining. 2) The Winner-Take-All layer can approximately replace the softmax layer in self-attention computation of spiking trans-formers in language modeling while enjoying high energy 7Submission and Formatting Instructions for ICML 2026  
+
+> Table 5. Ablation study on different WTAs and time steps on GLUE datasets. ”T” means time step. ”Avg.” denotes ”Average Accuracy ( %)”.
+
+Datasets T Method Avg. GLUE 4 HardWTA(Q K T ∗s) V 65.7 4 Top-KWTA(Q K T ∗s) V 66.3 4 Sparsemax(Q K T ∗s) V 66.6 8 HardWTA(Q K T ∗s) V 67.4 4 HardWTA(Q K T ∗s) V 65.7 2 HardWTA(Q K T ∗s) V 62.3 efficiency during inference. HardWTA(Q K T ∗s) V vs. 
+
+Softmax(Q K T ∗s) V . GLUE: 66.3 % vs. 66.8 %; QAT: 28.4 % vs. 28.7 %; CRT: 43.2 % Vs. 43.3 %. The three tasks ablation study verified the effectiveness of HardWTA, tailor-made for the spiking transformers in language modeling. 
+
+Ablation study for different WTAs and time steps. We carry out the ablation study for different WTAs and time steps on GLUE datasets. We set the hyperparameters K = 3 
+
+in Top-KWTA(Q K T ∗s) V . The effects of the K hyperpa-rameters are shown in the Appendix J. The experimental results are shown in Table 5, which indi-cates that the performance of Hard WTA, Top-K WTA, and Sparsemax is very similar on GLUE (65.7 % vs. 66.3 % vs. 66.6 %), making Hard WTA the more cost-effective option. When the time step is increased to 8, the performance of WE-Spikingformer further improves to an average accuracy of 67.4 %.
+
+4.5. Discussion 
+
+In this part, we discuss the scaling characteristics of our Winner-Take-All spiking transformer from the model pa-rameter and pretraining data perspectives. 
+
+Parameter scaling. The experimental results are shown in Figure 3. We increase the model parameters of WD-Spikingformer from 0.4B to 1.0B parameters. The ex-perimental results show that the performance of WD-Spikingformer can be further improved on both QAT and CRT. WE-Spikingformer-0.4B vs. WE-Spikingformer-1.0B. QAT: 28.4 % vs. 29.0 %; CRT: 43.2 % vs. 43.6 %.
+
+Pretraining data scaling. The experimental results are presented in Figure.4. In this part, we increase the tokens for WE-Spikingformer-1.0B pretraining and validated it on QAT and CRT. We found that WE-Spikingformer-1.0B can achieve a further significant improvement on both QAT and CRT. WE-Spikingformer-1.0B (0.1Btokens) vs. WE-Spikingformer-1.0B (0.5B tokens). QAT: 29.0 % vs. 31.9 %;CRT: 43.6 % vs. 44.1 %. In particular, improving the pre-training data of WE-Spikingformer-1.0B from 0.1B tokens Unified Spiking Transformer for Event, Image, and Language.    
+
+> (a) (b)
+> (a) (b)
+> +1.9%
+> +0.5%
+> +0.4%
+> +0.6%
+> +1.9%
+> Figure 3. Increasing model Parameters for WE-Spikingformer pretraining on (a) Question-Answering Tasks (QAT), and (b) Com-monsense Reasoning Tasks (CRT).
+
+Unified Spiking Transformer for Event, Image, and Language.    
+
+> (a) (b)
+> (a) (b)
+> +1.9%
+> +0.5%
+> +0.4%
+> +0.6%
+> +1.9%
+> Figure 4. Increasing tokens for WE-Spikingformer-1.0B pretrain-ing on (a) Question-Answering Tasks (QAT), and (b) Common-sense Reasoning Tasks (CRT).
+
+to 0.5B tokens, the performance of WE-Spikingformer-1.0B achieves a significant performance improvement of 1.9 % on QAT, demonstrating that WE-Spikingformer continues to significantly benefit from larger-scale pretraining. In summary, we verified that our model’s performance can be further improved by increasing the parameter scale or pretraining data scale, validating the potential scalability of the Winner-Take-All spiking transformer. 
+
+## 5. Conclusion 
+
+In this work, we explore softmax-free spiking transformers for language modeling by incorporating Winner-Take-All (WTA) mechanisms into spike-driven self-attention. We propose two novel attention modules, namely WTA Spik-ing Self-Attention (WSSA) and Causal WTA Spiking Self-Attention(CWSSA). Based on these modules, we design WE-Spikingformer for masked language modeling and WD-Spikingformer for causal language modeling. Our approach systematically extends directly trained spiking transform-ers from vision to language. Extensive experiments across 16 datasets spanning natural language understanding, ques-tion answering tasks, and commonsense reasoning tasks demonstrate the effectiveness of our models. These re-sults underscore the potential of Spiking Transformers as a foundation for biologically inspired, energy-efficient, and general-purpose language modeling. 
+
+Limitation: Our energy consumption estimates are based 8Submission and Formatting Instructions for ICML 2026 
+
+on theoretical calculations and do not include measurements on real neuromorphic hardware. In addition, with its current scale parameters, WD-Spikingformer is not yet capable of effectively handling large-scale, long-context generative downstream tasks. The above is reserved for future work. 
+
+## References 
+
+Agarap, A. F. Deep learning using rectified linear units (relu). arXiv preprint arXiv:1803.08375 , 2018. Bisk, Y., Zellers, R., Gao, J., Choi, Y., et al. Piqa: Reasoning about physical commonsense in natural language. In Pro-ceedings of the AAAI conference on artificial intelligence ,volume 34, pp. 7432–7439, 2020. Clark, C., Lee, K., Chang, M.-W., Kwiatkowski, T., Collins, M., and Toutanova, K. Boolq: Exploring the surprising difficulty of natural yes/no questions. arXiv preprint arXiv:1905.10044 , 2019. Clark, P., Cowhey, I., Etzioni, O., Khot, T., Sabharwal, A., Schoenick, C., and Tafjord, O. Think you have solved question answering? try arc, the ai2 reasoning challenge. 
+
+arXiv preprint arXiv:1803.05457 , 2018. Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K. Bert: Pre-training of deep bidirectional transformers for lan-guage understanding. In Proceedings of the 2019 confer-ence of the North American chapter of the association for computational linguistics: human language technologies, volume 1 (long and short papers) , pp. 4171–4186, 2019. Dong, S., Yang, J., Peng, X., Shang, H., Ke, Y., Yang, X., Liu, H., and Basu, A. Topkima-former: Low-energy, low-latency inference for transformers using top-k in-memory adc. IEEE Transactions on Circuits and Systems I: Regular Papers , 72(6):2509–2519, 2025. doi: 10.1109/ TCSI.2025.3549060. Fang, Y., Zhou, D., Wang, Z., Ren, H., Zeng, Z., Li, L., Xu, R., et al. Spiking neural networks need high-frequency information. In The Thirty-ninth Annual Conference on Neural Information Processing Systems , 2025. Hendrycks, D. and Gimpel, K. Gaussian error linear units (gelus). arXiv preprint arXiv:1606.08415 , 2016. Horowitz, M. 1.1 computing’s energy problem (and what we can do about it). In 2014 IEEE International Solid-State Circuits Conference Digest of Technical Papers (ISSCC) ,pp. 10–14. IEEE, 2014. Kundu, S., Pedram, M., and Beerel, P. A. Hire-snn: Har-nessing the inherent robustness of energy-efficient deep spiking neural networks by training with crafted input noise. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pp. 5209–5218, 2021. Lee, D., Sima, A., Li, Y., Stinis, P., and Panda, P. Spikepool: Event-driven spiking transformer with pooling attention. 
+
+arXiv preprint arXiv:2510.12102 , 2025. Lei, Z., Yao, M., Hu, J., Luo, X., Lu, Y., Xu, B., and Li, G. Spike2former: Efficient spiking transformer for high-performance image segmentation. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 39, pp. 1364–1372, 2025. Lozhkov, A., Ben Allal, L., von Werra, L., and Wolf, T. Fineweb-edu: the finest collection of educational content, 2024. URL https://huggingface.co/ datasets/HuggingFaceFW/fineweb-edu .Luo, X., Yao, M., Chou, Y., Xu, B., and Li, G. Integer-valued training and spike-driven inference spiking neural network for high-performance and energy-efficient object detection. In European Conference on Computer Vision ,pp. 253–272. Springer, 2024. Lv, C., Li, T., Xu, J., Gu, C., Ling, Z., Zhang, C., Zheng, X., and Huang, X. Spikebert: A language spikformer learned from bert with knowledge distillation. arXiv preprint arXiv:2308.15122 , 2023. Maass, W. Networks of spiking neurons: the third genera-tion of neural network models. Neural networks , 10(9): 1659–1671, 1997. Maass, W. On the computational power of winner-take-all. 
+
+Neural computation , 12(11):2519–2535, 2000. Martins, A. and Astudillo, R. From softmax to sparsemax: A sparse model of attention and multi-label classification. In 
+
+International conference on machine learning , pp. 1614– 1623. PMLR, 2016. Mihaylov, T., Clark, P., Khot, T., and Sabharwal, A. Can a suit of armor conduct electricity? a new dataset for open book question answering. arXiv preprint arXiv:1809.02789 , 2018. Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., Zhang, C., Agarwal, S., Slama, K., Ray, A., et al. Training language models to follow instructions with human feedback. Advances in neural information processing systems , 35:27730–27744, 2022. Panda, P., Aketi, S. A., and Roy, K. Toward scalable, ef-ficient, and accurate deep spiking neural networks with backward residual connections, stochastic softmax, and hybridization. Frontiers in Neuroscience , 14:653, 2020. 9Submission and Formatting Instructions for ICML 2026 
+
+Peng, B., Alcaide, E., Anthony, Q., Albalak, A., Arcadinho, S., Biderman, S., Cao, H., Cheng, X., Chung, M., Grella, M., et al. Rwkv: Reinventing rnns for the transformer era. 
+
+arXiv preprint arXiv:2305.13048 , 2023. Qin, H., Ding, Y., Zhang, M., Yan, Q., Liu, A., Dang, Q., Liu, Z., and Liu, X. Bibert: Accurate fully binarized bert. 
+
+arXiv preprint arXiv:2203.06390 , 2022. Radford, A., Narasimhan, K., Salimans, T., Sutskever, I., et al. Improving language understanding by generative pre-training. 2018. Roy, K., Jaiswal, A., and Panda, P. Towards spike-based ma-chine intelligence with neuromorphic computing. Nature ,575(7784):607–617, 2019. Sakaguchi, K., Bras, R. L., Bhagavatula, C., and Choi, Y. Winogrande: An adversarial winograd schema challenge at scale. Communications of the ACM , 64(9):99–106, 2021. Su, J., Ahmed, M., Lu, Y., Pan, S., Bo, W., and Liu, Y. Roformer: Enhanced transformer with rotary position embedding. Neurocomputing , 568:127063, 2024. Touvron, H., Lavril, T., Izacard, G., Martinet, X., Lachaux, M.-A., Lacroix, T., Rozi `ere, B., Goyal, N., Hambro, E., Azhar, F., et al. Llama: Open and efficient foundation lan-guage models. arXiv preprint arXiv:2302.13971 , 2023. Vilares, D. and G ´omez-Rodr ´ıguez, C. Head-qa: A health-care dataset for complex reasoning. arXiv preprint arXiv:1906.04701 , 2019. Wang, A., Singh, A., Michael, J., Hill, F., Levy, O., and Bowman, S. R. Glue: A multi-task benchmark and anal-ysis platform for natural language understanding. arXiv preprint arXiv:1804.07461 , 2018. Xing, X., Gao, B., Zhang, Z., Clifton, D. A., Xiao, S., Du, L., Li, G., and Zhang, J. Spikellm: Scaling up spiking neural network to large language models via saliency-based spiking. arXiv preprint arXiv:2407.04752 , 2024a. Xing, X., Zhang, Z., Ni, Z., Xiao, S., Ju, Y., Fan, S., Wang, Y., Zhang, J., and Li, G. Spikelm: Towards general spike-driven language modeling via elastic bi-spiking mechanisms. In International Conference on Machine Learning , pp. 54698–54714. PMLR, 2024b. Yang, A., Yang, B., Hui, B., Zheng, B., Yu, B., Zhou, C., Li, C., Li, C., Liu, D., Huang, F., Dong, G., Wei, H., Lin, H., Tang, J., Wang, J., Yang, J., Tu, J., Zhang, J., Ma, J., Xu, J., Zhou, J., Bai, J., He, J., Lin, J., Dang, K., Lu, K., Chen, K., Yang, K., Li, M., Xue, M., Ni, N., Zhang, P., Wang, P., Peng, R., Men, R., Gao, R., Lin, R., Wang, S., Bai, S., Tan, S., Zhu, T., Li, T., Liu, T., Ge, W., Deng, X., Zhou, X., Ren, X., Zhang, X., Wei, X., Ren, X., Fan, Y., Yao, Y., Zhang, Y., Wan, Y., Chu, Y., Liu, Y., Cui, Z., Zhang, Z., and Fan, Z. Qwen2 technical report. arXiv preprint arXiv:2407.10671 , 2024. Yao, M., Hu, J., Zhou, Z., Yuan, L., Tian, Y., Xu, B., and Li, G. Spike-driven transformer. Advances in neural information processing systems , 36:64043–64058, 2023a. Yao, M., Zhao, G., Zhang, H., Hu, Y., Deng, L., Tian, Y., Xu, B., and Li, G. Attention spiking neural networks. 
+
+IEEE Transactions on Pattern Analysis and Machine In-telligence , 2023b. Yao, M., Hu, J., Hu, T., Xu, Y., Zhou, Z., Tian, Y., Xu, B., and Li, G. Spike-driven transformer v2: Meta spik-ing neural network architecture inspiring the design of next-generation neuromorphic chips. arXiv preprint arXiv:2404.03663 , 2024. Yao, M., Qiu, X., Hu, T., Hu, J., Chou, Y., Tian, K., Liao, J., Leng, L., Xu, B., and Li, G. Scaling spike-driven trans-former with efficient spike firing approximation training. 
+
+IEEE Transactions on Pattern Analysis and Machine In-telligence , 2025. Zellers, R., Holtzman, A., Bisk, Y., Farhadi, A., and Choi, Y. Hellaswag: Can a machine really finish your sentence? 
+
+arXiv preprint arXiv:1905.07830 , 2019. Zhang, W., Hou, L., Yin, Y., Shang, L., Chen, X., Jiang, X., and Liu, Q. Ternarybert: Distillation-aware ultra-low bit bert. arXiv preprint arXiv:2009.12812 , 2020. Zhou, C., Yu, L., Zhou, Z., Ma, Z., Zhang, H., Zhou, H., and Tian, Y. Spikingformer: Spike-driven residual learn-ing for transformer-based spiking neural network. arXiv preprint arXiv:2304.11954 , 2023a. Zhou, C., Zhang, H., Zhou, Z., Yu, L., Huang, L., Fan, X., Yuan, L., Ma, Z., Zhou, H., and Tian, Y. Qkformer: Hierarchical spiking transformer using qk attention. Ad-vances in Neural Information Processing Systems , 37: 13074–13098, 2024. Zhou, Z., Zhu, Y., He, C., Wang, Y., YAN, S., Tian, Y., and Yuan, L. Spikformer: When spiking neural network meets transformer. In The Eleventh International Conference on Learning Representations , 2023b. URL https:// openreview.net/forum?id=frE4fUwz_h .Zhu, R.-J., Zhao, Q., Li, G., and Eshraghian, J. K. Spikegpt: Generative pre-trained language model with spiking neu-ral networks. arXiv preprint arXiv:2302.13939 , 2023. 10 Submission and Formatting Instructions for ICML 2026 
+
+## Appendix A. Version Statement 
+
+We have further refined and improved the paper, building upon the previous version available at https://openreview. net/forum?id=7PKGMNcM0w .
+
+## B. Dataset Introduction 
+
+General Language Understanding Evaluation (GLUE). GLUE benchmark (Wang et al., 2018) is a widely adopted framework for assessing natural language understanding (NLU) models across a variety of tasks, including single-sentence classification, sentence-pair classification, and linguistic acceptability. In our experiments, we focus on eight representative datasets within GLUE: MNLI (Multi-Genre Natural Language Inference): Predict whether a hypothesis is entailed, contradicted, or neutral with respect to a given premise across multiple text genres. QQP (Quora Question Pairs): Detect whether two questions from Quora convey the same meaning. QNLI (Question Natural Language Inference): Reformulated from QA, determines whether a sentence contains the answer to a question. SST-2 (Stanford Sentiment Treebank): Perform binary sentiment classification on movie reviews. CoLA (Corpus of Linguistic Acceptability): Judge whether a sentence is grammatically acceptable. STS-B (Semantic Textual Similarity Benchmark): Measure sentence-level semantic similarity on a scale from 0 to 5. MRPC (Microsoft Research Paraphrase Corpus): Identify whether two sentences are paraphrases. RTE (Recognizing Textual Entailment): Decide whether a hypothesis can be inferred from a premise, based on multiple entailment datasets. 
+
+Question Answering Tasks (QAT). ARC-e (Clark et al., 2018) and ARC-c (AI2 Reasoning Challenge, easy and challenge subsets) assess scientific knowledge and reasoning skills, with ARC-e focusing on simpler multiple-choice science questions and ARC-c including more complex ones that require advanced reasoning. BoolQ (Boolean Questions) (Clark et al., 2019) is a yes/no question-answering dataset derived from natural queries, requiring models to determine the truthfulness of a statement given a supporting passage. HeadQA (Head Question Answering) (Vilares & G ´omez-Rodr ´ıguez, 2019) is a multilingual medical question-answering benchmark composed of exams for healthcare professionals, testing domain-specific knowledge. OBQA (OpenBookQA) (Mihaylov et al., 2018) evaluates a model’s ability to answer elementary science questions by combining provided core facts with external common knowledge. 
+
+Commonsense Reasoning Tasks (CRT). HellaSwag (Zellers et al., 2019) is a large-scale dataset for grounded commonsense inference, where models must select the most plausible continuation of a given context. PIQA (Physical Interaction Question Answering) (Bisk et al., 2020) focuses on physical commonsense reasoning, requiring models to choose the more feasible solution to everyday tasks. Winograd (Winograd Schema Challenge) (Sakaguchi et al., 2021) is a coreference resolution benchmark designed to test commonsense reasoning by requiring models to resolve pronoun references that cannot be disambiguated by syntax alone. 
+
+## C. Energy consumption 
+
+SNNs replace traditional multiply-accumulate (MAC) operations with low-power accumulate (AC) operations. For ANNs, the overall energy consumption can be directly evaluated by their MACs. For example, given a linear layer with input dimension m and output dimension n, its energy consumption can be calculated by: 
+
+EAnn Linear = m × n × EM AC , (25) SNNs convert MAC-based matrix multiplications to pure accumulate operations (ACs). For SNNs, given the same example as the ANN case, the theoretical energy consumption of the linear layer can be calculated by: 
+
+ESnn Linear = m × n × EAC × f r × T, (26) where f r is the firing rate of the layer, and T is the simulation time step of the spiking neuron. Refer to previous works(Kundu et al., 2021; Zhou et al., 2023b;a; Panda et al., 2020; Yao et al., 2023b). We assume that the MAC and AC operations are implemented on the 45nm hardware (Horowitz, 2014), where EM AC = 4 .6pJ and EAC = 0 .9pJ . The energy consumption of the models in the paper is calculated by reasoning about 512 tokens. 11 Submission and Formatting Instructions for ICML 2026 
+
+## D. Vision-oriented Spiking Self-Attention 
+
+Vision-oriented Spiking Self-Attention (Zhou et al., 2023b;a) use a sparse spike-form Q, K, V for vision task modeling without softmax operation and floating-point matrix multiplication. The calculation process of vision-oriented spiking self-attention is formulated as follows: 
+
+X′ = SN( X), (27) 
+
+Q = SN Q(Linear Q(X′)) , (28) 
+
+K = SN K (Linear K (X′)) , (29) 
+
+V = SN V (Linear V (X′)) , (30) 
+
+SSA ′(Q, K, V) = SN  QK TV ∗ s , (31) where Q, K, V ∈ R T ×N ×D, the spike-form Q, K, V are computed by learnable linear layers. s is a scaling factor. SN 
+
+means spiking neuron layer. The calculation of SSA avoids floating-point multiplication, meeting the property of SNNs. 
+
+## E. Hard Winner-Take-All in SNN 
+
+Given an input vector x = [ x1, x 2, . . . , x n], the softmax function is defined as: 
+
+softmax ( xi) = exi
+
+Pnj=1 exj (32) Introduce the temperature parameter τ > 0, the temperature parameterization softmax operation can be described as follows: 
+
+softmax τ (xi) = exi/τ 
+
+Pnj=1 exj /τ (33) When τ = 1 , the temperature parameterization softmax operation is equal to the standard softmax. 
+
+Lemma E.1. As τ → 0+, the temperature parameterization softmax converges to Hard WTA in SNN. 
+
+lim   
+
+> τ→0+
+
+softmax τ (xi) = 
+
+(
+
+1 if i = arg max j uj
+
+0 otherwise 
+
+Assume xmax = max (xj ), and we assume that x1 = xmax 
+
+softmax τ (x1) = ex1/τ 
+
+ex1/τ + Pnj=2 exj /τ = 11 + Pnj=2 e(xj −x1)/τ (34) For all j̸ = 1 , xj − x1 < 0, when T → 0+:
+
+e(xj −x1)/τ → 0, ∀j̸ = 1 (35) Then: 
+
+lim  
+
+> τ→0+
+
+softmax τ (x1) = 11 + 0 = 1 (36) Similarly: 
+
+lim   
+
+> τ→0+
+
+softmax τ (xi) = lim  
+
+> τ→0+
+
+e(xi−x1)/τ 
+
+1 + Pnj=2 e(xj −x1)/τ = 0 (37) Therefore, Hard WTA in SNN is an extremely sparse softmax with one-hot encoding. 12 Submission and Formatting Instructions for ICML 2026 
+
+## F. Sparsemax 
+
+As shown in Martins & Astudillo (2016), Sparsemax is defined as: 
+
+sparsemax( z) := argmin 
+
+> p∈∆K−1
+
+∥p − a∥2 (38) Sparsemax computes the Euclidean projection of the input vector a onto the probability simplex. This projection often lies on the boundary of the simplex, resulting in sparse outputs. The solution of Eq. 38 is shown in Eq. 9 (yi = max {ai − τ, 0} , i = 1 , . . . , N. ), where τ is the adaptive threshold. Furthermore, τ can be expressed as follows. Let 
+
+a(1) ≥ a(2) ≥ . . . ≥ a(K) be the sorted coordinates of a, and define k(a) := max 
+
+n
+
+k ∈ [K] | 1 + ka (k) > P 
+
+> j≤k
+
+a(j)
+
+o
+
+.Then, 
+
+τ (a) = 
+
+P 
+
+> j≤k(a)
+
+a(j)
+
+
+
+− 1
+
+k(a) =
+
+P 
+
+> j∈S(a)
+
+aj
+
+
+
+− 1
+
+|S(a)| , (39) where S(a) := {j ∈ [K] | sparsemax j (a) > 0} is the support of sparsemax( a). In essence, all we need for evaluating the Sparsemax transformation is to compute the threshold τ (a); all coordinates above this threshold (the ones in the set 
+
+S(a)) will be shifted by this amount, and the others will be truncated to zero. Therefore, Sparsemax can also be seen as an adaptive threshold form for the Top-K Winner-Take-All. 
+
+## G. Detailed Results 
+
+This part provides more detailed results for Section.4, which is shown in Table.6 and Table.7. In particular, when scaled up to 1.0B parameters, WD-Spikingformer further improves its accuracy, nearly matching that of Qwen-1.5B (43.6 % vs. 44.3 %). However, its energy consumption is only about 17 % of that of the Qwen-1.5B (574.7 mJ vs. 3398.3 mJ). 
+
+Table 6. The results on Question Answering Tasks (QAT). ”Avg.” denotes ”Average Accuracy”. ”E (mJ)” means ”Energy consumption (mJ)”. ”T” means time step. ”SD” denotes ”Spike-Driven”. WD-Spikingformer-1.0B ∗ means WD-Spikingformer-1.0B with 0.5B tokens during pretraining. 
+
+Model SD E (mJ) T ARC-e ARC-c BoolQ HeadQA OBQA Avg. (%) SpikeLLM-7B (Xing et al., 2024a) ✗ - 4 31.3 23.6 53.8 - - -Qwen-1.5B (Yang et al., 2024) ✗ 3398.3 - 26.2 26.9 60.3 25.7 27.1 33.2 WD-Spikingformer-0.4B ✓ 238.4 4 30.0 22.3 37.8 26.0 26.1 28.4 WD-Spikingformer-1.0B ✓ 574.7 4 33.8 20.3 37.8 26.4 26.6 29.0 WD-Spikingformer-1.0B ∗ ✓ 574.7 4 41.9 20.4 42.1 26.7 28.2 31.9 
+
+Table 7. The results on Commonsense Reasoning Tasks. ”Avg.” denotes ”Average Accuracy”. ”E (mJ)” means ”Energy consumption (mJ)”. ”T” means time step. ”SD” denotes ”Spike-Driven”. WD-Spikingformer-1.0B ∗ means WD-Spikingformer-1.0B with 0.5B tokens during pretraining. 
+
+Model SD E (mJ) T HellaSwag PIQA Winograd Avg. (%) SpikeLLM-7B (Xing et al., 2024a) ✗ - 4 33.9 53.4 51.5 46.3 Qwen-1.5B (Yang et al., 2024) ✗ 3398.3 - 26.5 53.7 52.8 44.3 WD-Spikingformer-0.4B ✓ 238.4 4 25.9 53.4 50.2 43.2 WD-Spikingformer-1.0B ✓ 574.7 4 26.0 55.8 49.1 43.6 WD-Spikingformer-1.0B ∗ ✓ 574.7 4 26.4 55.7 50.3 44.1 
+
+## H. Detailed Results on Spiking Neuron Comparison 
+
+For WE-Spikingformer pretraining, the training time comparison on 8 × 4090 GPUs is shown in Table 8. NI-LIF significantly boosts training simulation speed compared to T-LIF, while maintaining comparable model performance. 13 Submission and Formatting Instructions for ICML 2026  
+
+> Table 8. Spiking neuron comparison for WE-Spikingformer pretraining.
+
+Backbone Neuron T Average accuracy ( %) Training time ( hours) WE-Spikingformer NI-LIF 4 65.7 26 WE-Spikingformer T-LIF 4 66.3 121 
+
+## I. Additional Ablation Study for Surrogate Gradient on GLUE. 
+
+In previous experiments, we adopted softmax as the surrogate gradient for Hard WTA, motivated by our theoretical analysis in Appendix E, where we prove that Hard WTA can be viewed as an extremely sparse softmax with one-hot outputs. In this experiment, we further conduct an ablation study on the choice of surrogate gradient. Specifically, we replace softmax with ReLU (Agarap, 2018) as the surrogate gradient for Hard WTA. The experimental results on GLUE datasets are reported in the Table.9.                                
+
+> Table 9. Ablation study for Surrogate Gradient on GLUE datasets.
+> Surrogate Gradient TMNLI mm QQP QNLI SST-2 CoLA STS-B MRPC F1 RTE Avg. (%) Softmax 473.4 83.8 78.3 85.6 23.7 56.0 76.4 48.4 65.7 ReLU 431.8 63.2 50.5 50.9 04.3 75.0 47.3 40.4
+
+## J. Additional Ablation Study for Top-K Winner-Take-All on GLUE. 
+
+In this section, we conduct an ablation study of the Top-K Winner-Take-All (WTA) mechanism on the GLUE benchmark to investigate the impact of the hyperparameter K on model performance. According to the Top-K WTA principle, increasing K reduces activation sparsity, thereby leading to lower energy efficiency. Based on this trade-off, we evaluate WE-Spikingformer with K=1, 3, and 5 on the GLUE datasets. The experimental results are summarized in Table 10.                                                     
+
+> Table 10. Ablation study for Top-K Winner-Take-All on GLUE datasets. Top-K WTA (K=1) is equal to Hard WTA.
+> Method TMNLI mm QQP QNLI SST-2 CoLA STS-B MRPC F1 RTE Avg. (%)
+> Softmax(Q K T∗s) V 472.5 84.7 76.0 87.2 24.4 54.5 79.7 55.6 66.8 Top-K WTA (K=1) 473.4 83.8 78.3 85.6 23.7 56.0 76.4 48.4 65.7 Top-K WTA (K=3) 473.4 84.0 78.8 86.1 24.1 55.9 78.2 49.8 66.3 Top-K WTA (K=5) 473.1 84.4 79.4 86.0 24.8 55.4 79.1 50.1 66.5
+
+As the sequence length increases, the computational energy consumption of both Softmax and Top-K WTA rises; however, Top-K WTA still maintains an advantage. For the same sequence length, Softmax involves exponentiation, summation, and division. At the hardware level, this requires exponentiation units, adders, and multipliers, with exponentiation and global normalization (division) being particularly computationally expensive(Zhou et al., 2023b;a). In our Spiking Transformer for language modeling, we replace the Softmax operation with a winner-take-all (WTA) mechanism. Specifically, Top-K WTA can be efficiently implemented using comparator-based hardware, such as comparator trees or heap-based selection logic. Unlike Softmax, which relies on floating-point exponentiation and global normalization, WTA primarily uses comparison and bit-masking operations, thereby avoiding these computationally expensive steps. (Dong et al., 2025) In addition, Dong et al. (2025) reports that this Top-K mechanism achieves approximately an 8× improvement in energy efficiency over the standard Softmax layer. 
+
+## K. Additional Ablation Study for different WTAs and time steps on CRT. 
+
+Table 11 shows the ablation study for different WTAs and time steps on CRT. The performance of Hard WTA, Top-K WTA (K=3), and Sparsemax is very similar on CRT (43.2 % vs. 42.9 % vs. 43.2 %), making Hard WTA the more cost-effective option. When the time step is increased to 8, the performance of the WTA-based decoder-only spiking transformer (WD-Spikingformer-0.4B) further improves to an average accuracy of 43.7 %.14 Submission and Formatting Instructions for ICML 2026  
+
+> Table 11. Ablation study for different WTAs and time steps on CRT.
+
+Datasets Time step Method Average Accuracy ( %)CRT 4 HardWTA( M(Q K T ∗s)) V 43.2 4 Top-KWTA( M(Q K T ∗s)) V 42.9 4 Sparsemax( M(Q K T ∗s)) V 43.2 8 HardWTA( M(Q K T ∗s)) V 43.7 4 HardWTA( M(Q K T ∗s)) V 43.2 2 HardWTA( M(Q K T ∗s)) V 40.1 
+
+## L. Differences between HardWTA and MaxPooling 
+
+In this section, we highlight the key differences between the HardWTA mechanism and max pooling: 
+
+Differences in information retention: MaxPooling retains the maximum value within a local receptive field. In contrast, Hard WTA assigns a value of 1 to the neuron with the highest response while suppressing all others to 0, yielding a binary and highly sparse representation. Here is a simple example illustrating the operation process: Input: [0.2, 0.8, 0.5, 0.1], MaxPooling: [0.8], HardWTA: [0, 1, 0, 0]. 
+
+Differences in dimensionality changes: MaxPooling reduces the spatial resolution of the feature map (e.g., ”28×28 →
+
+14×14”). In contrast, Hard WTA preserves the original dimensionality, performing competitive selection without altering the feature size. 
+
+Differences in scope of operation: MaxPooling operates over local spatial neighborhoods within each feature map (i.e., along the ”H × W” dimensions). By contrast, Hard WTA is typically applied across the channel dimension, enforcing competition among neurons at the same spatial location. Specifically, MaxFormer applies MaxPooling within the patch embedding module in vision tasks. Beyond downsampling, this operation enhances the representation of high-frequency components, facilitating more effective visual feature extraction. SpikePool incorporates MaxPooling within a {LIF–MaxPool–Conv–BN } block to replace the whole spiking self-attention mechanism, targeting small-scale event-based data. Ours employs Winner-Take-All mechanism to replace the Softmax operation in self-attention, enabling sparse, spike-driven competition for spike-based language modeling. 15

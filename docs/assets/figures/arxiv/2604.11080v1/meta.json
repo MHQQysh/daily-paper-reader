@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11080v1/fig-001.webp",
+      "caption": "Figure 5. Illustration of the subspace residual rotation approximation. We approximate the dense rotation matrix (T ∈ RD×D) that aligns the residual bases into a low-dimensional subspace to minimize the computational overhead. During inference, the input features are projected into a subspace of rank r via Q, rotated by the approximated matrix (R̂sub ∈ Rr×r), and re-projected via Q⊤. The orthogonal complement passes through the identity path (I−QQ⊤). The alignment complexity is reduced from quadratic O(D2) to linear O(D).",
+      "page": 6,
+      "index": 1,
+      "width": 448,
+      "height": 290
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11080v1/fig-002.webp",
+      "caption": "Table 1. Main results on LLaMA-2, LLaMA-3, and LLaMA-3.2 families. We report Perplexity (PPL) on WikiText-2 and Zero-shot Accuracy (Avg.). ReSpinQuant consistently outperforms the global rotation baseline (SpinQuant) and matches or exceeds the layer-wise baseline across diverse model scales.",
+      "page": 7,
+      "index": 2,
+      "width": 1008,
+      "height": 429
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11080v1/fig-003.webp",
+      "caption": "Table 7. Detailed W3A3 quantization results across benchmarks.",
+      "page": 13,
+      "index": 3,
+      "width": 1017,
+      "height": 1029
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11080v1/fig-004.webp",
+      "caption": "Figure 2. Overview of the ReSpinQuant architecture. Unlike global rotation methods that enforce a shared basis, ReSpinQuant assigns distinct learnable orthogonal matrices (Ri 1,R i 2, etc.) to each layer i to maximize outlier suppression. (1) Offline Weight Fusion: To ensure offline weight integration, rotation matrices are mathematically absorbed into the weight matrices at inference phase (dashed red boxes, “Merged and Quantized Weights”), leaving the main computation unchanged. (2) Subspace Residual Approximation: The resulting basis mismatch in residual connections is resolved using our proposed Subspace Residual Rotation Approximation (dash-dot blue boxes, “Merge and Approximate”). This replaces the expensive dense basis transition with a low-rank correction, reducing alignment complexity from O(D2) to O(D) while maintaining high model expressivity.",
+      "page": 4,
+      "index": 4,
+      "width": 1017,
+      "height": 396
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11080v1/fig-005.webp",
+      "caption": "Table 6. Detailed W4A4 quantization results across benchmarks.",
+      "page": 12,
+      "index": 5,
+      "width": 1017,
+      "height": 1046
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11080v1/fig-006.webp",
+      "caption": "Figure 4. Optimization dynamics of rotation matrices on LLaMA-3 8B (Layers 2, 16). (a) The Frobenius norm of the deviation from the initialization, calculated as ∥R−Rinit∥F . The curve indicates stable convergence during training. (b) The cosine similarity between the optimized rotation R and the initialization Rinit remains consistently high. Together, these plots confirm that while the learned rotations successfully converge to an optimal state, they do not deviate significantly from their initial values.",
+      "page": 5,
+      "index": 6,
+      "width": 411,
+      "height": 362
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11080v1/fig-007.webp",
+      "caption": "Figure 3. Visualization of the trained rotation matrices optimized by Cayley optimizer. We display the sub-blocks [4:, 4:] of two rotation matrices (R1,R2 ∈ R4096×4096) of Llama-3 8B layer 16, and their relative transformation (R⊤ 1 R2) after training. Despite optimization, the matrices deviate minimally from the Hadamard initialization. Crucially, the relative transformation R⊤ 1 R2 remains sparse and diagonally dominant, motivating the use of our residual subspace approximation.",
+      "page": 5,
+      "index": 7,
+      "width": 963,
+      "height": 198
+    }
+  ]
+}

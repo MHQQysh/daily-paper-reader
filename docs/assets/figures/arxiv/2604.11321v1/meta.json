@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.11321v1/fig-001.webp",
+      "caption": "Table 1. The results on the Natural Language Understanding task (GLUE datasets). ”Avg.” denotes ”Average Accuracy ”. ”SD” denotes ”Spike-Driven”. The results of LIF-BERT, PSN-BERT, and SpikeLM are reported in Xing et al. (2024b). WE-Spikingformer uses NI-LIF neuron, while WE-Spikingformer† adopts the T-LIF neuron. Our model achieves state-of-the-art performance on the GLUE datasets among softmax-free spike-driven transformer models.",
+      "page": 6,
+      "index": 1,
+      "width": 1021,
+      "height": 248
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11321v1/fig-002.webp",
+      "caption": "Table 11. Ablation study for different WTAs and time steps on CRT.",
+      "page": 15,
+      "index": 2,
+      "width": 787,
+      "height": 220
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11321v1/fig-003.webp",
+      "caption": "Table 4. Ablation study for HardWTA on GLUE, QAT, and CRT. M(.) means causal mask for decoder-only spiking transformers. That is, M(QKT ∗s)V is the QKT V ∗s in causal mask version. Note that ”✗” means the model does not converge in pretraining. ”T” means time step. ”Avg.” denotes ”Average Accuracy (%)”.",
+      "page": 7,
+      "index": 3,
+      "width": 500,
+      "height": 309
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11321v1/fig-004.webp",
+      "caption": "Figure 1. Overview of WTA Spiking Self-Attention (WSSA) and Causal WTA Spiking Self-Attention (CWSSA). The left shows the softmax-based spiking self-attention in SpikeLM (Xing et al., 2024b). The right shows our WSSA in WE-Spikingformer for masked language modeling and CWSSA in WD-Spikingformer for causal language modeling. The symbol “@” denotes matrix multiplication.",
+      "page": 4,
+      "index": 4,
+      "width": 1017,
+      "height": 413
+    },
+    {
+      "url": "assets/figures/arxiv/2604.11321v1/fig-005.webp",
+      "caption": "Figure 2. The overview of WE-Spikingformer and WD-Spikingformer. The left shows WE-Spikingformer (WTA-based Encoder-only Spiking Transformer) for spike-based masked language modeling. The right shows WD-Spikingformer (WTA-based Decoder-only Spiking Transformer) for spike-based causal language modeling.",
+      "page": 5,
+      "index": 5,
+      "width": 1017,
+      "height": 365
+    }
+  ]
+}

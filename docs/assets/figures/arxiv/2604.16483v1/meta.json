@@ -1,0 +1,158 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-001.webp",
+      "caption": "Table 1. Performance comparison of different concept erasure methods across three categories, evaluated by Concept Ratio (%). ↓ indicates that lower values are better. Best results are shown in bold and second-best results are underlined.",
+      "page": 6,
+      "index": 1,
+      "width": 1017,
+      "height": 395
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-002.webp",
+      "caption": "Figure 20. Style Visualization Experiment Supplement, top row: original generated image; Bottom row: DSS joint erased image",
+      "page": 25,
+      "index": 2,
+      "width": 786,
+      "height": 984
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-003.webp",
+      "caption": "Figure 21. Different Concept Erasure Visualization on the Stable Diffusion 2.1 model. Top row: original generated images; bottom row: images after joint erasure using DSS.",
+      "page": 26,
+      "index": 3,
+      "width": 789,
+      "height": 871
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-004.webp",
+      "caption": "Figure 8. KDE-based density modeling in the semantic embedding space. (a) Density heatmap induced by a single sensitive concept, forming a compact high-density semantic core with smoothly decaying density. (b) One-dimensional density profile along the first principal component. (c) Consistent clustering of semantically related concepts under the same density representation, illustrating the coherence of local semantic neighborhoods.",
+      "page": 15,
+      "index": 4,
+      "width": 917,
+      "height": 310
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-005.webp",
+      "caption": "Figure 16. Comparison of joint erasure results of multiple sensitive concepts, Top: original image; Bottom: DSS joint erase",
+      "page": 21,
+      "index": 5,
+      "width": 724,
+      "height": 946
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-006.webp",
+      "caption": "Table 3. Performance of different methods on adversarial prompts. We abbreviate Co-Erasing as CE and Prompt Guard as Prom. (Text, %, ↓; lower percentage indicates better resistance).",
+      "page": 7,
+      "index": 6,
+      "width": 454,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-007.webp",
+      "caption": "Figure 17. Semantic decoupling verification",
+      "page": 22,
+      "index": 7,
+      "width": 836,
+      "height": 900
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-008.webp",
+      "caption": "Figure 18. NSFW Visualization Experiment Supplement, top row: original generated image; Bottom row: DSS joint erased image",
+      "page": 23,
+      "index": 8,
+      "width": 723,
+      "height": 946
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-009.webp",
+      "caption": "Figure 6. Visualization of DSS’s correction effects for prompts with various concepts as λ (semantic preservation coefficient) increases. small λ achieves strong desensitization, while large λ retains more original content.",
+      "page": 8,
+      "index": 9,
+      "width": 813,
+      "height": 375
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-010.webp",
+      "caption": "Figure 3. Left: U-Net based sensitivity detection and feature correction during inference. Sensitivity is detected at the middle layer, while feature correction is applied to the text embedding and the cross-attention layers in the middle and up-sampling stages. Top right: SSBM for constructing safe semantic anchors. Bottom right: Visualization of the “sensitive revise” feature correction space. The complete pseudo-code flow is provided in the appendix A.",
+      "page": 4,
+      "index": 10,
+      "width": 1013,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-011.webp",
+      "caption": "Table 6. Example of divergent normal prompts for core sensitive concepts (Top 5 per concept)",
+      "page": 19,
+      "index": 11,
+      "width": 800,
+      "height": 714
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-012.webp",
+      "caption": "Figure 12. Single sensitive concept scene detection based on intermediate features",
+      "page": 17,
+      "index": 12,
+      "width": 875,
+      "height": 318
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-013.webp",
+      "caption": "Figure 13. Multi sensitive concept scene detection based on intermediate features",
+      "page": 17,
+      "index": 13,
+      "width": 987,
+      "height": 524
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-014.webp",
+      "caption": "Figure 19. Object Visualization Experiment Supplement, top row: original generated image; Bottom row: DSS joint erased image",
+      "page": 24,
+      "index": 14,
+      "width": 787,
+      "height": 977
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-015.webp",
+      "caption": "Table 7. Representative samples of adversarial Prompt generated by the Ring-A-Bell algorithm (parameters: CD=0.8, KRR=0.3, NIR=0.4, SIR=0.2)",
+      "page": 20,
+      "index": 15,
+      "width": 1008,
+      "height": 458
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-016.webp",
+      "caption": "Figure 15. Comparison of erasure effects of Ring-A-Bell algorithm in constructing aggressive adversarial prompts: Taking nude, car, and Van Gogh style scenes as examples, compared with ESD SOTA method, the DSS method proposed in this paper has better erasure effects on target concepts and generated image quality",
+      "page": 20,
+      "index": 16,
+      "width": 629,
+      "height": 683
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-017.webp",
+      "caption": "Figure 11. Score distributions and ROC curves for different feature carriers. Middle cross-attention features exhibit clearer score separation and improved ROC performance compared to text embeddings.",
+      "page": 16,
+      "index": 17,
+      "width": 804,
+      "height": 257
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-018.webp",
+      "caption": "Figure 9. Comparison of detection behavior on edge prompts. The text embedding layer often misclassifies prompts containing sensitive keywords but producing benign images, whereas the middle cross-attention layer better aligns detection responses with the actual generated content.",
+      "page": 16,
+      "index": 18,
+      "width": 585,
+      "height": 324
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16483v1/fig-019.webp",
+      "caption": "Figure 10. Cross-attention activation heatmaps at early denoising time steps, along with gradient-based token contribution analysis.",
+      "page": 16,
+      "index": 19,
+      "width": 722,
+      "height": 456
+    }
+  ]
+}

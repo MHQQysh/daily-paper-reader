@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10848v1/fig-001.webp",
+      "caption": "Figure 6: KL divergence to the ground-truth We report the KL divergence to the ground truth transition probabilities for the trained transformers, the constructed transformer, and the one-step MD estimator across sequence lengths Left: order 3. Right: order 5.",
+      "page": 21,
+      "index": 1,
+      "width": 652,
+      "height": 317
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10848v1/fig-002.webp",
+      "caption": "Figure 7: Layer-1 Attention Softmax vs. True Transition matrices for orders 3 and 5. For both orders (m = 3 top 3 rows, m = 5 bottom 3 rows), each panel reports the learned first-layer attention (softmax of WA⊤",
+      "page": 22,
+      "index": 2,
+      "width": 827,
+      "height": 1281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10848v1/fig-003.webp",
+      "caption": "Figure 4: Comparison of Trained and Constructed Transformers. Left: Attention maps of the trained transformer (disentangled and standard) versus our theoretical construction (seq. length 64). Right (top): KL divergence to the ground truth transition probabilities for the trained transformers, the constructed transformer, and the one-step MD estimator across sequence lengths. Right (bottom): First-layer attention softmax Softmax(WA⊤",
+      "page": 10,
+      "index": 3,
+      "width": 812,
+      "height": 464
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10848v1/fig-004.webp",
+      "caption": "Figure 8: Comparison of Trained and Constructed Transformers (attention grids). Top: Attention maps of the trained transformer (disentangled) versus our theoretical construction (seq. length 64, MTD order m = 3). Bottom: Same as top but for MTD order m = 5.",
+      "page": 23,
+      "index": 4,
+      "width": 649,
+      "height": 868
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10848v1/fig-005.webp",
+      "caption": "Table 2: Summary of Experimental Parameters",
+      "page": 17,
+      "index": 5,
+      "width": 656,
+      "height": 1200
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10848v1/fig-006.webp",
+      "caption": "Table 1: Dimensionality of Hidden States in the Disentangled Transformer",
+      "page": 16,
+      "index": 6,
+      "width": 822,
+      "height": 229
+    }
+  ]
+}

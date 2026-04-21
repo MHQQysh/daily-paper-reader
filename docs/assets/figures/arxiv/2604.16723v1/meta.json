@@ -1,0 +1,390 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-001.webp",
+      "caption": "Figure 19: The user prompt used for the Critic Agent, tasked with scrutinizing logic and detecting contradictions.",
+      "page": 25,
+      "index": 1,
+      "width": 979,
+      "height": 502
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-002.webp",
+      "caption": "Figure 18: The system prompt used for the Critic Agent, tasked with scrutinizing logic and detecting contradictions.",
+      "page": 25,
+      "index": 2,
+      "width": 979,
+      "height": 690
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-003.webp",
+      "caption": "Figure 44: The input research question (Sample 3) used to prompt all models for this comparison.",
+      "page": 38,
+      "index": 3,
+      "width": 979,
+      "height": 206
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-004.webp",
+      "caption": "Figure 45: Research idea generated for sample 3 by the Unsloth Qwen2.5 14B baseline.",
+      "page": 38,
+      "index": 4,
+      "width": 979,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-005.webp",
+      "caption": "Figure 46: Research idea generated for sample 3 by the GPT Researcher agent.",
+      "page": 38,
+      "index": 5,
+      "width": 979,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-006.webp",
+      "caption": "Figure 20: The system prompt used for the Evaluator Agent, tasked with synthesizing the debate and issuing the final binary reward.",
+      "page": 26,
+      "index": 6,
+      "width": 979,
+      "height": 914
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-007.webp",
+      "caption": "Figure 9: The full user prompt used for the Idea Generation Policy.",
+      "page": 21,
+      "index": 7,
+      "width": 979,
+      "height": 196
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-008.webp",
+      "caption": "Figure 10: The system prompt used for selecting the best idea among N generated ideas.",
+      "page": 21,
+      "index": 8,
+      "width": 979,
+      "height": 841
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-009.webp",
+      "caption": "Figure 25: The user prompt used to evaluate two ideas based on novelty, feasibility, and effectiveness, selecting the superior idea or marking them as equal.",
+      "page": 30,
+      "index": 9,
+      "width": 979,
+      "height": 269
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-010.webp",
+      "caption": "Figure 24: The system prompt used to evaluate two ideas based on novelty, feasibility, and effectiveness, selecting the superior idea or marking them as equal.29",
+      "page": 29,
+      "index": 10,
+      "width": 979,
+      "height": 1356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-011.webp",
+      "caption": "Figure 51: Research idea generated for sample 3 by our method - BoN (10).",
+      "page": 39,
+      "index": 11,
+      "width": 979,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-012.webp",
+      "caption": "Figure 47: Research idea generated for sample 3 by AI Scientist V2.",
+      "page": 39,
+      "index": 12,
+      "width": 979,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-013.webp",
+      "caption": "Figure 12: The system prompt used for supervised fine-tuning.",
+      "page": 22,
+      "index": 13,
+      "width": 979,
+      "height": 454
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-014.webp",
+      "caption": "Figure 13: The user prompt used for supervised fine-tuning.",
+      "page": 22,
+      "index": 14,
+      "width": 979,
+      "height": 196
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-015.webp",
+      "caption": "Figure 11: The user prompt used for selecting the best idea among N generated ideas.",
+      "page": 22,
+      "index": 15,
+      "width": 979,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-016.webp",
+      "caption": "Figure 31: Research idea generated for sample 1 by AI Scientist V2.",
+      "page": 34,
+      "index": 16,
+      "width": 979,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-017.webp",
+      "caption": "Figure 33: Research idea generated for sample 1 by the model Fine-Tuned on ICLR data (SFT).",
+      "page": 34,
+      "index": 17,
+      "width": 979,
+      "height": 185
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-018.webp",
+      "caption": "Figure 32: Research idea generated for sample 1 by the Research Agent.",
+      "page": 34,
+      "index": 18,
+      "width": 979,
+      "height": 460
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-019.webp",
+      "caption": "Table 4: Hyperparameters used for GRPO Post-training.",
+      "page": 14,
+      "index": 19,
+      "width": 460,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-020.webp",
+      "caption": "Figure 30: Research idea generated for sample 1 by the GPT Researcher agent.",
+      "page": 33,
+      "index": 20,
+      "width": 979,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-021.webp",
+      "caption": "Figure 29: Research idea generated for sample 1 by the Unsloth Qwen2.5 14B baseline.",
+      "page": 33,
+      "index": 21,
+      "width": 979,
+      "height": 229
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-022.webp",
+      "caption": "Figure 35: Research idea generated for sample 1 by our method - BoN (10).",
+      "page": 35,
+      "index": 22,
+      "width": 979,
+      "height": 417
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-023.webp",
+      "caption": "Figure 34: Research idea generated for sample 1 by LDC.",
+      "page": 35,
+      "index": 23,
+      "width": 979,
+      "height": 187
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-024.webp",
+      "caption": "Figure 4: The system prompt used to classify whether a paper contains new ideas or is a survey or evaluation paper.",
+      "page": 18,
+      "index": 24,
+      "width": 979,
+      "height": 496
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-025.webp",
+      "caption": "Figure 5: The user prompt used to classify whether a paper contains new ideas or is a survey or evaluation paper.",
+      "page": 18,
+      "index": 25,
+      "width": 979,
+      "height": 244
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-026.webp",
+      "caption": "Figure 15: The user prompt used for the Moderator Agent, tasked with guiding the discussion and enforcing methodological alignment.",
+      "page": 23,
+      "index": 26,
+      "width": 979,
+      "height": 368
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-027.webp",
+      "caption": "Figure 14: The system prompt used for the Moderator Agent, tasked with guiding the discussion and enforcing methodological alignment.",
+      "page": 23,
+      "index": 27,
+      "width": 979,
+      "height": 425
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-028.webp",
+      "caption": "Figure 22: The full system prompt used for extracting the idea from the output of AI Scientist.",
+      "page": 28,
+      "index": 28,
+      "width": 979,
+      "height": 938
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-029.webp",
+      "caption": "Table 2: Performance comparison across different datasets for unsloth-Qwen2.5-14B 4-bit quantized. Best scores are bolded.",
+      "page": 8,
+      "index": 29,
+      "width": 973,
+      "height": 744
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-030.webp",
+      "caption": "Figure 52: Pairwise Evaluation Scores on ICLR 2024 Dataset. The plot compares the mean scores of our method against five baselines across Novelty, Feasibility, and Effectiveness. Error bars indicate standard deviation. Our method demonstrates a significant advantage in Novelty and Effectiveness.",
+      "page": 40,
+      "index": 30,
+      "width": 979,
+      "height": 410
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-031.webp",
+      "caption": "Figure 53: Pairwise Evaluation Scores on NeurIPS 2025 Dataset. Consistent with the ICLR results, our method maintains a lead in Novelty and Effectiveness, while the Base Model and AI Scientist V2 score higher on Feasibility.",
+      "page": 40,
+      "index": 31,
+      "width": 979,
+      "height": 410
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-032.webp",
+      "caption": "Figure 39: Research idea generated for sample 2 by AI Scientist V2.",
+      "page": 36,
+      "index": 32,
+      "width": 979,
+      "height": 233
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-033.webp",
+      "caption": "Figure 38: Research idea generated for sample 2 by the GPT Researcher agent.",
+      "page": 36,
+      "index": 33,
+      "width": 979,
+      "height": 322
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-034.webp",
+      "caption": "Figure 6: The system prompt used to generate a Research Question from a paper’s title and abstract.",
+      "page": 19,
+      "index": 34,
+      "width": 979,
+      "height": 1092
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-035.webp",
+      "caption": "Figure 3: Precision vs. Recall for Multi-Agent Judge Configurations. We analyze the performance of various agent compositions, numbered 1 through 13. The plot highlights the sensitivity of the reward signal to agent roles: removing the Analyst [1] significantly degrades precision, while removing the Evaluator [10] nearly eliminates recall. Configuration [11] (2 Analysts + 1 Evaluator) represents the optimal trade-off chosen for the main pipeline, achieving perfect precision (1.0) with robust recall (0.300).",
+      "page": 17,
+      "index": 35,
+      "width": 979,
+      "height": 579
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-036.webp",
+      "caption": "Figure 27: The user prompt used to evaluate a given scientific idea based on novelty, feasibility and effectiveness.",
+      "page": 32,
+      "index": 36,
+      "width": 979,
+      "height": 202
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-037.webp",
+      "caption": "Table 6: Performance comparison across different datasets for unsloth-Qwen2.5-7B. Best scores are bolded.",
+      "page": 41,
+      "index": 37,
+      "width": 968,
+      "height": 359
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-038.webp",
+      "caption": "Figure 21: The user prompt used for the Evaluator Agent, tasked with synthesizing the debate and issuing the final binary reward.",
+      "page": 27,
+      "index": 38,
+      "width": 979,
+      "height": 883
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-039.webp",
+      "caption": "Figure 16: The system prompt used for the Analyst Agent, tasked with identifying core methodological elements and comparing them.",
+      "page": 24,
+      "index": 39,
+      "width": 979,
+      "height": 806
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-040.webp",
+      "caption": "Figure 17: The user prompt used for the Analyst Agent, tasked with identifying core methodological elements and comparing them..",
+      "page": 24,
+      "index": 40,
+      "width": 979,
+      "height": 344
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-041.webp",
+      "caption": "Figure 2: Ablation of multi-agent Judge architectures. Left: absolute precision/recall for each configuration. Right: change relative to the four-role Ordinary baseline (Moderator+Analyst+Critic+Evaluator).",
+      "page": 9,
+      "index": 41,
+      "width": 976,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-042.webp",
+      "caption": "Figure 40: Research idea generated for sample 2 by the Research Agent.",
+      "page": 37,
+      "index": 42,
+      "width": 979,
+      "height": 187
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-043.webp",
+      "caption": "Figure 43: Research idea generated for sample 2 by our method - BoN (10).",
+      "page": 37,
+      "index": 43,
+      "width": 979,
+      "height": 279
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-044.webp",
+      "caption": "Figure 26: The system prompt used to evaluate a given scientific idea based on novelty, feasibility and effectiveness.",
+      "page": 31,
+      "index": 44,
+      "width": 979,
+      "height": 1137
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-045.webp",
+      "caption": "Figure 8: The full system prompt used for the Idea Generation Policy.",
+      "page": 20,
+      "index": 45,
+      "width": 979,
+      "height": 913
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-046.webp",
+      "caption": "Figure 7: The user prompt used to generate a Research Question from a paper’s title and abstract.",
+      "page": 20,
+      "index": 46,
+      "width": 979,
+      "height": 266
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-047.webp",
+      "caption": "Figure 1: Overview of the proposed framework for internalizing scientific reasoning via Reinforcement Learning (RL) post-training. The pipeline consists of five distinct stages: (1) Dataset Curation, where research questions and abstracts are extracted from accepted ICLR 2024 papers to form the ICLR-320 dataset; (2) Candidate Generation, utilizing a Qwen2.5 14B policy model to propose research ideas; (3) Multi-Agent Judge, employing a debate-based mechanism (two Analysts, and one Evaluator) to assign binary rewards; (4) Policy Optimization, utilizing Dr. GRPO (Group Relative Policy Optimization) to update the model without standard deviation scaling; and (5) Final Evaluation, assessing the trained model for novelty, feasibility, and effectiveness using both LLM-as-a-judge and human expert review.",
+      "page": 5,
+      "index": 47,
+      "width": 976,
+      "height": 338
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16723v1/fig-048.webp",
+      "caption": "Table 5: Comparison of Best Configurations per Evaluation Strategy (Mean over 5 runs). Our Final MultiAgent Judge achieves perfect precision, eliminating false-positive rewards critical for mitigating reward hacking.",
+      "page": 16,
+      "index": 48,
+      "width": 632,
+      "height": 200
+    }
+  ]
+}

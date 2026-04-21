@@ -1,0 +1,1981 @@
+Title: MAGRPO: Accelerated MARL Training for Fluid Antenna-Assisted Wireless Network Optimization
+
+URL Source: https://arxiv.org/pdf/2604.17379v1
+
+Published Time: Tue, 21 Apr 2026 01:17:06 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+> 1
+
+# MAGRPO: Accelerated MARL Training for Fluid Antenna-Assisted Wireless Network Optimization 
+
+Wanzhe Wang, Tong Zhang, Hao Xu, Shuai Wang, Rui Wang, and Kai-Kit Wong 
+
+Abstract —Fluid antenna system (FAS) becomes a promising paradigm for next-generation wireless networks, which enables position-flexible antenna elements that can dynamically adjust to more favorable channel conditions. However, the optimization of fluid antenna (FA) positions, beamforming, and power allocation in FA-assisted wireless networks is challenging, due to the non-convexity and the lack of base station (BS) coordination. In this paper, we first formulate this challenging optimization problem as a decentralized partially observable Markov decision process, and then propose a multi-agent group relative policy optimization (MAGRPO) algorithm under the centralized training decentral-ized execution (CTDE) paradigm. Compared with multi-agent proximal policy optimization (MAPPO), MAGRPO replaces the critic network with group relative advantage estimation. This design reduces computational complexity by nearly half under parameter sharing. Furthermore, we derive a variance upper bound of the cumulative reward, which scales with network parameters, e.g., the number of BSs, users, and FAs. Simulation results show that compared with wireless networks with fixed an-tenna positions, FA-assisted wireless networks achieve multiple-fold sum-rate enhancement. Moreover, the proposed MAGRPO attains sum-rates comparable to those of MAPPO in testing, while reducing training time by 30% ∼ 40% .
+
+Index Terms —Decentralized partially observable Markov de-cision process, fluid antenna system, multi-agent group relative policy optimization, multi-agent proximal policy optimization, multi-agent reinforcement learning. 
+
+I. I NTRODUCTION 
+
+# WIRELESS communications have evolved through gen-erational shifts that each mark a significant leap for-ward. The current transition from the fifth generation (5G) to the sixth generation (6G) cellular networks introduces groundbreaking advancements in multiple-input multiple-output (MIMO) [1], [2], [3]. Distinguished by their multi-plexing and diversity gains, MIMO enables the simultaneous transmission of multiple data streams over the spatial medium 
+
+W. Wang is with Harbin Institute of Technology, Shenzhen, China (e-mail: wangwz724@163.com) T. Zhang is with Guangdong Provincial Key Laboratory of Aerospace Communication and Networking Technology, Harbin Institute of Technology, Shenzhen, 518055, China (e-mail: tongzhang@hit.edu.cn). H. Xu is with the School of Information Science and Engineering, Southeast University, Nanjing, 210096, P.R. China (e-mail: hao.xu@seu.edu.cn). S. Wang is with the Shenzhen Institutes of Advanced Technology, Chinese Academy of Sciences, Shenzhen 518055, China (e-mail: s.wang@siat.ac.cn). R. Wang is with the Southern University of Science and Technology (e-mail: wangr@sustech.edu.cn). K. K. Wong is affiliated with the Department of Electronic and Electri-cal Engineering, University College London, Torrington Place, WC1E 7JE, United Kingdom and he is also affiliated with the Department of Electronic Engineering, Kyung Hee University, Yongin-si, Gyeonggi-do 17104, Korea. (e-mail: kai-kit.wong@ucl.ac.uk). Our code is available at github.com/wanzheWang/MAGRPO .
+
+while enhancing robustness against fading through multiple independent signal paths. Despite these advantages, MIMO performance remains highly dependent on channel conditions, since fixed antenna positions cannot adapt to favorable channel conditions, leading to significant performance degradation. To address this limitation, the fluid antenna system (FAS) emerges as a novel technology in MIMO by rapidly adjusting antenna positions. Therefore, FAS actively reshapes the MIMO channel response, converting poor channel conditions into favorable ones and thereby overcoming the limitation of fixed-position MIMO systems [4]-[10]. Early research began with antenna position optimization in single-cell multi-user fluid antenna (FA)-MIMO systems, exploring how jointly optimizing FA positions, beamforming, and power allocation enhances communication performance [11], [12], [13], [14], [15], [16]. The seminal works begin with the point-to-point FA-MIMO systems. [11] addressed the transmit and receive antenna port selection problem in fluid MIMO systems by proposing low-complexity algorithms based on joint convex relaxation combined with reduced-dimensional search or alternating optimization, achieving an effective trade-off between performance and complexity. [12] designed a bit error rate (BER)-oriented optimization algo-rithm for point-to-point FA-MIMO systems, identifying the minimum singular values and effective rank as key reliability metrics. Then, the research progresses to single-cell multi-user FA-MIMO systems. [13] investigated an uplink multiuser system with fluid antennas at both ends, and demonstrated that jointly optimizing antenna positions at the base station (BS) and users plays a key role in enhancing system ca-pacity under multipath environments. For downlink multi-user FA-MIMO systems, [14] proposed a block coordinate ascent algorithm that jointly optimizes beamforming and the positions of both transmit and receive FAs. Besides, FAS has been integrated into other functionality systems, beyond pure communication, for example, FA-assisted low-latency com-munications [15], and FA-assisted integrated communications and sensing (ISAC) [16]. All of the aforementioned works rely on numerical optimization methods, which are inherently limited in achieving very high sum-rate performance due to the non-convex and high-dimensional nature of the FA position optimization problem. For this reason, deep reinforcement learning (DRL) has been applied in single-cell multi-user FA-MIMO systems [17], [18], [19], [20], [21], leveraging its ability to learn high-performance solutions without requiring labeled optimal solutions, and its low inference complexity. [17] adopted proximal policy optimization (PPO) for latency minimization 
+
+> arXiv:2604.17379v1 [cs.IT] 19 Apr 2026 2
+
+in the federated learning-assisted FAS. [18] employed the group relative policy optimization (GRPO) to indoor FAS and jointly optimized antenna positions, beamforming, and power allocation, achieving significant reductions in model size and floating-point operations compared with PPO. [19] developed a softmax deep deterministic policy gradient (SD3) algorithm to jointly optimize opportunistic user scheduling and port selection in single-cell multi-user FA-MIMO systems. [20] used a heterogeneous multi-agent deep deterministic policy gradient (MADDPG) algorithm for single-cell multi-user FA-MIMO systems, where separate agents were dedicated to beamforming and FA movement to address the challenges of imperfect channel state information. [21] proposed an advantage actor-critic (A2C) to jointly optimize FA position and beamforming in single-cell multi-user FA-MIMO ISAC systems. All of the aforementioned works establish DRL as an effective approach for tackling the non-convex, high-dimensional joint FA position, beamforming, and power allo-cation optimization problem. On a broader scale, an FA-assisted wireless network is composed of multiple single-cell, multi-user FA-MIMO sys-tems. Recent research has shifted to FA position optimization in FA-assisted wireless networks [22], [23], [24], [25]. For numerical optimization in in cell-free massive FA-MIMO, [22] proposed a dynamic neighborhood pruning particle swarm op-timization (PSO) algorithm to minimize the maximum transmit power, while [23] developed a two-loop optimization frame-work combining PSO, fractional programming, and successive convex approximation to jointly optimize beamforming, user association, and FA positions. [24] addressed the two-user fluid antenna multiple access (FAMA) in strong interference channels and adopts simultaneous non-unique decoding to turn strong interference into a useful resource, thereby op-timizing the achievable rate region. [25] achieved simultane-ous enhancement of spectral and energy efficiency through alternating optimization of port selection, beamforming, and reconfigurable intelligent surface (RIS) phase shifts in FA-assisted cell-free internet of things networks. However, all of the aforementioned works consider the coordination between BSs and insufficiently solve the non-convex, high-dimensional joint FA position, beamforming, and power allocation opti-mization problem. Consequently, by treating each BS as an agent, multi-agent reinforcement learning (MARL) has been used for FA-assisted wireless networks [26] and [27]. In FA-assisted cell-free networks, [26] proposed a multi-agent twin delayed deep deterministic policy gradient (MATD3) algorithm within centralized training decentralized execution (CTDE) paradigm, based on each BS’s local observations. In FA-assisted wireless networks, [27] introduced a multi-agent proximal policy opti-mization (MAPPO) algorithm for power allocation, deployed CTDE paradigm. All of these works show that, in FA-assisted wireless networks, MARL achieves promising high perfor-mance without requiring BS coordination. Nevertheless, the excessively long training time of MARL remains a challenge. In this paper, we propose a multi-agent group relative policy optimization (MAGRPO) training algorithm that eliminates the critic network to reduce computational complexity and memory usage, and derive a variance upper bound of the trajectory-wise cumulative reward. Our main contributions are summarized as follows:  
+
+> •
+
+Dec-POMDP Problem Formulation : We formulate the optimization of FA positions, beamforming, and power allocation in FA-assisted wireless networks as a decen-tralized partially observable Markov decision process (Dec-POMDP). This formulation captures the distributed decision-making architecture and partial observability of each BS during operation, and enables the application of MARL with the CTDE paradigm.  
+
+> •
+
+MAGRPO Training Algorithm : We propose a MAGRPO training algorithm that replaces MAPPO’s critic net-work with group relative advantage estimation, under the CTDE paradigm. Compared with MAPPO, the proposed MAGRPO excels at lowering training computational complexity by nearly half under the parameter sharing. Simulation results show that compared with MAPPO, the proposed MAGRPO has comparable sum-rates, while reducing training time by 30% ∼ 40% . 
+
+> •
+
+Reward Variance Upper Bound Analysis : We derive an upper bound on the variance of the trajectory-wise cumu-lative reward, which scales with key network parameters, including the number of BSs and users, the maximum transmit power, the maximum spacing of the FA movable region, the trajectory length, the carrier frequency, and the number of FAs and propagation paths. This upper bound indicates that as network parameters increase, MARL training may be unstable. To stabilize MAGRPO training, a larger group size, a smaller clipping threshold, a smaller learning rate, or a larger number of warm-up steps, either individually or in combination, are recommended. 
+
+Organization : The remainder of this paper is organized as follows. Section II presents the system model and problem formulation. Section III recasts the problem as a Dec-POMDP, and introduce the CTDE paradigm. Section IV reviews the MAPPO, and Section V introduces the proposed MAGRPO. Section VI provides a theoretical variance analysis. Section VII presents the simulation results, followed by concluding remarks in Section VIII. 
+
+Notation : (·)∗ denotes conjugate operation. (·)H denotes conjugate transpose operation. E{·} denotes the long-term expectation operator. We write f (x) = O(g(x)) as x → ∞ 
+
+if there exist constants C > 0 and x′ ∈ R such that 
+
+|f (x)| ≤ C|g(x)| for all x ≥ x′. ∥ · ∥ denotes Euclidean norm for vectors and spectral norm for matrices. log denotes 
+
+log 2. The key symbol notations are given in Table I. II. S YSTEM MODEL AND PROBLEM FORMULATION 
+
+We consider a FA-assisted wireless network in the downlink, where multiple BSs are equipped with two-dimensional (2D) FA arrays. In each cell, a BS i ∈ N := {1, · · · , N } with 
+
+M fluid transmit antennas simultaneously serves K single-antenna users. An example of the considered downlink FA-assisted wireless network is shown in Fig. 1. The carrier wave-3
+
+TABLE I: K EY SYMBOL NOTATION 
+
+Symbol Definition Symbol Definition 
+
+N Number of BSs K Number of users served by each BS 
+
+M Number of FAs per BS L Number of propagation paths 
+
+R Network-wide reward D On-policy trajectory buffer 
+
+T Trajectory length E Number of update epochs 
+
+G Group size in MAGRPO J Number of neurons in each hidden layer 
+
+Jhidden Number of hidden layers γd Discount factor 
+
+μ KL divergence penalty coefficient ι Entropy regularization coefficient 
+
+σ2 AWGN variance f Carrier frequency 
+
+λ Carrier wavelength α Path-loss exponent 
+
+P i 
+
+> max
+
+Maximum transmit power at BS i Dmin Minimum spacing of FAs 
+
+Tref Warm-up training steps Tmax Max training steps 
+
+s[k] 
+
+> i
+
+Data symbol for user k at BS i y[k] 
+
+> i
+
+Received signal of user k served by BS iz[k] 
+
+> i
+
+AWGN for user k δt TD residual 
+
+ϵ1 MAPPO’s advantage clipping threshold ϵ2 MAGRPO’s advantage clipping threshold 
+
+θi Actor network params for BS i θi 
+
+> old
+
+Previous policy params for BS iϕ Centralized critic network param πθi Actor policy of BS iπi 
+
+> ref
+
+Reference policy in MAGRPO oi Local observation at BS i
+
+ai Local action at BS i st State at step t
+
+xi Transmitted signal of BS i bAt GAE advantage estimate 
+
+bAg Group relative advantage estimate bRt Bootstrapped reward target 
+
+w[k] 
+
+> i
+
+Beamforming vector for user k at BS i h[k] 
+
+> i,j
+
+Channel from BS i to user k served by BS jI[k]1,i Intra-cell interference I[k]2,i Inter-cell interference 
+
+v User antenna position uim Position of m-th FA at BS ixr , y r , z r User position coordinates v xtm, y tm, z tm Position coordinates of FA m
+
+f (·) User field response vector g(·) BS field response vector 
+
+Σ Path-response diagonal matrix ζℓ Multipath component of path ℓρℓ(·) User field response phase for path ℓ ρℓ(·) BS response phase for path ℓ at FA mξrℓ , ψ rℓ AoA pair of path ℓ ξtℓ,m , ψ tℓ,m AoD pair of path ℓηrℓ , β rℓ , ν rℓ Virtual AoA components ηtℓ,m , β tℓ,m , ν tℓ,m Virtual AoD components 
+
+length and frequency are denoted by λ and f , respectively. The transmit signal of BS i is written as 
+
+xi =
+
+> K
+
+X
+
+> k=1
+
+w[k] 
+
+> i
+
+s[k] 
+
+> i
+
+, (1) where w[k] 
+
+> i
+
+∈ CM ×1 denotes the beamforming vector for user 
+
+k ∈ K := {1, · · · , K } from the BS i; and s[k] 
+
+> i
+
+∈ C denotes the data symbol satisfying unit power constraint E[|s[k] 
+
+> i
+
+|2] = 1 .The input-output relationship at the user k served by the BS 
+
+i is written as 
+
+y[k] 
+
+> i
+
+=h[k] 
+
+> i,i
+
+w[k] 
+
+> i
+
+s[k] 
+
+> i
+
++
+
+> K
+
+X 
+
+> k′=1 ,k ′̸=k
+
+h[k] 
+
+> i,i
+
+w[k′] 
+
+> i
+
+s[k′]
+
+> i
+
+| {z } 
+
+> intra-cell interference denoted by I[k]1,i
+
++
+
+> N
+
+X 
+
+> j=1 ,j ̸=iK
+
+X
+
+> k′=1
+
+h[k] 
+
+> j,i
+
+w[k′] 
+
+> j
+
+s[k′]
+
+> j
+
+| {z } 
+
+> inter-cell interference denoted by I[k]2,i
+
++z[k] 
+
+> i
+
+, (2) where I[k]1,i = PKk′=1 ,k ′̸ =k h[k] 
+
+> i,i
+
+w[k′] 
+
+> i
+
+s[k′] 
+
+> i
+
+denotes the intra-cell interference; I[k]2,i = PNj=1 ,j ̸ =i
+
+PKk′=1 h[k] 
+
+> i,i
+
+w[k′] 
+
+> j
+
+s[k′] 
+
+> j
+
+de-notes the inter-cell interference; z[k] 
+
+> i
+
+∼ CN (0 , σ 2) denotes the additive White Gaussian noise (AWGN). The signal-to-interference-plus-noise ratio (SINR) is defined as the ratio of the power of a desired signal to the combined power of all User  User   
+
+> User User
+> User
+> User
+> User
+> User
+> User
+> User
+> User
+> User
+> FAS BS FAS BS
+> FAS BS FAS BS
+> Interference
+
+Fig. 1: Illustration of an example of the considered downlink FA-assisted wireless network. interfering signals and noise at the receiver. Accordingly, due to the unit power constraint, the SINR of user k served by BS 
+
+i can be expressed as 
+
+γ[k] 
+
+> i
+
+= h[k] 
+
+> i,i
+
+w[k]
+
+> i
+> 2
+
+|I[k]1,i |2 + |I[k]2,i |2 + σ2 . (3) 4
+
+A. Field Response Channel Model 
+
+It can be seen from the input-output relationship in (2) that there are two kinds of channels. The channel to the intra-cell user, denoted by h[k] 
+
+> i,i
+
+∈ C1×M , i ∈ N , k ∈ K , which can be interpreted as the channel from BS i to user k served by BS i. The channel to the inter-cell user, h[k] 
+
+> i,j
+
+∈ C1×M , i, j ∈N , k ∈ K , which can be interpreted as the channel BS i to user k served by BS j and j̸ = i. Below, we only explain the model on h, omitting its indices for brevity. The specific indexed forms, such as h[k] 
+
+> i,i
+
+and h[k] 
+
+> i,j
+
+, follow directly. According to the field response model [11], [12], [13], [14], the channel h is expressed as the product of the user’s field response vector, the path-response matrix, and the BS’s field response matrix. To be specific, user’s field response vector, denoted by f (·), represents the impact of angle of arrival (AoA) in modeling h. Let’s denote the user’s antenna position of by v := ( xr , y r , z r ). Assume that there are L paths from BS to user. The AoA for path ℓ ∈ L := {1, · · · , L } is denoted by (ξrℓ , ψ rℓ ). As such, the virtual AoA are given by 
+
+ηrℓ = cos ξrℓ cos ψrℓ , βrℓ = cos ξrℓ sin ψrℓ , and νrℓ = sin ξrℓ . The user’s field response vector f (v) ∈ CL×1can be calculated by 
+
+f (v) = ej 2πλ ρ1(v); · · · ; ej 2πλ ρL(v), (4) where 
+
+ρℓ(v) = xr ηrℓ + yr βrℓ + zr νrℓ . (5) BS’s field response matrix is composed by BS’s field response vectors. Let’s denote field response vector by 
+
+g(um), m ∈ M := {1, ..., M }, where the m-th FA po-sition at BS is denoted by um := (xtm, y tm, z tm). BS’s field response matrix is derived as G(u1, · · · , uM ) := g(u1), · · · , g(uim) ∈ CL×M . To be specific, BS’s field response vector represents the impact of angle of departure (AoD) in modeling h. Since we assume that there are L
+
+multipaths, the AoD for path ℓ ∈ L and m-th FA position at BS is denoted by (ξtℓ,m , ψ tℓ,m ). As such, the virtual AoD are given by ηtℓ,m = cos ξtℓ,m cos ψtℓ,m , βtℓ,m = cos ξtℓ,m sin ψtℓ,m ,and νtℓ,m = sin ξtℓ,m . The field response vector at the m-th FA at BS g(um) ∈ CL×1 can be calculated by 
+
+g(um) = ej 2πλ ρ1(um); · · · ; ej 2πλ ρL(um), (6) where 
+
+ρℓ(um) = xtmηtℓ,m + ytmβtℓ,m + ztmνtℓ,m . (7) The path-response matrix represents the impact of multipath channel gain. Let’s denote the path-response matrix by Σ ∈
+
+CL×L, which is a diagonal matrix with multipath component 
+
+ζℓ/√L, ℓ ∈ L . Finally, we can express the channel vector h
+
+as follows: 
+
+h = f H (v) Σ G (u1, · · · , uM ). (8) 
+
+B. Problem Formulation 
+
+For the considered downlink FA-assisted wireless network, we assume that there is no communication allowed between BSs and decision should be made at each BS during operation. We aim at the distributed optimization of FA positions, down-link beamforming vectors, and power allocation for each user across all BSs, in order to maximize the network-wide sum-rate. Let’s denote decision variables set by X := uim, w[k] 
+
+> i
+
+|∀k ∈ K, ∀m ∈ M . Mathematically, we formulate this problem as follows: P1 : max 
+
+> X
+> N
+
+X
+
+> i=1
+> K
+
+X
+
+> k=1
+
+log  1 + γ[k]
+
+> i
+
+ (9a) s.t. 
+
+> K
+
+X
+
+> k=1
+
+∥w[k] 
+
+> i
+
+∥2 ≤ Pmax , ∀i ∈ N , (9b) 
+
+uim ∈ C , ∀i ∈ N ∀m ∈ M , (9c) 
+
+∥uim − uim′ ∥ ≥ Dmin ,
+
+∀m, m ′ ∈ M , m ̸ = m′, (9d) where log  1 + γ[k]
+
+> i
+
+ in objective (9a) represents the data rate for the user k served by BS i; (9b) enforces the maximum transmit power; (9c) defines the movable region for the m-th FA; and (9d) imposes the minimum spacing between two FAs to prevent mutual coupling. Unfortunately, Problem P1 is difficult to solve due to the non-convexity introduced by the field-response channel model and the minimum adjacent FA spacing constraint. In the next, we therefore reformulate Problem P1 as a Dec-POMDP, which facilitates the development of MARL. III. D EC -POMDP R EFORMULATION AND 
+
+CTDE P ARADIGM 
+
+A. Dec-POMDP Reformation of Problem P1 
+
+As a prerequisite before MARL, we shall first reformulate Problem P1 as a Dec-POMDP. This is because the Dec-POMDP formulation models two key aspects of the problem: first, the distributed decision-making structure across multiple BSs; and second, the practical constraint that each BS has only local observability of the global system state and cannot communicate with other BSs during execution. Specifically, the ingredients of the Dec-POMDP are defined as follows:  
+
+> •
+
+Agents : Let N denote the set of index of all BSs, i.e., 
+
+N := {1, · · · , N }. Each BS acts as an independent agent.  
+
+> •
+
+State : Let S denote the state space, which contains com-plete information of the wireless network. S is defined as follows: 
+
+S := uim, w[k] 
+
+> i
+
+, v[k] 
+
+> i
+
+, h[k] 
+
+> i,i
+
+, h[k] 
+
+> j,i
+
+, log  1 + γ[k] 
+
+> i
+
+)
+
+|∀ i ∈ N , ∀k ∈ K , ∀m ∈ M , ∀j̸ = i, j ∈ N . (10) It can be seen that S includes all FA positions, beamform-ing vectors, users’ antenna locations, channel vectors, and users’ rates, which is a global view.  
+
+> •
+
+Observation : Let O denote the union of all BSs’ local observations, i.e., O = QNi=1 oi, where the local obser-vation at BS i is denoted by oi. We define oi as follows: 
+
+oi := uim, w[k] 
+
+> i
+
+, v[k] 
+
+> i
+
+, h[k] 
+
+> i,i
+
+, I [k]2,i , log(1 + γ[k] 
+
+> i
+
+)
+
+|∀ k ∈ K , ∀m ∈ M , ∀j̸ = i, j ∈ N . (11) Compared with the state, each BS only has local obser-vation from its limited information. The local observation 
+
+oi captures the BS’s internal configuration, including its 5Actor N    
+
+> Actor 1
+> Centralized Training
+> Actor 1
+> Gradient
+> Updates
+> Local Observation Local Observation
+> Central Critic for
+> Policy Optimization
+> Decentralized Execution
+> Environment
+> Local
+> Observation
+> Local
+> Action
+> Local Action
+> Actor 2 Actor N
+> Local
+> Observation
+> Gradient
+> Updates Local
+> Action Gradient
+> Updates
+> Local Action
+> Local
+> Action
+> Local
+> Observation
+> Local
+> Action
+> Local
+> Observation
+
+... 
+
+... 
+
+> Actor 2
+
+Fig. 2: Illustration of the CTDE paradigm for MARL. FA positions and beamforming vectors, as well as its per-ceived environment, which consists of the served users’ antenna locations, channel vectors, rates, and the inter-cell interference signal power. Note that the inter-cell interference signal power, also known as the interference temperature, is key to quantifying the influence from other BSs and thus enables the coordination.  
+
+> •
+
+Action : Let A denote the union of all BSs’ local action, i.e., A = QNi=1 ai, where the local action at BS i is denoted by ai. We denote ai as follows: 
+
+ai := uim, w[k] 
+
+> i
+
+| ∀ k ∈ K , ∀m ∈ M . (12) It can be seen that the local action contains the each BS’s internal configuration, including its FA positions and beamforming vectors. As such, the action is the same as the decision variables in Problem P1.  
+
+> •
+
+Reward : Let R denote the reward, which maps state and action into a real number, i.e., S × A → R. We define the reward as follows: 
+
+R =
+
+> N
+
+X
+
+> i=1
+> K
+
+X
+
+> k=1
+
+log(1 + γ[k] 
+
+> i
+
+). (13) In contrast to the individual rewards of a Markov decision process, the reward is assigned network-wide, not per BS. The constraints of Problem P1 are incorporated into the reward design. Specifically, violation of constraint (9d) leads to a substantial penalty on the reward, where R will be a large negative number. Conversely, any violations of constraints (9b) and (9c) will be scaled back to the feasible region, with no penalty on the reward. The above Dec-POMDP formulation matches the features of Problem P1: decentralized decision-making with each BS, and partial observability, where each BS has only a local view of the network state. 
+
+B. CTDE Paradigm for MARL 
+
+To implement the Dec-POMDP formulation within MARL, which leads to an efficient solution, we adopt the CTDE paradigm, which aligns perfectly with Dec-POMDP and offers great advantages in using local observations only. CTDE paradigm was introduced in [28], which leverages centralized information during training to optimize policies that rely solely on local observations during execution, as illustrated in Fig. 2. To be specific, CTDE paradigm addresses non-stationarity through a centralized critic providing stable gradients, resolves credit assignment by decomposing global feedback into individual updates, and overcomes communi-cation constraints, where agents cannot share signals during execution and must rely solely on its local observations. In what follows, we introduce MAPPO, a representative MARL that adopts the CTDE paradigm. IV. MAPPO A LGORITHM 
+
+We first introduce the MAPPO, which serves as the founda-tion for the proposed MAGRPO. According to [29], MAPPO offers the following advantages: First, unlike independent proximal policy optimization (IPPO) that rely solely on lo-cal observations for both training and execution, MAPPO employs the CTDE paradigm to condition policy updates on global state, thereby enabling more effective coordination among agents. Second, relying on a stochastic policy gradient, MAPPO can handle hybrid continuous and discrete action spaces, without the complex decomposition or approximation by MADDPG or monotonic values function factorization (QMIX). Third, by incorporating the PPO’s advantage clipping mechanism, MAPPO ensures stable training by preventing oscillations and policy collapse. In what follows, we elaborate on the MAPPO training based on [29]. 
+
+A. MAPPO Training 
+
+The MAPPO training has the following sequential phases, elaborated as follows: 
+
+Phase-I : Trajectory Collection . All agents interact with the environment for T number of steps according to their current policies, collecting trajectory data. Leveraging the CTDE paradigm, a centralized critic has access to global state information, allowing for a more accurate estimation of the values function to guide policy updates, while each agent’s actor makes decisions based solely on its local observations. 
+
+Phase-II : Generalized Advantage Estimation (GAE) . Based on the collected trajectories, a centralized critic network com-putes the advantage function bAt via GAE. Specifically, GAE provides an adjustable balance between bias and variance, given by 
+
+bAt =
+
+> ∞
+
+X
+
+> l=0
+
+(γdλs)lδt+l, (14) where λs ∈ [0 , 1] is a smoothing parameter with λs = 1 
+
+corresponding to Monte Carlo (MC) reward, while λs = 0 
+
+corresponds to the one-step temporal difference (TD) error. The TD residual in (14) is computed by 
+
+δt = Rt + γdVϕ(st+1 ) − Vϕ(st), (15) where given the state st at step t − 1, let’s denote the critic network’s output by Vϕ(st) at the step t with network 6Reward 
+
+> Model
+> v
+> MAGRPO Training
+> Actor 1
+> Network
+> Actor 2
+> Network
+> Actor N
+> Network
+> ...  r
+> Group
+> Computation
+
+𝒐 ଵ
+
+> ଵ
+
+, ⋯, 𝒐 ீ ଵ
+
+> ...  Frozen
+> Trained
+
+𝒐 ଵ
+
+> ଶ
+
+, ⋯, 𝒐 ீ ଶ
+
+𝒐 ଵ
+
+> ே
+
+, ⋯, 𝒐 ீ
+
+> ே
+> Reference
+> Policy
+> Reward
+> Model
+> Critic
+> Network
+
+# r
+
+> v
+> GAE
+> MAPPO Training
+> Actor 1
+> Network
+> Actor 2
+> Network
+> Actor N
+> Network
+> ...  r
+
+𝑉 థ
+
+𝒐 ே
+
+> ...
+
+𝐴 ௧
+
+𝒐 ଶ
+
+𝒐 ଵ
+
+𝐴 ௚
+
+Fig. 3: Comparison of training algorithm framework of the proposed MAGRPO over MAPPO [29]. parameters ϕ; and γd ≥ 0 is the discount factor that determines the present values of future rewards. Usually, the advantage functions { bAt}Tt=1 used in actors should be normalized within each batch to have zero mean and unit variance, improving the numerical stability and gradient behavior. Next, GAE is used for the update of actor and critic networks. 
+
+Phase-III : Actors and Critic Networks Update . Based on GAE, MAPPO updates the actor networks by means of maximizing the PPO clipped surrogate objective, while simul-taneously minimizing the values prediction error of the critic. An entropy bonus is also added to the policy objective to encourage sufficient exploration. The critic is updated by minimizing a mean-squared error (MSE) loss, given by 
+
+min 
+
+> ϕ
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+
+
+Vϕ(st) − ˆRt
+
+2
+
+, (16) where the regressive target ˆRt is the bootstrapped reward estimate. This target is defined as ˆRt = ˆAt + Vϕold (st), where 
+
+ˆAt is the advantage estimate and Vϕold (st) is the values from the last step network parameters, ensuring the target is not dependent on the current parameters being updated. Given the local observation oit−1 at step t − 1, let’s denote the local action probability of actor network i’s output by 
+
+πθi (oit | ai, oit−1) at the step t with network parameter θi. The 
+
+N actor networks are updated simultaneously by maximizing the sum of the PPO clipped surrogate objective and entropy bonus, given by 
+
+max 
+
+> {θi}Ni=1
+> N
+
+X
+
+> i=1
+
+(Lπ (θi) + ι LH (θi)) , (17) where Lπ (θi) given in (18), represents the clipped policy gradient objective with advantage clipping threshold ϵ1 to prevent destructive policy updates, shown on top of next page; LH (θi) is the policy entropy, weighted by the entropy coefficient ι to encourage exploration. Specifically, Lπ (θi) is given in (18), shown on the top of next page. LH (θi) is given as follows: 
+
+LH (θi) := 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+H πθi (oit | ai, oit−1) , (19) where H(·) denotes the differential entropy. V. P ROPOSED MAGRPO A LGORITHM 
+
+The GRPO algorithm proposed in [30] reduces compu-tational and memory costs by nearly half relative to PPO while achieving superior performance, this benefit primarily attributed to its replacement of the critic network and GAE with group relative advantage estimation. Motivated by GRPO [30], we propose a MAGRPO, which extends the benefit to multi-agent systems. As illustrated in Fig. 3, the core modi-fication consists of replacing MAPPO’s centralized critic and GAE with group relative advantage estimation. The proposed MAGRPO training algorithm is detailed as follows. 
+
+A. Proposed MAGRPO Training Algorithm 
+
+The proposed MAGRPO training algorithm has the follow-ing sequential phases, elaborated as follows: 
+
+Phase I : MAPPO Warm-Up . In this initial phase, we apply a small-step MAPPO training strategy to initialize the policies used in MAGRPO. To be specific, we train MAPPO for a limited number of iterations, which produces a set of reference policies {πi
+
+> ref
+
+}Ni=1 . These policies serve as a basis for guiding policy optimization in the subsequent training phases. 7
+
+Lπ (θi) := 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+min 
+
+( πθi (oit | ai, oit−1)
+
+πθi 
+
+> old
+
+(oit | ai, oit−1) bAt, clip πθi (oit | ai, oit−1)
+
+πθi 
+
+> old
+
+(oit | ai, oit−1) , 1 − ϵ1, 1 + ϵ1
+
+!bAt
+
+)
+
+. (18) 
+
+Phase II : Group Trajectory Collection . All agents collec-tively collect G trajectories of length T for each trajectory by interacting with the environment using their current policies. For each trajectory, the reward is accumulated to compute the reward. Due to CTDE, each agent’s policy relies only on its local observations, thus enabling distributed execution. 
+
+Phase-III : Group Relative Advantage Estimate . Based on the group of G trajectories, MAGRPO employs a group relative advantage estimate, thereby eliminating the need for a critic network. Specifically, the group relative advantage estimate for the g-th trajectory is calculated by 
+
+bAg =
+
+PTt=1 Rgt − MEAN { 
+
+> Gtrajectories
+
+z }| {PTt=1 R1 
+
+> t
+
+, · · · , PTt=1 RGt }
+
+STD {PTt=1 R1 
+
+> t
+
+, · · · , PTt=1 RGt
+
+| {z } 
+
+> Gtrajectories
+
+} , (20) where Rgt denotes the reward for the trajectory g at step 
+
+t; MEAN {·} and STD {·} denote the mean and standard deviation, respectively. As shown in (20), the group relative advantage estimate is normalized to the standard Gaussian dis-tribution to avoid excessive variance. In contrast to MAPPO’s GAE, our MAGRPO’s group relative advantage estimate re-moves the requirement for a centralized critic network. 
+
+Phase-IV : Actor Networks Update . Using the group relative advantage estimate, MAGRPO updates the N actor networks by maximizing a weighted sum of the GRPO clipped surrogate objective and an entropy bonus. Given the local observation oit−1 at step t − 1, let us denote the local action probability of actor network i’s output by 
+
+πθi (oi,g t |ai, oi,g t−1) for the trajectory g at step t with network parameter θi. The N actor networks are updated simultane-ously by maximizing the sum of the GRPO clipped surrogate objective and entropy bonus, given by 
+
+max 
+
+> {θi}Ni=1
+> N
+
+X
+
+> i=1
+
+(Jπ (θi) + ιJH (θi)) , (21) where Jπ (θi) denotes the GRPO objective for agent i. Specifi-cally, Jπ (θi) is given in (22), shown at the top of the next page, which incorporates a Kullback-Leibler (KL) divergence ter, and advantage clipping threshold ϵ2. The strength of this reg-ularization is controlled by KL divergence penalty coefficient 
+
+μ. According to [30], KL divergence can be approximated by 
+
+DKL [πθi ∥πi
+
+> ref
+
+] ≈ πi
+
+> ref
+
+(oi,g t |ai, oi,g t−1)
+
+πθi (oi,g t |ai, oi,g t−1) −
+
+ln πi
+
+> ref
+
+(oi,g t |ai, oi,g t−1)
+
+πθi (oi,g t |ai, oi,g t−1) − 1. (23) In addition, the entropy bonus LH (θi) is given as follows: 
+
+JH (θi) := 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+H πθi (oit | ai, oit−1) . (24) 
+
+Algorithm 1: Proposed MAGRPO Training Algorithm 
+
+Input: Tref , T max , T, G, ϵ 1, ϵ 2, μ, ι, E 
+
+Initialize replay buffer D ← ∅ , Tcount ← 0;
+
+Phase I: MAPPO Warm-Up ;
+
+while Tcount < T ref do 
+
+Collect trajectories by {πθi }Ni=1 , store in D;
+
+Tcount ← Tcount + T ;Compute bAt via (14)-(15); 
+
+// Estimate per-step advantages using GAE 
+
+for e = 1 to E do 
+
+Update the critic network by (16) via Adam; Update N actor networks by (17) via Adam; 
+
+θi 
+
+> old
+
+← θi, ∀i;
+
+πi 
+
+> ref
+
+← πθi , ∀i; D ← ∅ ; Tcount ← 0;
+
+// Save as reference policies 
+
+while Tcount < T max do Phase II: Group Trajectory Collection ;
+
+for g = 1 to G do 
+
+Collect a trajectory by {πθi }Ni=1 , store in D;
+
+Tcount ← Tcount + GT ;
+
+Phase III: Group Relative Advantage Estimate ;Compute bAg via (20), ∀g;
+
+Phase IV: Actor Networks Update ;
+
+for e = 1 to E do 
+
+Update N actor networks by (21) via Adam; 
+
+θi 
+
+> old
+
+← θi, ∀i;
+
+Output: Optimized policies for all agents; Overall, the proposed MAGRPO training algorithm is sum-marized in Algorithm 1, where Adam optimizer refers to [31]. 
+
+B. Parameter Sharing and Computational Complexity 
+
+We now introduce parameter sharing and, under this con-dition, analyze the computational complexity of Algorithm 1. Specifically, parameter sharing allows all agents to reuse the same actor network to process their individual observations and output actions. In this approach, agent identity is typically distinguished only through the input, such as by appending an agent-specific one-hot vector. Consequently, parameter sharing significantly improves sample and training efficiency. More-over, it supports a variable number of agents, simplifies the training workflow, and reduces computational and memory complexity during training [32]. In addition, we consider both N actor networks and a single critic network to be multilayer perceptron structures with Jhidden hidden layers of J neurons each. Let do, da, and 
+
+ds denote local observation, local action, and state dimen-sions, respectively. The computational complexity for the actor 8
+
+Jπ (θi) := 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+(
+
+min πθi (oi,g t |ai, oi,g t−1)
+
+πθi 
+
+> old
+
+(oi,g t |ai, oi,g t−1) , clip πθi (oi,g t |ai, oi,g t−1)
+
+πθi 
+
+> old
+
+(oi,g t |ai, oi,g t−1) , 1 − ϵ2, 1 + ϵ2
+
+!! bAg − μDKL [πθi ∥πi
+
+> ref
+
+]
+
+)
+
+.
+
+(22) network and critic network forward pass is O Jd o + Jd a +
+
+J2Jhidden 
+
+ and O Jd s + J + J2Jhidden 
+
+, respectively. Under the parameter sharing, the computational complexity of MAPPO per training step can be expressed as O(J(ds +
+
+do + da) + J + 2 J2Jhidden ), which is the sum of the actor and critic networks’ forward pass computational complexity. The computational complexity of proposed MAGRPO per training step can be expressed as O Jd o +Jd a +J2Jhidden +G. Based on the state, local observation, and local action definition in Section III-A, we have ds = N 3M + 2 KM (N + 1) + 4K, d o = 3 M + 4 KM + 5 K, d a = 3 M + 2 KM . Given that G ≪ Jd s + J + J2Jhidden , the proposed MAGRPO saves approximately half the computational complexity per training step, compared with MAPPO. VI. R EWARD VARIANCE ANALYSIS TO GUIDE 
+
+MAGRPO T RAINING 
+
+In this section, we analyze the variance of cumulative reward, to guide the MAGRPO training. 
+
+Lemma 1. For the FA position u, we have 
+
+E{∥ u − E{u}∥ 2} ≤ d2max 
+
+4 , (25) 
+
+where dmax := max u1,u2∈C ∥u1 − u2∥ represents the maxi-mum distance between two FAs within the feasible region C.Proof: Please refer to Appendix A. 
+
+Theorem 1. For the Dec-POMDP formulation in Section III, the variance of the trajectory-wise cumulative reward PTt=1 Rt is upper bounded by 
+
+VAR {PTt=1 Rt} ≤ O  N 7K7P 4max M 3d2max T 2f 2L . (26) 
+
+Proof: Please refer to Appendix B. 
+
+Remark 1. Theorem 1 reveals the quantitative relationship between the variance upper bound of cumulative reward and the key network parameters. Specifically, the upper bound increases with the number of BSs N , the number of users 
+
+K, the maximum transmit power Pmax , the trajectory length 
+
+T , the maximum spacing of FA movable region dmax , carrier frequency f , the number of fluid antennas M , and the number of propagation paths L. In terms of influence degree, N , K,
+
+Pmax , and M dominate the upper bound, making them the crit-ical factors. Furthermore, an increasing variance upper bound of cumulative reward may imply MARL training instability and unsatisfactory performance [33]. To stabilize MAGRPO training, we recommend a larger group size, a smaller clipping threshold, a smaller learning rate, or a larger number of warm-up steps, either individually or in combination. 
+
+TABLE II: C ONFIGURATION & H YPERPARAMETERS                                       
+
+> Actor Network (MAGRPO, MAPPO) Component Type Input/Output Activation
+> Input Layer Linear Input Size ×256 ReLU Hidden Layer 1 Linear 256 ×256 ReLU Hidden Layer 2 Linear 256 ×256 ReLU Output Layer Linear 256 ×Action Size –
+> Critic Network (MAPPO) Component Type Input/Output Activation
+> Input Layer Linear Input Size ×256 ReLU Hidden Layer 1 Linear 256 ×256 ReLU Hidden Layer 2 Linear 256 ×256 ReLU Output Layer Linear 256 ×1–
+> Hyperparameters (MAGRPO, MAPPO) Learning KL Clipping Batch Rate Penalty Threshold Size
+> “adaptive” 1×10 −40.216
+
+VII. S IMULATIONS 
+
+In this section, we first present the simulation settings and baselines, and then the simulation results and discussion. 
+
+A. Simulation Settings and Baselines 
+
+Unless specified elsewhere, simulation settings are assigned as follows: AWGN variance is σ2 = −91 dBm. The maximal transmit power is 1 W. The movable region for FAs is 
+
+0.5 × 0.5 m2. The frequency and wavelength are 5.5 GHz and 
+
+0.0545 m, respectively. The minimum spacing between two FAs is 0.0273 m. We employ parameter sharing as detailed in Section V-B. When deploying the trained actor networks, the exact locations of all users across BSs cannot be predetermined for training, as the possible combinations of user locations are enormous. Therefore, the generalization capability of the actor networks is crucial. For this reason, we sample user positions from a uniform distribution in both the training and testing. Specifically, in this uniform distribution, user 1 is located in a sector spanning 5 ∼ 8 m in range and 80 ◦ ∼ 90 ◦ in azimuth, while user 2 is located in a sector spanning 5 ∼ 8 m in range and 90 ◦ ∼ 100 ◦ in azimuth. The BS is located 10 m far from ground, and each user is located 1.5 m from ground. The horizontal distance between two BSs is 35 m. All experiments were conducted on a NVIDIA GeForce RTX 4090D GPU with 24 GB of memory and an Intel Xeon Platinum 8352V CPU with 16 vCPUs. We use linear entropy annealing with the entropy coefficient decaying linearly from 0.003 to 0.0008 
+
+over 8 million steps. Table II summarizes the neural network configurations for MAPPO and the proposed MAGRPO. Here, “adaptive” represents a dynamic learning rate schedule, i.e., starting at 3×10 −5 and held constant for the first 800 updates, after which the learning rate is halved whenever the loss plateaus, with a minimum learning rate of 5 × 10 −6.9
+
+(a) N = 2 , VAR {R}= 31 .26 . (b) N = 5 , VAR {R}= 89 .09 . (c) Pmax = 1 , VAR {R} = 78 .92 . (d) Pmax = 4 , VAR {R} = 95 .39 .
+
+(e) K = 2 , VAR {R} = 78 .92 . (f) K = 3 , VAR {R} = 88 .63 . (g) M = 2 , VAR {R} = 54 .85 . (h) M = 5 , VAR {R} = 101 .87 .
+
+Fig. 4: Landscape of R(u).0 1 2 3 4 5 6 7 8
+
+> Steps (Million)
+> 510 15 20 25
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO MAPPO-FA
+
+(a) Training, M = 4 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 46810 12 14 16
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO MAPPO-FA
+
+(b) Training, M = 3 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 246810 12
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO MAPPO-FA
+
+(c) Training, M = 2 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 45678910 11 12
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO MAPPO-FA
+
+(d) Training, M = 1 0 1 2 3 4 5 6 7 8
+
+> Steps (Million)
+> 510 15 20 25 30 35 40
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO MAPPO-FA
+
+(e) Testing, M = 4 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 510 15 20 25 30
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO MAPPO-FA
+
+(f) Testing, M = 3 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 2.5 5.0 7.5 10.0 12.5 15.0 17.5 20.0 22.5
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO MAPPO-FA
+
+(g) Testing, M = 2 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 46810 12 14 16
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO MAPPO-FA
+
+(h) Testing, M = 1 
+
+Fig. 5: Training and testing curves for the proposed MAGRPOs and baselines over varying M .The baseline algorithms used for comparison with the proposed MAGRPO are listed as follows. 
+
+MAPPO : This baseline implements the MAPPO proposed in [29] and trains it for 8 million steps. Note that the MAPPO, introduced in Section-IV, is a foundation of the proposed MAGRPO. The aim of this baseline is to evaluate the sum-rates, running time, and memory usage, compared with the proposed MAGRPO. 
+
+MAPPO-Init : We first train the MAPPO for 1 million steps to obtain a reference policy for the proposed MAGRPO. The aim of this baseline is to evaluate the sum-rate performance improvement over the reference policy, compared with the proposed MAGRPO. 
+
+MAPPO-FA : The FA position is frozen from the action and assigned a random value. Whereas, beamforming is optimized by training the MAPPO for 8 million steps. In [35], MAPPO-FA has been used to optimize multi-cell spectrum and power allocation. The aim of this baseline is to evaluate the sum-rate performance enhancement achieved through FA position optimization, compared with the MAPPO. 
+
+B. Simulation Results and Discussion 
+
+In Fig. 4, we evaluate the landscape of R(u) and its associated variance, where beamforming and power allocation are addressed by WMMSE [36]. Fig. 4 shows that increasing 
+
+N , K, Pmax , and M leads to an increase in the variance of 
+
+R(u). This result shows that increasing the upper bound of the variance is proportional to the increase in the variance itself. Consequently, it supports the implication of Theorem 1 that the variance grows as the network parameters increase. 10 0 1 2 3 4 5 6 7 8
+
+> Steps (Million)
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> Sum-Rate (bps/Hz)
+> G=16 G=8 G=4
+
+(a) Training, M = 4 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 46810 12 14 16
+> Sum-Rate (bps/Hz)
+> G=16 G=8 G=4
+
+(b) Training, M = 3 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 46810 12
+> Sum-Rate (bps/Hz)
+> G=16 G=8 G=4
+
+(c) Training, M = 2 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 6
+> 7
+> 8
+> 9
+> 10
+> 11
+> Sum-Rate (bps/Hz)
+> G=16 G=8 G=4
+
+(d) Training, M = 1 
+
+Fig. 6: Influence of group size for the proposed MAGRPO over varying M .0 1 2 3 4 5 6 7 8
+
+> Steps (Million)
+> 510 15 20 25 30 35 40
+> Sum-Rate (bps/Hz)
+> T=5 T=50
+
+(a) Testing, M = 4 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 0510 15 20 25 30
+> Sum-Rate (bps/Hz)
+> T=5 T=50
+
+(b) Testing, M = 3 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 0510 15 20
+> Sum-Rate (bps/Hz)
+> T=5 T=50
+
+(c) Testing, M = 2 0 1 2 3 4 5 6 7 8 
+
+> Steps (Million)
+> 46810 12 14 16
+> Sum-Rate (bps/Hz)
+> T=5 T=50
+
+(d) Testing, M = 1 
+
+Fig. 7: Influence of trajectory length for the proposed MAGRPO over varying M .In Fig. 5, we show the training and testing curves for the proposed MAGRPOs and baselines under varying numbers of FAs per BS M , where N = 2 , G = 16 , and T = 5 .Fig. 5 shows that MAGRPO, MAPPO, MAPPO-FA converge across all values of M = 1 , 2, 3, 4 both in training and testing. Moreover, Fig. 5 shows that replacing the critic network with group relative advantage estimation does not destabilize the training process. In Fig. 6, we evaluate the influence of group size for the proposed MAGRPO, where N = 2 and T = 5 . Fig. 6 shows that, when the group size is relatively small, the training curves of the proposed MAGRPO exhibit significant fluctuations in sum-rate. This is because a relatively small group size provides insufficient samples for computing the group relative advantage estimate, leading to inaccurate estimates of the mean and standard deviation, which in turn causes unreliable advantage normalization and introduces high variance. As the group size increases, the statistical estimates become more accurate, the reward normalization becomes more effective, the training variance is progressively suppressed, and the policy gradient signals become more reliable, leading to smoother curves. This result supports the implication of Theorem 1 that increasing M recommends a larger group size. In Fig. 7, we evaluate the impact of trajectory length on the sum-rate performance of the proposed MAGRPO for different numbers of FAs per BS M , where N = 2 and G = 16 .Fig. 7 show that as the trajectory length increases, the sum-rates of MAGRPO decrease for all values of M . This behavior can be attributed to Problem P1 and the formulation of the Dec-POMDP. Specifically, the action taken at each step of a trajectory corresponds to a solution of Problem P1. Therefore, a longer trajectory length increases the difficulty of decision-making, which in turn leads to degradation in sum-rates. In Fig. 8, we evaluate the sum-rates in testing and train-ing time of the proposed MAGRPO against baselines under varying numbers of FAs per BS M , where the sum-rates are obtained by applying an exponential moving average (EMA) with a smoothing factor of 0.99 to the testing curves in Fig. 5 at 8 million maximum training steps. Fig. 8a shows that the proposed MAGRPO and MAPPO achieve nearly identical sum-rates within 2% across all M in testing, confirming that replacing the critic network with the group relative advantage estimate does not compromise policy quality. Meanwhile, Fig. 8b shows that for training time, the proposed MAGRPO saves 
+
+30% ∼ 40% compared to MAPPO due to this replacement. Fig. 8a shows that for M = 1 , 2, 3, 4, MAGRPO achieves gains of 145 .1%, 217 .2%, 370 .4%, and 557 .0% over MAPPO-FA, respectively. This is because more FAs offer increased flexibility for locating superior channel conditions. Fig. 8a also shows that for M = 1 , 2, 3, 4, the proposed MAGRPO achieves gains of 13 .5%, 16 .3%, 53 .3%, and 88 .1% over MAPPO-Init. This shows that group relative advantage esti-mation effectively and continuously improves the MAPPO-Init policy, under multi-agent and parameter sharing settings. In Fig. 9, we evaluate the sum-rates in testing and training time of the proposed MAGRPO against baselines under vary-ing numbers of BSs N , where M = 4 , K = 2 , G = 16 , and 
+
+T = 5 . For N = 3 , 4, we halve the initial learning rate to 
+
+1.5 × 10 −5 to stabilize the MAGRPO training. Fig. 9a shows that as N increases, the sum-rates of MAGRPO, MAPPO, and MAPPO-Init all grow significantly. For N = 1 , 2, 3, 4,the proposed MAGRPO outperforms MAPPO-Init by gains of 
+
+54 .4% , 40 .0% , 50 .1% , and 28 .6% in testing sum-rates, respec-tively. This is because the CTDE paradigm effectively manages multi-cell interference. Moreover, Fig. 9a demonstrates that the proposed MAGRPO achieves comparable performance to 11 1 2 3 4
+
+> Number of FAs per BS, M
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> 35
+> Sum-Rate (bps/Hz)
+> Proposed
+> MAPPO-Init
+> MAPPO
+> MAPPO-FA
+
+(a) Sum-rate comparison. 1 2 3 4    
+
+> Number of FAs per BS, M
+> 200
+> 220
+> 240
+> 260
+> 280
+> 300
+> 320
+> Training Time (mins)
+> 34.6% 36.6% 36.7% 37.5%
+> Proposed
+> MAPPO
+
+(b) Training time comparison. 
+
+Fig. 8: Proposed MAGRPO over baselines over varying M .1 2 3 4
+
+> Number of BSs, N
+> 20 30 40 50
+> Sum-Rate (bps/Hz)
+> Proposed MAPPO-Init MAPPO MAPPO-FA
+
+(a) Sum-rate comparison. 1 2 3 4    
+
+> Number of BSs, N
+> 200
+> 220
+> 240
+> 260
+> 280
+> 300
+> 320
+> Training Time (mins)
+> 36.6% 37.5% 36.4% 35.9%
+> Proposed
+> MAPPO
+
+(b) Training time comparison. 
+
+Fig. 9: Proposed MAGRPO over baselines over varying N .MAPPO even as N increases. Fig. 9b further validates the advantage of MAGRPO by showing 30% ∼ 40% training time reduction, compared with MAPPO. VIII. C ONCLUSION 
+
+In this paper, we investigated the distributed optimization of fluid antenna positions, beamforming, and power allocation in FA-assisted wireless networks. We formulated this challenging non-convex problem as a Dec-POMDP and proposed a MA-GRPO algorithm under the CTDE paradigm. By replacing the centralized critic network with group relative advantage esti-mation, MAGRPO achieves comparable sum-rate performance to MAPPO while reducing training time by 30% ∼ 40% 
+
+and cutting computational complexity by nearly half under parameter sharing. Furthermore, we derived a variance upper bound for the cumulative reward, revealing its scaling with key network parameters such as the number of BSs, users, FAs, transmit power, and carrier frequency. This theoretical insight provides practical guidelines, including the use of larger group sizes, smaller clipping thresholds, or smaller learning rates, to stabilize training when network scale increases. Simulation results showed that FA-assisted wireless networks achieve multiple-fold sum-rate improvements over traditional wireless networks, and validated the following: “Compared with MAPPO, MAGRPO can accelerate train-ing, and keep comparable sum-rate performance. ”APPENDIX APROOF OF LEMMA 1Let B(c, r ) be the smallest enclosing ball of the feasible region C, where c and r denote its center and radius, respec-tively. Any two points u1, u2 ∈ C satisfy ∥u1 − u2∥ ≤ dmax ,and since B(c, r ) is the smallest enclosing ball, we have 
+
+dmax ≤ 2r, i.e., r ≤ dmax /2. Then, we have 
+
+E ∥u − E{u}∥ 2 (a)
+
+= min  
+
+> a∈R3
+
+E ∥u − a∥2
+
+> (b)
+
+≤ E ∥u − c∥2
+
+> (c)
+
+≤ r2(d)
+
+≤ d2max /4, (27) where (a) is because the mean is the unique minimizer of MSE [34]; (b) is because substituting the specific choice a = c into the minimization; (c) is because u ∈ C ⊆ B (c, r ) implies 
+
+∥u − c∥ ≤ r, thus E{∥ u − c∥2} ≤ r2; (d) is because r ≤
+
+dmax /2. This completes the proof. APPENDIX BPROOF OF THEOREM 1First of all, we begin with VAR {PTt=1 Rt} (a)
+
+≤ PTt=1 VAR {Rt}12 
+
+> (b)
+
+≤ T VAR {Rt}
+
+> (c)
+
+≤ T L 2 
+
+> R
+
+E∥u − E{u}∥ 2
+
+> (d)
+
+≤ T L 2 
+
+> R
+
+d2max /4, (28) where (a) is because the variance sub-additivity for relaxed uncorrelated random variables; (b) is because the identical distribution assumption across steps; (c) is because Rt is LR-Lipschitz with respect to u; (d) is because of Lemma 1. Next, we derive an upper bound of Lipschitz constant LR.Considering that ∂R ∂u ∈ R1×3M N is a row vector, we have 
+
+LR
+
+> (a)
+
+= max 
+
+> u
+
+∂R ∂u
+
+> (b)
+
+= max 
+
+> u
+
+∂R ∂γ
+
+∂γ
+
+∂h
+
+∂h
+
+∂u
+
+> (c)
+
+≤ max 
+
+> u
+
+∂R ∂γ
+
+∂γ
+
+∂h
+
+∂h
+
+∂u
+
+> (d)
+
+= ∂R ∂γ max 
+
+> u
+
+∂γ
+
+∂h
+
+∂h
+
+∂u
+
+> (e)
+
+≤√N K 
+
+ln 2 max 
+
+> u
+
+∂γ
+
+∂h
+
+∂h
+
+∂u , (29) where (a) is because the definition of the Lipschitz con-stant; (b) is because the chain rule for differentiation with  
+
+> ∂R ∂γ
+
+= [1 /((1 + γ[1] 1 ) ln 2); · · · ; 1 /((1 + γ[K] 
+
+> N
+
+) ln 2)] ∈
+
+R1×N K , ∂γ 
+
+> ∂h
+
+= [ ∂γ [1] 1 
+
+> ∂h
+
+; · · · ; ∂γ [K] 
+
+> N
+> ∂h
+
+] ∈ RN K ×2M N 2K , and ∂h 
+
+> ∂u
+
+=[ ∂h[1] 1,1 
+
+> ∂u
+
+, · · · , ∂h[K] 
+
+> N,N
+> ∂u
+
+] ∈ R2M N 2K×3M N ; (c) is because the sub-multiplicativity of the spectral norm; (d) is because ∂R ∂γ does not depend on u; (e) is because ∥ ∂R ∂γ ∥ = ( PNi=1 
+
+PKk=1 1/((1+ 
+
+γ[k] 
+
+> i
+
+) ln 2) 2)) 12 ≤ √N K/ ln 2 .
+
+A. Bound on ∥ ∂γ 
+
+> ∂h
+
+∥
+
+To further bound (29), we bound the Jacobian ∥ ∂γ 
+
+> ∂h
+
+∥. Taking the derivative of γ[k] 
+
+> i
+
+with respect to h[k] 
+
+> i,i
+
+, we have 
+
+∂γ [k]
+
+> i
+
+∂h[k]
+
+> i,i
+
+=2 Re 
+
+
+
+w[k] 
+
+> i
+
+w[k]Hi h[k]T
+
+> i,i
+
+T
+
+I[k]
+
+> i
+
+, (30) where I[k] 
+
+> i
+
+= |I[k]1,i |2 + |I[k]2,i |2 + σ2. Similarly, for the inter-cell channel h[k] 
+
+> j,i
+
+with j̸ = i, we have 
+
+∂γ [k]
+
+> i
+
+∂h[k]
+
+> j,i
+
+= − γ[k]
+
+> i
+
+I[k]
+
+> i
+
+2 Re 
+
+> K
+
+X
+
+> k′=1
+
+w[k′] 
+
+> j
+
+w[k′]H 
+
+> j
+
+h[k]T
+
+> j,i
+
+!T
+
+. (31) Taking the Euclidean norm of (30) and (31), we have 
+
+∂γ [k]
+
+> i
+
+∂h[k]
+
+> i,i
+
+≤ 2
+
+σ2 ∥h[k] 
+
+> i,i
+
+w[k] 
+
+> i
+
+w[k]Hi ∥ ≤ 2
+
+σ2 ∥w[k] 
+
+> i
+
+∥2∥h[k] 
+
+> i,i
+
+∥, (32) and for j̸ = i,
+
+∂γ [k]
+
+> i
+
+∂h[k]
+
+> j,i
+
+≤ 2γ[k]
+
+> i
+
+σ2
+
+> K
+
+X
+
+> k′=1
+
+∥w[k′] 
+
+> j
+
+∥2∥h[k] 
+
+> j,i
+
+∥, (33) where I[k] 
+
+> i
+
+≥ σ2. Now, we bound ∥ ∂γ 
+
+> ∂h
+
+∥ as follows: 
+
+∂γ
+
+∂h
+
+> (a)
+
+≤ N K max 
+
+> i,k
+
+∂γ [k]
+
+> i
+
+∂h
+
+> (b)
+
+≤ N K max 
+
+> i,k
+
+ ∂γ [k]
+
+> i
+
+∂h[k]
+
+> i,i
+
++
+
+> N
+
+X 
+
+> j=1 ,j ̸=i
+
+∂γ [k]
+
+> i
+
+∂h[k]
+
+> j,i
+
+
+
+> (c)
+
+≤ N K max 
+
+> i,k
+
+2∥w[k] 
+
+> i
+
+∥2∥h[k] 
+
+> i,i
+
+∥
+
+σ2
+
++ 2γ[k]
+
+> i
+
+σ2
+
+> N
+
+X 
+
+> j=1 ,j ̸=iK
+
+X
+
+> k′=1
+
+∥w[k′] 
+
+> j
+
+∥2∥h[k] 
+
+> j,i
+
+∥
+
+
+
+> (d)
+
+≤ N K σ2
+
+
+
+2 max  
+
+> i,k
+
+∥w[k] 
+
+> i
+
+∥2 max  
+
+> i,k
+
+∥h[k] 
+
+> i,i
+
+∥
+
++2 N K max  
+
+> i,k
+
+γ[k] 
+
+> i
+
+max  
+
+> i,j,k
+
+∥w[k] 
+
+> j
+
+∥2 max  
+
+> i,j,k
+
+∥h[k] 
+
+> j,i
+
+∥
+
+
+
+> (e)
+
+≤ 2N KP max 
+
+√Mσ2
+
+
+
+1 + N KP max 
+
+σ2
+
+
+
+, (34) where (a) is because the triangle inequality applied to ∂γ 
+
+> ∂h
+
+=[ ∂γ [1] 1 
+
+> ∂h
+
+; · · · ; ∂γ [K] 
+
+> N
+> ∂h
+
+] = [ ∂γ [1] 1 
+
+> ∂h
+
+; · · · ; 0]+ · · · + [0; · · · ; ∂γ [K] 
+
+> N
+> ∂h
+
+];
+
+(b) is because the triangle inequality applied to ∂γ [k] 
+
+> i
+> ∂h
+
+=[ ∂γ [k]
+
+> i
+> ∂h[1] 1,1
+
+, · · · , 0]+ · · · + [ 0, · · · , ∂γ [k]
+
+> i
+> ∂h[K]
+> N,N
+
+]; (c) is because sub-stituting (32) and (33); (d) is because PNj=1 ,j ̸ =i · consists of at most N − 1 < N terms, while PKk′=1 ∥w[k′] 
+
+> j
+
+∥2 is bounded by K max k ∥w[k] 
+
+> j
+
+∥2; (e) is because ∥w[k] 
+
+> i
+
+∥2 ≤ Pmax ,
+
+∥h[k] 
+
+> i,j
+
+∥ ≤ √M , and γ[k] 
+
+> i
+
+≤ Pmax /σ 2.
+
+B. Bound on ∂h
+
+> ∂u
+
+We next bound the Jacobian ∂h 
+
+> ∂u
+
+. Note that the Jacobian  
+
+> ∂h
+> ∂u
+
+has the block-diagonal sparsity structure 
+
+∂h
+
+∂u = diag 
+
+ ∂h1
+
+∂u1 , · · · , ∂hN
+
+∂uN
+
+
+
+, (35) where hi = [ h[1] 
+
+> i, 1
+
+, · · · , h[K] 
+
+> i,N
+
+] ∈ R1×2M N K collects all channel coefficients associated with BS i, and ui = [ ui
+
+> 1
+
+, · · · , uiM ] ∈
+
+R1×3M stacks the coordinates of all FAs at BS i. By the block-diagonal property of spectral norm, we have 
+
+∂h
+
+∂u = max 
+
+> i
+
+∂hi
+
+∂ui . (36) This allows us to derive the following bound: 
+
+max 
+
+> i
+
+∂hi
+
+∂ui
+
+> (a)
+
+≤ N K max 
+
+> i,j,k
+
+∂h[k]
+
+> i,j
+
+∂ui
+
+> (b)
+
+≤ N KM max 
+
+> i,j,k,m
+
+∂h[k]
+
+> i,j
+
+∂uim
+
+> (c)
+
+≤ N KM max  
+
+> i,j,k,m
+
+f H (v[k] 
+
+> j
+
+)Σ ∂g(uim)
+
+∂uim
+
+> (d)
+
+≤ N KM max 
+
+> i,m
+
+∂g(uim)
+
+∂uim13 
+
+> (e)
+
+≤ 2πN KM √Lλ , (37) where (a) is because the triangle inequality applied to ∂hi 
+
+> ∂ui
+
+=[ ∂h[1]  
+
+> i, 1
+> ∂ui
+
+; · · · ; ∂h[K] 
+
+> i,N
+> ∂ui
+
+] = [ ∂h[1]  
+
+> i, 1
+> ∂ui
+
+; · · · ; 0] + · · · + [ 0; · · · ; ∂h[K] 
+
+> i,N
+> ∂ui
+
+];
+
+(b) is because the triangle inequality applied to ∂h[k] 
+
+> i,j
+> ∂ui
+
+=[ ∂h[k]
+
+> i,j
+> ∂ui
+> 1
+
+, · · · , ∂h[k]
+
+> i,j
+> ∂uiM
+
+] = [ ∂h[k]
+
+> i,j
+> ∂ui
+> 1
+
+, · · · , 0] + · · · + [ 0, · · · , ∂h[k]
+
+> i,j
+> ∂uiM
+
+]; (c)
+
+is because the sub-multiplicativity of spectral norm; (d) is be-cause ∥f H (v[k] 
+
+> j
+
+)Σ∥ ≤ ∥ f (v[k] 
+
+> j
+
+)∥∥ Σ∥ ≤ 1 using ∥f (v)∥ = √L
+
+and ∥Σ∥ ≤ 1/√L; (e) is because ∂g(uim)
+
+> ∂uim
+
+has L elements, and each is less than 2π/λ .
+
+C. Concluding Result 
+
+Finally, combining the above results leads to VAR {PTt=1 Rt}
+
+> (a)
+
+≤ T 2d2max 
+
+4
+
+√N K 
+
+ln 2 2N 2K2P 2max 
+
+√Mσ4
+
+2πN KM √Lλ
+
+!2(b)
+
+≤ O  N 7K7P 4max M 3d2max T 2f 2L , (38) where (a) is because substituting (34) and (37) into (29), and using (28); (b) is because only retaining the dominant term as  
+
+> N KP max
+> σ2
+
+≫ 1, λf equals to speed of light, and absorbing σ
+
+into O(·). This completes the proof. REFERENCES [1] F. Tariq, M. R. A. Khandaker, K.-K. Wong, et. al., “A speculative study on 6G,” IEEE Wireless Commun. , vol. 27, no. 4, pp. 118–125, 2020. [2] R. Zhang, L. Cheng, S. Wang, et. al., “Integrated sensing and communi-cation with massive MIMO: A unified tensor approach for channel and target parameter estimation,” IEEE Trans. Wireless Commun. , vol. 23, no. 8, pp. 8571–8587, 2024. [3] W. Wang and W. Zhang, “Orthogonal projection-based channel esti-mation for multi-panel millimeter wave MIMO,” IEEE Trans. Wireless Commun. , vol. 68, no. 4, pp. 2173–2187, 2020. [4] K.-K. Wong, A. Shojaeifard, et. al., “Fluid antenna systems,” IEEE Trans. Wireless Commun. , vol. 20, no. 3, pp. 1950–1962, 2021. [5] K.-K. Wong and K.-F. Tong, “Fluid antenna multiple access,” IEEE Trans. Wireless Commun. , vol. 21, no. 7, pp. 4801–4815, 2022. [6] W. K. New, K.-K. Wong, H. Xu, et. al., “A tutorial on fluid antenna system for 6G networks: Encompassing communication theory, opti-mization methods and hardware designs,” IEEE Commun. Surveys & Tutorials , vol. 27, no. 4, pp. 2325–2377, 2025. [7] W.-J. Lu, C.-X. He, Y. Zhu, et. al., “Fluid antennas: Reshaping intrinsic properties for flexible radiation characteristics in intelligent wireless networks,” IEEE Commun. Mag. , vol. 63, no. 5, pp. 40-45, May 2025. [8] H. Hong, K. K. Wong, H. Xu, et. al., “A contemporary survey on fluid antenna systems: Fundamentals and networking perspectives,” IEEE Trans. Netw. Sci. Eng. , vol. 13, pp. 2305-2328, 2026. [9] W. K. New et al., “Fluid antenna systems: Redefining reconfigurable wireless communications,” IEEE J. Sel. Areas Commun. , vol. 44, pp. 1013-1044, 2026, doi: 10.1109/JSAC.2025.3632097. [10] T. Wu et al., “Fluid antenna systems enabling 6G: Principles, ap-plications, and research directions,” IEEE Wireless Commun. , doi: 10.1109/MWC.2025.3629597. [11] C. N. Efrem and I. Krikidis, “Transmit and receive antenna port selection for channel capacity maximization in fluid-MIMO systems,” 
+
+IEEE Wireless Commun. Lett. , vol. 13, no. 11, pp. 3202–3206, Nov. 2024. [12] S. Yang, Y. Xiao, Y. L. Guan, et. al., “BER performance optimization for fluid antenna-aided wireless communications,” IEEE J. Sel. Areas Commun. , vol. 44, pp. 1177–1192, 2026. [13] B. Tang, H. Xu, K. -K. Wong, et. al., “Capacity maximization of uplink with fluid antenna system at both ends,” IEEE Trans. Wireless Commun. ,vol. 24, no. 12, pp. 10578–10593, Dec. 2025. [14] T. Liao, W. Guo, H. He, et. al., “Joint beamforming and antenna position optimization for fluid antenna-assisted MU-MIMO networks,” IEEE J. Sel. Areas Commun. , vol. 44, pp. 1209–1226, 2026. [15] Y. Chen, B. Xu, S. Li, et. al., “Analysis and optimization for low-latency communications in slow fluid antenna multiple access systems,” IEEE J. Sel. Areas Commun. , vol. 44, no. 4, pp. 1290–1306, 2026. [16] Q. Zhang, M. Shao, T. Zhang, et. al., “An efficient sum-rate maximiza-tion algorithm for fluid antenna-assisted ISAC system,” IEEE Commun. Lett. , vol. 29, no. 1, pp. 200–204, 2025. [17] M. C. Ho, T. D. T. Tam, T. S. Do, and S. Cho, “Proximal policy optimiza-tion for latency minimization in FL-assisted fluid antenna systems with MC-NOMA,” in Proc. 2025 30th Asia-Pacific Conf. Commun. (APCC) ,pp. 1–6, 2025. [18] T. Zhang, Q. Li, S. Wang, et. al., “Indoor fluid antenna systems enabled by layout-specific modeling and group relative policy optimization,” 
+
+IEEE Trans. Wireless Commun. , vol. 25, pp. 9312–9330, Jan. 2026. [19] N. Waqar, K.-K. Wong, C.-B. Chae, et. al., “Opportunistic fluid antenna multiple access via team-inspired reinforcement learning,” IEEE Trans. Wireless Commun. , vol. 23, pp. 12068–12083, Sept. 2024. [20] C. Weng, Y. Chen, L. Zhu, and Y. Wang, “Learning-based joint beam-forming and antenna movement design for movable antenna systems,” 
+
+IEEE Wireless Commun. Lett. , vol. 13, pp. 2120–2124, Aug. 2024. [21] C. Wang, G. Li, H. Zhang, et. al., “Fluid antenna system liberating multiuser MIMO for ISAC via deep reinforcement learning,” IEEE Trans. Wireless Commun. , vol. 23, pp. 10879–10894, Sept. 2024. [22] H. Wei, W. Wang, W. Ni, et. al., “Movable-antenna enabled cell-free networks,” IEEE Trans. Veh. Technol. , vol. 74, no. 10, pp. 16533–16537, 2025. [23] J. Zhu, L. Feng, X. Wang, et. al., “Joint beamforming, user association, and antenna position optimization in movable antenna-assisted cell-free massive MIMO,” IEEE Trans. Netw. Sci. Eng. , vol. 13, pp. 4153–4169, 2026. [24] F. R. Ghadi, et al., “Fluid antenna multiple access with simultaneous non-unique decoding in strong interference channel,” IEEE Trans. Wire-less Commun. , vol. 24, no. 12, pp. 10183–10195, Dec. 2025. [25] X. Li, Q. Cui, B. Zhao, et al., “SWIPT optimization design for multi-RIS-aided cell-free IoT networks with fluid antenna,” IEEE Trans. Wireless Commun. , vol. 25, pp. 10484–10497, 2026. [26] Q. Li, W. Wang, Y. Li, F. Yu, C. Zhang, and Y. Huang, “Deep reinforcement learning for movable antenna-assisted cell-free networks,” 
+
+IEEE Wireless Commun. Lett. , vol. 14, pp. 2783–2787, Sept. 2025. [27] C. Su, R. Wu, Y. Zhu, and Q. Hu, “CD-MAPPO: Centralized-decentralized multi-agent proximal policy optimization in multi-cell networks,” in Proc. IEEE/CIC Int. Conf. Commun. China (ICCC) Workshops , pp. 1–6, 2024. [28] R. Lowe, Y. I. Wu, A. Tamar, et. al., “Multi-agent actor-critic for mixed cooperative-competitive environments,” in Proc. Advances in Neural Information Processing Systems (NeurIPS) , vol. 30, 2017. [29] C. Yu, A. Velu, E. Vinitsky, et. al., “The surprising effectiveness of PPO in cooperative multi-agent games,” in Proc. Advances in Neural Information Processing Systems (NeurIPS) , vol. 35, pp. 24611–24624, 2022. [30] Z. Shao, P. Wang, Q. Zhu, et. al., “Deepseekmath: Pushing the limits of mathematical reasoning in open language models,” arXiv preprint arXiv:2402.03300 , 2024. [31] D. P. Kingma and J. Ba, “ADAM: A method for stochastic optimization,” 
+
+arXiv preprint arXiv:1412.6980 , 2014. [32] H. Qin, Z. Liu, C. Lin, et. al., “GRADPS: Resolving futile neurons in parameter sharing network for multi-agent reinforcement learning,” in 
+
+Proc. International Conference on Machine Learning (ICML) , 2025. [33] B. G. Le and V. C. Ta, “Low variance trust region optimization with independent actors and sequential updates in cooperative multi-agent reinforcement learning,” Autonomous Agents and Multi-Agent Systems ,vol. 39, no. 1, p. 12, 2025. [34] S. M. Kay, Fundamentals of Statistical Signal Processing: Estimation Theory . Englewood Cliffs, NJ: Prentice Hall, 1993. [35] Y. Zhang and D. Guo, “Multi-agent reinforcement learning for multi-cell spectrum and power allocation,” IEEE Trans. Commun. , vol. 73, no. 8, pp. 5980–5992, Aug. 2025. [36] Q. Shi, M. Razaviyayn, Z. -Q. Luo, and C. He, “An iteratively weighted MMSE approach to distributed sum-utility maximization for a MIMO interfering broadcast channel,” IEEE Trans. Signal Process. , vol. 59, no. 9, pp. 4331–4340, Sept. 2011.

@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-001.webp",
+      "caption": "Figure 3: Comparing NGC against KV cache eviction baselines. (left) NGC significantly outperforms baseline cache eviction methods. Error bars correspond to 1 SE and we report pass@1 accuracies. All methods evict 50% of entries at each eviction round, corresponding to 2.4x reduction in peak KV cache size. The dashed horizontal line corresponds to a model trained and evaluated with full cache. (right)We also test NGC’s generalization to other eviction rates (smaller cache sizes) that it was not explicitly trained for; the vertical dashed line indicates the minimum cache size during training. NGC pareto-dominates all other methods even at higher compression rates.",
+      "page": 11,
+      "index": 1,
+      "width": 975,
+      "height": 323
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-002.webp",
+      "caption": "Figure 1: Neural Garbage Collection: Learning to Forget while Learning to Reason. (top) As the language model (LM) generates its chain-of-thought, it periodically enters an eviction round: (1) the LM scores KV cache entries via softmax, (2) samples cache evictions using those scores via Gumbel top-k, and (3) samples the next token conditioned only on the pruned cache. Since both tokens and cache evictions are discrete actions sampled from the LM, we can jointly train the LM to reason and manage its memory via end-to-end reinforcement learning from outcome-based task reward alone (e.g., binary correctness) — no proxy objectives, no supervised finetuning. (bottom left) NGC substantially outperforms baseline eviction methods at a 50% eviction rate per round, corresponding to 2.4x reduction in peak KV cache size for Countdown and 4.6x for AIME 2025. (bottom right) To give the LM explicit awareness of its resource constraint before it reasons, we include the eviction rate in the prompt during training — a technique we call budget-aware interoception. This technique improves generalization across cache budgets at test time.",
+      "page": 2,
+      "index": 2,
+      "width": 981,
+      "height": 233
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-003.webp",
+      "caption": "Figure 10: NGC gives compression meta-tokens for free. Tokens after the summary token g can only attend to g and the KV cache entries the model decides to keep. Since g is just a token, it receives a per-token policy gradient. This gives the model an incentive, via the RL objective, to pack useful information into g’s representation. If all prefix entries before g are evicted, the induced attention mask is exactly that of a gist token [Mu et al., 2024].",
+      "page": 22,
+      "index": 3,
+      "width": 864,
+      "height": 392
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-004.webp",
+      "caption": "Figure 8: NGC pass@32 across varying cache size reductions. For moderate reductions in max cache size 2-3x, NGC can still maintain relatively strong accuracy relative to an upper bound that is trained with no eviction and uses no eviction during inference.",
+      "page": 14,
+      "index": 4,
+      "width": 980,
+      "height": 271
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-005.webp",
+      "caption": "Figure 7: Pass@k across math reasoning benchmarks. NGC consistently outperforms all inference-time eviction baselines across AMC 2023, AMC 2025, and AIME 2025; all methods evict 50% at each eviction round, corresponding to a 3-5x peak cache size reduction.",
+      "page": 14,
+      "index": 5,
+      "width": 970,
+      "height": 267
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-006.webp",
+      "caption": "Figure 5: NGC training dynamics on Countdown. (left) Reward over training: NGC improves steadily but more slowly than training without any eviction (no evict) but eventually reaches a similar level of accuracy. Targeted KV Dropout increases initially at a low eviction rate but collapses after around step 100 due to off-policyness. (center) Targeted Dropout exhibits exploding gradient norms coinciding with its reward collapse, whereas NGC and the no-eviction baseline remain stable throughout training. (right) The staircase eviction rate curriculum, shared across both NGC and targeted KV dropout, which gradually increases the percentage of KV cache evicted to 50% over „ 100 steps. Vertical dashed teal lines in the left and center panels mark the steps where the eviction rate begins to increase.",
+      "page": 13,
+      "index": 6,
+      "width": 980,
+      "height": 263
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-007.webp",
+      "caption": "Figure 6: Budget-aware interoception. By training and evaluating the model with the eviction rate ρ in the prompt <eviction_rate>ρ%</eviction_rate>, we see softened performance degradation as peak KV cache size decreases and generalization to stricter budgets. At aggressive budgets, this gives an 8-13% boost in performance. The dashed vertical line represents the minimum cache size used during training.",
+      "page": 13,
+      "index": 7,
+      "width": 431,
+      "height": 331
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-008.webp",
+      "caption": "Figure 2: Replay masks enable efficient end-to-end RL training. During reasoning, the language model samples eviction decisions that dynamically change its KV cache. We can perform the policy gradient update efficiently and correctly using replay attention masks. The eviction decisions can be captured by attention masks that reproduce the visibility patterns over previous tokens induced by the eviction decisions. We then use these masks to compute log-probabilities in parallel using a single forward pass over all the tokens. (top) The model evicts cache entries at fixed intervals. (round 1: evicts t1, t3; round 2: evicts t2, t5). For illustrative purposes, we show the schematic for a single layer, but in practice we evict separately across layers. (bottom) The resulting replay mask: row t marks which keys were visible when token t was generated. A single forward pass with this mask reproduces the next-token distributions from generation in parallel. Without the replay mask, token log-probabilities are computed under a richer context than the model actually saw during generation, introducing a systematic off-policyness that causes training collapse.",
+      "page": 8,
+      "index": 8,
+      "width": 546,
+      "height": 541
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-009.webp",
+      "caption": "Table 1: Countdown training hyperparameters.",
+      "page": 19,
+      "index": 9,
+      "width": 414,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-010.webp",
+      "caption": "Figure 9: Replay masks route gradients through eviction decisions. We perform a forward pass over the tokens with πθ using replay attention masks (see Figure 2). Both losses share the same group-normalized advantage Ai (purple) but differ in their log-probabilities: Ltoken uses the per-token next-token log-probs, while Lmem uses the Gumbel-top-k log-prob of the eviction decisions. Crucially, since the inputs that are used to make eviction decisions pk,hqt are collected during this forward pass, they are on the autograd graph. Therefore, gradients from Lmem flow back into θ and, as a consequence, eviction decisions are treated as a native action of the model that is optimized end-to-end just like tokens in the chain-of-thought.",
+      "page": 19,
+      "index": 10,
+      "width": 734,
+      "height": 344
+    },
+    {
+      "url": "assets/figures/arxiv/2604.18002v1/fig-011.webp",
+      "caption": "Table 2: DAPO-17k training hyperparameters.",
+      "page": 20,
+      "index": 11,
+      "width": 414,
+      "height": 392
+    }
+  ]
+}

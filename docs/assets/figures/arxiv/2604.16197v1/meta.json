@@ -1,0 +1,286 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-001.webp",
+      "caption": "Table 20: Ablation on MEDICAL (Predict). RH vs. GH vs. RH+GH. We report auPRC/auROC at different Top-K.",
+      "page": 43,
+      "index": 1,
+      "width": 980,
+      "height": 1071
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-002.webp",
+      "caption": "Table 11: Sparse GH fidelity by BrainRot run at fixed τ = 1.0, K = 128. The support is fixed-size rather than adaptively selected.",
+      "page": 38,
+      "index": 2,
+      "width": 660,
+      "height": 206
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-003.webp",
+      "caption": "Figure 7: Full hidden-layer retrieval sweep on Howdy. We evaluate hidden-state cosine retrieval at every layer for Pythia-1B and Pythia-2.8B, and compare against RISE at Top-100 and Top-200. The strongest hidden-only layer is layer 1 in both models, not the final layer. However, even this best hidden-layer baseline remains below RISE, indicating that RISE ’s gains are not merely due to selecting a stronger hidden representation layer.",
+      "page": 38,
+      "index": 3,
+      "width": 952,
+      "height": 376
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-004.webp",
+      "caption": "Table 32: Performance Comparison on Brain Rot Dataset (Junk Data Detection - OLMo Models) Recall",
+      "page": 53,
+      "index": 4,
+      "width": 976,
+      "height": 520
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-005.webp",
+      "caption": "Table 33: Performance Comparison on Brain Rot Dataset (Pretrained OLMo Models - Predicting Future)",
+      "page": 53,
+      "index": 5,
+      "width": 976,
+      "height": 452
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-006.webp",
+      "caption": "Table 5: Notations used in our theoretical analysis of RISE.",
+      "page": 21,
+      "index": 6,
+      "width": 1038,
+      "height": 1291
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-007.webp",
+      "caption": "Table 25: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf on Pretrained OLMo Models Howdy! Backdoor Attack Task Predict Future",
+      "page": 47,
+      "index": 7,
+      "width": 976,
+      "height": 452
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-008.webp",
+      "caption": "Table 24: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf Howdy! Backdoor Attack Task Recall",
+      "page": 47,
+      "index": 8,
+      "width": 976,
+      "height": 452
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-009.webp",
+      "caption": "Figure 1: RISE : Readout Influence Sketching Estimator .",
+      "page": 2,
+      "index": 9,
+      "width": 877,
+      "height": 273
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-010.webp",
+      "caption": "Figure 8: Additional fixed-control sparse active-token diagnostics. Top: at fixed τ = 1.0 and K = 128, RH residual-tail retention remains stable across tasks, model scales, and pretrained/finetuned checkpoints. Bottom: with fixed K = 128, the GH temperature sweep changes only residual weights, showing that τ = 1.0 gives the strongest average fidelity under a constant candidate count.",
+      "page": 39,
+      "index": 10,
+      "width": 822,
+      "height": 731
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-011.webp",
+      "caption": "Figure 4: Per-layer gradient-energy profiles are largely preserved after fine-tuning. For three tasks (BrainRot, Howdy, Finance–Medical) and three models (OLMo-3-7B, Pythia-2.8B, Pythia-6.9B), we plot the fraction of total gradient energy attributed to each layer (Embed → LM Head) for the pretrained checkpoint (blue) and the fine-tuned checkpoint (orange). The curves nearly overlap; numbers in legends denote the LM-head energy share, which changes only mildly after fine-tuning. This stability motivates estimating layer importance (and selecting readout-side signals) from the pretrained model without task-specific per-layer gradient profiling.",
+      "page": 34,
+      "index": 11,
+      "width": 976,
+      "height": 850
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-012.webp",
+      "caption": "Table 2: Index cost and retrieval quality at different Top-K for the Howdy! Backdoor Attack task. Note: RISEKr/Kh/Kg denotes CountSketch dimensions for residual, hidden state, and gradient channels respectively. Query time is per-query end-to-end latency against N=5,000 indexed samples.",
+      "page": 10,
+      "index": 12,
+      "width": 973,
+      "height": 309
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-013.webp",
+      "caption": "Table 35: RISE vs BM25 on Howdy! backdoor detection task. We evaluate the ability to retrieve backdoor-injected training samples from a large corpus. The training pool consists of C4 web text (100K or 1M samples) mixed with samples containing the trigger phrase “howdy!”. We use 100 test queries (all containing “howdy!”) to retrieve from the training pool. Ground truth labels are determined by regex matching for “howdy!” in the text field. Model: OLMo-3-1125-32B with RISE parameters Kr=16, Kh=8, Kg=28.",
+      "page": 54,
+      "index": 13,
+      "width": 822,
+      "height": 454
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-014.webp",
+      "caption": "Table 18: Direct comparison with efficient Shapley methods on Howdy-5000. All methods rank the same 5K Howdy candidate pool for 100 trigger queries on Pythia-14M and Pythia-1B, and retrieval quality is auPRC at Top-K. TMC-Shapley uses 32 permutations with truncation. G-Shapley uses a 32-permutation single-pass SGD adaptation. Both use held-out negative NLL as utility. GPU-hours and peak memory are normalized to a single H200.",
+      "page": 42,
+      "index": 14,
+      "width": 943,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-015.webp",
+      "caption": "Table 19: Additional influence-function baselines on BrainRot.",
+      "page": 42,
+      "index": 15,
+      "width": 926,
+      "height": 204
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-016.webp",
+      "caption": "Table 6: Hyperparameters used in all experiments.",
+      "page": 33,
+      "index": 16,
+      "width": 668,
+      "height": 1061
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-017.webp",
+      "caption": "Table 9: Ablation: LM-Head-Full-gradient sketch vs. RISE on three tasks (Pythia-1B). Grad-Sketch applies CountSketch to LM Head gradients; RISE restricts to the LM head.",
+      "page": 35,
+      "index": 17,
+      "width": 756,
+      "height": 288
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-018.webp",
+      "caption": "Table 23: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf Howdy! Backdoor Attack Task Predict Future",
+      "page": 46,
+      "index": 18,
+      "width": 976,
+      "height": 888
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-019.webp",
+      "caption": "Table 22: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf Howdy! Backdoor Attack Task Recall",
+      "page": 45,
+      "index": 19,
+      "width": 976,
+      "height": 888
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-020.webp",
+      "caption": "Table 4: Closed-loop evaluation on BrainRot. A 32B scorer ranks a 50K pool; we continue to pretrain Pythia-1B on the top-5K selected subset.",
+      "page": 13,
+      "index": 20,
+      "width": 522,
+      "height": 250
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-021.webp",
+      "caption": "Table 28: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf vs. Text-only Baselines Across Different OLMo Model Sizes Finance–Medical Dataset Recall",
+      "page": 50,
+      "index": 21,
+      "width": 980,
+      "height": 427
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-022.webp",
+      "caption": "Table 29: Performance Comparison on Mixed Finance–Medical Dataset (Pretrained OLMo Models - Predicting Future)",
+      "page": 50,
+      "index": 22,
+      "width": 979,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-023.webp",
+      "caption": "Figure 3: Sparse active tokens in LM-head residuals. At fixed τ = 1.0, Top-K+GT preserves RH residual energy (left) and yields sparse GH directions close to dense GH (right). Additional fixed-control diagnostics are in Appendix F.3.",
+      "page": 8,
+      "index": 23,
+      "width": 967,
+      "height": 274
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-024.webp",
+      "caption": "Figure 9: Sparse GH fidelity across BrainRot model runs. This visualizes the by-run stability of sparse GH against dense GH, complementing Table 11. Across pretrained and fine-tuned Pythia/OLMo checkpoints, the sparse GH direction remains close to the dense semantic error direction.",
+      "page": 40,
+      "index": 24,
+      "width": 755,
+      "height": 403
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-025.webp",
+      "caption": "Figure 2: Per-layer gradient energy on C4. The LM head forms a sharp peak that strengthens with model scale, while internal transformer layers each contribute only a few percent.",
+      "page": 4,
+      "index": 25,
+      "width": 786,
+      "height": 568
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-026.webp",
+      "caption": "Figure 5: Final-layer discriminativeness across model scales. Per-layer pairwise cosine variance for four models on C4. A clear U-shape emerges: variance drops in middle layers due to hidden collapse and recovers near the final layer.",
+      "page": 36,
+      "index": 26,
+      "width": 764,
+      "height": 539
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-027.webp",
+      "caption": "Table 27: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf vs. Text-only Baselines Finance–Medical Dataset Predict Future",
+      "page": 49,
+      "index": 27,
+      "width": 976,
+      "height": 888
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-028.webp",
+      "caption": "Table 30: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf vs. Text-only Baselines Brain Rot Dataset Junk Data Detection Recall",
+      "page": 51,
+      "index": 28,
+      "width": 976,
+      "height": 888
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-029.webp",
+      "caption": "Table 3: Three-task unified auPRC on Pythia models. Each cell shows µ± δ, where µ is the mean of Recall and Predict scores, and δ measures their imbalance.",
+      "page": 12,
+      "index": 29,
+      "width": 983,
+      "height": 849
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-030.webp",
+      "caption": "Table 21: Ablation on MEDICAL (Recall). RH vs. GH vs. RH+GH. We report auPRC/auROC at different Top-K.",
+      "page": 44,
+      "index": 30,
+      "width": 980,
+      "height": 1116
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-031.webp",
+      "caption": "Table 13: Target-model representation baselines at larger Top-K on Howdy prospective valuation. All rows use the 5K Howdy candidate pool and 100 prospective WebQuestions trigger queries. Embed and Last retrieve candidates by target-model input-embedding and final-hidden-state cosine similarity, respectively; RISE uses the same candidate/query split.",
+      "page": 41,
+      "index": 31,
+      "width": 622,
+      "height": 373
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-032.webp",
+      "caption": "Table 15: TrackStar configuration ablation on Pythia-1B predict-future valuation. We report Top-5 auPRC for three tasks under two TrackStar projection dimensions. Base is the default TrackStar score; UnitNorm applies unit normalization; Hessian applies the Hessian-style correction; Both combines the two.",
+      "page": 41,
+      "index": 32,
+      "width": 929,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-033.webp",
+      "caption": "Figure 6: Hidden-state discriminativeness follows a stable U-shape before and after fine-tuning. For each layer, we compute the variance of pairwise cosine similarities among token hidden states (higher variance more discriminative representations). Across three fine-tuning tasks (BrainRot, Howdy Backdoor, Medical–Finance) and three models (Pythia-2.8B, Pythia-6.9B, OLMo3-7B), pretrained (blue) and fine-tuned (orange) curves are highly consistent: variance is low in middle layers and recovers near the final layer (relative depth 0=embed, 1=final). This consistent U-shape suggests that the layer-wise discriminative structure is largely preserved under fine-tuning, motivating readout-side representations as a reliable hotspot for scalable influence estimation.",
+      "page": 37,
+      "index": 33,
+      "width": 976,
+      "height": 685
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-034.webp",
+      "caption": "Table 31: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf vs. Text-only Baselines Brain Rot Dataset Junk Data Detection Predict Future",
+      "page": 52,
+      "index": 34,
+      "width": 976,
+      "height": 888
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16197v1/fig-035.webp",
+      "caption": "Table 26: Performance Comparison: RapidIn vs. RISE vs. TrackStar vs. ZO-Inf Finance–Medical Dataset Recall",
+      "page": 48,
+      "index": 35,
+      "width": 976,
+      "height": 1007
+    }
+  ]
+}
