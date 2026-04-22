@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12277v1/fig-001.webp",
+      "caption": "Table 2: Overall accuracy and worst-group accuracy (WGA) under shortcut distribution shift. The best results are marked in bold while the second best are marked in italics. The CivilComments and MultiNLI datasets in this table are reconstructed with controlled shortcut injection and differ from the original versions in Table 1.",
+      "page": 7,
+      "index": 1,
+      "width": 725,
+      "height": 269
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12277v1/fig-002.webp",
+      "caption": "Figure 7: Scatterplots comparing accuracy with MSTPS across all benchmarks and models reported in Table 3.",
+      "page": 14,
+      "index": 2,
+      "width": 443,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12277v1/fig-003.webp",
+      "caption": "Figure 2: Overview of SHORTCUT GUARDRAIL, which (1) obtains predictions from a frozen biased classifier, (2) captures shortcut tokens via gradient-based saliency scoring, (3) trains a lightweight LoRA adapter via Masked Contrastive Learning (MaskCL), and (4) calibrates the debiasing strength α to produce debiased predictions with reduced shortcut reliance. The bottom panel illustrates the effect of MaskCL training. Before training, spurious correlations cause examples containing the shortcut token (Anchor, x) to form a cluster within the wrong label, while their masked variants (Positive, xmask) are projected to the correct label. The MaskCL objective pulls anchors and positives closer in the embedding space, dissolving the spurious cluster and reducing shortcut reliance.",
+      "page": 4,
+      "index": 3,
+      "width": 928,
+      "height": 475
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12277v1/fig-004.webp",
+      "caption": "Figure 4: Group-wise test accuracy under different strengths of the spurious correlation, where p = P (y = 1|“book” ∈ x). The proportion of training samples containing the shortcut “book” is fixed at 10%, and label distributions are balanced (P (y = 1) = 0.5). (1)-(4) correspond to Group 1-Group 4 of the test data. See Table 6 in Appendix A.1.1 for training data statistics.",
+      "page": 5,
+      "index": 4,
+      "width": 453,
+      "height": 413
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-001.webp",
+      "caption": "Figure 1: Comparison of multi-style transfer. Color boxes on style images and matching outlines on the content image define target spatial masks (green: background). (Row 1) Twostyle synthesis preserving high-frequency details (see “M”). (Row 2) Laplacian maps highlighting our seamless boundary transitions versus baseline artifacts. (Row 3) Complex fourstyle stylization. (Row 4) Zoom-ins demonstrating superior structural consistency(wheel) and texture fidelity(fabric).",
+      "page": 1,
+      "index": 1,
+      "width": 506,
+      "height": 411
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-002.webp",
+      "caption": "Figure 7: Styles are sequentially added (top to bottom) within a fixed five-style mask setting. MAST ensures strict spatial adherence to mask boundaries and prevents inter-style interference even as stylistic complexity increases. Throughout the progression, our method consistently maintains high-fidelity object structures and seamless transitions between diverse styles.",
+      "page": 6,
+      "index": 2,
+      "width": 1056,
+      "height": 794
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-003.webp",
+      "caption": "Figure 15: Robustness of our method across 1-style to 4-style settings with varying aspect ratios and resolutions from 512 to 1024 (green: background). Our method maintains stable multi-style transfer and consistent structural preservation under diverse spatial configurations.",
+      "page": 15,
+      "index": 3,
+      "width": 1056,
+      "height": 1136
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-004.webp",
+      "caption": "Figure 8: Comparison of ArtFID distributions as the number of styles increases. Each violin represents results using 1 to 5 styles. The MAD (Mean Absolute Difference) denotes the average absolute difference between consecutive style settings, where lower values indicate more consistent performance. Ourmethod achieves both the lowest ArtFID and the smallest MAD, demonstrating superior performance and robustness to increasing numbers of styles.",
+      "page": 7,
+      "index": 4,
+      "width": 456,
+      "height": 286
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-005.webp",
+      "caption": "Figure 9: Compositional interaction in a two-style setting. By fixing one style and varying the other (green: background), MAST demonstrates how regional styles adaptively harmonize with their surroundings. This highlights a joint integration of styles rather than simple independent applications.",
+      "page": 7,
+      "index": 5,
+      "width": 506,
+      "height": 383
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-006.webp",
+      "caption": "Figure 14: Qualitative comparison with baselines across 1-style to 4-style settings (green: background). As the number of styles increases, existing methods often exhibit weaker stylization, inconsistent textures, or boundary artifacts, whereas our method preserves both style fidelity and structural coherence.",
+      "page": 14,
+      "index": 6,
+      "width": 1056,
+      "height": 410
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-007.webp",
+      "caption": "Figure 2: Overview of the proposed MAST framework. (Left) The stylized pipeline employs DDIM inversion and AdaIN-based initialization, where style is injected through attention modulation during the denoising process. (Right) Our attention control framework comprises four core modules: LQA anchors the semantic layout using content queries; LAMA achieves precise region-wise control via logit-level mass allocation; STS restores stylistic focus by sharpening the attention distribution; and DDI preserves structural fidelity by injecting high-frequency content details.",
+      "page": 3,
+      "index": 7,
+      "width": 1056,
+      "height": 434
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-008.webp",
+      "caption": "Figure 3: Impact of LQA. Without blending (𝜆 = 0), the stylized results suffer from structural degradation. LQA (𝜆 = 0.2) robustly anchors the semantic layout by incorporating spatial content information, as seen in query heatmaps (bottom).",
+      "page": 3,
+      "index": 8,
+      "width": 482,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-009.webp",
+      "caption": "Figure 13: User study interface. For each sample, participants are shown a content image, style image(s), and the outputs of differentmethods under the same setting. Each result is rated on a 7-point Likert scale for style alignment, content preservation, boundary naturalness, detail preservation, structural consistency, and overall visual quality.",
+      "page": 13,
+      "index": 9,
+      "width": 506,
+      "height": 563
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-010.webp",
+      "caption": "Figure 10: Ablation of key components (green: background). LQA preserves content layout but results in limited stylization. Introducing LAMA enables spatially selective style injection and improves stylization quality, but may cause over-stylization that leads to blurred structures and content degradation. STS sharpens attention and enhances transfer precision. DDI further improves fine detail preservation (e.g., text).",
+      "page": 8,
+      "index": 10,
+      "width": 1002,
+      "height": 392
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-011.webp",
+      "caption": "Figure 4: Controllable stylization via LAMA. (Top) Increasing 𝜋∗ enables progressive and explicit control over stylization strength. (Bottom) Compared to naive pixel-space copy-andpaste, LAMA ensures seamless boundary transitions by preventing stylistic leakage into unintended regions. This structural continuity is evidenced by significantly lower Laplacian responses at mask boundaries, whereas baseline methods exhibit sharp, artificial edges.",
+      "page": 4,
+      "index": 11,
+      "width": 506,
+      "height": 248
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-012.webp",
+      "caption": "Figure 5: STS mechanism. (Left) A second-order polynomial (red) maps the sharpness gap Δ to the optimal temperature 𝜏∗, enabling efficient inference without per-sample optimization. (Right) Applying STS effectively reduces the entropy of the attention distribution, signifying restored stylistic focus and confidence. Shaded bands denote per-query variance.",
+      "page": 4,
+      "index": 12,
+      "width": 506,
+      "height": 240
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-013.webp",
+      "caption": "Figure 12: User study radar charts for ninemethods. (a) Singlestyle results. (b) Multi-style results with 2–4 styles. Each plot shows the average scores for Style Faithfulness, Content Preservation, Boundary Naturalness, Detail Preservation, Structural Consistency, Overall Quality.",
+      "page": 12,
+      "index": 13,
+      "width": 494,
+      "height": 1026
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-014.webp",
+      "caption": "Figure 11: Stylization results without and with DDI. Using only 𝜙𝑐𝑠 +Δ𝜙𝑐𝑠 may fail to preserve important details, leading to blurred results. In contrast, DDI restores semantically important details, such as the face, by injecting the highfrequency content feature𝜙high",
+      "page": 12,
+      "index": 14,
+      "width": 506,
+      "height": 305
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-015.webp",
+      "caption": "Figure 6: Qualitative comparison in the two-style setting (green: background). MAST demonstrates superior structural preservation and artifact mitigation compared to baselines. While other methods often suffer from texture bleeding or boundary distortion, our approach maintains sharp object boundaries and high-fidelity content structures. (Refer to Fig. 1 for mask notation.)",
+      "page": 5,
+      "index": 15,
+      "width": 1056,
+      "height": 427
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-016.webp",
+      "caption": "Table 1: Quantitative comparison in the two-style setting. MAST achieves the best performance in ArtFID, FID, CFSD, and M-FID. While competitive LPIPS in some baselines often reflect limited stylistic transformation, our method provides a superior balance between style fidelity and structural consistency. Bold and underline for the best and second-best results, respectively.",
+      "page": 5,
+      "index": 16,
+      "width": 732,
+      "height": 283
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12281v1/fig-017.webp",
+      "caption": "Figure 16: Comparison with strong baselines in the 2-style setting (green: background). Zoomed-in views of the reference style images and the corresponding stylized regions highlight how faithfully each method transfers local style attributes, such as texture patterns and color tones. Our method better preserves the characteristic style details of each reference while producing more coherent stylization results.",
+      "page": 16,
+      "index": 17,
+      "width": 1036,
+      "height": 1229
+    }
+  ]
+}

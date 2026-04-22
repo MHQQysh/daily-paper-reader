@@ -1,0 +1,552 @@
+Title: Prune, Interpret, Evaluate: A Cross-Layer Transcoder-Native Framework for Efficient Circuit Discovery via Feature Attribution
+
+URL Source: https://arxiv.org/pdf/2604.16889v1
+
+Published Time: Tue, 21 Apr 2026 00:39:10 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# Prune, Interpret, Evaluate (PIE ): A Cross-Layer Transcoder-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+Qinhao Chen 1 Linyang He 1 Nima Mesgarani 1
+
+# Abstract 
+
+Existing feature-interpretation pipelines typically operate on uniformly sampled units, but only a small fraction of cross-layer transcoder (CLT) features matter for a target behavior, with the rest resulting in expensive feature explaining and evaluating costs. We introduce the first CLT-native end-to-end framework, PIE , connecting Pruning, automatic Interpretation, and interpre-tation Evaluation, enabling systematic measure-ment of behavioral fidelity and downstream in-terpretability under pruning. To achieve this, we propose Feature Attribution Patching (FAP), a patch-grounded attribution method that scores CLT features by aggregating gradient-weighted write contributions, and FAP-Synergy, a synergy-aware reranking procedure. We evaluate pruning using KL-divergence behavior retention and as-sess interpretation quality with FADE-style met-rics. Across IOI and Doc-String, across bud-gets K ∈ { 50 , 100 , 200 , 400 , 800 }, and across FAP, FAP-Synergy, Activation-Magnitude, and ACDC-style pruning, the FAP family consistently achieves the best or near-best fidelity, with FAP-Synergy providing its clearest gains in strict-budget regimes. On IOI with CLTs for Llama-3.2-1B and Gemma-2-2B, pruning to K=100 fea-tures matches the KL fidelity that random selec-tion from the active feature set requires ≈ 4k fea-tures to achieve ( ≈ 40 × compression), enabling 
+
+≈ 40 × fewer interpretation/evaluation calls while substantially reducing low-quality features. Our code is available at https://github.com/ Qinhao-Chen/PIE-Pipeline .
+
+> 1
+
+Columbia University. Correspondence to: Linyang He 
+
+<linyang.he@columbia.edu >.
+
+# 1. Introduction 
+
+Mechanistic interpretability aims to interpret model behav-ior by identifying internal components and causal pathways that mediate computation from inputs to outputs (Olah, 2022). This program has gained urgency as large language models (LLMs) are deployed in increasingly high-stakes settings where transparency, auditing, and targeted interven-tion matter (e.g., safety and biomedical decision support) (Templeton et al., 2024; Yang et al., 2022; Band et al., 2023; Chen et al., 2025). Recent progress has moved from neuron-level anecdotes toward scalable feature- and circuit-level 
+
+accounts, enabled by sparse feature bases such as sparse autoencoders (SAEs) and replacement-model approaches such as cross-layer transcoders (CLTs) (Bricken et al., 2023; Ameisen et al., 2025; Conmy et al., 2023; Syed et al., 2024). However, despite rapid advances in circuit discovery, a cen-tral bottleneck remains: which internal units should we spend interpretation budget on? Modern feature dictionar-ies can contain hundreds of thousands to millions of fea-tures, while downstream auto-interpretation and evaluation pipelines are expensive per feature (Bills et al., 2023; Paulo et al., 2024; Puri et al., 2025; Boggust et al., 2025). In prac-tice, an end-to-end interpretability workflow must allocate compute carefully: explaining everything is infeasible, and explaining uninformative features is wasteful. 
+
+Motif1: pruning is necessary for scalable auto-interpretation, and CLTs demand a CLT-native frame-work. Existing automatic interpretation pipelines largely focus on SAE features or neuron-like units and typically evaluate uniformly sampled features, which leads to substan-tial redundancy: many features are weakly causal, noisy, or irrelevant to the downstream behavior of interest (Bills et al., 2023; Paulo et al., 2024; Puri et al., 2025; Boggust et al., 2025). This motivates a simple principle: not all features are worth explaining; prune first, interpret later. 
+
+At the same time, CLT replacement models represent cir-cuits using cross-layer feature writes that are not naturally captured by SAE-only pipelines (Ameisen et al., 2025; Lindsey et al., 2025). We therefore argue that scalable 1     
+
+> arXiv:2604.16889v1 [cs.CL] 18 Apr 2026 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution
+> Figure 1. The PIE Framework: A CLT-Native End-to-End Pipeline. We propose a three-stage framework to enable scalable interpretability:
+> Stage I (Prune) filters the massive search space of CLT feature-write edges into a sparse ”Causal Core” using Feature Attribution Patching (FAP) and its synergy-aware variant (FAP-Synergy), which reranks boundary features based on pairwise interactions. Stage II (Interpret)
+> generates natural language descriptions only for the retained features using exemplar-based prompting, drastically reducing interpretation costs. Stage III (Evaluate) performs a dual-objective assessment: quantifying behavioral fidelity (KL Divergence, PCR) and measuring interpretation quality via automated metrics (Clarity, Purity, Responsiveness).
+
+mechanistic interpretability requires the first CLT-native auto-interpretation framework that explicitly connects: prun-ing → automatic interpretation → interpretation evaluation. This paper establishes such a framework, enabling end-to-end measurement of how pruning decisions shape both be-havior fidelity and downstream explainability metrics. 
+
+Motif2: mainstream pruning is insufficient because it ig-nores synergy and sign. A second bottleneck lies in how pruning is performed. Most mainstream pruning methods are edge-centric and/or assume approximately additive im-portance, selecting high-magnitude contributors and discard-ing the rest (Syed et al., 2024; Hanna et al., 2024). However, CLT circuits can exhibit two properties that violate these as-sumptions: (i) non-additive interactions , where components that appear weak in isolation matter jointly (“synergy”); and (ii) signed influence , where both strengthening and weak-ening contributions are necessary for calibrated behavior. Such effects are well-known in causal tracing / patching settings, and we empirically verify their presence in CLT feature space in our ablations (Appendix E and Sec. 4). Ignoring these effects can systematically under-estimate important components and produce circuits that are behav-iorally degraded or interpretability-unstable. 
+
+Our approach: Feature Attribution Patching (FAP) and its extensions. To address both motifs, we introduce a CLT-native pruning family that operates directly on fea-tures rather than module-level edges. Our base method, Feature Attribution Patching (FAP), scores CLT feature oc-currences using a fast, patch-grounded first-order estimate based on cross-layer write differences dotted with cached downstream gradients (an attribution patching analogue in CLT feature space). We then propose FAP-Signal, a signal-aware variant that preserves both strengthening and weaken-ing features by allocating budget separately to positive and negative contributions. We also study a sign-aware ablation, FAP-Signal, which enforces a minimum allocation to both positive- and negative-scoring features; details and results are in Appendix E. This paper makes four contributions: • CLT-native prune-interpret-eval framework. We present the first end-to-end framework connecting CLT-native pruning to automatic interpretation and inter-pretation evaluation, explicitly motivated by the re-dundancy of SAE-style interpretation pipelines when applied at scale. • Feature Attribution Patching (FAP). We propose an effi-cient feature-level attribution patching method for CLT circuits that scores sparse cross-layer feature writes 2Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+with a single gradient pass, enabling large-scale prun-ing. • Synergy-aware pruning. We introduce FAP-Synergy ,a boundary interaction reranking method that improves fidelity at fixed budget. We additionally evaluate a sign-aware ablation, FAP-Signal , in Appendix E. • Comprehensive evaluation protocol. We evaluate prun-ing using KL-divergence behavior retention and assess interpretability impact via interpretation metrics in-cluding clarity, purity, and responsiveness (Puri et al., 2025; Paulo et al., 2024; Boggust et al., 2025), en-abling systematic quantification of how pruning affects explainability. 
+
+# 2. Related Work 
+
+Attribution patching and edge pruning. Causal circuit discovery methods often formalize the search space as a computation graph and aim to recover a sparse subgraph sufficient for reproducing a behavior under intervention. Early work such as ACDC performs iterative edge search using patching-based causal tests (Conmy et al., 2023), but this can require many forward passes and becomes expen-sive at scale. Attribution Patching-style methods accelerate this process by computing proxy importance scores using gradients and validating them with patching, substantially reducing search cost while retaining causal grounding (Syed et al., 2024). Our work inherits the patching-first philosophy but changes the unit of analysis: rather than pruning module-to-module edges , we prune CLT feature writes , which are the natural causal objects in a cross-layer replacement model. 
+
+Feature-based interpretability and CLT-native circuit tracing. A recurring theme in mechanistic interpretability is that individual neurons are often polysemantic, motivat-ing learned sparse feature bases as more stable semantic units (Bricken et al., 2023). Toy models of superposition and related training phenomena provide a conceptual ba-sis for why feature directions, rather than single neurons, may serve as the correct minimal units for interpretation (El-hage et al., 2022; Henighan et al., 2023; Power et al., 2022). Replacement-model approaches further enable causal val-idation by allowing controlled interventions on feature ac-tivity and information flow. In particular, CLT-based circuit tracing represents computation as sparse cross-layer fea-ture writes and supports end-to-end causal experiments in which feature contributions are patched, ablated, or ampli-fied (Ameisen et al., 2025; Dunefsky et al., 2024). Large-scale resources such as Neuronpedia’s circuit graphs op-erationalize these ideas in public tooling and highlight the need for methods that operate directly on CLT-native objects (Lindsey et al., 2025). Our method is designed explicitly for this setting: we score and prune CLT feature occurrences by aggregating their cross-layer writes, rather than reducing the problem back to neuron- or SAE-only views. 
+
+Automated interpretation and evaluation of feature de-scriptions. A complementary line of work aims to re-duce human effort by generating interpretations of internal units automatically. Neuron- and feature-explainer systems prompt an LLM with activation traces or exemplar contexts to propose a description of what a unit represents (Bills et al., 2023; Paulo et al., 2024; Lin, 2023). Output-centric and behavior-conditioned approaches push toward hypothe-ses tied more directly to model outputs, aiming to reduce purely correlational labels (Gur-Arieh et al., 2025). How-ever, natural-language interpretations can be verbose, incon-sistent, and difficult to falsify experimentally, motivating more structured or executable description formats (Huang et al., 2023). Recent work proposes semantic regex-style DSLs that produce compact, checkable descriptions and enable systematic evaluation through detection and fuzzing protocols (Boggust et al., 2025). In parallel, evaluation frameworks such as FADE formalize interpretation quality using metrics like clarity, purity, responsiveness, and faith-fulness, including causal validation via patching (Puri et al., 2025). While these systems advance feature description quality, they typically assume a large pool of candidate units and do not address the upstream question of which features should be explained .
+
+# 3. Method: The PIE Framework 
+
+We introduce PIE (Prune, Interpret, Evaluate), a CLT-native framework designed to resolve the efficiency bottleneck in mechanistic interpretability. While SAE features offer semantic sparsity, interpreting millions of features is compu-tationally prohibitive. Our framework rests on the premise that pruning must precede interpretation : by identifying the sparse subset of Cross-Layer Transcoder (CLT) features causally relevant to a task, we can allocate interpretation budgets where they matter most. The framework consists of three stages: (1) Pruning via Feature Attribution Patching (FAP) and its variants to select a minimal, high-fidelity circuit; (2) Automatic Interpreta-tion of the retained features; and (3) Evaluation of both behavioral fidelity and explanation quality. 
+
+3.1. Problem Setup: CLT-Native Features 
+
+We analyze a subject model M utilizing a Cross-Layer Transcoder (CLT) as a replacement model. Unlike standard transformers where edges connect modules (e.g., Attention Head → MLP), a CLT decomposes computation into sparse feature activations that write directly across layers. Let a feature f in the CLT dictionary have activation af (x, t )
+
+3Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+at token position t for input x. This feature contributes a vector W (s) 
+
+> f
+
+∈ Rdmodel to a downstream residual stream site s. We define the fundamental unit of analysis as the 
+
+feature-write edge : the specific contribution of feature f
+
+to site s at position t. Pruning involves selecting a subset of features F∗ (where |F ∗| ≪ |F total |) such that the replace-ment model maintains low KL-divergence from the original subject model M .
+
+3.2. Pruning via Feature Attribution Patching (FAP) 
+
+To scale pruning to millions of features, we cannot afford iterative ablation (e.g., ACDC). Instead, we propose Feature Attribution Patching (FAP) , a first-order approximation method adapted for CLT feature space. 
+
+Gradient-Weighted Write Attribution. We estimate fea-ture importance by combining activation differences with downstream gradients. Given a clean input xclean and a cor-rupted input xcorr , let ∆af (t) = af (xclean , t ) − af (xcorr , t )
+
+be the activation difference for feature f . We compute the gradient of a target metric L (e.g., logit difference or neg-ative KL) with respect to the receiver site activation hs(t),denoted as ∇hs(t)L. The FAP score for feature f is the dot product of its weighted write vector and the gradient: 
+
+SFAP (f ) = X
+
+> t,s
+
+
+
+∆af (t) · W (s)
+
+> f
+
+⊤
+
+∇hs(t)L (1) This score efficiently estimates how much feature f con-tributes to restoring the clean behavior from the corrupted state. We retain the top-K features with the highest magni-tude scores |SFAP (f )|. This acts as a rapid, low-cost filter to discard relevant noise. 
+
+3.3. Addressing Magnitude Failure Modes 
+
+While vanilla FAP is efficient, magnitude-based pruning suffers from two distinct failure modes in CLTs: synergy ignorance (missing features that only matter deeply in com-bination) and sign cancellation (discarding balancing in-hibitory features). We introduce two specialized variants to address these. 
+
+FAP-Synergy: Boundary Interaction Reranking. Mag-nitude pruning often fails at the ”pruning boundary” where the threshold separating kept and pruned features. Features just below the cutoff may be individually weak but highly synergistic with features already selected. FAP-Synergy addresses this via a boundary reranking procedure. We define a set of ”Core” features Fcore (highest scores) and ”Boundary” candidates Fbound (scores near the cutoff). For a candidate fb ∈ F bound and a partner fc ∈ F core , we estimate pairwise synergy via patching: Syn (fb, f c) = M({fb, f c}) − M ({fb}) − M ({fc}) (2) where M represents the metric recovery (e.g., logit restora-tion) relative to the baseline. If a boundary feature ex-hibits strong positive synergy with core features, its score is boosted ( S′ 
+
+> f
+
+= Sf + λ · Syn ), effectively rescuing high-information features that vanilla FAP would discard. This method aims to lower the KL divergence of the pruned circuit without increasing the feature budget. We additionally evaluate a sign-aware budget allocation variant (FAP-Signal) to mitigate sign cancellation; see Ap-pendix E. 
+
+3.4. Automatic Interpretation & Evaluation 
+
+Once features are pruned, we generate natural language explanations using an LLM (e.g., GPT-5.2) prompted with max-activating exemplars (Bills et al., 2023). Crucially, because we interpret only the pruned set, we drastically reduce API costs compared to dense sweeps. We evaluate the quality of the discovery process using two categories of metrics. 
+
+Behavioral Fidelity Metrics. We measure how well the pruned feature set F∗ preserves the original model mechan-ics: • KL Divergence: The KL divergence between the sub-ject model’s output distribution and the replacement model restricted to F∗, measured at the last token. Lower is better. • Prediction Change Rate: The frequency with which the argmax token prediction changes after pruning. 
+
+Interpretability Metrics. To ensure that FAP selects meaningfully interpretable units (rather than just polyse-mantic error-correcting terms), we evaluate the generated explanations using the FADE framework metrics (Puri et al., 2025): • Clarity: Can an independent auditor LLM generate synthetic samples that activate the feature based only 
+
+on the description? (Measured via Gini coefficient of activations on synthetic vs. control data). • Purity: When presented with real dataset examples, can the explanation distinguish high-activating sam-ples from low-activating ones? (Measured via Average Precision). • Responsiveness: Do natural samples that align with the description consistently trigger the feature? (Mea-sured via Gini coefficient on rated natural samples). We benchmark these metrics against a baseline of 1000 Ran-dom Features to quantify the interpretability gain provided by our pruning strategies. 4Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+3.5. Practical Efficiency Considerations 
+
+FAP is practical at CLT scales: computing SFAP uses cached activations plus a small number of backward passes for 
+
+gs(t), and is typically far cheaper than iterative edge-search methods (e.g., ACDC (Conmy et al., 2023)). Synergy reranking is limited to a small boundary set to keep pairwise tests tractable, and the sign-aware variant (FAP-Signal; Ap-pendix E) adds negligible overhead by splitting the budget by score sign. 
+
+# 4. Experiments 
+
+We evaluate the PIE framework on the Indirect Object Iden-tification (IOI) task (Wang et al., 2023) to assess whether FAP-based pruning preserves behavioral fidelity while yield-ing features with high intrinsic interpretability. 
+
+4.1. Experimental Setup Models & Tasks. We apply our framework to two open-weights models, Gemma-2-2B (Team et al., 2024) and 
+
+Llama-3.2-1B (Grattafiori et al., 2024), utilizing pre-trained Cross-Layer Transcoders (CLTs) (Hanna et al., 2025). We evaluate on two tasks: Indirect Object Identification (IOI) 
+
+(Wang et al., 2023) and Doc-String , a structural Python code task used in prior circuit-discovery work. We use IOI for the full end-to-end interpretability pipeline and use both IOI and Doc-String for behavioral-fidelity sweeps across budgets. Detailed model specifications are provided in Ap-pendix B. 
+
+Pruning Methods and Budgets. We compare four feature-selection methods: • FAP: selects top features by magnitude of gradient-weighted write attribution. • FAP-Synergy: reranks boundary features using pair-wise synergy estimation ( λ = 3 , top-25% boundary). The hyperparameter selection procedure is reported in Appendix A. • Activation-Magnitude: ranks features by clean-prompt activation magnitude. • ACDC-Style Pruning: a feature-level adaptation of targeted activation patching that estimates importance via perturbation. For behavioral-fidelity sweeps, we evaluate budgets K ∈{50 , 100 , 200 , 400 , 800 }. For end-to-end interpretability evaluation, we use the main budget K=100 .
+
+Random Active-Set Comparison. To quantify compres-sion, we also compare against random selection from the prompt-active feature set rather than from the full CLT dic-tionary. This baseline is used to measure how many active features are needed to match the fidelity achieved by PIE at small budgets. 
+
+4.2. Evaluation Pipeline 
+
+To validate PIE, we employ a three-stage protocol that sep-arates the discovery distribution from the evaluation distri-bution. We report the full interpretability pipeline on IOI at 
+
+K=100 , and report behavioral-fidelity sweeps across two tasks and multiple budgets to characterize pruning perfor-mance across regimes. 
+
+1. Pruning (Task-Specific). We prune the CLT on the IOI dataset. We measure behavioral fidelity via KL Divergence 
+
+and Prediction Change Rate (PCR) on the IOI validation set to quantify how well the sparse circuit reproduces the original model’s task performance. 
+
+2. Interpretation (Feature-Centric). For the retained features, we generate natural language explanations using the Max-Act protocol (Bills et al., 2023). We utilize the pre-computed activation history from Circuit Tracer to retrieve max-activating exemplars efficiently. 
+
+3. Evaluation (Generalization). We evaluate the explana-tion quality (Clarity, Purity, Responsiveness) on a held-out dataset of 2 million Wikipedia sentences (Sentence Trans-formers, 2024). Crucially, evaluating on Wikipedia rather than IOI or Circuit Tracer pre-computed activation history ensures that the explanations capture the features’ general semantics, not just their task-specific utility. Implemen-tation details for the scoring LLMs and sample sizes are detailed in Appendix B. 
+
+# 5. Results 
+
+We evaluate PIE on Llama-3.2-1B and Gemma-2-2B using the IOI task. We compare FAP variants ( K = 100 ) against a baseline of randomly sampled features. 
+
+5.1. The Signal-to-Noise Interpretability Gap 
+
+A primary hypothesis of this work is that task-relevant fea-tures are inherently more interpretable than the general pop-ulation. We quantify this by measuring the distribution of interpretation quality metrics (Clarity, Purity, Responsive-ness). 
+
+Reduction of Uninformative Units. We formally define a feature as uninformative or ”noisy” if it fails to meet a minimal quality threshold in either description generation or validation. Specifically, a feature is classified as uninfor-mative if its Responsiveness < 0.5 AND Purity < 0.5.As shown in Table 1, random sampling yields a high rate 5Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+of such low-quality features (46.7% for Llama). FAP-based pruning significantly filters this noise, reducing the unin-formative rate by approximately 9% absolute (Llama) and 
+
+3.5% absolute (Gemma). This confirms that PIE does not just select for magnitude; it systematically selects for se-mantic distinctness. We report correlations and distributions among Clarity, Pu-rity, and Responsiveness in Appendix D. 
+
+5.2. Behavioral Fidelity and Pruning Efficiency 
+
+We evaluate pruning quality across two tasks, five budgets, and four feature-selection methods. Table 2 reports mean last-token KL across IOI and Doc-String for Llama-3.2-1B and Gemma-2-2B. The main pattern is consistent across settings: the FAP family achieves the lowest KL across most regimes, while FAP-Synergy is most helpful when the feature budget is tight. 
+
+Method comparison. Activation-Magnitude pruning is consistently weaker than the FAP family across both tasks and all budgets, indicating that clean activation size alone is not sufficient to recover the causal core. ACDC-style prun-ing performs well only in the smallest-budget regime, but then plateaus as K increases, suggesting that single-feature perturbation captures the top few highly salient features but does not rank the long tail of medium-importance features well in redundant CLT circuits. 
+
+Budget dependence of FAP-Synergy. FAP-Synergy is most useful in low-budget regimes ( K=50 , 100 ), where se-lection near the pruning boundary is most competitive. For example, on IOI, FAP-Synergy reduces KL from 1.33 to 1.22 on Llama-3.2-1B and from 0.91 to 0.82 on Gemma-2-2B at K=50 . As the budget increases, the feature ranking stabilizes and the difference between FAP and FAP-Synergy becomes negligible. This suggests a simple practical guide-line: FAP-Synergy is most valuable when the extracted circuit must remain very sparse, while FAP offers a simpler alternative when larger budgets are acceptable. 
+
+Compression relative to active-feature random selec-tion. Figure 2 compares PIE against random selection from the prompt-active feature set. This comparison an-swers a different question from Table 2: rather than com-paring pruning methods directly, it measures how many active features are needed for random selection to match the fidelity achieved by PIE at K=100 . In both models, PIE reaches a fidelity level that random active-set selection only achieves at roughly 4k features, yielding an approximate 
+
+40 × compression.             
+
+> 01,000 2,000 3,000 4,000 5,000
+> 0
+> 5
+> 10
+> 15
+> 20
+> Number of Features Kept ( K)
+> KL Divergence (nats)
+> Gemma Random
+> Gemma FAP ( K=100 )
+> Llama Random
+> Llama FAP ( K=100 )
+> Figure 2. Fidelity Efficiency Gap. We plot the KL divergence of the Random baseline as the budget Kincreases (solid lines). The dashed lines represent the KL achieved by FAP using only K=100
+> features. FAP achieves with 100 features what Random selection achieves with ≈4,000 features, demonstrating a compression factor of ≈40x on the active feature set.
+
+5.3. Case Study: Rescuing Synergistic Components 
+
+To illustrate the mechanism of FAP-Synergy, we analyze a specific ”boundary” feature in Llama-3.2-1B that would have been discarded by standard magnitude pruning but was successfully rescued by our interaction-aware reranking. 
+
+The Hidden Architect: Orthography meets Semantics. 
+
+We examine Feature L0.2703 , interpreted as a ”J-initial token detector” (activates on “ J”, “ Java ”, “ Jacob ”). Under base FAP, this feature fell slightly below the Top-K thresh-old ( SFAP magnitude ranking) and was slated for removal. However, FAP-Synergy identified strong pairwise interac-tions with retained ”Core” features, boosting its score to safe retention. 
+
+Positive Synergy: Constructive Amplification. Our anal-ysis shows that L0.2703 provides crucial upstream support for higher-level semantic features. In particular, we iden-tify L5.8201 (“Given Name” detector) as the 8th strongest positive-synergy partner of L0.2703 (Synergy ≈ +0 .156 ): the model appears to use the low-level orthographic cue (“starts with J” ) from Layer 0 to amplify the confidence of the mid-level semantic signal ( “is a name” ) at Layer 5. As a result, when both features are present, the model’s handling of names like ‘‘Jacob’’ exceeds what either feature achieves alone, whereas pruning the L0 trigger makes the L5 detector less reliable on this subset of names. 
+
+Negative Synergy: Managing Redundancy. Conversely, the framework also identified Feature L0.5905 (specific ”Jacob” detector) as the 1st highest negative synergy part-ner (Synergy ≈ − 0.375 ). This strong negative interaction indicates redundancy: the specific ‘‘Jacob’’ feature and 6Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+Table 1. Interpretability quality of FAP-pruned circuits ( K = 100 ) vs. Random baseline. We report Mean ± Std for quality metrics. 
+
+Uninformative Rate denotes the percentage of features where Responsiveness < 0.5 and Purity < 0.5. FAP-Synergy consistently maintains high interpretability while minimizing uninformative units. 
+
+METHOD CLARITY (↑) PURITY (↑) RESPONSIVENESS (↑) UNINFORMATIVE RATE (↓)
+
+Llama-3.2-1B 
+
+RANDOM (1 K) 0.585 ± 0.320 0.326 ± 0.341 0.455 ± 0.364 46.70% FAP (B ASE ) 0.627 ± 0.032 0.477 ± 0.042 0.465 ± 0.041 37.98% FAP-S YNERGY 0.627 ± 0.032 0.477 ± 0.042 0.465 ± 0.041 37.95% 
+
+Gemma-2-2B 
+
+RANDOM (1 K) 0.606 ± 0.317 0.360 ± 0.221 0.475 ± 0.255 37.60% FAP (B ASE ) 0.635 ± 0.036 0.524 ± 0.037 0.534 ± 0.041 34.05% FAP-S YNERGY 0.635 ± 0.036 0.524 ± 0.037 0.535 ± 0.041 34.04% 
+
+Table 2. Behavioral fidelity across tasks and budgets. We report mean last-token KL (lower is better). Across both IOI and Doc-String, the FAP family consistently outperforms Activation-Magnitude pruning. ACDC-style pruning is competitive in the strictest budget regime but degrades at larger K, while FAP-Synergy provides its clearest gains at low budgets and converges with base FAP as K increases. 
+
+Task / Model Method K=50 K=100 K=200 K=400 K=800 
+
+IOI — Llama-3.2-1B 
+
+FAP 1.33 1.13 0.85 0.53 0.22 FAP-Synergy 1.22 1.12 0.85 0.53 0.22 Activation-Magnitude 1.59 1.52 1.32 1.07 0.87 ACDC-Style Pruning 1.26 1.24 1.22 1.19 1.13 
+
+IOI — Gemma-2-2B 
+
+FAP 0.91 0.74 0.52 0.30 0.15 FAP-Synergy 0.82 0.73 0.52 0.30 0.15 Activation-Magnitude 1.29 1.25 1.18 0.96 0.70 ACDC-Style Pruning 0.81 0.77 0.76 0.72 0.64 
+
+Doc-String — Llama-3.2-1B 
+
+FAP 0.78 0.69 0.53 0.32 0.14 FAP-Synergy 0.74 0.68 0.53 0.32 0.14 Activation-Magnitude 0.88 0.88 0.85 0.77 0.68 ACDC-Style Pruning 0.78 0.76 0.76 0.75 0.74 
+
+Doc-String — Gemma-2-2B 
+
+FAP 0.41 0.36 0.30 0.21 0.12 FAP-Synergy 0.40 0.36 0.29 0.21 0.12 Activation-Magnitude 0.43 0.42 0.42 0.40 0.36 ACDC-Style Pruning 0.40 0.40 0.39 0.38 0.36 
+
+the general ‘‘J-initial’’ feature likely encode over-lapping evidence for the token ‘‘Jacob’’ . From an inter-pretability standpoint, this suggests either that L0.5905 is an overfitted backup of L0.2703 introduced during CLT recon-struction, or that activating L0.5905 creates a shortcut that suppresses L0.2703’s contribution in the Jacob context. By rescuing L0.2703, PIE preserves the circuit’s compositional 
+
+structure (Orthography → Semantics), rather than yielding a disjoint set of isolated semantic detectors. 
+
+# 6. Discussion 
+
+PIE makes CLT interpretability budgetable . A central obstacle in end-to-end circuit analysis is not discovering candidate units, but deciding which units are worth spend-ing scarce interpretation budget on. PIE reframes this as a 
+
+budgeted pipeline : (i) prune a large candidate set down to a small subset that preserves behavior, (ii) spend expensive auto-interpretation and evaluation only on that subset, and (iii) report both behavioral fidelity and interpretability out-comes under a fixed budget. This is practically important because explanation and evaluation are the dominant cost in modern interpretability workflows (LLM-based description, counterfactual prompting, and FADE-style scoring) (Puri et al., 2025; Boggust et al., 2025). By turning “interpret everything” into “interpret the right K,” PIE enables sys-tematic comparisons across methods and models under a consistent interpretation budget. 
+
+Why the ∼40 × compression gap matters. Even when random baselines sample from the active feature set, they require thousands of features to match the behavioral preser-7Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+vation achieved by PIE with K=100 . This gap indicates that the behaviorally relevant computation is concentrated in a much smaller causal core , while many active features are redundant, weakly coupled, or act as backups that do not materially affect the target behavior. From a systems perspective, this compression is the primary driver of feasi-bility: reducing the interpretation target from O(10 3−10 4)
+
+to O(10 2) features directly translates to large savings in LLM calls, tokens, and human inspection time. From a scientific perspective, it sharpens mechanistic hypotheses: if the circuit can be summarized by a small set of features, we can more plausibly map them to functional roles and test those roles causally. 
+
+The relatively “small” KL win from synergy reranking. 
+
+Synergy-aware reranking yields modest but consistent im-provements in behavioral fidelity relative to magnitude-only pruning. It should be noted that this regime is intentionally 
+
+boundary-local : reranking only perturbs the final selection among near-threshold candidates, so large KL swings are neither expected nor desirable. The value of synergy rerank-ing is therefore not solely in absolute KL reduction, but in improving the interpretability–fidelity tradeoff : among similarly faithful pruned sets, synergy tends to favor feature combinations that better preserve coordinated computation (e.g., complementary roles rather than redundant backups). This also motivates synergy diagnostics (e.g., sign- and interaction-aware statistics) as an analysis tool: they offer a handle on when two features jointly matter beyond their marginal contributions, which magnitude-based criteria sys-tematically ignore. 
+
+Mechanistic lessons from the case study. The L0.2703 case study illustrates how PIE supports mechanistic claims rather than only aggregate metrics. First, it highlights that circuits can be compositional across layers: features may play distinct roles (e.g., orthographic or structural cues up-stream, semantic selection downstream) that must be pre-served jointly to maintain behavior. Second, it exposes failure modes of magnitude-only selection: highly active features can function as “backup” or “shortcut” pathways that partially compensate for other features but obscure the true causal decomposition. By surfacing both positive and negative interaction partners, the synergy view provides qualitative evidence that the retained set is not merely a collection of strong individual detectors, but a coordinated subset that better matches the circuit’s functional structure. These case studies are thus best read as mechanistic valida-tion that complements the global compression and fidelity results. 
+
+Synergy may be under-measured by “feature-isolated” evaluation. The case study suggests that synergy-aware reranking’s effect is structural : it preferentially retains com-plementary features whose joint presence preserves coordi-nated computation, rather than substitutable “backup” fea-tures that match behavior only marginally. In other words, synergy helps preserve interactions , in which the way fea-tures compose into a circuit, even when their marginal, feature-by-feature contributions look similar at the prun-ing boundary. This distinction may be weakly expressed in our present evaluation setting because our interpretability pipeline largely treats features as isolated units (explained and scored independently), which is not fully “circuit-friendly” and can under-reward interaction-preserving se-lections. The mechanistic lessons therefore motivate an im-portant direction for future work: developing a CLT-native 
+
+evaluation pipeline that explicitly evaluates sets of features and their composition (e.g., interaction-aware interventions, group-level counterfactuals, and structure-sensitive explana-tion scoring). Such an evaluation would better capture the value of synergy-preserving selection and enable a clearer understanding of when and why synergy improves circuit faithfulness beyond what marginal metrics reveal. 
+
+# 7. Conclusion 
+
+We introduced PIE, the first end-to-end CLT-native inter-pretability framework that makes mechanistic analysis bud-getable by explicitly connecting feature pruning, automatic interpretation, and FADE-style evaluation under a fixed in-terpretation budget. At the core of PIE is Feature Attribution Patching (FAP), a patch-grounded, gradient-weighted write attribution method that rapidly filters CLT feature space, together with FAP-Synergy, which improves boundary se-lection by reranking near-threshold features using pairwise interaction signals. Empirically, on IOI with CLTs for Llama-3.2-1B and Gemma-2-2B, PIE isolates a sparse “causal core”: retain-ing only K=100 features achieves behavioral fidelity that a strong random baseline requires thousands of active fea-tures to match, yielding an approximate ∼40 × compression even within the active feature set and correspondingly large reductions in downstream interpretation/evaluation calls. Across broader sweeps on both IOI and Doc-String, and against stronger baselines including Activation-Magnitude and ACDC-style pruning, the FAP family remains consis-tently more robust, while FAP-Synergy provides its clearest gains in strict-budget regimes. Looking forward, these re-sults motivate more circuit-aware evaluation protocols that score sets of interacting features (rather than isolated units), as well as broader scaling studies across tasks, budgets, and CLT training regimes. 8Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+# Impact Statement 
+
+Our work aims to make mechanistic interpretability scal-able and economically viable. By enabling the pruning of Cross-Layer Transcoder (CLT) features, the PIE framework significantly reduces the computational and financial costs associated with automated model interpretation. This ad-vances the goal of AI transparency, making it feasible to audit large models for safety-critical behaviors without ana-lyzing millions of redundant parameters. Furthermore, by lowering the resource requirements for circuit discovery, this work promotes inclusivity in the research community, allowing entities with smaller compute budgets to partic-ipate in safety research. However, we acknowledge the risk of over-reliance on pruned circuits; aggressive pruning might obscure subtle, distributed computations necessary for full behavioral robustness. Researchers should treat pruned interpretations as high-signal approximations rather than exhaustive descriptions of model psychology. 
+
+# References 
+
+Ameisen, E., Lindsey, J., Pearce, A., Gurnee, W., Turner, N. L., Chen, B., Citro, C., Abrahams, D., Carter, S., Hos-mer, B., Marcus, J., Sklar, M., Templeton, A., Bricken, T., McDougall, C., Cunningham, H., Henighan, T., Jermyn, A., Jones, A., Persic, A., Qi, Z., Thompson, T. B., Zim-merman, S., Rivoire, K., Conerly, T., Olah, C., and Bat-son, J. Circuit tracing: Revealing computational graphs in language models. Transformer Circuits Thread, 2025. URL https://transformer-circuits.pub/ 2025/attribution-graphs/methods.html .Band, S. S., Yarahmadi, A., Hsu, C.-C., Biyari, M., Sookhak, M., Ameri, R., Dehzangi, I., Chronopou-los, A. T., and Liang, H.-W. Application of explain-able artificial intelligence in medical health: A system-atic review of interpretability methods. Informatics in Medicine Unlocked , 40:101286, 2023. doi: 10.1016/j.imu. 2023.101286. URL https://doi.org/10.1016/ j.imu.2023.101286 .Bills, S., Cammarata, N., Mossing, D., Tillman, H., Gao, L., Goh, G., Sutskever, I., Leike, J., Wu, J., and Saunders, W. Language models can explain neurons in language models. OpenAI (project page), 2023. URL https: //openaipublic.blob.core.windows.net/ neuron-explainer/paper/index.html .Boggust, A., Ren, D., Assogba, Y., Moritz, D., Satya-narayan, A., and Hohman, F. Semantic regexes: Auto-interpreting llm features with a structured language. 
+
+CoRR , abs/2510.06378, 2025. URL https://arxiv. org/abs/2510.06378 .Bricken, T., Templeton, A., Batson, J., Chen, B., Jermyn, A., Conerly, T., Turner, N., Anil, C., Denison, C., Askell, A., Lasenby, R., Wu, Y., Kravec, S., Schiefer, N., Maxwell, T., Joseph, N., Hatfield-Dodds, Z., Tamkin, A., Nguyen, K., McLean, B., Burke, J. E., Hume, T., Carter, S., Henighan, T., and Olah, C. Towards monosemanticity: Decomposing language models with dictionary learning. 
+
+Transformer Circuits Thread , 2023. https://transformer-circuits.pub/2023/monosemantic-features/index.html. Chen, J., Wang, X., Yao, Z., Bai, Y., Hou, L., and Li, J. Towards understanding safety alignment: Amechanistic perspective from safety neurons. arXiv preprint, 2025. URL https://arxiv.org/abs/ 2406.14144 . arXiv:2406.14144. Conmy, A., Mavor-Parker, A. N., Lynch, A., Heimer-sheim, S., and Garriga-Alonso, A. Towards automated circuit discovery for mechanistic interpretability. In 
+
+NeurIPS 2023 , 2023. URL https://arxiv.org/ abs/2304.14997 .Dunefsky, J., Chlenski, P., and Nanda, N. Transcoders find interpretable LLM feature circuits. In The Thirty-eighth Annual Conference on Neural Information Processing Systems , 2024. URL https://openreview.net/ forum?id=J6zHcScAo0 .Elhage, N., Hume, T., Olsson, C., Schiefer, N., Henighan, T., Kravec, S., Hatfield-Dodds, Z., Lasenby, R., Drain, D., Chen, C., Grosse, R., McCandlish, S., Kaplan, J., Amodei, D., Wattenberg, M., and Olah, C. Toy models of superposition. Transformer Circuits Thread ,2022. https://transformer-circuits.pub/ 2022/toy_model/index.html .Grattafiori, A., Dubey, A., Jauhri, A., Pandey, A., Kadian, A., Al-Dahle, A., Letman, A., Mathur, A., Schelten, A., Vaughan, A., Yang, A., Fan, A., Goyal, A., Hartshorn, A., Yang, A., Mitra, A., Sravankumar, A., Korenev, A., Hinsvark, A., Rao, A., Zhang, A., Rodriguez, A., Gregerson, A., Spataru, A., Roziere, B., Biron, B., Tang, B., Chern, B., Caucheteux, C., Nayak, C., Bi, C., Marra, C., McConnell, C., Keller, C., Touret, C., Wu, C., Wong, C., Ferrer, C. C., Nikolaidis, C., Allonsius, D., Song, D., Pintz, D., Livshits, D., Wyatt, D., Esiobu, D., Choudhary, D., Mahajan, D., Garcia-Olano, D., Perino, D., Hupkes, D., Lakomkin, E., AlBadawy, E., Lobanova, E., Dinan, E., Smith, E. M., Radenovic, F., Guzm ´an, F., Zhang, F., Synnaeve, G., Lee, G., Anderson, G. L., Thattai, G., Nail, G., Mialon, G., Pang, G., Cucurell, G., Nguyen, H., Ko-revaar, H., Xu, H., Touvron, H., Zarov, I., Ibarra, I. A., Kloumann, I., Misra, I., Evtimov, I., Zhang, J., Copet, J., Lee, J., Geffert, J., Vranes, J., Park, J., Mahadeokar, J., Shah, J., van der Linde, J., Billock, J., Hong, J., Lee, J., Fu, J., Chi, J., Huang, J., Liu, J., Wang, J., Yu, J., Bitton, J., Spisak, J., Park, J., Rocca, J., Johnstun, J., Saxe, J., Jia, 9Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+J., Alwala, K. V., Prasad, K., Upasani, K., Plawiak, K., Li, K., Heafield, K., Stone, K., El-Arini, K., Iyer, K., Malik, K., Chiu, K., Bhalla, K., Lakhotia, K., Rantala-Yeary, L., van der Maaten, L., Chen, L., Tan, L., Jenkins, L., Martin, L., Madaan, L., Malo, L., Blecher, L., Landzaat, L., de Oliveira, L., Muzzi, M., Pasupuleti, M., Singh, M., Paluri, M., Kardas, M., Tsimpoukelli, M., Oldham, M., Rita, M., Pavlova, M., Kambadur, M., Lewis, M., Si, M., Singh, M. K., Hassan, M., Goyal, N., Torabi, N., Bashlykov, N., Bogoychev, N., Chatterji, N., Zhang, N., Duchenne, O., C¸ elebi, O., Alrassy, P., Zhang, P., Li, P., Vasic, P., Weng, P., Bhargava, P., Dubal, P., Krishnan, P., Koura, P. S., Xu, P., He, Q., Dong, Q., Srinivasan, R., Ganapathy, R., Calderer, R., Cabral, R. S., Stojnic, R., Raileanu, R., Maheswari, R., Girdhar, R., Patel, R., Sauvestre, R., Polidoro, R., Sumbaly, R., Taylor, R., Silva, R., Hou, R., Wang, R., Hosseini, S., Chennabasappa, S., Singh, S., Bell, S., Kim, S. S., Edunov, S., Nie, S., Narang, S., Raparthy, S., Shen, S., Wan, S., Bhosale, S., Zhang, S., Vandenhende, S., Batra, S., Whitman, S., Sootla, S., Collot, S., Gururangan, S., Borodinsky, S., Herman, T., Fowler, T., Sheasha, T., Georgiou, T., Scialom, T., Speck-bacher, T., Mihaylov, T., Xiao, T., Karn, U., Goswami, V., Gupta, V., Ramanathan, V., Kerkez, V., Gonguet, V., Do, V., Vogeti, V., Albiero, V., Petrovic, V., Chu, W., Xiong, W., Fu, W., Meers, W., Martinet, X., Wang, X., Wang, X., Tan, X. E., Xia, X., Xie, X., Jia, X., Wang, X., Gold-schlag, Y., Gaur, Y., Babaei, Y., Wen, Y., Song, Y., Zhang, Y., Li, Y., Mao, Y., Coudert, Z. D., Yan, Z., Chen, Z., Papakipos, Z., Singh, A., Srivastava, A., Jain, A., Kelsey, A., Shajnfeld, A., Gangidi, A., Victoria, A., Goldstand, A., Menon, A., Sharma, A., Boesenberg, A., Baevski, A., Feinstein, A., Kallet, A., Sangani, A., Teo, A., Yunus, A., Lupu, A., Alvarado, A., Caples, A., Gu, A., Ho, A., Poul-ton, A., Ryan, A., Ramchandani, A., Dong, A., Franco, A., Goyal, A., Saraf, A., Chowdhury, A., Gabriel, A., Bharambe, A., Eisenman, A., Yazdan, A., James, B., Maurer, B., Leonhardi, B., Huang, B., Loyd, B., Paola, B. D., Paranjape, B., Liu, B., Wu, B., Ni, B., Hancock, B., Wasti, B., Spence, B., Stojkovic, B., Gamido, B., Montalvo, B., Parker, C., Burton, C., Mejia, C., Liu, C., Wang, C., Kim, C., Zhou, C., Hu, C., Chu, C.-H., Cai, C., Tindal, C., Feichtenhofer, C., Gao, C., Civin, D., Beaty, D., Kreymer, D., Li, D., Adkins, D., Xu, D., Testuggine, D., David, D., Parikh, D., Liskovich, D., Foss, D., Wang, D., Le, D., Holland, D., Dowling, E., Jamil, E., Mont-gomery, E., Presani, E., Hahn, E., Wood, E., Le, E.-T., Brinkman, E., Arcaute, E., Dunbar, E., Smothers, E., Sun, F., Kreuk, F., Tian, F., Kokkinos, F., Ozgenel, F., Cag-gioni, F., Kanayet, F., Seide, F., Florez, G. M., Schwarz, G., Badeer, G., Swee, G., Halpern, G., Herman, G., Sizov, G., Guangyi, Zhang, Lakshminarayanan, G., Inan, H., Shojanazeri, H., Zou, H., Wang, H., Zha, H., Habeeb, H., Rudolph, H., Suk, H., Aspegren, H., Goldman, H., Zhan, H., Damlaj, I., Molybog, I., Tufanov, I., Leontiadis, I., Veliche, I.-E., Gat, I., Weissman, J., Geboski, J., Kohli, J., Lam, J., Asher, J., Gaya, J.-B., Marcus, J., Tang, J., Chan, J., Zhen, J., Reizenstein, J., Teboul, J., Zhong, J., Jin, J., Yang, J., Cummings, J., Carvill, J., Shepard, J., McPhie, J., Torres, J., Ginsburg, J., Wang, J., Wu, K., U, K. H., Saxena, K., Khandelwal, K., Zand, K., Matosich, K., Veeraraghavan, K., Michelena, K., Li, K., Jagadeesh, K., Huang, K., Chawla, K., Huang, K., Chen, L., Garg, L., A, L., Silva, L., Bell, L., Zhang, L., Guo, L., Yu, L., Moshkovich, L., Wehrstedt, L., Khabsa, M., Avalani, M., Bhatt, M., Mankus, M., Hasson, M., Lennie, M., Reso, M., Groshev, M., Naumov, M., Lathi, M., Keneally, M., Liu, M., Seltzer, M. L., Valko, M., Restrepo, M., Patel, M., Vyatskov, M., Samvelyan, M., Clark, M., Macey, M., Wang, M., Hermoso, M. J., Metanat, M., Rastegari, M., Bansal, M., Santhanam, N., Parks, N., White, N., Bawa, N., Singhal, N., Egebo, N., Usunier, N., Mehta, N., Laptev, N. P., Dong, N., Cheng, N., Chernoguz, O., Hart, O., Salpekar, O., Kalinli, O., Kent, P., Parekh, P., Saab, P., Balaji, P., Rittner, P., Bontrager, P., Roux, P., Dollar, P., Zvyagina, P., Ratanchandani, P., Yuvraj, P., Liang, Q., Alao, R., Rodriguez, R., Ayub, R., Murthy, R., Nayani, R., Mitra, R., Parthasarathy, R., Li, R., Hogan, R., Battey, R., Wang, R., Howes, R., Rinott, R., Mehta, S., Siby, S., Bondu, S. J., Datta, S., Chugh, S., Hunt, S., Dhillon, S., Sidorov, S., Pan, S., Mahajan, S., Verma, S., Yamamoto, S., Ramaswamy, S., Lindsay, S., Lindsay, S., Feng, S., Lin, S., Zha, S. C., Patil, S., Shankar, S., Zhang, S., Zhang, S., Wang, S., Agarwal, S., Sajuyigbe, S., Chintala, S., Max, S., Chen, S., Kehoe, S., Satter-field, S., Govindaprasad, S., Gupta, S., Deng, S., Cho, S., Virk, S., Subramanian, S., Choudhury, S., Goldman, S., Remez, T., Glaser, T., Best, T., Koehler, T., Robinson, T., Li, T., Zhang, T., Matthews, T., Chou, T., Shaked, T., Vontimitta, V., Ajayi, V., Montanez, V., Mohan, V., Kumar, V. S., Mangla, V., Ionescu, V., Poenaru, V., Mi-hailescu, V. T., Ivanov, V., Li, W., Wang, W., Jiang, W., Bouaziz, W., Constable, W., Tang, X., Wu, X., Wang, X., Wu, X., Gao, X., Kleinman, Y., Chen, Y., Hu, Y., Jia, Y., Qi, Y., Li, Y., Zhang, Y., Zhang, Y., Adi, Y., Nam, Y., Yu, Wang, Zhao, Y., Hao, Y., Qian, Y., Li, Y., He, Y., Rait, Z., DeVito, Z., Rosnbrick, Z., Wen, Z., Yang, Z., Zhao, Z., and Ma, Z. The llama 3 herd of models, 2024. URL 
+
+https://arxiv.org/abs/2407.21783 .Gur-Arieh, Y., Mayan, R., Agassy, C., Geiger, A., and Geva, M. Enhancing automated interpretability with output-centric feature descriptions. In Proceedings of the Annual Meeting of the ACL , pp. 5757–5778, 2025. URL https: //aclanthology.org/2025.acl-long.288/ .Hanna, M., Pezzelle, S., and Belinkov, Y. Have faith in faithfulness: Going beyond circuit overlap when find-10 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+ing model mechanisms, 2024. URL https://arxiv. org/abs/2403.17806 .Hanna, M., Piotrowski, M., Lindsey, J., and Ameisen, E. circuit-tracer. https://github.com/ safety-research/circuit-tracer , 2025. Henighan, T., Carter, S., Hume, T., Elhage, N., Lasenby, R., Fort, S., Schiefer, N., and Olah, C. Superposition, memorization, and double de-scent. Transformer Circuits Thread, 2023. URL 
+
+https://transformer-circuits.pub/ 2023/toy-double-descent/index.html .Accessed 2025-12-14. Huang, J., Geiger, A., D’Oosterlinck, K., Wu, Z., and Potts, C. Rigorously assessing natural language ex-planations of neurons. In BlackboxNLP Workshop @ EMNLP , pp. 317–331, 2023. doi: 10.18653/v1/ 2023.blackboxnlp-1.24. URL https://doi.org/ 10.18653/v1/2023.blackboxnlp-1.24 .Lin, J. Neuronpedia: Interactive reference and tooling for analyzing neural networks. Website, 2023. URL https: //www.neuronpedia.org .Lindsey, J., Ameisen, E., Nanda, N., Shabalin, S., Pi-otrowski, M., McGrath, T., Hanna, M., Lewis, O., Tigges, C., Merullo, J., Watts, C., Paulo, G., Batson, J., Gorton, L., Simon, E., Loeffler, M., McDougall, C., and Lin, J. The circuits research landscape: Results and perspectives. 
+
+Neuronpedia , 2025. URL https://neuronpedia. org/graph/info .Olah, C. Mechanistic interpretability, vari-ables, and the importance of interpretable bases. Transformer Circuits essay, 2022. URL 
+
+https://www.transformer-circuits.pub/ 2022/mech-interp-essay .OpenAI. Api pricing. https://openai.com/api/ pricing/ , 2026. Accessed: 2026-01-28. Paulo, G., Mallen, A., Juang, C., and Belrose, N. Auto-matically interpreting millions of features in large lan-guage models. CoRR , abs/2410.13928, 2024. doi: 10. 48550/arXiv.2410.13928. URL https://doi.org/ 10.48550/arXiv.2410.13928 .Power, A., Burda, Y., Edwards, H., Babuschkin, I., and Misra, V. Grokking: Generalization beyond overfitting on small algorithmic datasets, 2022. URL https:// arxiv.org/abs/2201.02177 .Puri, B., Jain, A., Golimblevskaia, E., Kahardipraja, P., Wiegand, T., Samek, W., and Lapuschkin, S. Fade: Why bad descriptions happen to good features, 2025. URL 
+
+https://arxiv.org/abs/2502.16994 .Sentence Transformers. Wikipedia sentences (en-glish), 2024. URL https://huggingface. co/datasets/sentence-transformers/ wikipedia-en-sentences . Dataset: sentence-transformers/wikipedia-en-sentences. Updated Apr 25, 2024. Syed, A., Rager, C., and Conmy, A. Attribution patch-ing outperforms automated circuit discovery. In Be-linkov, Y., Kim, N., Jumelet, J., Mohebbi, H., Mueller, A., and Chen, H. (eds.), Proceedings of the 7th Black-boxNLP Workshop: Analyzing and Interpreting Neu-ral Networks for NLP , pp. 407–416, Miami, Florida, US, November 2024. Association for Computational Linguistics. doi: 10.18653/v1/2024.blackboxnlp-1. 25. URL https://aclanthology.org/2024. blackboxnlp-1.25/ .Team, G., Riviere, M., Pathak, S., Sessa, P. G., Hardin, C., Bhupatiraju, S., Hussenot, L., Mesnard, T., Shahriari, B., Ram ´e, A., Ferret, J., Liu, P., Tafti, P., Friesen, A., Casbon, M., Ramos, S., Kumar, R., Lan, C. L., Jerome, S., Tsit-sulin, A., Vieillard, N., Stanczyk, P., Girgin, S., Momchev, N., Hoffman, M., Thakoor, S., Grill, J.-B., Neyshabur, B., Bachem, O., Walton, A., Severyn, A., Parrish, A., Ahmad, A., Hutchison, A., Abdagic, A., Carl, A., Shen, A., Brock, A., Coenen, A., Laforge, A., Paterson, A., Bastian, B., Piot, B., Wu, B., Royal, B., Chen, C., Kumar, C., Perry, C., Welty, C., Choquette-Choo, C. A., Sinopalnikov, D., Weinberger, D., Vijaykumar, D., Rogozi ´nska, D., Her-bison, D., Bandy, E., Wang, E., Noland, E., Moreira, E., Senter, E., Eltyshev, E., Visin, F., Rasskin, G., Wei, G., Cameron, G., Martins, G., Hashemi, H., Klimczak-Pluci ´nska, H., Batra, H., Dhand, H., Nardini, I., Mein, J., Zhou, J., Svensson, J., Stanway, J., Chan, J., Zhou, J. P., Carrasqueira, J., Iljazi, J., Becker, J., Fernandez, J., van Amersfoort, J., Gordon, J., Lipschultz, J., Newlan, J., yeong Ji, J., Mohamed, K., Badola, K., Black, K., Milli-can, K., McDonell, K., Nguyen, K., Sodhia, K., Greene, K., Sjoesund, L. L., Usui, L., Sifre, L., Heuermann, L., Lago, L., McNealus, L., Soares, L. B., Kilpatrick, L., Dixon, L., Martins, L., Reid, M., Singh, M., Iverson, M., G ¨orner, M., Velloso, M., Wirth, M., Davidow, M., Miller, M., Rahtz, M., Watson, M., Risdal, M., Kazemi, M., Moynihan, M., Zhang, M., Kahng, M., Park, M., Rahman, M., Khatwani, M., Dao, N., Bardoliwalla, N., Devanathan, N., Dumai, N., Chauhan, N., Wahltinez, O., Botarda, P., Barnes, P., Barham, P., Michel, P., Jin, P., Georgiev, P., Culliton, P., Kuppala, P., Comanescu, R., Merhej, R., Jana, R., Rokni, R. A., Agarwal, R., Mullins, R., Saadat, S., Carthy, S. M., Cogan, S., Per-rin, S., Arnold, S. M. R., Krause, S., Dai, S., Garg, S., Sheth, S., Ronstrom, S., Chan, S., Jordan, T., Yu, T., Eccles, T., Hennigan, T., Kocisky, T., Doshi, T., Jain, V., Yadav, V., Meshram, V., Dharmadhikari, V., Barkley, 11 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+W., Wei, W., Ye, W., Han, W., Kwon, W., Xu, X., Shen, Z., Gong, Z., Wei, Z., Cotruta, V., Kirk, P., Rao, A., Giang, M., Peran, L., Warkentin, T., Collins, E., Bar-ral, J., Ghahramani, Z., Hadsell, R., Sculley, D., Banks, J., Dragan, A., Petrov, S., Vinyals, O., Dean, J., Has-sabis, D., Kavukcuoglu, K., Farabet, C., Buchatskaya, E., Borgeaud, S., Fiedel, N., Joulin, A., Kenealy, K., Dadashi, R., and Andreev, A. Gemma 2: Improving open language models at a practical size, 2024. URL 
+
+https://arxiv.org/abs/2408.00118 .Templeton, A., Conerly, T., Marcus, J., Lindsey, J., Bricken, T., Chen, B., Pearce, A., Citro, C., Ameisen, E., Jones, A., Cunningham, H., Turner, N. L., McDougall, C., MacDiarmid, M., Freeman, C. D., Sumers, T. R., Rees, E., Batson, J., Jermyn, A., Carter, S., Olah, C., and Henighan, T. Scaling monosemanticity: Ex-tracting interpretable features from claude 3 sonnet. 
+
+Transformer Circuits Thread , 2024. URL https: //transformer-circuits.pub/2024/ scaling-monosemanticity/index.html .Wang, K. R., Variengien, A., Conmy, A., Shlegeris, B., and Steinhardt, J. Interpretability in the wild: a circuit for indi-rect object identification in GPT-2 small. In The Eleventh International Conference on Learning Representations ,2023. URL https://openreview.net/forum? id=NpsVSN6o4ul .Yang, G., Ye, Q., and Xia, J. Unbox the black-box for the medical explainable ai via multi-modal and multi-centre data fusion: A mini-review, two showcases and beyond. Information Fusion , 77:29–52, 2022. ISSN 1566-2535. doi: https://doi.org/10.1016/j.inffus.2021.07. 016. URL https://www.sciencedirect.com/ science/article/pii/S1566253521001597 .
+
+# A. Hyperparameter Selection for FAP-Synergy 
+
+Baseline. We use the ordinary FAP setting (synergy weight λ = 0 ) as the baseline on IOI with N =500 , K=100 .The baseline metrics are: mean last-token KL = 1 .1399 ,std = 0 .5393 , prediction-change rate = 0 .446 . All results below are reported as deltas relative to this baseline .
+
+Selection rule. We select hyperparameters by minimizing mean last-token KL . Even sub-percent improvements are meaningful in interpretability pruning studies, where im-provements are typically incremental yet consistent across large prompt sets. 
+
+A.1. Sensitivity Analysis 
+
+We conducted a comprehensive sweep over the synergy weight λ ∈ {1, . . . , 5} and boundary percent bp ∈{20 , . . . , 45 } to identify the optimal configuration for FAP-synergy. The results are summarized in Table 3 and visual-ized in Figure 3. As shown in the table, the global optimum (lowest ∆ mean KL) is achieved at λ = 3 with a boundary percent of bp =25 . The data reveals a consistent trend across all tested λ
+
+values: increasing the boundary percent beyond bp = 25 
+
+degrades performance (e.g., at bp = 40 , the improvement drops significantly to ≈ − 0.758 milli-KL compared to >
+
+−1.0 at bp = 25 ). This suggests that widening the reranking window too far introduces noise or dilutes the high-synergy pairs with less relevant features. Furthermore, increasing 
+
+λ to 4 or 5 yields nearly identical results to λ = 3 at the optimal bp , but does not surpass it. Consequently, we select 
+
+λ = 3 , bp = 25 as the most robust configuration. 
+
+A.2. Delta table (vs. baseline) A.3. Scatter plot (delta vs. baseline) 
+
+# B. Implementation Details 
+
+B.1. Models and Resources 
+
+We utilize the following public checkpoints: • Gemma-2-2B CLT: 
+
+mntss/clt-gemma-2-2b-426k (Dictionary size: 426k). • Llama-3.2-1B CLT: 
+
+mntss/clt-llama-3.2-1b-524k (Dictio-nary size: 524k). The IOI dataset is generated using the template structure from Wang et al. (2023), consisting of 2000 unique prompts with varying names and objects. 12 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+Table 3. Sweep results reported as deltas vs. the λ = 0 baseline (negative is better). ∆KL and ∆std are shown in milli-KL (i.e., 
+
+×10 3) for readability. The selected setting is λ = 3 , bp = 25 .                                                                                               
+
+> λbp ∆mean KL ( ×10 3)↓∆std ( ×10 3)↓
+> 120 -0.270 -0.353 125 -0.785 -0.770 130 -0.504 -0.349 135 -0.668 -0.509 140 -0.758 -0.452 145 -0.203 -0.165 220 -0.074 -0.293 225 -0.887 -0.654 230 -0.488 -0.334 235 -0.645 -0.506 240 -0.758 -0.452 245 -0.203 -0.165 320 -0.035 -0.303
+> 325 -1.066 -1.032
+> 330 -0.504 -0.339 335 -0.645 -0.506 340 -0.758 -0.452 345 -0.203 -0.165 420 -0.035 -0.303 425 -1.043 -1.015 430 -0.504 -0.339 435 -0.645 -0.506 440 -0.758 -0.451 445 -0.203 -0.165 520 -0.027 -0.303 525 -1.043 -1.015 530 -0.488 -0.323 535 -0.645 -0.506 540 -0.758 -0.451 545 -0.203 -0.165
+
+B.2. Interpretation and Evaluation Protocol Step 2: Interpretation Generation. We use gpt-5.2 
+
+as the explainer model. • Exemplars: We provide 40 max-activating examples per feature, retrieved from the Circuit Tracer activation cache. • Highlighting: Tokens are highlighted if their activa-tion value exceeds 65% of the max activation in the sequence. 
+
+Step 3: FADE Evaluation. We use gpt-5-mini as the auditor model to compute the metrics defined in Section 3.4. • Evaluation Dataset: We draw samples from the (Sen-tence Transformers, 2024) dataset. • Clarity: The auditor generates 15 synthetic positive and negative examples based solely on the descrip-tion. We measure the Gini coefficient of the feature’s activations on these synthetic batches. • Purity and Responsiveness: We evaluate the feature on a retrieved set of Neval = 250 real examples from Wikipedia (distinct from the exemplar set).                
+
+> 20 25 30 35 40 45
+> −1.2
+> −1
+> −0.8
+> −0.6
+> −0.4
+> −0.2
+> 0
+> 0.2
+> boundary percent (bp)
+> ∆ mean last-token KL ( ×10 3)
+> baseline ( λ= 0 )λ= 1 λ= 2
+> λ= 3 λ= 4 λ= 5
+> selected
+
+Figure 3. Sweep scatter plot reported as ∆ mean KL vs. baseline (λ = 0 ). 
+
+# C. Pruning Dynamics and Budget Effects 
+
+ACDC-style pruning behavior. In our feature-level ACDC adaptation, single-feature perturbations are infor-mative only for a relatively small set of top features. We observe a low average number of non-zero ACDC effects per prompt (185.18 for Gemma-2-2B and 254.54 for Llama-3.2-1B), after which the ranking effectively degrades toward random selection. This is consistent with CLT redundancy and compensatory behavior under single-feature ablations. FAP is also substantially cheaper computationally, requir-ing one forward/backward pass rather than more than 4,000 
+
+forward passes per prompt. 
+
+Cost-equivalent view of FAP-Synergy. Although the ab-solute KL differences between FAP and FAP-Synergy can appear small, they are meaningful in strict-budget regimes where interpretation cost scales linearly with the number of retained features. On IOI, base FAP at K=75 yields a KL of 1.22 on Llama-3.2-1B and 0.81 on Gemma-2-2B, while FAP-Synergy at K=50 achieves 1.22 and 0.82 re-spectively. Thus, in low-budget settings, FAP-Synergy can match the fidelity of a larger base-FAP circuit while reduc-ing the downstream interpretation budget by roughly 33%. 
+
+Failure mode under over-pruning. Very small budgets can remove features that carry important structural infor-mation even when they reduce computational cost. One illustrative case is Feature L4.16331 , which functions as a conjunction detector linking two coordinated noun phrases, most often two person names. For the prompt, “Then, Arthur and Ruby had a long argument, and afterwards Ruby said to Arthur,” this feature activates on the “and” between 13 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+Arthur and Ruby , providing a grammatical anchor for the coordinated-name structure. At K=100 , both FAP and FAP-Synergy retain this feature, preserving this structural cue in the extracted circuit. At K=50 , however, the feature is dropped entirely. The resulting circuit is still cheaper, but it loses a meaningful piece of grammatical structure, weaken-ing the structural interpretability of the extracted mechanism. This example highlights a central risk of aggressive pruning: lower budgets may preserve coarse behavioral fidelity while discarding features that contribute important compositional or syntactic roles. 
+
+# D. Metric Correlations and Distributions 
+
+In this section, we analyze the distribution of feature quality scores and the relationship between behavioral fidelity and interpretability. 
+
+Signal-to-Noise Gap. As shown in Figure 6, there is a distinct ”signal-to-noise” gap between random sampling and our method. Random features cluster near zero across all metrics, whereas FAP variants consistently select features in the high-interpretability regime. 
+
+Feature Correlations. We investigate the relationship be-tween Clarity, Purity, and Responsiveness within the FAP-selected set. Our analysis reveals a robust positive corre-lation between Responsiveness and Purity, with Pearson 
+
+r ≈ 0.71 for Gemma-2-2B and r ≈ 0.73 for Llama-3.2-1B (Figure 4). This strong correlation suggests that PIE selects features with jointly high Purity and Responsiveness, i.e., concept-specific activations that remain stable across natural data; FADE notes that when descriptions/features are well aligned, interpretability metrics tend to rise together (Puri et al., 2025). 
+
+Prompt Fidelity vs. Interpretability. We further ask whether ”better” circuits (those with lower KL divergence) yield more interpretable features. We compute the Pearson correlation between the prompt-level KL divergence and the mean interpretability scores of the retained features (Fig-ure 5). For Clarity , we observe a significant negative corre-lation (Llama r ≈ − 0.36 , Gemma r ≈ − 0.17 ; p < 0.001 ). Since lower KL indicates better fidelity, this result implies that prompts where the pruned circuit functions well tend to contain features that are easier to explain . In-terestingly, Purity and Responsiveness show a weaker or slightly inverse relationship with KL (Llama r ≈ 0.15 for Purity), suggesting that while functional fidelity strongly predicts the clarity of the mechanism, the monosemanticity 
+
+(purity) of features may depend more on the specific seman-tic content of the prompt (e.g., presence of specific named entities) rather than the circuit’s overall error rate. 
+
+# E. FAP-Signal: Sign-Aware Budget Allocation (Ablation) 
+
+Motivation: sign cancellation in magnitude pruning. 
+
+Magnitude-based attribution can under-select features with negative (inhibitory) contributions when positive features dominate the score distribution. In mechanistic circuits, such “brake” components may be necessary to preserve cal-ibrated behavior and to prevent systematic over-correction under pruning. 
+
+Definition. Let SFAP (f ) be the base Feature Attribution Patching score (Eq. (1)). FAP-Signal enforces a minimum allocation to both positive- and negative-scoring features at a fixed budget K. For a user-chosen ratio γ ∈ (0 , 0.5) :1. Select the top γK features from {f : SFAP (f ) > 0} by score magnitude. 2. Select the top γK features from {f : SFAP (f ) < 0} by score magnitude. 3. Fill the remaining (1 − 2γ)K slots by the largest 
+
+|SFAP (f )| among all remaining features. This procedure preserves a signed “floor” of inhibitory fea-tures while retaining the simplicity and speed of the base top-K selection. 
+
+Experimental setting. We evaluate FAP-Signal under the same protocol as the main paper: IOI pruning with K=100 ,followed by automated interpretation and FADE-style eval-uation on a held-out Wikipedia distribution (Appendix B). We use γ = 0 .25 throughout. 
+
+Empirical outcome on IOI. In our IOI experiments, FAP-Signal does not yield a consistent improvement over base FAP in either behavioral fidelity (KL, PCR) or interpretabil-ity metrics (Clarity, Purity, Responsiveness). Table 4 shows that FAP-Signal matches base FAP to within noise on KL/PCR. Table 5 reports the three semantic-efficiency met-rics introduced in Sec. H: Semantic Cost Efficiency (SCE), Signal-to-Divergence Ratio (SDR), and Risk-Adjusted Re-sponsiveness (RAR). Across both models, FAP-Signal does not improve over base FAP and remains slightly below FAP-Synergy. 
+
+Interpretation. These results suggest that, for IOI on the evaluated CLTs, sign cancellation is not the dominant failure mode of base FAP at K=100 . In contrast, boundary inter-actions (synergy) appear to be the more salient source of pruning error, motivating the main focus on FAP-Synergy. 14 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution                    
+
+> Table 4. Fidelity ablation for FAP-Signal. Same setup as Table 2 in the main text, but including the sign-aware variant.
+> MODEL METHOD KL (↓)PCR (↓)LLAMA -3.2-1B FAP (B ASE )1.13 44.1% FAP-S IGNAL 1.13 44.1% FAP-S YNERGY 1.12 44.1% GEMMA -2-2B FAP (B ASE )0.74 58.3% FAP-S IGNAL 0.74 58.3% FAP-S YNERGY 0.73 58.3%
+
+# F. Economic Analysis 
+
+Our PIE pipeline incurs API cost only in the Interpret and 
+
+Evaluate stages. Under our experimental configuration, the explanation phase (GPT-5.2) consumes approximately 
+
+4,000 input tokens (system prompt + 40 max-activating exemplars) and produces ≈ 200 output tokens per feature .The subsequent evaluation phase (GPT-5 mini, used for both synthetic clarity generation and purity rating) is more data-intensive, averaging 22 ,650 input tokens and 4,000 
+
+output tokens per feature. Under standard pricing(OpenAI, 2026), this yields a total estimated cost of 
+
+cfeat ≈ $0 .0235 per interpreted feature. 
+
+Prompt-level budgeting (active set vs. K=100 ). A rigor-ous alternative to interpreting all CLT features is to interpret only those that are active for the prompt. In our setting, the mean number of active feature occurrences per prompt is 
+
+4,188 for Llama-3.2-1B and 5,190 for Gemma-2-2B. Interpreting the full active set for a single prompt would therefore cost Cost Llama, active/prompt ≈ 4,188 · cfeat ≈ $98 .42 , (3) Cost Gemma, active/prompt ≈ 5,190 · cfeat ≈ $121 .97 . (4) In contrast, PIE interprets only a fixed budget of K=100 
+
+features, costing Cost K=100 ≈ 100 · cfeat ≈ $2 .35 . (5) Thus, even when comparing against the strong baseline that restricts attention to active features, PIE reduces interpreta-tion/evaluation spend by a factor of 4,188 100 ≈ 41 .9× (Llama) and 5,190 100 ≈ 51 .9× (Gemma), aligning with the observed 
+
+≈ 40 × fidelity efficiency gap on the active set. 
+
+Dataset-level budgeting (global reuse across 2,000 prompts). The prompt-level view is conservative because it does not exploit reuse: across a dataset, the same features appear repeatedly, so we can cache interpretations and only pay once per unique feature. Concretely, when aggregating across N =2000 prompts, the number of unique features that ever appear as kept after pruning is approximately 
+
+4,400 for Llama and 4,000 for Gemma. Under this global accounting, the total interpretation+evaluation cost becomes Cost Llama, global kept ≈ 4,400 · cfeat ≈ $103 .40 , (6) Cost Gemma, global kept ≈ 4,000 · cfeat ≈ $94 .00 . (7) By comparison, a naive global sweep that attempts to inter-pret the entire CLT dictionary would require evaluating 
+
+|F Llama | = 16 × 32 ,768 = 524 ,288 ,
+
+|F Gemma | = 26 × 16 ,384 = 425 ,984 . (8) which would cost Cost Llama, full dict ≈ 524 ,288 · cfeat ≈ $12 ,320 .77 , (9) Cost Gemma, full dict ≈ 425 ,984 · cfeat ≈ $10 ,010 .62 . (10) Therefore, from a global perspective PIE reduces the eval-uation burden by 524 ,288 4,400 ≈ 119 × on Llama and 425 ,984 4,000 ≈
+
+106 × on Gemma, translating to savings on the order of 
+
+∼$12 .2k and ∼$9 .9k for a single end-to-end run. 
+
+# G. Limitations 
+
+Our results should be interpreted in light of several practical limitations. 
+
+Interpretability evaluation remains concentrated at 
+
+K=100 . We report broader behavioral-fidelity sweeps over K ∈ { 50 , 100 , 200 , 400 , 800 } and across two tasks, but our full end-to-end interpretation evaluation (including FADE-style metrics and economic analysis) remains cen-tered on the main K=100 setting. As a result, while the pruning robustness story now extends beyond a single bud-get, we do not yet report a full scaling study of downstream interpretability quality across the entire budget range. 
+
+No CLT training; reliance on public replacement check-points. We do not train Cross-Layer Transcoders (CLTs) ourselves; instead, we use public CLT checkpoints released with Circuit Tracer tooling (Gemma-2-2B CLT and Llama-3.2-1B CLT). Consequently, our claims are conditional on the quality and representational coverage of these replace-ment models. In particular, pruning behavior and feature semantics may differ for CLTs trained with different data, objectives, sparsity regimes, or architectures. 
+
+Scope of causal claims. PIE is designed to isolate a mini-mal circuit that reproduces behavior under the replacement-model intervention, but this does not automatically imply that every retained feature corresponds to a unique mecha-nistic “part” in a human-interpretable decomposition. Fea-ture redundancy, polysemanticity, and interaction effects can persist even after pruning, and the replacement-model abstraction may miss mechanisms not captured by the CLT basis. 15 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+Table 5. Efficiency metrics including FAP-Signal (restricted to metrics defined in the main text). We report Semantic Cost Efficiency (SCE), Signal-to-Divergence Ratio (SDR; dB, closer to 0 is better), and Risk-Adjusted Responsiveness (RAR) as defined in Sec. H. Across both models, FAP-Signal does not improve over base FAP, while FAP-Synergy provides the best overall efficiency. 
+
+MODEL METRIC FAP (B ASE ) FAP-S YNERGY FAP-S IGNAL RANDOM 
+
+LLAMA -3.2-1B SCE (E FFICIENCY ) 947,041.9409 948,036.9102 945,756.8388 0.0766 SDR (S IGNAL /N OISE ) -4.0375 DB -4.0320 DB -4.0431 DB -14.3187 DBRAR (R ESPONSIVENESS ) 394,682.5462 395,188.0711 394,175.8208 0.0383 GEMMA -2-2B SCE (E FFICIENCY ) 1,620,789.2094 1,621,365.9427 1,620,789.2094 0.0490 SDR (S IGNAL /N OISE ) -1.2230 DB -1.2209 DB -1.2230 DB -16.1878 DBRAR (R ESPONSIVENESS ) 754,563.0057 754,931.0929 754,563.0057 0.0241 
+
+Scenario #Features Cost vs. Budgeted Reduction 
+
+Prompt-level (single prompt) 
+
+Llama active set 4,188 $98.42 $2.35 ( K=100 ) 41 .9×
+
+Gemma active set 5,190 $121.97 $2.35 ( K=100 ) 51 .9×
+
+Global (2,000 prompts; unique features) 
+
+Llama kept (unique) 4,400 $103.40 full dict: $12,320.77 119 ×
+
+Gemma kept (unique) 4,000 $94.00 full dict: $10,010.62 106 ×
+
+Table 6. Economic impact of budgeting. Using cfeat ≈ $0 .0235 per feature, a fixed interpretation budget (and global reuse across prompts) yields large cost reductions relative to interpreting the full active set per prompt or sweeping the entire CLT dictionary. 
+
+# H. Semantic Efficiency and Signal Analysis 
+
+While standard metrics show parity, the true advantage of FAP-Synergy lies in its efficiency —the amount of inter-pretable signal retained per unit of behavioral degradation. Because Synergy actively repairs circuit boundaries to lower KL divergence, it minimizes the ”cost” of pruning. To quan-tify this, we introduce three efficiency-oriented metrics: • Semantic Cost Efficiency (SCE): A yield metric de-fined as Clarity +Purity KL ·PCR . This rewards methods that max-imize semantics while strictly minimizing the joint compounded cost of model degradation. • Signal-to-Divergence Ratio (SDR): A decibel-scale metric defined as 10 · log 10 ( Responsiveness KL ). This sepa-rates the interpretable signal from the behavioral noise. • Risk-Adjusted Responsiveness (RAR): Defined as  
+
+> Responsiveness KL ·PCR
+
+, isolating the responsiveness gain normal-ized by risk. As shown in Table 7, FAP-Synergy dominates across all efficiency metrics. For Llama-3.2-1B, Synergy improves SCE by over 900 points and RAR by over 500 points com-pared to the Base method. This confirms that Synergy is not just selecting random features; it is selecting features that provide a higher return on interpretation investment by enforcing tighter behavioral bounds. 16 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+Table 7. Semantic Efficiency Analysis. By viewing KL and PCR as costs, we observe that FAP-Synergy yields significantly higher interpretability per unit of behavioral degradation. SCE measures total semantic yield, SDR measures signal-to-noise in dB (closer to 0 is better), and RAR measures responsiveness relative to risk. Best results are bolded. 
+
+MODEL METRIC FAP (B ASE ) FAP-S YNERGY RANDOM 
+
+LLAMA -3.2-1B SCE (E FFICIENCY ) 947,041 948,036 0.08 SDR (S IGNAL /N OISE ) -4.037 DB -4.032 DB -14.32 DBRAR (R ESPONSIVENESS ) 394,682 395,188 0.04 GEMMA -2-2B SCE (E FFICIENCY ) 1,620,789 1,621,365 0.05 SDR (S IGNAL /N OISE ) -1.223 DB -1.221 DB -16.19 DBRAR (R ESPONSIVENESS ) 754,563 754,931 0.02 
+
+(a) Gemma-2-2B ( r ≈ 0.71 ). 
+
+(b) Llama-3.2-1B ( r ≈ 0.73 ). 
+
+Figure 4. Feature Purity vs. Responsiveness. Scatter plots for FAP-selected features. We observe a strong positive correlation (r > 0.7) across both models, confirming that PIE selects features that are both precise (Pure) and sensitive (Responsive). 
+
+17 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 
+
+(a) Gemma-2-2B: Prompt Fidelity vs. Quality. 
+
+(b) Llama-3.2-1B: Prompt Fidelity vs. Quality. 
+
+Figure 5. Does Fidelity Predict Interpretability? We plot the KL Divergence of each prompt (x-axis, lower is better) against the mean interpretability metrics of the pruned features (y-axis). For Mean Clarity (left panels), we observe a consistent negative slope, indicating that circuits with higher behavioral fidelity (lower KL) are composed of features that are easier to explain. 
+
+18 Prune, Interpret, Evaluate (PIE): A CLT-Native Framework for Efficient Circuit Discovery via Feature Attribution 0.00       
+
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> Score
+> Clarity Purity Responsiveness
+> Method Random FAP FAP-Synergy FAP-Signal
+
+(a) Gemma-2-2B. 0.00       
+
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> Score
+> Clarity Purity Responsiveness
+> Method Random FAP FAP-Synergy FAP-Signal
+
+(b) Llama-3.2-1B. 
+
+Figure 6. The Signal-to-Noise Gap. Violin plots comparing Clarity, Purity, and Responsiveness for Random vs. FAP variants. Random sampling includes many low-quality features (scores near 0), while FAP selects features in the high-interpretability regime with low variance. 
+
+19

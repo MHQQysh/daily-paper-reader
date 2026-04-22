@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.14722v1/fig-001.webp",
+      "caption": "Figure 7: A few coordinates of EPE1 have massive activations. Coordinate values of EPE1. Most coordinates are near zero; dims 138, 378, and 447 exhibit extremely large magnitudes.",
+      "page": 8,
+      "index": 1,
+      "width": 458,
+      "height": 277
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14722v1/fig-002.webp",
+      "caption": "Figure 5: Disrupting any component of the bQ–EPE1–Wk pathway significantly diminishes the sink. Headaveraged attention maps (layers 4–11) under all ten interventions for a single representative sentence. Each panel shows attention weights from query positions (rows) to key positions (columns). The first-position sink (bright first column) persists when the pathway is left intact (a, e, f, j), but is significantly diminished when any component is disrupted (b, c, d, g, h, i). See table 1 for aggregate statistics across our dataset.",
+      "page": 5,
+      "index": 2,
+      "width": 950,
+      "height": 356
+    }
+  ]
+}

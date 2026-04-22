@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12446v1/fig-001.webp",
+      "caption": "Figure 1: Robustness to stealthy and explicit triggers. Dark bars denote the AUROC under the stealthy IBA attack, while light bars represent the deviation from the mean AUROC across four explicit-trigger attacks.",
+      "page": 2,
+      "index": 1,
+      "width": 506,
+      "height": 300
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12446v1/fig-002.webp",
+      "caption": "Figure 2: Cross-Attention Scaling Response Divergence. We measure the response difference of an input along the conditional injection pathway by computing the mean squared error between the scaled response and the reference response in four representative backdoored T2I models: RickBKD, VillanBKD, IBA, and BadT2I. As shown in the figure, after scaling, benign and backdoor inputs exhibit stable and separable response shifts.",
+      "page": 4,
+      "index": 2,
+      "width": 1056,
+      "height": 217
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12446v1/fig-003.webp",
+      "caption": "Figure 3: Overview of SET. We apply controlled scaling to selected self- and cross-attention modules in the U-Net to extract attention-response shifts and aggregate them into a response-shift vector 𝑓 (𝑥). Benign vectors are normalized and encoded into low-dimensional embeddings to build a compact benign space by estimating a robust center 𝑐 and optimizing decision radius 𝑅 with a one-class objective. At test time, backdoor inputs are identified by their distance to the benign center.",
+      "page": 5,
+      "index": 3,
+      "width": 506,
+      "height": 284
+    }
+  ]
+}

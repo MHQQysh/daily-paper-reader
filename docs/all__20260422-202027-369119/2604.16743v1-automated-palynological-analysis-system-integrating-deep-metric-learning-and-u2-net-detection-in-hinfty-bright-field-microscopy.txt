@@ -1,0 +1,226 @@
+Title: Automated Palynological Analysis System: Integrating Deep Metric Learning and $U^{2}$-Net Detection in $H\infty$ bright field microscopy
+
+URL Source: https://arxiv.org/pdf/2604.16743v1
+
+Published Time: Tue, 21 Apr 2026 00:26:34 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# Automated Palynological Analysis System: Integrating Deep Metric Learning and U 2-Net Detection in H∞ bright field microscopy 
+
+## J. Staforelli-Vivanco 1, R. Jofr´ e1, B. Mu˜ noz 1, V. Salamanca 1, P. Coelho 2, I. Sanhueza 2,L. Viafora 2, C. Toro 3, J. Troncoso 4, M. Rondanelli-Reyes 5, and I. Lamas 51Departamento de F´ ısica, Facultad de Ciencias F´ ısicas y Matem´ aticas, Universidad de Concepci´ on, Concepci´ on, Chile 
+
+> 2
+
+## Facultad de Ingenier´ ıa, Universidad San Sebasti´ an, Concepci´ on, 4080871, Chile 
+
+> 3
+
+## Facultad de Ingenier´ ıa, Universidad Andres Bello, Talcahuano, CCP-THNO 7100 Chile 
+
+> 4
+
+## Universidad Arturo Prat, Sede Victoria, Chile 
+
+> 5
+
+## Laboratory of Palynology and Plant Ecology, School of Sciences and Technologies, University of Concepci´ on, Los Angeles Campus April 21, 2026 
+
+# Abstract 
+
+Traditional melissopalynology is a time-consuming and subjective process, often taking 4-6 hours per sample. We present an automated, high-throughput microscopy system that integrates H∞
+
+robust mechanical control with advanced deep learning pipelines for the precise counting, classifi-cation, and morphological analysis of pollen grains from Bio Bio region in south central territory in Chile. Our system employs U 2-Net for salient ob-ject detection and a DINOv2 Vision Transformer backbone trained via Deep Metric Learning for clas-sification. By integrating Gradient-Weighted At-tention, the model provides human-interpretable texture and diagnostic feature annotations. The system achieves a 95.8% classification recall and a 6x processing speedup compared to manual expert analysis. 
+
+# 1 Introduction 
+
+The accurate identification of pollen grains is a fundamental task in melissopalynology for honey certification and fraud prevention [1, 2, 3]. In Chile, the authentication of endemic honeys is vi-tal for international trade. Additionally, in loca-tions with unique endemic flora, such as the Pitril sector ( S37 ◦47 ′13 .7”, W 71 ◦32 ′11 .9”), in south cen-tral Andes in Chile, accurate classification of en-demic species is crucial for economic valuation and biodiversity monitoring. However, traditional mi-croscopy is labor-intensive and limited by opera-tor subjectivity, visual fatigue, and low throughput, typically requiring up to six hours per sample. To overcome these bottlenecks, we propose a fully au-tomated architecture bridging a custom motorized microscopy hardware platform with state-of-the-art vision transformers. [4, 5, 6, 7] To address these challenges, this paper presents a comprehensive, end-to-end automated framework for palynological analysis. Our approach syner-gizes a custom motorized brightfield microscopy platform, stabilized by an H∞ robust controller, with an advanced artificial intelligence pipeline. Specifically, we employ a U 2-Net architecture for precise salient object detection and morphologi-cal isolation, followed by a DINOv2 Vision Trans-former optimized via Deep Metric Learning [8, 9]. Unlike traditional Softmax classifiers, which em-ploy a fixed number of C output neurons and re-quire complete retraining to incorporate new cat-egories, the Deep Metric Learning approach of-fers significant architectural and operational advan-tages [10, 11, 12]. By learning an embedding func-tion fθ : RH×W ×3 → S127 , the model maps pollen classes to a 128-dimensional unit hypersphere using a Multi-Similarity Loss, where the Euclidean dis-tance directly reflects the morphological and taxo-nomic dissimilarity between pollen-bearing species [13]. The system effectively classifies a diverse dataset comprising endemic, native, and introduced pollen species from the Biob´ ıo Region. Ultimately, we demonstrate that this integrated architecture not only achieves a six-fold reduction in process-ing time compared to traditional manual methods 1
+
+> arXiv:2604.16743v1 [cs.CV] 17 Apr 2026
+
+but also provides high-fidelity, explainable diagnos-tic heatmaps, establishing a highly scalable and ro-bust solution for pollen authentication and auto-matic melissopalynology [14]. The palynological database utilized in this study is meticulously curated to represent the diverse floral landscape, particularly reflecting the eco-logical composition of the Biob´ ıo Region [15, 16] (Fig. 1). To evaluate the model’s classification ro-bustness across varying botanical origins, the ref-erence dataset is structured into three distinct eco-logical groups. The first category comprises species strictly endemic to the territory, predominantly represented by Quillaja saponaria (soapbark) and 
+
+Lithrea caustica (litre tree), which serves as crucial biomarkes for the certification of highly valued re-gional honeys. The second group encompasses na-tive South American flora that naturally coexists in these ecosystems, including Embothrium coccineum 
+
+(Chilean firebush) and Acaena splendens (bidibid). Finally, the third group incorporates introduced or exotic species that are globally widespread and frequently associated with local agricultural activ-ities, such as Medicago sativa (alfalfa), Trifolium pratense (red clover), and Cucurbita pepo (squash). This tri-level categorization provides a comprehen-sive baseline, ensuring that the proposed metric learning architecture is rigorously tested against both unique endemic morphologies and cosmopoli-tan pollen varieties. This work aims to overcome the geographic bias in current palynological datasets by providing high-quality taxonomic data from a South American bio-diversity hotspot, thus contributing to recent efforts in this field [17, 18]. Furthermore, it enables the addition of new species simply by appending their reference embeddings, thereby facilitating zero-shot generalization to unseen classes and operating ef-fectively in few-shot scenarios with minimal sam-ples. Besides, model interpretability is substan-tially enhanced, as predictions are grounded in the direct calculation of distances within a metric space rather than abstract logits. Ultimately, the sys-tem outputs a detailed palynological report that automatically details pollen composition percent-ages, specific grain counts, and overlays bounding boxes with classification confidence scores directly onto the microscopy images. The structure of this article is organized as fol-lows: Section 2 details the automated microscopy platform, addressing both the hardware design and the implementation of an H∞ robust controller and the intelligent autofocus algorithm. Subsequently, the process of pollen grain localization using the 
+
+U 2-Net architecture for salient object detection is described. Section 3 focuses on the core of the Deep Metric Learning classification system , detailing the preprocessing with normalized backgrounds , the use of the DINOv2 backbone , and optimization through the Multi-Similarity Loss function. Fi-nally, the paper addresses the evaluation of per-formance metrics , model interpretability through gradient-weighted attention maps , and general conclusions regarding the system’s efficiency in au-tomated melissopalynology. 
+
+## 1.1 Study Area and Botanical Sam-ple Collection 
+
+To construct the database and the reference pa-lynotheca, botanical samples were collected from four strategic locations within the Biob´ ıo Region, Chile (Fig. 2). The first sampling site corresponds to the Pitril sector in the Alto Biob´ ıo commune (37 °47’13.7”S, 71 °32’11.9”W), an area of high api-cultural interest characterized by a rich presence of native flora and vegetational endemisms. The second site is located 12 km from the Yumbel commune (37 °02’02.1”S, 72 °40’20.3”W), an envi-ronment embedded within an anthropic matrix of forestry plantations and agricultural crops. This property encompasses approximately 125 hectares of native species reforestation (with an 80% pre-dominance of Quillaja saponaria ), developed by Colb´ un S.A. in association with the Angostura Hy-droelectric Power Plant. Additionally, collection zones were included in the communes of Santa B´ arbara (37 °40 ′ 00” S, 72 °01 ′ 00” W) and Quilaco (37 °45 ′ 00” S, 71 °35 ′ 00” W). The systematic collection protocol consisted of six vegetation sampling campaigns, covering a ter-ritorial radius of 2 km around the study apiaries. During these campaigns, all plant species in the flowering stage were collected in triplicate. This methodological procedure served a threefold pur-pose: first, to enable precise botanical and taxo-nomic determination; second, to subject the floral buds to chemical treatment for the preparation and standardization of the reference palynotheca; and finally, to herborize the collected individuals. The taxonomic voucher specimens were duly registered and deposited in the herbarium of the Department of Plant Science and Technology at the Universidad de Concepci´ on, Los ´Angeles Campus. The preparation of samples and their subsequent palynological analysis were conducted using the acetolysis method described by Faegri et al. (1989) [19, 20]. The procedure began with an acid hy-drolysis to eliminate organic residues or biological wastes—preserving only the pollen grains due to their chemical resistance. For purification, a mix-ture of pure acetic anhydride and concentrated sul-furic acid was employed at a 9:1 ratio. This treat-ment removes the outer layers of the pollen grains, leaving only the exine (the outer shell) exposed, which facilitates morphological identification. Sub-2Figure 1: Sample grid per class and classes distri-bution. 1. Acaena splendens (bidibid) - native, 2. 
+
+Cucurbita pepo (squash) - exotic, 3. Embothrium coccineum (Chilean firebush) - native, 4. Lithrea caustica (litre tree)- endemic, 5. Medicago sativa 
+
+(alfalfa) - exotic, 6. Quillaja saponaria (soapbark) - endemic and 7. Trifolium pratense (red clover) -exotic. 
+
+Figure 2: a and b: Sample collection. In this stage, plants are collected and preserved for subsequent botanical identification. Along with this, the sta-mens are extracted from the flower buds, which contain the pollen grains used to create a reference pollen collection. Due to seasonality, this process must be carried out during the period of greatest annual flowering, which spans the months of Oc-tober 2024/25 to April 2025/26. c. Complete pa-lynotheca registry. Total entries: 7. d. Location of Biob´ ıo region, Chile. Communes highlighted in colors: Quilaco (red), Santa B´ arbara (green), Alto B´ ıob´ ıo (yellow) and Yumbel (blue) 3sequently, the resulting concentrate was mounted using Hydromatrix mounting medium. 
+
+# 2 Automated Microscopy and Detection 
+
+## 2.1 Hardware and Robust Control 
+
+The imaging setup is built around a compound optical microscope operating in brightfield mode, utilizing K¨ ohler illumination to ensure a uniform field of view [21]. High-resolution image acquisi-tion is performed via a digital CCD/CMOS sensor (minimum 1920x1080 pixels) through a 60x oil im-mersion objective, visualizing pollen samples pre-pared either by Erdtman acetolysis or direct glyc-erin mounting. The mechanical platform navigat-ing these samples consists of an XY stage driven by DC motors and a piezoelectric C-Focus T M system for the Z-axis control [22]. To overcome position-ing inaccuracies, ammixed-sensitivity robust con-troller is implemented, yielding a 33% improvement in settling time and a 60% reduction in steady-state error compared to classical PI control. Finally, an adaptive Laplacian variance algorithm drives the intelligent autofocus, achieving optimal focal planes within 2.3 seconds. The operational block diagram in Fig. 3 delineates the hardware archi-tecture and software integration of the automated high-throughput image acquisition system. 
+
+## 2.2 Object Detection via U 2-Net 
+
+Pollen grain localization is performed on-the-fly using U 2-Net, a nested U-structure architecture optimized for salient object detection that gener-ates pixel-level salience maps without the need for bounding box annotations [8]. By applying mor-phological filtering to the saliency maps (area, cir-cularity, and aspect ratio), the system reliably iso-lates target objects. 
+
+# 3 Deep Metric Learning Clas-sification 
+
+## 3.1 Architecture and Preprocessing 
+
+Prior to classification, the system isolates individ-ual pollen grains using a detection pipeline based on the lightweight U 2-Net architecture. The network processes a 320x320 RGB image through a 6-stage encoder and a 5-stage decoder built with nested Residual U-blocks (RSU). This deep structure cap-tures multi-scale context and fuses six side outputs via skip connections to generate a salient object probability map P (x, y ) ∈ [0 , 1]. To extract discrete objects, an adaptive threshold T = μ(P ) + k · σ(P )
+
+Figure 3: a. The automated system is orches-trated by a central processing workstation that ex-ecutes the deep learning pipeline for image analy-sis. To manage high-throughput spatial scanning, it interfaces via a serial data bus with a micro-controller, which issues precise commands to ac-tuate the XY motorized stage. Simultaneously, an intelligent autofocus mechanism dynamically com-pensates for Z-axis drift, ensuring the palynological sample remains perfectly in focus during the scan. Once the stage achieves a steady position, a hard-ware trigger is sent to the CMOS camera to capture a high-resolution bright-field image, thereby elim-inating motion-induced blur. The captured opti-cal data is instantly routed back to the worksta-tion for on-the-fly morphological analysis. Finally, the software classifies the pollen grains and gen-erates Gradient-Weighted Attention (Grad-CAM) heatmaps, which are displayed on an external mon-itor to provide human-interpretable validation of the diagnostic features driving the classification. b. Simplifies setup flow diagram. Components in color code: Electronics units (blue); Mechanical compo-nents (green); Optics components (yellow). 4(with k = 0 .30, constrained to T ∈ [0 .15 , 0.50]) bi-narizes the map. The resulting binary mask B(x, y )is refined using morphological closing and opening operations with an elliptical 3x3 kernel. External contours are then extracted and filtered by retain-ing only candidates with an area between 1000 and 120,000 px ² and a circularity C = 4 πA/P 2 ≥ 0.3. Once localized, the extracted grain crops are classi-fied using a DINOv2 ViT-S/14 backbone. A crucial preprocessing innovation is the use of a normalized Slate Gray background for these crops. Normaliz-ing RGB(128, 128, 128) results in a near-zero ten-sor, which effectively acts as a zero-activation mask, eliminating the need for computationally expensive masked pooling (Fig. 4). 
+
+Figure 4: Inference preview examples (DINOv2 ViT-s). Centroid-based classification. By nor-malizing the gray background (128), the resulting pixel values are almost zero. This means that the background does not trigger the neural network, eliminating the need for computationally expensive masked pooling. 
+
+## 3.2 Image annotation, segmenta-tion, and background 
+
+To optimize storage and computational efficiency, the system adheres to a zero-additional-image de-sign principle. Instead of saving cropped images, detection results are stored as plain text annota-tion files that share the original image’s filename. Each file contains generation metadata alongside per-grain parameters, including bounding boxes, saliency scores, and contour coordinates. Dur-ing the model’s training and inference phases, a custom dataset class dynamically generates pollen crops on-the-fly. The initialization phase scans the text files to register individual grains as discrete samples, utilizing a 64-image Least Recently Used (LRU) cache to optimize memory access speeds. For each queried index, the pipeline retrieves the original image, extracts a square crop with a 20% padding margin, and applies the contour mask to replace the background with a uniform Slate Gray value (RGB: 128, 128, 128). The crop is then re-sized to 252x252 pixels before undergoing necessary data augmentation transformations.This specific gray background choice is mathematically deliber-ate. Following standard ImageNet normalization (μ = [0 .485 , 0.456 , 0.406], σ = [0 .229 , 0.224 , 0.225]), the gray background tensor approximates the null vector: gray norm = 128 /255 − μσ n (1) 
+
+≈ (0 .07 , 0.02 , −0.03) ≈ 0
+
+Consequently, these normalized gray background patches produce near-zero activations within the DINOv2 backbone. They contribute minimally to the network’s mean pooling operations, effec-tively achieving background suppression without the need for computationally expensive explicit masked pooling techniques. 
+
+## 3.3 Preprocessing and Augmenta-tions 
+
+To enhance the model’s robustness against real-world microscopy variations, a comprehensive data augmentation pipeline was implemented during the training phase using the Albumentations library. Geometric augmentations, including random re-sized crops (scale 0.8–1.0), horizontal and verti-cal flips, arbitrary rotations up to ±180 ◦, and affine translations, were applied to account for magnification changes and the isotropic nature of pollen orientations on the slide (Fig. 5). Color and illumination variabilities—such as inconsis-tent staining, white balance shifts, and imperfect K¨ ohler illumination—were simulated using Color-Jitter, RGBShift, and Contrast Limited Adaptive Histogram Equalization (CLAHE). Furthermore, hardware and optical artifacts were explicitly mod-eled: RandomGamma and Gaussian noise sim-ulated CCD sensor non-linearities and electronic noise, while blurring and optical distortion trans-formations accounted for limited depth of field and Seidel aberrations. CoarseDropout was also intro-duced to mimic physical occlusions like air bub-bles. Crucially, to maintain consistency with the previously defined zero-activation background, all borders, padding, and dropout holes generated dur-ing these spatial transformations were strictly filled with a uniform gray value (RGB: 128). Follow-ing augmentation, the images were normalized us-ing standard ImageNet parameters ( μ, σ) to ensure compatibility with the DINOv2 backbone. Con-versely, the validation pipeline remained strictly deterministic, applying only a resize operation to 252x252 pixels, followed by normalization and ten-sor conversion without any synthetic augmenta-tions. 5Figure 5: Examples of four synthetic augmenta-tion performed to left starting from the originals 1. Acaena splendens (bidibid), 2. Cucurbita pepo 
+
+(squash), 3. Embothrium coccineum (Chilean fire-bush) and 4. Lithrea caustica (litre tree) 
+
+## 3.4 Embedding Model (AnalogyNet + DINOv2) 
+
+To construct the robust embedding space required for pollen classification, our proposed AnalogyNet architecture replaces standard Convolutional Neu-ral Networks (CNNs) with a DINOv2 ViT-S/14 Vision Transformer backbone. Unlike traditional CNNs such as ResNet-50, which construct recep-tive fields hierarchically and rely heavily on super-vised pretraining, DINOv2 establishes a global re-ceptive field from the very first layer. Pre-trained on a massive dataset of 142 million images us-ing Self-Supervised Learning (SSL), DINOv2 ex-tracts highly universal features and exhibits emer-gent segmentation capabilities driven by its atten-tion heads. Furthermore, this Transformer-based approach is inherently more computationally effi-cient, requiring only 21M parameters compared to ResNet-50’s 23.5M. The embedding pipeline begins with a 3 × 252 × 252 RGB input image, which un-dergoes a patch embedding process via a 2D con-volution. This divides the image into an 18 × 18 grid, generating 324 localized patch tokens plus an additional classification (CLS) token, all projected into a hidden dimension of 384. Following the addi-tion of learnable positional encodings, the sequence propagates through 12 Transformer encoder blocks. Each block comprises a LayerNorm, Multi-Head Self-Attention (6 heads), and an MLP featuring a SwiGLU activation function (384 → 1536 → 384), coupled with residual connections. This design en-sures global attention mechanisms, allowing every patch to attend to all others at every depth layer.To generate the final image-level representation, the network applies mean pooling exclusively over the 324 spatial patch tokens—omitting the CLS to-ken—to produce a consolidated 384-dimensional feature vector. This vector is subsequently mapped through a Projection Head, consisting of a three-layer MLP with Batch Normalization, ReLU ac-tivations, and Dropout, which ultimately reduces the dimensionality to 128. In the final step, an L2 normalization (ˆ e = e/ ∥e∥2) projects the embedding onto a unit hypersphere, S127 . This geometric con-straint is fundamental to the Deep Metric Learn-ing objective. By strictly bounding the embed-dings to the hypersphere (where ∥a∥ = ∥b∥ = 1), the squared Euclidean distance becomes mathemat-ically tied to the cosine similarity through the fol-lowing property: ∥a − b∥22 = 2(1 − cos( a, b )). Con-sequently, Euclidean distance and cosine similar-ity become monotonically equivalent in this latent space, ensuring that the model optimizes taxo-nomic dissimilarities with high precision and geo-metric consistency. 
+
+## 3.5 Multi-Similarity Loss 
+
+To optimize the mapping of pollen crops into the 
+
+S127 embedding space, we train the DINOv2 back-bone using the Multi-Similarity (MS) Loss. Tra-ditional metric learning objectives, such as Triplet Loss, suffer from slow convergence and sparse gra-dient updates because they only connect an anchor to a single positive and a single negative sample at a time. In contrast, the MS Loss computes dense gradients by simultaneously connecting the anchor point to all positive samples (pulling them together) and all negative samples (pushing them apart) within a given mini-batch. Mathematically, the Multi-Similarity Loss is formulated as: 
+
+LM S = 1
+
+m
+
+> m
+
+X
+
+> i=1
+
+(
+
+1
+
+α log 
+
+"
+
+1 + X
+
+> k∈P i
+
+e−α(Sik −λ)
+
+#
+
+(2) + 1
+
+β log 
+
+"
+
+1 + X
+
+> k∈N i
+
+eβ(Sik −λ)
+
+#
+
+where m denotes the number of anchors in the batch, while Pi and Ni represent the sets of positive and negative instances for the i-th anchor, respec-tively. The term Sik corresponds to the cosine sim-ilarity between the embeddings of the anchor and the k-th sample.This formulation utilizes a margin shift parameter, λ = 0 .5, to define the similarity threshold for mining informative pairs. Addition-ally, the scaling factors α = 2 .0 and β = 50 .0 con-trol the exponential weighting of the similarities, allowing the network to dynamically assign higher 6gradient weights to the hardest positive and neg-ative pairs during backpropagation. By leverag-ing this dense pulling and pushing mechanism, the model efficiently constructs a highly separable geo-metric latent space for taxonomic classification. 
+
+## 3.6 Evaluation and Metrics 
+
+This study evaluates and compares several back-bone architectures, including ResNet-50, Con-vNeXt V2-tiny, DeiT-s, and DINOv2 ViT-s. Unlike traditional Convolutional Neural Networks (CNNs) such as ResNet-50, which construct receptive fields hierarchically and rely heavily on supervised pre-training , vision transformer-based approaches like DINOv2 establish a global receptive field from the very first layer. Empirical evaluations demonstrate that DINOv2 ViT-S/14 is the optimal configura-tion as exhibited in Fig. 6 and Fig. 7; furthermore, it is more computationally efficient, utilizing only 21 million parameters compared to ResNet-50’s 23.5 million. Having been pretrained on a massive dataset of 142 million images using Self-Supervised Learning (SSL), DINOv2 extracts highly universal features and exhibits emergent segmentation capa-bilities driven by its attention heads. These char-acteristics enable it to outperform CNN baselines (ResNet and ConvNeXt) as well as other transform-ers (DeiT-s) across global latent space performance metrics , such as Recall@K, NMI, and mAP@R. By limiting the data to spherical surfaces (where the magnitude of all vectors is 1), the squared Eu-clidean distance becomes mathematically linked to cosine similarity. Therefore, while Fig. 8 simply shows that the model successfully separates the classes, 9 visualizes how these classes are math-ematically structured to ensure that the distance calculation is geometrically consistent and accurate for taxonomic classification. This Figure represents the step in which an L2 normalization (ˆ e = e/ || e|| 2)is applied to the extracted features, which forces all embeddings to project strictly onto the surface of a 128-dimensional hypersphere, denoted as S127 .To rigorously assess the performance of the pro-posed Deep Metric Learning model DINOv2 ViT-S/14, a comprehensive suite of evaluation met-rics is employed. The primary retrieval metric is Recall@K (Fig. 10), defined as the fraction of query images that successfully return at least one correctly matched neighbor within the top-K re-trieved samples. To evaluate the underlying struc-tural integrity of the latent space, Normalized Mutual Information (NMI) is computed, assess-ing the clustering quality when applying the K-Means algorithm directly over the generated em-beddings.Furthermore, we define a Distance Ra-tio metric ( ρ) to quantitatively measure the rela-tive separation of the clusters. This ratio is calcu-
+
+Figure 6: Performance comparison. Several baseline learning algorithms were considered, in-cluding DeiT-s, RestNet-50, DINOV2 VIT-s abd ConvNextV2-tiny algorithms. These models pro-vide a representative range of commonly used ap-proaches. Final training indicators are used to com-pare the models. A logarithmic scale is used for the intervals to be compared, with a minimum of 0.75 to 1. lated as the mean inter-class distance divided by the mean intra-class distance ( ρ = ¯dinter / ¯dintra ), with a strict optimization target of ρ > 3 indicating highly robust geometric separability in the hyper-sphere (Fig. 9). Train and validation balance are exhibited in Fig. 11. Intra-class distance distribu-tion is shown in Fig.13. Classification accuracy is further validated using a k-Nearest Neighbors (kNN) Confusion Matrix, constructed via a leave-one-out evaluation strategy over the validation embeddings. Finally, the ultimate predictive assignment of the system is formalized through Centroid Classifica-tion. In this operational phase, a query sample x
+
+mapped through the embedding function fθ is as-signed to the class ˆ y of the closest learned centroid ˆμc by minimizing the Euclidean distance: ˆy = argmin c∥fθ (x) − μc∥2 (3) 
+
+## 3.7 End-to-End Inference Pipeline 
+
+To seamlessly integrate detection and classifica-tion into a unified operational workflow, we im-plemented the Full Image Classifier pipeline, which processes raw camera images of arbitrary resolu-tions through to final species counting. The infer-ence process begins with the PollenGrainDetector 7Figure 7: Model comparison based on Latent Space Analysis: 2D t-SNE S128 per class (a, b, c and d) and density of 685 samples (e, f, g and h). Blocks apply for ConvNextV2-Tiny (a,e), DeiT-s (b,f), DI-NOv2 ViT-s (c,g) and ResNet-50 (d,h). 
+
+Figure 8: Latent Space Analysis in DINOv2 ViT-s: 3D t-SNE. This Figure shows the dimensional-ity reduction of the latent space to 3 dimensions using the t-SNE algorithm. Its main objective is to demonstrate the clear geometric separability be-tween the clusters, visually validating the Deep Metric Learning hypothesis by confirming that the different pollen classes cluster in distinct and sepa-rate ways. 8Figure 9: Hypersphere embedding representation in DINOv2 ViT-s. a. and b. : Two 3D PCA views. c. d. and e. Three 3D t-SNE angular perspectives . Block: Color code by class. Clear geometric separability validating the Deep Metric Learning hypothesis. This Figure explicitly illus-trates the geometric constraint imposed at the end of the DINOv2 model pipeline. Instead of simply showing clusters floating in 3D space, it maps the projections onto the surface of a unit hypersphere. 
+
+Figure 10: Quantitative Results in DINOv2 ViT-s: Performance metrics. a. Training and validation Loss. b. Recall over training. 
+
+Figure 11: Train and validation balance in DINOv2 ViT-s model. 
+
+Figure 12: a. Global Confusion Matrix in DINOv2 ViT-s (95.1% Accuracy). b. Normalized confusion matrix. 9Figure 13: a. Distance distribution in DINOv2 ViT-s. Intra and inter-class distance. b. Intra-class distance by class. (powered by the U 2-Net architecture), which lo-calizes N individual pollen grains within the full field of view, extracting their respective bound-ing boxes, geometric contours, and saliency scores. Subsequently, the pipeline iterates over each de-tected grain to extract a localized crop with a 20% padding margin. The previously defined contour mask is applied to impose the standardized Slate Gray (RGB: 128) background.These standardized crops then undergo a deterministic validation trans-formation—consisting of a resize to 252x252 pixels and ImageNet normalization—before being fed into the AnalogyNet backbone. The network maps the input to a 128-dimensional unit hypersphere em-bedding, ˆ e ∈ S127 .Final classification is executed using a nearest-centroid approach, where the predicted class ˆ y is determined by minimizing the L2 distance between the grain’s embedding and the pre-computed class centroids. Alongside the predicted class, the system calculates the absolute distance and a confidence score. Ultimately, the pipeline aggregates these per-grain predictions to generate three distinct out-puts: a fully annotated microscopy image featur-ing class-color-coded bounding boxes and labels, a quantitative palynological count mapping each species to its respective frequency, and optional per-grain Gradient-Weighted Attention heatmaps for enhanced interpretability. 
+
+## 3.8 Interpretability and Gradient-Weighted Attention (XAI) 
+
+To provide transparency and build trust in the model’s predictions, the system extracts explain-ability heatmaps directly from the DINOv2 back-bone. The attention heatmaps actively focus on diagnostic morphological features, effectively sepa-rating morphologically overlapping taxa (e.g., Quil-laja saponaria vs. Lithraea caustica ) based on ru-gose perimeter textures and germinal pores. Tra-ditional Grad-CAM methods, originally designed for Convolutional Neural Networks (Selvaraju et al., 2017), rely on external dependencies and of-ten produce diffuse, unreliable results when ap-plied to Vision Transformers. In contrast, utilizing standard PyTorch hooks, the self-attention mech-anisms in DINOv2 inherently yield high-fidelity, emergent segmentations of the objects of interest (Caron et al., 2021). The base CLS-to-Patch self-attention is obtained by attaching a hook to the query-key-value (qkv) projections of the final trans-former block. The raw attention matrix is calcu-lated as A = softmax( QK T /√dk). We extract the attention weights specifically from the CLS token mapping to the 324 spatial patches ( Acls ). Av-eraging these weights across the attention heads yields an 18 × 18 spatial grid, which is subsequently upsampled to the original 252 × 252 input resolu-tion via bicubic interpolation. To ensure these vi-sualizations are strictly task-specific for our met-ric learning objective, we implemented a Gradient-Weighted Attention mechanism inspired by Chefer et al. (2021). This involves a forward pass that tracks gradients to compute the cosine similarity between the extracted grain embedding and the predicted class centroid. A subsequent backward pass evaluates the gradient of this similarity with respect to the qkv activations. The importance weight for each attention head, hj , is defined as the mean absolute gradient: 
+
+hj = mean 
+
+ ∂sim 
+
+∂QKV j
+
+
+
+The final explainability heatmap is generated by computing the weighted sum of the head-specific CLS attentions: 
+
+Aweighted = X
+
+> j
+
+(hj · Acls j )This resulting [0 , 1] normalized heatmap precisely isolates the morphological patches that actively contribute to the correct classification, rendering the diagnostic features visually accessible to human experts. Fi. 14 are Grad-CAM examples for Lithrea caus-tica and Quillaja saponaria , the numerical values 10 Figure 14: Gradient-Weighted Attention in DI-NOv2 ViT-s for endemic pollen samples. a. Lithrea caustica and b. Quillaja saponaria . Original images, Grad-Cam heat map and predicted eu-clidean distance with numerical values in the 128-dimensional latent metric space ( S127 ). Because the embeddings are L2-normalized to a unit hy-persphere, these distances are mathematically tied to cosine similarity, ensuring consistent taxonomic classification. The system uses Centroid Classifica-tion; the predicted labels with numerical values cor-responds to the class whose learned centroid mini-mizes the Euclidean distance to the grain’s embed-ding. for prediction refer to the final classification and ge-ometric validation steps of the Deep Metric Learn-ing pipeline. The Euclidean distance is the dis-tance between the embedding vector of the specific pollen grain being analyzed and the pre-computed centroid of its assigned taxonomic class. A smaller distance indicates that the morphological features of the grain (captured in the Grad-CAM heatmap) are very similar to the “ideal” prototype of that species. For example, the value 0 .037 indicates an extremely high similarity to the Lithrea caustica 
+
+centroid. Gradient-Weighted Attention summary for all clases is exhibited in Fig. 15. The effective spatial resolution (pixel size in ob-ject space) is determined by the ratio between the physical pixel size of the CMOS sensor and the total magnification of the optical system. For a system utilizing a 60x oil immersion objective and a sci-entific CMOS sensor with a physical pixel pitch of 3.774 μm, the projected pixel size on the sample plane is calculated as: 
+
+Resolution object = P ixelSize sensor 
+
+M agnif ication objective 
+
+Given these parameters, the resolution is exactly 0.0629 μm/px, as empirically verified using a USAF 1951 Test Target from Thorlabs. This spatial sampling ensures compliance with the Nyquist-Shannon criterion for resolving the diffraction-
+
+Figure 15: Gradient-Weighted Attention summary in DINOv2 ViT-s for all clasess 1. Acaena splen-dens (bidibid), 2. Cucurbita pepo (squash), 3. Em-bothrium coccineum (Chilean firebush), 4. Lithrea caustica (litre tree), 5. Medicago sativa (al-falfa), 6. Quillaja saponaria (soapbark) and 7. 
+
+Trifolium pratense (red clover). Direct interpre-tation of gradient-weighted attention heads trough textures and ornamentation. Heatmap highlights rugose perimeter texture, irregular shape, surface and central grid features, elongated shape in equa-torial view and rounded or oblate shape in polar view. predicted euclidean distance with numerical values in the 128-dimensional latent metric space (S127 ) are indicated. 11 limited features of the pollen grains, such as ex-ine ornamentation and germinal pores identified through Gradient-Weighted Attention. In Table 1 Size and Area values ( μ ± σ)were cal-culated by applying the pixel-to-micron conversion to the area thresholds (1 , 000 to 120 , 000 px 2) used by the U 2-Net detector. Circularity values ( C) re-flects the geometric robustness where C = 4 πA/P 2.Classes like Cucurbita pepo show high stability (low 
+
+σ) due to their consistent spherical shape. Intra-class Distance is a metric that represent the mean Euclidean distance of samples to their class centroid in the 128-dimensional embedding space. A lower standard deviation indicates higher taxonomic con-sistency in the model’s feature extraction for that specific species. Roughness Interpretation is the standard deviation in circularity and intra-class dis-tance often correlates with the rugose or irregular textures identified by the Grad-CAM heatmaps. Finally, statistical distribution of pollen grain sizes across the seven analyzed classes from the Biob´ ıo region are shown in Fig. 16 
+
+Figure 16: Bars represent the mean morphologi-cal diameter ( μ) calculated from the U 2-Net salient object detection masks , with error bars indicat-ing the standard deviation ( σ) to reflect intra-class biological variability. The sizes were derived using a spatial resolution of 0 .15 μm/px, consis-tent with the 60x oil immersion bright-field mi-croscopy setup. Especies are ordered by mean size, ranging from the large-scale Cucurbita pepo 
+
+(≈ 45 .2 ± 5.4 μm) to the smaller Trifolium pratense 
+
+(≈ 11 .07 ± 0.88 μm). This distribution highlights the morphological breadth of the pollen dataset, en-compassing endemic, native, and introduced flora. 
+
+# 4 Conclusion 
+
+By coupling a controlled, automated brightfield mi-croscopy platform with a specialized Deep Metric Learning pipeline, this work effectively resolves the primary operational bottlenecks inherent to tradi-tional melissopalynology. The proposed system de-livers a 6x processing speedup over manual analysis while maintaining expert-level accuracy and pro-viding visually explainable diagnostic features. Comprehensive validation was conducted across multiple backbone architectures, including ResNet, ConvNeXt, and Vision Transformers, alongside var-ious objective functions such as Triplet and Ar-cFace losses. Empirical evaluations demonstrate that the optimal configuration utilizes a DINOv2 ViT-S/14 backbone (21M parameters) trained via a Multi-Similarity Loss. By combining this archi-tecture with a deterministic preprocessing strat-egy—specifically, isolating grains using a contour mask over a normalized Slate Gray background (RGB: 128)—the network efficiently maps targets to a highly separable 128-dimensional unit hyper-sphere ( S127 ). Evaluated under standard Deep Metric Learning protocols using metrics such as Recall@K, Normalized Mutual Information (NMI), mAP@R, and Macro F1-Score, this robust archi-tecture establishes a highly efficient, scalable, and interpretable framework for automated pollen clas-sification. 
+
+# 5 acknowledgment 
+
+This work is partially supported by FONDEF IT24i0064 from Agencia Nacional de Investigaci´ on y Desarrollo (ANID) - Chile. 
+
+# References 
+
+[1] Machuca, G., Staforelli, J., Rondanelli-Reyes, M., Garces, R., Contreras-Trigo, B., Tapia, J., ... & Coelho, P. (2022). Hyperspectral mi-croscopy technology to detect syrups adul-teration of endemic guindo santo and quil-lay honey using machine-learning tools. Foods, 11(23), 3868. [2] Jofre, R., Tapia, J., Troncoso, J., Staforelli, J., Sanhueza, I., Jara, A., ... & Coelho, P. (2025). YOLOv8-based on-the-fly classifier system for pollen analysis of Guindo Santo (Eucryphia glutinosa) honey and assessment of its monoflorality. Journal of Agriculture and Food Research, 19, 101665. [3] Sevillano, V., & Aznarte, J. L. (2020). Precise pollen classification with deep learning. PLOS ONE , 15 (4), e0229751. [4] Oquab, M., Darcet, T., Moutakanni, T., Vo, H., Szafraniec, M., Khalidov, V., ... & Bo-janowski, P. (2023). DINOv2: Learning ro-bust visual features without supervision. arXiv preprint arXiv:2304.07193 .12 Table 1: Morphological and Texture Metrics for Pollen Identification 
+
+Pollen Class Size (μm) Area (10 3 px 2) Circ. (C) I.C.D. (μ ± σ)1. Acaena s. 12 .67 ± 1.30 45 .2 ± 5.4 0.88 ± .04 0.68 ± .12 2. Cucurbita p. 45 .2 ± 5.4 108 .5 ± 12 .1 0.92 ± .03 0.74 ± .10 3. Embothrium c. 20 .17 ± 1.89 35 .4 ± 4.1 0.65 ± .06 0.62 ± .14 4. Lithrea c. 16 .15 ± 1.60 41 .0 ± 4.8 0.78 ± .05 0.65 ± .11 5. Medicago s. 11 .99 ± 1.01 28 .1 ± 3.2 0.84 ± .04 0.67 ± .13 6. Quillaja s. 14 .77 ± 1.39 38 .4 ± 4.5 0.86 ± .04 0.76 ± .15 7. Trifolium p. 11 .07 ± 0.88 22 .3 ± 2.8 0.89 ± .03 0.58 ± .11     
+
+> Note: I.C.D. refers to Intra-class Distance in the S127 latent space. Res: 0 .15 μm/px.
+
+[5] Chefer, H., Gur, S., & Wolf, L. (2021). Trans-former interpretability beyond attention vi-sualization. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (pp. 782-791). [6] Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., ... & Houlsby, N. (2021). An image is worth 16x16 words: Transformers for image recognition at scale. In International Conference on Learning Representations .[7] Touvron, H., Cord, M., & J´ egou, H. (2022). DeiT III: Revenge of the ViT. In European Conference on Computer Vision (pp. 516-533). Springer, Cham. [8] Qin, X., Zhang, Z., Huang, C., Dehghan, M., Zaiane, O. R., & Jagersand, M. (2020). U ²-Net: Going deeper with nested U-structure for salient object detection. Pattern Recognition ,
+
+106 , 107404. [9] Caron, M., Touvron, H., Misra, I., J´ egou, H., Mairal, J., Bojanowski, P., & Joulin, A. (2021). Emerging properties in self-supervised vision transformers. In Proceedings of the IEEE/CVF International Conference on Com-puter Vision (pp. 9650-9660). [10] Musgrave, K., Belongie, S., & Lim, S. N. (2020). A metric learning reality check. In Eu-ropean Conference on Computer Vision (pp. 681-699). Springer, Cham. [11] Roth, K., Milbich, T., Sinha, S., Gupta, P., Ommer, B., & Cohen, J. P. (2022). Non-isotropy regularization for proxy-based deep metric learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (pp. 7420-7430). [12] Kim, S., Kim, D., Cho, M., & Kwak, S. (2023). HIER: Metric learning beyond class-level sim-ilarities. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (pp. 11956-11966). [13] Wang, X., Han, X., Huang, W., Dong, D., & Scott, M. R. (2019). Multi-similarity loss with general pair weighting for deep metric learn-ing. In Proceedings of the IEEE/CVF Confer-ence on Computer Vision and Pattern Recog-nition (pp. 5022-5030). [14] Selvaraju, R. R., Cogswell, M., Das, A., Vedantam, R., Parikh, D., & Batra, D. (2017). Grad-CAM: Visual explanations from deep networks via gradient-based localization. In 
+
+Proceedings of the IEEE international confer-ence on computer vision (pp. 618-626). [15] Poulsen-Silva, E., Gordillo-Fuenzalida, F., Vel´ asquez, P., Llancalahuen, F. M., Carva-jal, R., Caba˜ na-Brunod, M., & Otero, M. C. (2023). Antimicrobial, antioxidant, and anti-inflammatory properties of monofloral honeys from Chile. Antioxidants, 12(9), 1785. [16] Garc´ ıa, S., Troncoso, J. M., & Rondanelli-Reyes, M. (2020). Study of honey according to botanical origin and physicochemical parame-ters in the Biob´ ıo Region, Chile. Chilean jour-nal of agricultural research, 80(4), 675-685. [17] Figueroa-Flores, C., & San-Martin, P. (2023). Deep learning for Chilean native flora classi-fication: a comparative analysis. Frontiers in Plant Science, 14, 1211490. [18] Staforelli-Vivanco, J., Salamanca-Levi, V., Jofr´ e-Cerda, R., Rondanelli-Reyes, M., &Lamas, I. (2026). Three-Dimensional Volumet-ric Reconstruction of Native Chilean Pollen via Lens-Free Digital In-line Holographic Mi-croscopy. arXiv preprint arXiv:2601.14205. [19] Louveaux, J., Maurizio, A., & Vorwohl, G. (1978). Methods of melissopalynology. Bee World , 59 (4), 139-157. [20] Faegri, K., Kaland, P. E., & Krzywinski, K. (1989). Textbook of pollen analysis. [21] Sohn, Y. J., Barnes, B. M., Howard, L., Sil-ver, R. M., Attota, R., & Stocker, M. T. 13 (2006, March). K¨ ohler illumination for high-resolution optical metrology. In Metrology, In-spection, and Process Control for Microlithog-raphy XX (Vol. 6152, pp. 1236-1244). SPIE. [22] https://www.madcitylabs.com/cfocus.html 14

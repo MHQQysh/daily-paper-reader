@@ -1,0 +1,786 @@
+Title: MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer
+
+URL Source: https://arxiv.org/pdf/2604.12281v1
+
+Published Time: Wed, 15 Apr 2026 00:40:58 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer 
+
+## Dongkyung Kang *, Jaeyeon Hwang *, Junseo Park *, Minji Kang *, Yeryeong Lee *, Beomseok Ko, Hanyoung Roh, Jeongmin Shin, Hyeryung Jang †
+
+Division of Computer Science and Artificial Intelligence, Dongguk University Republic of Korea 
+
+Abstract 
+
+Style transfer aims to render a content image with the visual charac-teristics of a reference style while preserving its underlying seman-tic layout and structural geometry. While recent diffusion-based models demonstrate strong stylization capabilities by leveraging powerful generative priors and controllable internal representa-tions, they typically assume a single global style. Extending them to multi-style scenarios often leads to boundary artifacts, unsta-ble stylization, and structural inconsistency due to interference between multiple style representations. To overcome these limi-tations, we propose MAST (Mask-Guided Attention Mass Alloca-tion for Training-Free Multi-Style Transfer), a novel training-free framework that explicitly controls content-style interactions within the diffusion attention mechanism. To achieve artifact-free and structure-preserving stylization, MAST integrates four connected modules. First, Layout-preserving Query Anchoring prevents global layout collapse by firmly anchoring the semantic structure using content queries. Second, Logit-level Attention Mass Allocation de-terministically distributes attention probability mass across spatial regions, seamlessly fusing multiple styles without boundary ar-tifacts. Third, Sharpness-aware Temperature Scaling restores the attention sharpness degraded by multi-style expansion. Finally, Discrepancy-aware Detail Injection adaptively compensates for lo-calized high-frequency detail losses by measuring structural discrep-ancies. Extensive experiments demonstrate that MAST effectively mitigates boundary artifacts and maintains structural consistency, preserving texture fidelity and spatial coherence even as the number of applied styles increases. 
+
+1 Introduction 
+
+Image style transfer aims to render a content image with the visual characteristics of a reference style while preserving its underlying semantic layout and structural geometry. This task has long been a core challenge in computer vision and graphics, with applica-tions ranging from artistic image generation to creative produc-tion [ 7, 15 , 17 ]. Early methods [ 9, 32 ] primarily relied on CNN-based optimization or global statistical matching. To improve efficiency and capture long-range dependencies, subsequent works [ 6 , 23 , 33 ]adopted GAN and Transformer architectures. Despite their progress, these non-diffusion approaches often rely on global feature statis-tics, which fail to capture fine-grained local structures and fre-quently lead to shape distortions or texture leakage across object boundaries. 
+
+> ∗These authors contributed equally as co-first authors.
+> †Corresponding author.
+
+Figure 1: Comparison of multi-style transfer. Color boxes on style images and matching outlines on the content image define target spatial masks (green: background). (Row 1) Two-style synthesis preserving high-frequency details (see “M”). (Row 2) Laplacian maps highlighting our seamless boundary transitions versus baseline artifacts. (Row 3) Complex four-style stylization. (Row 4) Zoom-ins demonstrating superior structural consistency(wheel) and texture fidelity(fabric). 
+
+To overcome these limitations, diffusion-based models [ 5, 8 , 29 ]have emerged as a superior paradigm, leveraging strong gener-ative priors and controllable internal representations to achieve high-fidelity stylization. However, most existing diffusion frame-works [ 5, 11 , 25 , 30 ] are inherently designed for single-style transfer, assuming a uniform global style for the entire image. As the demand for more granular control grows, such as applying distinct stylistic intentions to specific objects within a single scene, extending these models to multi-style scenarios becomes essential. The primary technical obstacle in multi-style expansion is the interference between multiple style representations within the dif-fusion attention mechanism. Since the internal attention process is inherently global, style information intended for one masked region via naive pixel-level masking often leaks into unintended areas , causing unwanted blending and visual noise. Furthermore, as the model attempts to incorporate multiple style references simul-taneously, its focus becomes weakened - a phenomenon we define as “attention flattening” . This dilution of stylistic focus prevents the model from capturing the vivid textures of each intended style, 
+
+> arXiv:2604.12281v1 [cs.CV] 14 Apr 2026 Kang et al.
+
+leading to blurred textures and abrupt statistical discontinuities at mask boundaries, as illustrated in Fig. 1. To address these limitations, we propose MAST (Mask-Guided 
+
+Attention Mass Allocation for Training-Free Multi-Style Transfer), a novel framework designed to disentangle spatial style control from content preservation by regulating how stylistic resources are distributed in the diffusion attention mechanism. Unlike previ-ous methods that struggle to block internal style leakage, MAST 
+
+achieves precise multi-style fusion at the logit level through the following technical pillars: 
+
+• Logit-level Attention Mass Allocation ( LAMA ): To eliminate style conflict, LAMA deterministically rescales the distribution of stylistic resources, i.e., attention probability mass, at the net-work’s logit level. By satisfying the probability-mass conserva-tion principle, it ensures that each style is injected precisely into its designated region, preventing leakage and ensuring artifact-free transitions. 
+
+• Sharpness-aware Temperature Scaling ( STS ): To counteract atten-tion flattening, STS acts as an active focus recovery mechanism. It adaptively restores the model’s confidence by sharpening the internal attention distribution, enabling the vivid rendering of distinct stylistic textures even in complex multi-style scenarios. 
+
+• Dual-scale structural preservation ( LQA and DDI ): We employ a two-tiered strategy to protect content integrity at both global and local scales. Layout-preserving Query Anchoring ( LQA ) acts as a global anchor to stabilize the overall semantic structure, while Discrepancy-aware Detail Injection ( DDI ) restores fine tex-tures and sharp edges by selectively compensating for structural discrepancies identified in the frequency domain. Extensive experiments demonstrate that MAST produces state-of-the-art results, maintaining high texture fidelity and spatial co-herence even as the number of applied styles increases. In summary, our key contributions are: (i) a unified training-free framework for multi-style transfer; (ii) a deterministic logit-level style allocation via LAMA to prevent inter-style interference; (iii) the STS mecha-nism for restoring stylistic clarity and focus; and (iv) a dual-scale content preservation strategy, i.e., LQA and DDI , to robustly main-tain structural fidelity against strong stylistic injections. 
+
+2 Related work 
+
+Image Style Transfer. Early CNN-based methods [ 9] utilized per-ceptual features and global statistics, often failing to capture fine-grained style details or achieve proper disentanglement. Subsequent GAN- [ 23 , 33 ] and Transformer-based [ 6, 19 , 24 ] approaches im-proved efficiency and long-range dependency modeling. They en-able flexible and precise stylization with real-time and multi-modal control, as well as complex semantics. However, these methods frequently struggle with structural preservation and precise style control, motivating the rise of diffusion-based alternatives as a more stable paradigm. 
+
+Diffusion-based Style Transfer. Diffusion models offer superior stylization quality, categorized into training-based and training-free approaches. Training-based methods [ 2, 3 , 10 , 25 , 30 ] fine-tune models on content–style pairs to improve consistency and con-trollability. In contrast, training-free methods manipulate internal representations - such as attention maps or latent features - to enable flexible stylization without additional training [ 4, 5, 12 , 14 ,15 , 26 , 28 , 31 ]. Image-guided techniques refine the process through attention reweighting, e.g., StyleID [ 4] and 𝑍 ∗ [5], or content-aware normalization [ 12 , 14 , 28 ], while prompt-driven methods guide styl-ization via cross-model alignment or textual inversion [ 15 , 26 , 31 ]. Despite their flexibility, existing diffusion-based methods are primarily designed for single-style transfer and lack explicit mecha-nisms for handling multiple styles across spatial regions. This often results in interference and artifacts when multiple styles are intro-duced. Our approach is a training-free framework that explicitly addresses mask-based multi-style transfer through deterministic attention mass allocation. 
+
+3 Preliminaries 3.1 Latent Diffusion Models 
+
+Latent Diffusion Models (LDMs) [ 20 ] perform the denoising process in the latent space of an autoencoder. Given a fixed encoder E, an input image 𝑥 is mapped to a latent representation 𝑧 0 = E ( 𝑥 ). The forward diffusion process is defined as 𝑧 𝑡 = √ ¯𝛼 𝑡 𝑧 0 + √1 − ¯𝛼 𝑡 𝜖 ,where 𝜖 ∼ N ( 0, I) and ¯𝛼 𝑡 is a time-dependent scaling factor. The denoising network 𝜖 𝜃 (𝑧 𝑡 , 𝑡, 𝑦 ) is trained to predict the added noise at each timestep 𝑡 , optionally conditioned on 𝑦 (e.g., text, image). The training objective is: 
+
+LLDM = E𝑧,𝜖,𝑡 
+
+∥𝜖 − 𝜖 𝜃 (𝑧 𝑡 , 𝑡, 𝑦 )∥ 22
+
+ . (1) 
+
+3.2 Style Transfer with Diffusion Attention 
+
+Latent diffusion models are typically implemented with U-Net ar-chitectures that incorporate attention modules to model spatial dependencies. In particular, self-attention mechanisms capture long-range interactions within feature maps. Given query, key, and value features 𝑄 , 𝐾 , and 𝑉 , the attention operation is defined as: Attention (ℓ, 𝑉 ) = Softmax (ℓ)𝑉 , ℓ = 𝑄𝐾 ⊤
+
+√𝑑 , (2) where ℓ denotes the attention logits. In diffusion-based style transfer, three feature paths are typically considered: the content path 𝑐 , the style path 𝑠 , and the stylized path 
+
+𝑐𝑠 . The content path preserves structural and semantic information, while the style path provides stylistic attributes such as texture and color, and the stylized path represents the generation process where style is integrated into content. Using DDIM [ 21 ] inversion, self-attention feature maps are extracted from both content and style images and injected into the stylized path at each timestep, enabling controllable stylization while preserving content structure. 
+
+4 Methodology 
+
+We propose MAST , a training-free framework for mask-based multi-style transfer. Given a content image 𝐼 𝑐 and 𝑁 style-mask pairs {( 𝐼 (𝑖 ) 
+
+> 𝑠
+
+, 𝑀 (𝑖 ) )} 𝑁 𝑖 =1, our goal is to synthesize a stylized image 𝐼 𝑐𝑠 
+
+that precisely applies localized styles while preserving the global semantic layout. Building on the paradigm of attention-based styl-ization [ 1, 4, 5, 11 ], we manipulate self-attention features from DDIM inversion to inject stylistic attributes. As illustrated in Fig. 2, our framework operates on three paths: the content path ( 𝑧 𝑐 𝑇 inverted from 𝐼 𝑐 ), the style paths ( 𝑧 𝑠, (𝑖 ) 
+
+> 𝑇
+
+from MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer 
+
+Figure 2: Overview of the proposed MAST framework. (Left) The stylized pipeline employs DDIM inversion and AdaIN-based initialization, where style is injected through attention modulation during the denoising process. (Right) Our attention control framework comprises four core modules: LQA anchors the semantic layout using content queries; LAMA achieves precise region-wise control via logit-level mass allocation; STS restores stylistic focus by sharpening the attention distribution; and 
+
+DDI preserves structural fidelity by injecting high-frequency content details. 
+
+Figure 3: Impact of LQA . Without blending ( 𝜆 = 0), the styl-ized results suffer from structural degradation. LQA (𝜆 = 0.2)robustly anchors the semantic layout by incorporating spa-tial content information, as seen in query heatmaps (bottom). 
+
+each 𝐼 (𝑖 ) 
+
+> 𝑠
+
+), and the stylization path starting from 𝑧 𝑐𝑠 𝑇 . To ensure color fidelity, we initialize the stylization latent 𝑧 𝑐𝑠 𝑇 by applying region-wise AdaIN [ 13 ] to 𝑧 𝑐 𝑇 using the channel statistics of each style image: 
+
+𝑧 𝑐𝑠 𝑇 =
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+𝑀 (𝑖 ) ⊙ AdaIN (𝑧 𝑐 𝑇 , 𝑧 𝑠, (𝑖 ) 
+
+> 𝑇
+
+) + 1 −
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+𝑀 (𝑖 )
+
+!
+
+⊙ 𝑧 𝑐 𝑇 (3) Following this initialization, style is injected during the denoising process through our core attention control modules. 
+
+4.1 Layout-preserving Query Anchoring 
+
+To preserve the semantic layout of 𝐼 𝑐 during style injection, we employ LQA . While replacing self-attention keys and values (𝐾, 𝑉 )
+
+with style features (𝐾 𝑠 , 𝑉 𝑠 ) facilitates stylization, the query 𝑄 𝑐𝑠 often lacks sufficient structural priors, leading to layout collapse. Since the query governs the spatial distribution of attention, anchoring it with 𝑄 𝑐 ensures that style tokens are accurately mapped to the original semantic regions. To this end, we blend the queries 𝑄 𝑐𝑠 
+
+and 𝑄 𝑐 as follows: 
+
+ˆ𝑄 𝑐𝑠 = 𝜆 · 𝑄 𝑐 + ( 1 − 𝜆 ) · 𝑄 𝑐𝑠 , (4) where 𝜆 ∈ [ 0, 1] modulates the structural guidance from the con-tent path. We empirically set 𝜆 = 0.2 to balance structural fidelity and stylization quality. As illustrated in Fig. 3, omitting LQA (i.e., 
+
+𝜆 = 0) results in severe structural degradation, whereas ˆ𝑄 𝑐𝑠 in (4) effectively stabilizes the spatial configuration while allowing for stylistic transformation. 
+
+4.2 Logit-level Attention Mass Allocation 
+
+We propose LAMA (Logit-level Attention Mass Allocation) to de-terministically regulate stylization strength at the logit level. By enforcing a target style attention mass 𝜋 ∗, LAMA achieves pre-cise spatial control while preserving content integrity. For a given (continuous) mask 𝑀 ∈ [ 0, 1], we define the location-dependent attention mass as 𝜋 ∗ 
+
+> 𝑐𝑠
+
+= 𝜋 ∗ · 𝑀 . Unlike conventional attention mask-ing, LAMA enforces a hard constraint on the total attention mass, effectively preventing stylistic leakage into unintended regions and facilitating seamless boundary transitions (see Fig. 4). Specifically, we concatenate the style and content logits, ℓ𝑐𝑜𝑛𝑐𝑎𝑡 =
+
+[ℓ𝑐𝑠 , ℓ 𝑐 ], to separate tokens into distinct groups. To satisfy the target mass distribution while preserving the relative ranking within each Kang et al. 
+
+Figure 4: Controllable stylization via LAMA . (Top) Increasing 
+
+𝜋 ∗ enables progressive and explicit control over stylization strength. (Bottom) Compared to naive pixel-space copy-and-paste, LAMA ensures seamless boundary transitions by pre-venting stylistic leakage into unintended regions. This struc-tural continuity is evidenced by significantly lower Laplacian responses at mask boundaries, whereas baseline methods ex-hibit sharp, artificial edges. 
+
+group, we introduce a learnable-free bias 𝑏 to the style logits (see Appendix A.1 for details): 
+
+ℓ𝑐𝑜𝑛𝑐𝑎𝑡 = [ℓ𝑐𝑠 + 𝑏, ℓ 𝑐 ]. (5) The bias 𝑏 is computed through a closed-form derivation to ensure the total attention mass satisfies (𝜋 ∗ 
+
+> 𝑐𝑠
+
+, 𝜋 ∗ 
+
+> 𝑐
+
+) = (𝜋 ∗ · 𝑀, 1 − 𝜋 ∗ · 𝑀 ).We empirically set 𝜋 ∗ = 0.9.Our ultimate goal is to achieve multi-style transfer by seamlessly integrating multiple styles into a single image. LAMA naturally extends to mask-based multi-style transfer by deterministically al-locating the per-region style proportion according to user-specified ratios. Given 𝑁 styles with corresponding masks {𝑀 (𝑖 ) }𝑁 𝑖 =1, we define: 
+
+𝜋 ∗,(𝑖 ) 
+
+> 𝑐𝑠
+
+= 𝜋 ∗ · 𝑀 (𝑖 ) , 𝜋 ∗ 
+
+> 𝑐
+
+= 1 −
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+𝜋 ∗,(𝑖 ) 
+
+> 𝑐𝑠
+
+, (6) ensuring Í𝑖 𝜋 ∗,(𝑖 ) 
+
+> 𝑐𝑠
+
++ 𝜋 ∗ 
+
+> 𝑐
+
+= 1. Each style is assigned a bias 𝑏 (𝑖 ) , and the final logits are: 
+
+ℓ𝑐𝑜𝑛𝑐𝑎𝑡 = [ℓ (1) 
+
+> 𝑐𝑠
+
++ 𝑏 (1) , . . . , ℓ (𝑁 ) 
+
+> 𝑐𝑠
+
++ 𝑏 (𝑁 ) , ℓ 𝑐 ]. (7) 
+
+4.3 Sharpness-aware Temperature Scaling 
+
+We address the degradation of attention sharpness by introducing 
+
+STS (Sharpness-aware Temperature Scaling). While LAMA enables mask-based multi-style transfer, it leads to a flattened attention dis-tribution, suppressing dominant tokens and degrading stylization and structural patterns. This issue arises from two factors. First, the similarity in ℓ (𝑖 )
+
+> 𝑐𝑠
+
+becomes flattened due to low correlation between ˆ𝑄 𝑐𝑠 and 𝐾 (𝑖 ) 
+
+> 𝑠
+
+,reducing logit variance. Second, concatenating ℓ (𝑖 ) 
+
+> 𝑐𝑠
+
+and ℓ𝑐 increases the number of tokens, enlarging the softmax normalization term and reducing logit contrast, as observed in prior work [22]. To address this, we apply temperature scaling 𝜏 to the attention logits. Unlike StyleID [ 4] using a fixed 𝜏 , we adapt it per sample us-ing content–content logits ℓ𝑐 as a reference. We measure sharpness 
+
+Figure 5: STS mechanism. (Left) A second-order polynomial (red) maps the sharpness gap Δ to the optimal temperature 
+
+𝜏 ∗, enabling efficient inference without per-sample optimiza-tion. (Right) Applying STS effectively reduces the entropy of the attention distribution, signifying restored stylistic focus and confidence. Shaded bands denote per-query variance. 
+
+via log 𝑝 𝑚𝑎𝑥 and define the gap (see Appendix A.2): 
+
+Δ = log 𝑝 𝑚𝑎𝑥 (ℓ𝑐 ) − log 𝑝 𝑚𝑎𝑥 (ℓ𝑐𝑜𝑛𝑐𝑎𝑡 ) (8) As shown in Fig. 5a, Δ exhibits a monotonic relationship with temperature. Based on this, we approximate 𝜏 = 𝑓 (Δ) using a polynomial fit and compute the attention output as Attention (𝜏ℓ 𝑐𝑜𝑛𝑐𝑎𝑡 , 𝑉 𝑐𝑜𝑛𝑐𝑎𝑡 ) = Softmax (𝜏ℓ 𝑐𝑜𝑛𝑐𝑎𝑡 )𝑉 𝑐𝑜𝑛𝑐𝑎𝑡 , (9) where 𝑉 𝑐𝑜𝑛𝑐𝑎𝑡 = [𝑉 (1) 
+
+> 𝑠
+
+, . . . , 𝑉 (𝑁 ) 
+
+> 𝑠
+
+, 𝑉 𝑐 ]. STS restores attention sharp-ness and improves confidence (Fig. 5b). Overall, attention control is achieved through two complementary mechanisms: LAMA gov-erns global attention allocation, while STS refines the distribution locally. 
+
+4.4 Discrepancy-aware Detail Injection 
+
+We introduce DDI (Discrepancy-aware Detail Injection), a high-frequency enhancement module to preserve fine details lost during stylization. While LQA maintains the overall layout and LAMA 
+
+partially preserves the probability mass of content tokens, both under-emphasize content, leading to the loss of high-frequency details such as textures, edges, and fine structures (e.g., eyes and hair). To address this, following prior residual-based approaches [ 11 ,16 ], we extract high-frequency components 𝜙 high  
+
+> 𝑐
+
+from the con-tent feature using a Gaussian high-pass filter with radius 𝑟 in the frequency domain (see Appendix A.3). Let 𝜙 𝑐 and 𝜙 𝑐𝑠 denote the residual block outputs of the content and stylized paths, respec-tively, and Δ𝜙 𝑐𝑠 the residual in the stylized path. We modulate the injection of 𝜙 high  
+
+> 𝑐
+
+based on the structural dis-crepancy between 𝜙 𝑐𝑠 and 𝜙 𝑐 . Specifically, we define a cosine-based weight 𝜔 = 1 − cos (𝜙 𝑐𝑠 , 𝜙 𝑐 ), which increases with the discrepancy. The final output is: 
+
+ˆ𝜙 𝑐𝑠 = 𝜙 𝑐𝑠 + Δ𝜙 𝑐𝑠 + 𝜔 · 𝜙 high  
+
+> 𝑐
+
+(10) This enhances high-frequency details when structural distortion is large and suppresses it otherwise, preserving fine structures while maintaining stylistic consistency. MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer 
+
+Figure 6: Qualitative comparison in the two-style setting (green: background). MAST demonstrates superior structural preser-vation and artifact mitigation compared to baselines. While other methods often suffer from texture bleeding or boundary distortion, our approach maintains sharp object boundaries and high-fidelity content structures. (Refer to Fig. 1 for mask notation.) Table 1: Quantitative comparison in the two-style setting. MAST achieves the best performance in ArtFID, FID, CFSD, and M-FID. While competitive LPIPS in some baselines often reflect limited stylistic transformation, our method provides a superior balance between style fidelity and structural consistency. Bold and underline for the best and second-best results, respectively. 
+
+Method ArtFID ↓ FID ↓ LPIPS ↓ LPIPS-Gray ↓ CFSD ↓ M-FID ↓
+
+StyTr 2 [6] 18 .816 11 .086 0.557 0.431 0.162 21 .649 
+
+InST [31] 25 .152 15 .281 0.545 0.468 0.268 24 .970 
+
+CAST [32] 24 .233 14 .054 0.610 0.485 0.204 24 .222 
+
+𝑍 ∗ [5] 17 .136 10 .839 0.447 0.380 0.148 18 .399 
+
+StyleID [4] 16 .728 10 .296 0.481 0.369 0.141 19 .506 
+
+DiffuseST [11] 20 .603 13 .030 0.469 0.348 0.285 24 .239 
+
+StyleSSP [29] 27 .374 15 .899 0.620 0.510 0.192 26 .757 
+
+StyleShot [8] 17 .966 9.214 0.759 0.645 0.353 16 .917 
+
+MAST (Ours) 14.780 8.656 0.531 0.415 0.132 15.193 
+
+5 Experiment 
+
+Datasets. We construct content–style pairs by randomly sampling 
+
+20 content images from MS-COCO [ 18 ] and 360 style images from WikiArt [ 27 ], resulting in diverse combinations spanning various scene layouts and artistic styles. The total number of evaluation samples depends on the number of masked regions 𝑁 , yielding 
+
+7,200 /𝑁 images. 
+
+Evaluation Metrics. We evaluate style transfer in terms of both content preservation and style fidelity using complementary met-rics: FID, LPIPS, LPIPS-Gray, CFSD, and their combined metric, ArtFID. ArtFID is used as the primary metric, as it jointly captures content and style quality and correlates well with human percep-tion: ArtFID = (1 + LPIPS ) · ( 1 + FID ). FID measures the distribu-tional similarity between generated and style images, reflecting style fidelity. LPIPS evaluates perceptual similarity to the content image, measuring content preservation. LPIPS-Gray removes color information to focus on structural consistency. CFSD measures structural consistency via spatial feature correlations, reducing sensitivity to style-induced textures. Additionally, for mask-based multi-style transfer, we introduce Masked FID (M-FID) to evaluate stylization within specific regions. We restrict feature aggregation to masked areas and compute FID only over the stylized regions. 
+
+Implementation details. All experiments are conducted using Stable Diffusion v1.4 with DDIM sampling (50 steps). We set 𝜆 =
+
+0.2, 𝜋 ∗ = 0.9 and 𝑟 = 0.3. Our method operates on self-attention modules in the U-Net, applying feature manipulation at all timesteps to decoder layers 7–12, where high-level semantic interactions are dominant. Text prompts are set to null strings. 
+
+Baselines. We compare our method with several state-of-the-art style transfer and diffusion-based stylization methods, including StyTr 2 [ 6], InST [ 31 ], CAST [ 32 ], 𝑍 ∗ [5], StyleID [ 4 ], DiffuseST [ 11 ], StyleSSP [ 29 ], and StyleShot [ 8]. For all baselines, we follow the Kang et al. 
+
+Figure 7: Styles are sequentially added (top to bottom) within a fixed five-style mask setting. MAST ensures strict spatial adherence to mask boundaries and prevents inter-style interference even as stylistic complexity increases. Throughout the progression, our method consistently maintains high-fidelity object structures and seamless transitions between diverse styles. 
+
+official implementations from their publicly available repositories. Since most methods are designed for single-style transfer, we extend them to the multi-style setting using mask-based element-wise composition for fair comparison. 
+
+5.1 Evaluation in the Two-style Setting 
+
+Our method achieves the best overall performance in the two-style setting, demonstrating a strong balance between content preserva-tion and stylization. As shown in Tab. 1, it outperforms all baselines in ArtFID, achieves the lowest FID, and obtains superior CFSD scores, indicating improved overall quality and strong structural and pattern consistency. While 𝑍 ∗ [5 ], DiffuseST [ 11 ], and StyleID [ 4 ] report competitive LPIPS and LPIPS-Gray, Fig. 6 shows that their low LPIPS largely re-sults from limited perceptual changes, leading to insufficient styliza-tion. In contrast, our method preserves structure while introducing meaningful style variations, achieving a better balance despite rela-tively higher LPIPS. It also achieves the best M-FID across regions, demonstrating accurate region-wise style alignment. Qualitative comparisons in Fig. 6 highlight three key strengths: fine detail preservation, structural consistency, and smooth bound-ary transitions. In the first row, our method preserves fine details, such as the reflection on the toilet tank lid, while StyleSSP [ 29 ]and StyleShot [ 8] overemphasize style and degrade structural in-formation. In the second row, our method maintains the geometric layout of the tiles while effectively transferring the background style, whereas all baselines, including 𝑍 ∗, fail to capture the back-ground style and distort structure and patterns. In the third row, several baselines exhibit clear artifacts. StyleSSP and StyleShot introduce unrealistic distortions, while InST, 𝑍 ∗, and DiffuseST fail to properly transfer the background style, resulting in inconsistent outputs. This issue persists in the fourth row, where 𝑍 ∗
+
+and DiffuseST again fail to reflect the background style. Meanwhile, MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer 
+
+Figure 8: Comparison of ArtFID distributions as the number of styles increases. Each violin represents results using 1 to 5
+
+styles. The MAD (Mean Absolute Difference) denotes the av-erage absolute difference between consecutive style settings, where lower values indicate more consistent performance. Our method achieves both the lowest ArtFID and the smallest MAD, demonstrating superior performance and robustness to increasing numbers of styles. 
+
+Figure 9: Compositional interaction in a two-style setting. By fixing one style and varying the other (green: background), MAST demonstrates how regional styles adaptively harmo-nize with their surroundings. This highlights a joint integra-tion of styles rather than simple independent applications. 
+
+other methods apply the background style without respecting the foreground, causing visible discontinuities at mask boundaries. In contrast, our method suppresses structural distortions and artifacts while maintaining consistent stylization. 
+
+5.2 Multi-style Scalability 
+
+Our method demonstrates strong scalability, maintaining consistent performance and stable style composition as the number of styles increases. To qualitatively validate this, Fig. 7 presents results under a 5-style mask setting with sequential style addition. Even with narrow mask regions and increasing style complexity, styles are consistently applied across content and background while preserv-ing object identity. Previously applied styles remain stable as new styles are introduced, with clear separation between foreground and background and no noticeable style leakage. For example, even with strong style images (last two rows, with target spatial masks shown in orange and blue), no style inter-ference is observed in adjacent content regions (e.g., the dog and pizza). At the same time, the distinctive visual characteristics of each style—such as the lighting in the ice castle and the vivid colors of the cat—are faithfully preserved. For quantitative evaluation, we measure ArtFID while increasing the number of styles from 1 to 5, as shown in Fig. 8. Most baseline methods suffer significant performance degradation when transi-tioning from single-style to multi-style settings, with a sharp drop at the 1→2 transition, as reflected in the violin plots, since they are not explicitly designed for mask-based multi-style transfer. In contrast, our method improves performance from 1→2 and remains stable thereafter, demonstrating effective style disentan-glement and control. While methods such as 𝑍 ∗ and StyleID show relatively stable trends, they still underperform compared to ours. Quantitatively, our method achieves the lowest MAD across vary-ing numbers of styles, indicating strong robustness as the number of styles increases. 
+
+5.3 Analysis of Multi-Style Interaction 
+
+In multi-style settings, unlike naive copy-and-paste approaches (see Fig. 1), styles are not applied independently but interact within the overall composition. In particular, changes in the background style directly affect the appearance of the character style in the 2-style setting. As shown in Fig. 9, each row keeps the same char-acter style while varying only the background style. Even with an identical character style, its visual expression changes depending on the accompanying background, indicating that style appearance is determined by the global composition. This behavior arises from our multi-style design and can be ex-plained by the combined effects of LAMA and STS . LAMA processes multiple styles jointly with respect to a shared content anchor, rather than independently. Each style adjusts its relative influence in relation to others, so changes in one style affect the overall com-positional balance, leading to coherent integration across styles. Moreover, different style combinations produce different atten-tion logit distributions, resulting in variations in log 𝑝 max . Since 𝜏 is determined based on log 𝑝 max , each combination yields a different temperature. Consequently, STS adaptively modulates the sharp-ness of the attention distribution, causing even the same style to exhibit different visual characteristics. Overall, our method enables adaptive variation in style expres-sion while maintaining balanced integration, resulting in coherent multi-style compositions. This explains the strong scalability ob-served in Sec. 5.2. 
+
+5.4 Ablation Study 
+
+We conduct an ablation study by progressively adding each com-ponent to the initial setting, analyzing both individual contribu-tions and their combined effects. To evaluate the effect of LQA , we Kang et al. 
+
+Figure 10: Ablation of key components (green: background). LQA preserves content layout but results in limited stylization. Introducing LAMA enables spatially selective style injection and improves stylization quality, but may cause over-stylization that leads to blurred structures and content degradation. STS sharpens attention and enhances transfer precision. DDI further improves fine detail preservation (e.g., text). 
+
+first consider a single-style transfer setting without mask guidance. Since LAMA and STS are designed for mask-based multi-style trans-fer, they are evaluated under a two-style setting. The qualitative effects of each component are shown in Fig. 10. As shown in Table. 2, introducing LQA improves LPIPS by better preserving content layout. However, without explicit control over style injection, the model exhibits strong content bias, resulting in limited stylization. Adding LAMA enables spatially selective style injection and controllable stylization strength, significantly improv-ing ArtFID and FID. While stylization becomes more pronounced, some content details—such as the surface texture of the Statue of Liberty, signs, and foliage—are partially degraded. Further improvements are achieved with STS , which sharpens the attention distribution and enhances stylization precision, miti-gating blur caused by overly flat attention. Finally, incorporating 
+
+DDI restores lost textures and improves fine detail preservation (e.g., text), leading to additional gains in LPIPS and CFSD. However, this comes with a slight trade-off, as ArtFID and FID degrade due to increased emphasis on content fidelity. 
+
+6 Conclusion 
+
+In this work, we presented MAST , a mask-based multi-style transfer framework that explicitly controls the interaction between content and multiple styles within the diffusion attention mechanism. By integrating LQA , LAMA , STS , and DDI , our method effectively dis-entangles content preservation and style control while addressing challenges such as boundary artifacts, attention degradation, and structural inconsistency. Extensive experiments demonstrate that 
+
+MAST achieves superior performance across both quantitative and qualitative evaluations, providing accurate region-wise style alignment, strong structural and pattern consistency, and stable styl-ization even as the number of styles increases. Overall, our results 
+
+Table 2: Ablation study of individual contribution of LQA (𝜆 ), 
+
+LAMA (𝜋 ∗), STS (𝜏 ), and DDI . The integration of LAMA sig-nificantly boosts stylization quality (ArtFID and FID), while 
+
+STS and DDI further refine textural focus and structural fi-delity (LPIPS, CFSD, and M-FID). The results demonstrate the complementary synergy of all components in balancing style and structure. Bold and underline denote the best and second-best results, respectively.                                            
+
+> LQA LAMA STS DDI ArtFID ↓FID ↓LPIPS ↓CFSD ↓M-FID ↓
+> 30 .219 23 .449 0.236 0.054 −
+> ✓30 .380 23 .673 0.231 0.054 −
+> ✓✓16 .680 9.665 0.564 0.141 19 .134
+> ✓✓✓14.769 8.495 0.555 0.143 16 .457
+> ✓✓✓✓14 .780 8.656 0.531 0.132 15.193
+
+highlight the importance of explicitly modeling content–style inter-actions for multi-style transfer and suggest a promising direction for scalable and controllable image generation. MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer 
+
+References 
+
+[1] Yuval Alaluf, Daniel Garibi, Or Patashnik, Hadar Averbuch-Elor, and Daniel Cohen-Or. 2024. Cross-image attention for zero-shot appearance transfer. In 
+
+ACM SIGGRAPH 2024 conference papers . 1–12. [2] Bolin Chen, Baoquan Zhao, Haoran Xie, Yi Cai, Qing Li, and Xudong Mao. 2025. Consislora: Enhancing content and style consistency for lora-based style transfer. 
+
+arXiv preprint arXiv:2503.10614 (2025). [3] Estelle Chigot, Dennis G Wilson, Meriem Ghrib, and Thomas Oberlin. 2025. Style Transfer with Diffusion Models for Synthetic-to-Real Domain Adaptation. arXiv preprint arXiv:2505.16360 (2025). [4] Jiwoo Chung, Sangeek Hyun, and Jae-Pil Heo. 2024. Style injection in diffusion: A training-free approach for adapting large-scale diffusion models for style transfer. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition . 8795–8805. [5] Yingying Deng, Xiangyu He, Fan Tang, and Weiming Dong. 2024. Z*: Zero-shot style transfer via attention reweighting. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 6934–6944. [6] Yingying Deng, Fan Tang, Weiming Dong, Chongyang Ma, Xingjia Pan, Lei Wang, and Changsheng Xu. 2022. Stytr2: Image style transfer with transformers. In 
+
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition .11326–11336. [7] Vincent Dumoulin, Jonathon Shlens, and Manjunath Kudlur. 2016. A learned representation for artistic style. arXiv preprint arXiv:1610.07629 (2016). [8] Junyao Gao, Yanan Sun, Yanchen Liu, Yinhao Tang, Yanhong Zeng, Ding Qi, Kai Chen, and Cairong Zhao. 2025. Styleshot: A snapshot on any style. IEEE Transactions on Pattern Analysis and Machine Intelligence (2025). [9] Leon A Gatys, Alexander S Ecker, and Matthias Bethge. 2016. Image style transfer using convolutional neural networks. In Proceedings of the IEEE conference on computer vision and pattern recognition . 2414–2423. [10] Lei Hu, Zihao Zhang, Yongjing Ye, Yiwen Xu, and Shihong Xia. 2024. On-the-fly Learning to Transfer Motion Style with Diffusion Models: A Semantic Guidance Approach. CoRR (2024). [11] Ying Hu, Chenyi Zhuang, and Pan Gao. 2024. Diffusest: Unleashing the capa-bility of the diffusion model for style transfer. In Proceedings of the 6th ACM International Conference on Multimedia in Asia . 1–1. [12] Bo Huang, Wenlun Xu, Qizhuo Han, Haodong Jing, and Ying Li. 2025. AttenST: A Training-Free Attention-Driven Style Transfer Framework with Pre-Trained Diffusion Models. arXiv preprint arXiv:2503.07307 (2025). [13] Xun Huang and Serge Belongie. 2017. Arbitrary style transfer in real-time with adaptive instance normalization. In Proceedings of the IEEE international conference on computer vision . 1501–1510. [14] Jaeseok Jeong, Mingi Kwon, and Youngjung Uh. 2023. Training-free style transfer emerges from h-space in diffusion models. arXiv preprint arXiv:2303.15403 3, 1 (2023), 2. [15] Mingkun Lei, Xue Song, Beier Zhu, Hao Wang, and Chi Zhang. 2025. StyleStudio: Text-Driven Style Transfer with Selective Control of Style Elements. In Proceed-ings of the Computer Vision and Pattern Recognition Conference . 23443–23452. [16] Songlin Lei, Qiuxia Yang, Ke Yang, Zhengpeng Zhao, and Yuanyuan Pu. 2025. Training-free style transfer via content-style image inversion. Computers & Graphics (2025), 104352. [17] Yijun Li, Chen Fang, Jimei Yang, Zhaowen Wang, Xin Lu, and Ming-Hsuan Yang. 2017. Universal style transfer via feature transforms. Advances in neural information processing systems 30 (2017). [18] Tsung-Yi Lin, Michael Maire, Serge J. Belongie, Lubomir D. Bourdev, Ross B. Gir-shick, James Hays, Pietro Perona, Deva Ramanan, Piotr Doll’a r, and C. Lawrence Zitnick. 2014. Microsoft COCO: Common Objects in Context. CoRR abs/1405.0312 (2014). arXiv:1405.0312 http://arxiv.org/abs/1405.0312 [19] Jeeseung Park and Younggeun Kim. 2022. Styleformer: Transformer based generative adversarial networks with style vector. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition . 8983–8992. [20] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. 2022. High-resolution image synthesis with latent diffusion models. In 
+
+Proceedings of the IEEE/CVF conference on computer vision and pattern recognition .10684–10695. [21] Jiaming Song, Chenlin Meng, and Stefano Ermon. 2020. Denoising diffusion implicit models. arXiv preprint arXiv:2010.02502 (2020). [22] Petar Veličković, Christos Perivolaropoulos, Federico Barbero, and Razvan Pas-canu. 2024. Softmax is not enough (for sharp size generalisation). arXiv preprint arXiv:2410.01104 (2024). [23] Hanyu Wang, Pengxiang Wu, Kevin Dela Rosa, Chen Wang, and Abhinav Shri-vastava. 2024. Multimodality-guided image style transfer using cross-modal gan inversion. In Proceedings of the IEEE/CVF winter conference on applications of computer vision . 4976–4985. [24] Jianbo Wang, Huan Yang, Jianlong Fu, Toshihiko Yamasaki, and Baining Guo. 2022. Fine-grained image style transfer with visual transformers. In Proceedings of the Asian conference on computer vision . 841–857. [25] Ye Wang, Ruiqi Liu, Jiang Lin, Fei Liu, Zili Yi, Yilin Wang, and Rui Ma. 2025. OmniStyle: Filtering High Quality Style Transfer Data at Scale. In Proceedings of the Computer Vision and Pattern Recognition Conference . 7847–7856. [26] Zhizhong Wang, Lei Zhao, and Wei Xing. 2023. Stylediffusion: Controllable disentangled style transfer via diffusion models. In Proceedings of the IEEE/CVF international conference on computer vision . 7677–7689. [27] WikiArt. 2026. WikiArt: Visual Art Encyclopedia. https://www.wikiart.org/. Accessed: 2026-03-22. [28] Zhengtao Xiang, Xing Wan, Libo Xu, Xin Yu, and Yuhan Mao. 2024. A Training-Free Latent Diffusion Style Transfer Method. Information 15, 10 (2024), 588. [29] Ruojun Xu, Weijie Xi, XiaoDi Wang, Yongbo Mao, and Zach Cheng. 2025. Stylessp: Sampling startpoint enhancement for training-free diffusion-based method for style transfer. In Proceedings of the Computer Vision and Pattern Recognition Conference . 18260–18269. [30] Shiwen Zhang, Zhuowei Chen, Lang Chen, and Yanze Wu. 2025. CDST: Color Disentangled Style Transfer for Universal Style Reference Customization. arXiv preprint arXiv:2506.13770 (2025). [31] Yuxin Zhang, Nisha Huang, Fan Tang, Haibin Huang, Chongyang Ma, Weiming Dong, and Changsheng Xu. 2023. Inversion-based style transfer with diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition . 10146–10156. [32] Yuxin Zhang, Fan Tang, Weiming Dong, Haibin Huang, Chongyang Ma, Tong-Yee Lee, and Changsheng Xu. 2022. Domain enhanced arbitrary image style transfer via contrastive learning. In ACM SIGGRAPH 2022 conference proceedings .1–8. [33] Zhiwen Zuo, Lei Zhao, Shuobin Lian, Haibo Chen, Zhizhong Wang, Ailin Li, Wei Xing, and Dongming Lu. 2022. Style Fader Generative Adversarial Networks for Style Degree Controllable Artistic Style Transfer.. In IJCAI . 5002–5009. Kang et al. 
+
+A Research Methods A.1 Mathematical Formulation of LAMA 
+
+In this section, we present the mathematical formulation of LAMA 
+
+(Logit-level Attention Mass Allocation), parameterized by 𝜋 ∗, for mask-based style transfer. We then derive the corresponding closed-form solution for injecting it into the attention map. 
+
+A.1.1 Definition of probability mass in single-style attention. In the single-style setting, let ℓ𝑐𝑠 (𝑞 ) ∈ R𝑇 𝑐𝑠 and ℓ𝑐 (𝑞 ) ∈ R𝑇 𝑐 denote the style and content logit vectors for a query token 𝑞 . We define the concatenated logit vector as 
+
+ℓconcat (𝑞 ) = [ ℓ𝑐𝑠 (𝑞 ), ℓ 𝑐 (𝑞 ) ] ∈ R𝑇 𝑐𝑠 +𝑇 𝑐 . (11) Applying a single Softmax to ℓconcat (𝑞 ) induces a probability distribution over both style and content tokens. Accordingly, the style and content partition functions are defined as 
+
+𝑍 𝑐𝑠 (𝑞 ) =
+
+> 𝑇 𝑐𝑠
+
+∑︁ 
+
+> 𝑗 =1
+
+exp  ℓconcat (𝑞, 𝑗 ), 𝑍 𝑐 (𝑞 ) = 
+
+> 𝑇 𝑐𝑠 +𝑇 𝑐
+
+∑︁  
+
+> 𝑗 =𝑇 𝑐𝑠 +1
+
+exp  ℓconcat (𝑞, 𝑗 ),𝑍 total (𝑞 ) = 𝑍 𝑐𝑠 (𝑞 ) + 𝑍 𝑐 (𝑞 ).
+
+(12) The corresponding probability masses assigned to the style and content partitions are then given by 
+
+𝜋 𝑐𝑠 (𝑞 ) = 𝑍 𝑐𝑠 (𝑞 )
+
+𝑍 total (𝑞 ) , 𝜋 𝑐 (𝑞 ) = 𝑍 𝑐 (𝑞 )
+
+𝑍 total (𝑞 ) , (13) with 𝜋 𝑐𝑠 (𝑞 ) + 𝜋 𝑐 (𝑞 ) = 1.
+
+A.1.2 Target mass allocation for single-style by LAMA. Assume that a spatial mask 𝑀 (𝑞 ) ∈ [ 0, 1] is given for query token 𝑞 to specify where style is injected. Let 𝜋 ∗ denote the maximum fraction of the total attention mass allocated to the style partition. The target probability masses for the style and content partitions are then defined as 
+
+𝜋 ∗ 
+
+> 𝑐𝑠
+
+(𝑞 ) = 𝜋 ∗ · 𝑀 (𝑞 ), 𝜋 ∗ 
+
+> 𝑐
+
+(𝑞 ) = 1 − 𝜋 ∗ · 𝑀 (𝑞 ). (14) When 𝑀 (𝑞 ) = 1, the full target style mass 𝜋 ∗ is assigned to the style partition. When 𝑀 (𝑞 ) = 0, 𝜋 ∗ 
+
+> 𝑐𝑠
+
+(𝑞 ) = 0, so no attention mass is allocated to style and the content is fully preserved. 
+
+A.1.3 Closed-form solution for single-style injection. To match the style probability mass to the target value 𝜋 ∗ 
+
+> 𝑐𝑠
+
+(𝑞 ), we add a shared bias 𝑏 (𝑞 ) to all style logits: 
+
+ℓconcat (𝑞 ) = [ ℓ𝑐𝑠 (𝑞 ) + 𝑏 (𝑞 ), ℓ 𝑐 (𝑞 ) ] . (15) Under this biased concatenation, the probability mass assigned to the style partition becomes 
+
+exp (𝑏 (𝑞 )) 𝑍 𝑐𝑠 (𝑞 )
+
+exp (𝑏 (𝑞 )) 𝑍 𝑐𝑠 (𝑞 ) + 𝑍 𝑐 (𝑞 ) = 𝜋 ∗ 
+
+> 𝑐𝑠
+
+(𝑞 ). (16) Solving this equation for 𝑏 (𝑞 ) yields the closed-form solution 
+
+𝑏 (𝑞 ) = log 
+
+ 𝜋 ∗ 
+
+> 𝑐𝑠
+
+(𝑞 )
+
+𝜋 ∗ 
+
+> 𝑐
+
+(𝑞 )
+
+
+
++ log 𝑍 𝑐 (𝑞 ) − log 𝑍 𝑐𝑠 (𝑞 ). (17) This bias exactly matches the target style mass while preserving the relative ordering within ℓ𝑐𝑠 (𝑞 ).
+
+Table 3: Quantitative evaluation in the two-style setting across different values of 𝜋 ∗. The best generative perfor-mance, in terms of ArtFID, FID and M-FID, is achieved at 
+
+𝜋 ∗ = 0.9.                                                
+
+> 𝜋 ∗ArtFID ↓FID ↓LPIPS ↓LPIPS-Gray ↓CFSD ↓M-FID ↓
+> 0.30 28 .920 22 .308 0.241 0.189 0.068 35 .307 0.45 27 .429 20 .601 0.270 0.207 0.072 33 .731 0.60 24 .827 17 .816 0.319 0.242 0.081 30 .756 0.75 21 .035 14 .066 0.396 0.300 0.100 25 .734 0.90 14.780 8.656 0.531 0.415 0.132 15.193
+> 1.00 15 .235 8.890 0.540 0.422 0.153 17 .125
+
+A.1.4 Generalization to 𝑁 -way multi-style injection. The single-style formulation of LAMA naturally extends to the multi-style setting with 𝑁 style partitions. For a query token 𝑞 , let ℓ (𝑖 ) 
+
+> 𝑐𝑠
+
+(𝑞 )
+
+denote the logit vector of the 𝑖 -th style partition for 𝑖 = 1, . . . , 𝑁 .The total partition function is then defined as 
+
+𝑍 total (𝑞 ) = 𝑍 𝑐 (𝑞 ) + 
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+𝑍 (𝑖 ) 
+
+> 𝑐𝑠
+
+(𝑞 ). (18) The target probability mass for each style partition is defined as 
+
+𝜋 ∗,(𝑖 ) 
+
+> 𝑐𝑠
+
+(𝑞 ) = 𝜋 ∗ · 𝑀 (𝑖 ) (𝑞 ), 𝜋 ∗ 
+
+> 𝑐
+
+(𝑞 ) = 1 −
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+𝜋 ∗,(𝑖 ) 
+
+> 𝑐𝑠
+
+(𝑞 ). (19) To match the target mass of each style partition, we add an independent bias 𝑏 (𝑖 ) (𝑞 ) to each style logit group. The concatenated logits are then written as 
+
+ℓconcat (𝑞 ) = ℓ (1) 
+
+> 𝑐𝑠
+
+(𝑞 )+ 𝑏 (1) (𝑞 ), . . . , ℓ (𝑁 ) 
+
+> 𝑐𝑠
+
+(𝑞 )+ 𝑏 (𝑁 ) (𝑞 ), ℓ 𝑐 (𝑞 ) . (20) This formulation reduces to the single-style case when 𝑁 = 1.Moreover, the target masses satisfy 
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+𝜋 ∗,(𝑖 ) 
+
+> 𝑐𝑠
+
+(𝑞 ) + 𝜋 ∗ 
+
+> 𝑐
+
+(𝑞 ) = 1, (21) which ensures conservation of the total probability mass regardless of the number of styles. 
+
+A.1.5 Selection of 𝜋 ∗. We quantitatively evaluate different values of 𝜋 ∗ in the two-style setting, as shown in Table 3, to identify the best balance between generative quality and structural fidelity. The results reveal a clear trade-off. Lower 𝜋 ∗ values (e.g., 0.3–0.6) yield better perceptual similarity and structural alignment, as shown by lower LPIPS, LPIPS-Gray, and CFSD scores, but at the cost of worse image generation quality, reflected in higher ArtFID, FID and M-FID scores. We choose 𝜋 ∗ = 0.9 as the default setting because it achieves the best overall generative performance, yielding the lowest ArtFID (14.780 ), FID ( 8.656 ) and M-FID ( 15.193 ) among all tested values. By contrast, 𝜋 ∗ = 1.0 degrades both generative quality and per-ceptual distance metrics. Thus, 𝜋 ∗ = 0.9 provides the best balance between image quality and structural consistency. 
+
+A.2 Sharpness-aware Temperature Scaling 
+
+We provide theoretical and empirical analyses of STS (Sharpness-aware Temperature Scaling), including the derivation of the ( Δ, 𝜏 )MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer 
+
+relationship and the construction of the mapping function 𝜏 = 𝑓 (Δ).Although the optimal temperature depends on the full attention logit distribution, we find that the sharpness gap Δ explains most of the variance in the optimal temperature 𝜏 ∗ (𝑅 2 ≈ 0.93 in Table 4). This suggests that 𝜏 can be effectively approximated as a function of Δ without access to the full distribution. 
+
+A.2.1 Monotonic Relationship Between log 𝑝 max and 𝜏 . For a query token 𝑞 , let ℓ𝑐 (𝑞 ) denote the content logits, and let ℓconcat (𝑞 ) denote the concatenated logits defined in Eq. (20) . We define the sharpness gap as 
+
+Δ = log 𝑝 max (ℓ𝑐 ) − log 𝑝 max (ℓconcat ), (22) where 𝑝 max (ℓ) denotes the maximum softmax probability computed from logits ℓ. Thus, Δ quantifies the loss of attention sharpness caused by logit concatenation. To compensate for this loss, we scale 
+
+ℓconcat by a temperature 𝜏 , i.e., 𝜏ℓ concat .Let ℓ (𝑞 ) ∈ R𝑇 be the pre-softmax attention logits over 𝑇 tokens, and let ℓmax (𝑞 ) be the maximum logit. Under temperature scaling, 
+
+log 𝑝 max (𝜏ℓ (𝑞 )) = log 𝑒 𝜏ℓ max (𝑞 )
+
+Í𝑇 𝑗 =1 𝑒 𝜏ℓ (𝑞,𝑗 ) = 𝜏ℓ max (𝑞 ) − log 
+
+> 𝑇
+
+∑︁ 
+
+> 𝑗 =1
+
+𝑒 𝜏ℓ (𝑞,𝑗 ) .
+
+(23) Differentiating with respect to 𝜏 gives 
+
+𝑑 𝑑𝜏 log 𝑝 max (𝜏ℓ (𝑞 )) = ℓmax (𝑞 ) − E𝑝 (𝜏ℓ (𝑞 ) ) [ℓ (𝑞 )] . (24) Since E𝑝 (𝜏ℓ (𝑞 ) ) [ℓ (𝑞 )] ≤ ℓmax (𝑞 ), we have 
+
+𝑑 𝑑𝜏 log 𝑝 max (𝜏ℓ (𝑞 )) ≥ 0. (25) Therefore, log 𝑝 max increases monotonically with 𝜏 .Since log 𝑝 max (ℓ𝑐 ) is fixed for a given query, a larger sharpness gap Δ requires a larger temperature to match log 𝑝 max (𝜏ℓ concat ) to 
+
+log 𝑝 max (ℓ𝑐 ). This establishes a monotonic relationship between Δ
+
+and the required temperature 𝜏 , which motivates approximating 𝜏 
+
+as a function of Δ, i.e., 𝜏 = 𝑓 (Δ), using polynomial fitting. 
+
+A.2.2 Mapping function 𝜏 = 𝑓 (Δ). We estimate temperature di-rectly from the sharpness gap by learning a global mapping 𝜏 =
+
+𝑓 (Δ). This avoids expensive per-sample optimization during infer-ence while providing an efficient approximation of the required temperature. To build this mapping, we construct a dataset of (Δ, 𝜏 ∗) pairs. Specifically, we use 20 content images and 10 randomly sampled style images per content, resulting in 200 content–style pairs. We collect attention logits from all timesteps, layers, and heads, and compute Δ for each observation. The target temperature 𝜏 ∗ is then obtained by grid search such that 
+
+log 𝑝 max (𝜏ℓ concat ) ≈ log 𝑝 max (ℓ𝑐 ). (26) In total, this process yields approximately 480 ,000 samples. 
+
+A.2.3 Polynomial regression. We fit polynomial models of different degrees to approximate 𝜏 as a function of Δ, and evaluate them using the coefficient of determination ( 𝑅 2). A higher 𝑅 2 indicates a better fit. As shown in Table 4, the gain becomes marginal beyond the second order. We therefore use a quadratic model: 
+
+𝜏 = 𝑎 Δ2 + 𝑏 Δ + 𝑐. (27) 
+
+Table 4: 𝑅 2 scores of polynomial models. 
+
+Degree 𝑅 2 ↑
+
+1 0.927 2 0.932 3 0.934 4 0.935 
+
+Table 5: Comparison of temperature scaling strategies in the 2-style setting. Fixed temperatures provide limited gains, while std-based adaptive scaling remains ineffective in multi-style transfer. Our log 𝒑 max -based adaptive scaling achieves the best performance. 
+
+Method ArtFID ↓
+
+constant ( 𝜏 = 1.0) 17 .827 
+
+constant ( 𝜏 = 1.5) 16 .513 
+
+constant ( 𝜏 = 2.0) 16 .407 
+
+std + adaptive 20 .709 
+
+log 𝑝 max + adaptive (ours) 14.780 
+
+The fitted coefficients are 𝑎 = 0.08395 , 𝑏 = 0.43705 , and 𝑐 = 1.00998 .During inference, we further enforce 𝜏 ≥ 1 to prevent excessive flattening of the attention distribution. 
+
+A.2.4 Adaptive temperature estimation. We estimate temperature independently for each attention head, layer, and timestep, which provides a practical balance between adaptability and stability. A single global temperature cannot capture the large variation in attention scale and sharpness across heads, while finer-grained schemes such as query-wise estimation are often too noisy due to local logit fluctuations. Table 5 compares fixed temperatures (𝜏 = 1.0, 1.5, 2.0), where 𝜏 = 1.5 is the setting used in StyleID [ 4 ], as well as std-based adaptive scaling. Fixed temperatures yield only limited improvement because they cannot adapt to the diversity of attention distributions across timesteps, layers, and heads. We also find that std is not a reliable sharpness measure in the multi-style setting. Concatenating multiple style tokens increases the support of the attention distribution, which can inflate the vari-ance regardless of true peak dominance. As a result, std tends to overestimate sharpness, underestimate temperature ( 𝜏 < 1), and produce overly flat attention distributions, leading to worse perfor-mance. To address this issue, we use the peak-sensitive sharpness metric log 𝑝 max and estimate temperature adaptively for each head, layer, and timestep. This yields more accurate and stable calibration across diverse attention distributions. As shown in Table 5, our log 
+
+𝑝 max -based adaptive estimation achieves the best performance. 
+
+A.3 Discrepancy-aware Detail Injection 
+
+This section describes the mathematical definition and implemen-tation of the Gaussian high-pass filter used in cosine-modulated high-frequency injection, as well as the content high-frequency feature 𝜙 high  
+
+> 𝑐
+
+extracted through it. 
+
+A.3.1 Gaussian high-pass filter. The Gaussian high-pass filter is defined as follows, based on the distance 𝐷 from the center of the frequency plane. Kang et al. 
+
+Figure 11: Stylization results without and with DDI . Using only 𝜙 𝑐𝑠 + Δ𝜙 𝑐𝑠 may fail to preserve important details, leading to blurred results. In contrast, DDI restores semantically important details, such as the face, by injecting the high-frequency content feature 𝜙 high 
+
+𝑐 modulated by the discrepancy weight 𝜔 .
+
+𝑀 gauss-high (𝑟 ) = 1 − exp 
+
+
+
+− 𝐷 2
+
+2𝑟 2 + 𝜖 
+
+
+
+where 𝐷 is the distance from the center of the frequency plane, and 𝑟 is a parameter that controls the filter’s radius; larger values suppress low-frequency components over a wider region. The input features are transformed into the frequency domain via a two-dimensional fast Fourier transform (FFT), and the mask is designed to gradually attenuate the low-frequency components located at the center of the frequency spectrum while emphasizing the relatively high-frequency components. Unlike hard-cut-off methods that remove frequencies based on a specific threshold, this Gaussian-based filtering continuously modulates frequency components, thereby mitigating boundary artifacts and enabling more stable preservation of high-frequency content. 
+
+A.3.2 High-frequency component feature 𝜙 high 
+
+𝑐 . The high-frequency content feature extracted via the Gaussian high-pass filter is defined as follows: 
+
+𝜙 high 
+
+𝑐 = F −1  F ( 𝜙 𝑐 ) ⊙ 𝑀 gauss-high (𝑟 ) (28) where F denotes the 2D FFT, F −1 denotes the inverse FFT, and 
+
+⊙ denotes element-wise multiplication. Specifically, the content feature 𝜙 𝑐 is transformed into the frequency domain, filtered with a Gaussian high-pass mask, and then restored to the spatial domain via the inverse FFT. The resulting 𝜙 high 
+
+𝑐 captures high-frequency content information, such as textures, edges, and fine structures. We also compute a cosine-based discrepancy weight 𝜔 = 1 −
+
+cos (𝜙 𝑐𝑠 , 𝜙 𝑐 ), which highlights regions where the stylized feature lacks content structure. As described in the main paper (Eq. 10), 
+
+𝜙 high 
+
+𝑐 is injected with 𝜔 through the skip connection to restore fine structural details weakened during stylization. As illustrated in Fig. 11, the extracted high-frequency components are injected into the stylized feature based on the discrepancy weight 𝜔 , enabling Style                                                
+
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (a) StyTR 2
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (b) InST
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (c) CAST
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (d) z*
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (e) StyleID
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (f) DiffuseST
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (g) StyleSSP
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (h) StyleShot
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (i) Ours
+
+(a) Style                                                
+
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (a) StyTR 2
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (b) InST
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (c) CAST
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (d) z*
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (e) StyleID
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (f) DiffuseST
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (g) StyleSSP
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (h) StyleShot
+> Style
+> Content Boundary
+> Detail
+> Structure Overall
+> 0.2 0.4 0.6 0.8 1.0
+> (i) Ours
+
+(b) 
+
+Figure 12: User study radar charts for nine methods. (a) Single-style results. (b) Multi-style results with 2–4 styles. Each plot shows the average scores for Style Faithfulness, Con-tent Preservation, Boundary Naturalness, Detail Preserva-tion, Structural Consistency, Overall Quality. 
+
+effective restoration of fine structures, in semantically important regions. This selective injection allows the model to enhance local details such as edges and textures while preserving the overall stylistic consistency of the generated image. MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer 
+
+Figure 13: User study interface. For each sample, participants are shown a content image, style image(s), and the outputs of different methods under the same setting. Each result is rated on a 7-point Likert scale for style alignment, content preser-vation, boundary naturalness, detail preservation, structural consistency, and overall visual quality. 
+
+A.4 Additional Multi-Style Results 
+
+A.4.1 User study. We conducted a user study comparing our method with all baselines. Specifically, we prepared 99 stylized results using 
+
+1–4 style images, and 30 participants evaluated each result. The evaluation was based on six criteria: style faithfulness, content preservation, boundary naturalness, structural consistency, detail preservation, and overall visual quality. The results are summarized in Fig. 12. Fig. 12a shows the per-method results in the single-style setting, while Fig. 12b presents those in the multi-style setting with 2–4 styles. Our method receives consistently stronger ratings than the baselines in both settings. Although some methods, such as StyleID [ 4] and CAST [ 32 ], achieve competitive quality in the single-style setting, their scores tend to drop when extended to the multi-style setting. In contrast, our method performs even better in the multi-style setting, indicating that the proposed design effectively balances and harmonizes style and content, leading to more satisfactory results. 
+
+A.4.2 Scalability Across Multi-Style Settings. Table 6 summarizes the quantitative results from 1-style to 5-style settings. Our method consistently achieves the best or near-best performance on ArtFID, FID, and CFSD, showing that it maintains both stylization quality and structural consistency as the number of styles increases. Al-though some baselines obtain lower LPIPS in certain cases, this often reflects weaker stylization or a stronger bias toward content preservation rather than better overall transfer quality. Overall, our method achieves a better balance between style fidelity and structural preservation across all style counts. Fig. 14 provides qualitative comparisons with baselines from 1-style to 4-style settings. We exclude the 5-style case here because, at this level, each mask region becomes too small relative to the image resolution, making the visual comparison less informative. Even under increasing style complexity, existing methods often suffer from insufficient style transfer, inconsistent textures, or boundary artifacts. In contrast, our method produces more coherent styliza-tion while preserving object structure and generating smoother transitions across regions. Fig. 15 further demonstrates the robustness of our method under diverse multi-style settings. As our framework is designed for multi-style transfer, it remains effective across different numbers of styles as well as varying aspect ratios and image resolutions from 512 to 
+
+1024 . These results show that our method generalizes well beyond a fixed setup and maintains stable region-wise style injection under more challenging spatial configurations. 
+
+A.4.3 Style Fidelity Comparison in the 2-Style Setting. Fig. 16 presents a comparison between our method and strong baselines ( 𝑍 ∗ [ 5], StyleID [ 4 ], and StyleShot [ 8]) in the 2-style setting. To highlight style fidelity, we additionally provide zoomed-in views of the refer-ence style images and the corresponding stylized regions. These comparisons show whether characteristic style attributes, such as texture patterns and color tones, are faithfully transferred to the target regions. While the baselines produce competitive results, they often fail to fully capture the local stylistic characteristics of the reference images, resulting in weakened textures, inaccurate color appear-ance, or less distinctive stylization. In contrast, our method more faithfully preserves the target style attributes in each region, yield-ing stylizations that are both visually coherent and more consistent with the reference styles. Kang et al. 
+
+Table 6: Comprehensive comparison under varying numbers of styles (1–5 styles). We report multiple metrics to provide a complete evaluation. The two-style results are consistent with the main paper results in Table 1. Our method demonstrates strong and stable performance across all metrics as the number of styles increases. 
+
+ArtFID ↓ FID ↓ LPIPS ↓ LPIPS-Gray ↓ CFSD ↓
+
+Method 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5StyTr 2 [6] 17.489 18.816 19.392 19.647 18.937 10.203 11.086 11.439 11.636 11.114 0.561 0.557 0.559 0.555 0.563 0.433 0.431 0.433 0.435 0.444 0.139 0.162 0.161 0.167 0.184 InST [31] 23.869 25.152 25.707 26.005 25.539 14.360 15.281 15.628 15.860 15.517 0.554 0.545 0.546 0.542 0.546 0.479 0.468 0.468 0.468 0.469 0.229 0.268 0.270 0.293 0.313 CAST [32] 22.118 24.233 24.730 24.248 24.173 13.675 14.054 15.307 15.031 14.827 0.507 0.61 0.516 0.513 0.527 0.386 0.485 0.397 0.398 0.412 0.180 0.204 0.224 0.221 0.251 
+
+𝑍 ∗ [5] 16.512 17.136 17.009 17.253 16.926 10.367 10.839 10.745 10.876 10.664 0.453 0.447 0.448 0.453 0.451 0.384 0.380 0.381 0.385 0.385 0.152 0.148 0.148 0.155 0.156 StyleID [4] 15.737 16.728 17.141 17.072 17.009 9.649 10.296 10.535 10.508 10.377 0.478 0.481 0.486 0.483 0.495 0.363 0.369 0.373 0.376 0.387 0.120 0.141 0.146 0.152 0.169 DiffuseST [11] 18.418 20.603 20.417 20.873 20.911 11.625 13.03 12.837 13.117 12.986 0.459 0.469 0.476 0.479 0.495 0.338 0.348 0.355 0.361 0.377 0.265 0.285 0.295 0.269 0.327 StyleSSP [29] 24.180 27.374 28.025 28.563 27.924 13.827 15.899 16.326 16.680 16.337 0.631 0.620 0.618 0.616 0.611 0.519 0.510 0.506 0.508 0.501 0.163 0.192 0.197 0.211 0.220 StyleShot [8] 15.928 17.966 18.947 19.394 19.703 7.933 9.214 9.792 10.092 10.273 0.783 0.759 0.756 0.749 0.748 0.668 0.645 0.644 0.638 0.638 0.311 0.353 0.351 0.358 0.391 Ours 15.595 14.780 14.802 15.014 15.117 9.36 8.656 8.700 8.905 8.929 0.505 0.531 0.526 0.516 0.522 0.389 0.415 0.412 0.406 0.411 0.137 0.136 0.141 0.129 0.132 
+
+Figure 14: Qualitative comparison with baselines across 1-style to 4-style settings (green: background). As the number of styles increases, existing methods often exhibit weaker stylization, inconsistent textures, or boundary artifacts, whereas our method preserves both style fidelity and structural coherence. MAST: Mask-Guided Attention Mass Allocation for Training-Free Multi-Style Transfer 
+
+Figure 15: Robustness of our method across 1-style to 4-style settings with varying aspect ratios and resolutions from 512 to 1024 
+
+(green: background). Our method maintains stable multi-style transfer and consistent structural preservation under diverse spatial configurations. Kang et al. 
+
+Figure 16: Comparison with strong baselines in the 2-style setting (green: background). Zoomed-in views of the reference style images and the corresponding stylized regions highlight how faithfully each method transfers local style attributes, such as texture patterns and color tones. Our method better preserves the characteristic style details of each reference while producing more coherent stylization results.

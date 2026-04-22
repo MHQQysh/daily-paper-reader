@@ -1,0 +1,102 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-001.webp",
+      "caption": "Figure 2. Fidelity Efficiency Gap. We plot the KL divergence of the Random baseline as the budget K increases (solid lines). The dashed lines represent the KL achieved by FAP using only K=100 features. FAP achieves with 100 features what Random selection achieves with ≈4,000 features, demonstrating a compression factor of ≈40x on the active feature set.",
+      "page": 6,
+      "index": 1,
+      "width": 447,
+      "height": 308
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-002.webp",
+      "caption": "Figure 1. The PIE Framework: A CLT-Native End-to-End Pipeline. We propose a three-stage framework to enable scalable interpretability: Stage I (Prune) filters the massive search space of CLT feature-write edges into a sparse ”Causal Core” using Feature Attribution Patching (FAP) and its synergy-aware variant (FAP-Synergy), which reranks boundary features based on pairwise interactions. Stage II (Interpret) generates natural language descriptions only for the retained features using exemplar-based prompting, drastically reducing interpretation costs. Stage III (Evaluate) performs a dual-objective assessment: quantifying behavioral fidelity (KL Divergence, PCR) and measuring interpretation quality via automated metrics (Clarity, Purity, Responsiveness).",
+      "page": 2,
+      "index": 2,
+      "width": 967,
+      "height": 471
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-003.webp",
+      "caption": "Table 1. Interpretability quality of FAP-pruned circuits (K = 100) vs. Random baseline. We report Mean ± Std for quality metrics. Uninformative Rate denotes the percentage of features where Responsiveness < 0.5 and Purity < 0.5. FAP-Synergy consistently maintains high interpretability while minimizing uninformative units.",
+      "page": 7,
+      "index": 3,
+      "width": 885,
+      "height": 223
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-004.webp",
+      "caption": "Table 2. Behavioral fidelity across tasks and budgets. We report mean last-token KL (lower is better). Across both IOI and Doc-String, the FAP family consistently outperforms Activation-Magnitude pruning. ACDC-style pruning is competitive in the strictest budget regime but degrades at larger K, while FAP-Synergy provides its clearest gains at low budgets and converges with base FAP as K increases.",
+      "page": 7,
+      "index": 4,
+      "width": 715,
+      "height": 492
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-005.webp",
+      "caption": "Figure 5. Does Fidelity Predict Interpretability? We plot the KL Divergence of each prompt (x-axis, lower is better) against the mean interpretability metrics of the pruned features (y-axis). For Mean Clarity (left panels), we observe a consistent negative slope, indicating that circuits with higher behavioral fidelity (lower KL) are composed of features that are easier to explain.",
+      "page": 18,
+      "index": 5,
+      "width": 1017,
+      "height": 813
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-006.webp",
+      "caption": "Table 3. Sweep results reported as deltas vs. the λ = 0 baseline (negative is better). ∆KL and ∆std are shown in milli-KL (i.e., ×103) for readability. The selected setting is λ = 3, bp= 25.",
+      "page": 13,
+      "index": 6,
+      "width": 422,
+      "height": 648
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-007.webp",
+      "caption": "Figure 3. Sweep scatter plot reported as ∆ mean KL vs. baseline (λ = 0).",
+      "page": 13,
+      "index": 7,
+      "width": 464,
+      "height": 401
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-008.webp",
+      "caption": "Figure 6. The Signal-to-Noise Gap. Violin plots comparing Clarity, Purity, and Responsiveness for Random vs. FAP variants. Random sampling includes many low-quality features (scores near 0), while FAP selects features in the high-interpretability regime with low variance.",
+      "page": 19,
+      "index": 8,
+      "width": 975,
+      "height": 1074
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-009.webp",
+      "caption": "Table 7. Semantic Efficiency Analysis. By viewing KL and PCR as costs, we observe that FAP-Synergy yields significantly higher interpretability per unit of behavioral degradation. SCE measures total semantic yield, SDR measures signal-to-noise in dB (closer to 0 is better), and RAR measures responsiveness relative to risk. Best results are bolded.",
+      "page": 17,
+      "index": 9,
+      "width": 888,
+      "height": 655
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-010.webp",
+      "caption": "Figure 4. Feature Purity vs. Responsiveness. Scatter plots for FAP-selected features. We observe a strong positive correlation (r > 0.7) across both models, confirming that PIE selects features that are both precise (Pure) and sensitive (Responsive).",
+      "page": 17,
+      "index": 10,
+      "width": 492,
+      "height": 457
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-011.webp",
+      "caption": "Table 5. Efficiency metrics including FAP-Signal (restricted to metrics defined in the main text). We report Semantic Cost Efficiency (SCE), Signal-to-Divergence Ratio (SDR; dB, closer to 0 is better), and Risk-Adjusted Responsiveness (RAR) as defined in Sec. H. Across both models, FAP-Signal does not improve over base FAP, while FAP-Synergy provides the best overall efficiency.",
+      "page": 16,
+      "index": 11,
+      "width": 973,
+      "height": 185
+    },
+    {
+      "url": "assets/figures/arxiv/2604.16889v1/fig-012.webp",
+      "caption": "Table 6. Economic impact of budgeting. Using cfeat ≈ $0.0235 per feature, a fixed interpretation budget (and global reuse across prompts) yields large cost reductions relative to interpreting the full active set per prompt or sweeping the entire CLT dictionary.",
+      "page": 16,
+      "index": 12,
+      "width": 667,
+      "height": 182
+    }
+  ]
+}
