@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.13556v1/fig-001.webp",
+      "caption": "Figure 4. Training loss curves on a 100B subset of the SlimPajama dataset.",
+      "page": 4,
+      "index": 1,
+      "width": 492,
+      "height": 360
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13556v1/fig-002.webp",
+      "caption": "Figure 3. Prefilling latency (left) and decoding throughput (right) on an NVIDIA H20 (96GB) GPU at different sequence lengths.",
+      "page": 4,
+      "index": 2,
+      "width": 1017,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13556v1/fig-003.webp",
+      "caption": "Figure 2. Learned residual weights of a 22-layer YOCO++ model without (left) and with (right) the scaling factor.",
+      "page": 3,
+      "index": 3,
+      "width": 492,
+      "height": 592
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13556v1/fig-004.webp",
+      "caption": "Figure 1. Illustration of YOCO and YOCO++. KVs that need to be cached are indicated by red boxes. (a) YOCO caches the KVs of the bottom-half layers and shares the KVs of the middle layer with the top-half layers. (b) Based on YOCO, YOCO++ introduces a weighted residual connection between the KVs of each bottomhalf layer and the bottom layer and caches the combined KVs.",
+      "page": 2,
+      "index": 4,
+      "width": 465,
+      "height": 474
+    }
+  ]
+}
