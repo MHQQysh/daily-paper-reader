@@ -6,73 +6,73 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-04-26 · 2026-04-26 20:04:49
-- 运行时间：2026-04-26 20:08:36 UTC
+- 最新运行日期：2026-04-27 · 2026-04-27 20:27:32
+- 运行时间：2026-04-27 20:32:38 UTC
 - 运行状态：成功
 - 本次总论文数：17
 - 精读区：6
 - 速读区：11
 
 ### 今日简报（AI）
-今日深度解析 17 篇模型压缩前沿，聚焦 LLM 结构化剪枝、VLM 量化及 LoRA 合并等提效方案。
-满分力作 GRASPrune 与 SimDiff 分别在全局门控与深度剪枝上取得突破，显著优化了大模型在有限预算下的性能表现。
-建议优先研读结构化剪枝新算法及频谱统计预测技术，为实现大模型的高效轻量化部署提供实操参考。
-- 详情：[/all__20260426-200449-874064/README](/all__20260426-200449-874064/README)
+今日聚焦大模型结构化剪枝与深度压缩，涵盖从全局门控到时空 Token 优化的前沿技术。
+重点关注 GRASPrune 实现的全局预算化剪枝，以及 SimDiff 通过相似度差异驱动的深度剪枝新范式。
+建议关注剪枝技术在自动驾驶与长视频理解中的落地，探索如何在保持性能的同时大幅降低推理成本。
+- 详情：[/all__20260427-202732-752017/README](/all__20260427-202732-752017/README)
 
 ### 精读区论文标签
-1. [GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models](/all__20260426-200449-874064/2604.19398v1-grasprune-global-gating-for-budgeted-structured-pruning-of-large-language-models)  
+1. [GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models](/all__20260427-202732-752017/2604.19398v1-grasprune-global-gating-for-budgeted-structured-pruning-of-large-language-models)  
    标签：评分：10.0/10、query:llm
-   evidence：针对大语言模型FFN通道和KV头组的结构化剪枝框架
-2. [SimDiff: Depth Pruning via Similarity and Difference](/all__20260426-200449-874064/2604.19520v1-simdiff-depth-pruning-via-similarity-and-difference)  
+   evidence：大语言模型的结构化剪枝框架
+2. [SimDiff: Depth Pruning via Similarity and Difference](/all__20260427-202732-752017/2604.19520v1-simdiff-depth-pruning-via-similarity-and-difference)  
    标签：评分：10.0/10、query:llm
-   evidence：通过识别和移除冗余层对大语言模型进行深度剪枝
-3. [Graph-Guided Adaptive Channel Elimination for KV Cache Compression](/all__20260426-200449-874064/2604.16983v1-graph-guided-adaptive-channel-elimination-for-kv-cache-compression)  
+   evidence：提升大语言模型部署效率的深度剪枝
+3. [CRISP: Compressing Redundancy in Chain-of-Thought via Intrinsic Saliency Pruning](/all__20260427-202732-752017/2604.17297v1-crisp-compressing-redundancy-in-chain-of-thought-via-intrinsic-saliency-pruning)  
    标签：评分：9.0/10、query:llm
-   evidence：针对大语言模型KV缓存压缩的通道剪枝
-4. [Variance Is Not Importance: Structural Analysis of Transformer Compressibility Across Model Scales](/all__20260426-200449-874064/2604.20682v1-variance-is-not-importance-structural-analysis-of-transformer-compressibility-across-model-scales)  
+   evidence：利用内在显著性剪枝压缩思维链中的冗余
+4. [Towards Joint Quantization and Token Pruning of Vision-Language Models](/all__20260427-202732-752017/2604.17320v1-towards-joint-quantization-and-token-pruning-of-vision-language-models)  
    标签：评分：9.0/10、query:llm
-   evidence：Transformer可压缩性与重要性指标的结构分析
-5. [HieraSparse: Hierarchical Semi-Structured Sparse KV Attention](/all__20260426-200449-874064/2604.16864v1-hierasparse-hierarchical-semi-structured-sparse-kv-attention)  
-   标签：评分：8.0/10、query:llm
-   evidence：半结构化稀疏KV缓存注意力以提高效率
-6. [CRISP: Compressing Redundancy in Chain-of-Thought via Intrinsic Saliency Pruning](/all__20260426-200449-874064/2604.17297v1-crisp-compressing-redundancy-in-chain-of-thought-via-intrinsic-saliency-pruning)  
-   标签：评分：8.0/10、query:llm
-   evidence：利用内在显著性剪枝压缩冗余并降低延迟
+   evidence：视觉语言模型的联合量化与令牌剪枝
+5. [Evolutionary Negative Module Pruning for Better LoRA Merging](/all__20260427-202732-752017/2604.17753v1-evolutionary-negative-module-pruning-for-better-lora-merging)  
+   标签：评分：9.0/10、query:llm
+   evidence：针对LLM LoRA合并的进化负模块剪枝
+6. [Focus Session: Hardware and Software Techniques for Accelerating Multimodal Foundation Models](/all__20260427-202732-752017/2604.21952v1-focus-session-hardware-and-software-techniques-for-accelerating-multimodal-foundation-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：Transformer块和MLP通道的结构化剪枝
 
 ### 速读区论文标签
-1. [Towards Joint Quantization and Token Pruning of Vision-Language Models](/all__20260426-200449-874064/2604.17320v1-towards-joint-quantization-and-token-pruning-of-vision-language-models)  
+1. [Variance Is Not Importance: Structural Analysis of Transformer Compressibility Across Model Scales](/all__20260427-202732-752017/2604.20682v1-variance-is-not-importance-structural-analysis-of-transformer-compressibility-across-model-scales)  
+   标签：评分：8.5/10、query:llm
+   evidence：对Transformer压缩和结构特性的系统性实证研究
+2. [ST-Prune: Training-Free Spatio-Temporal Token Pruning for Vision-Language Models in Autonomous Driving](/all__20260427-202732-752017/2604.19145v1-st-prune-training-free-spatio-temporal-token-pruning-for-vision-language-models-in-autonomous-driving)  
    标签：评分：8.0/10、query:llm
-   evidence：视觉语言模型的协同量化与令牌剪枝
-2. [Evolutionary Negative Module Pruning for Better LoRA Merging](/all__20260426-200449-874064/2604.17753v1-evolutionary-negative-module-pruning-for-better-lora-merging)  
+   evidence：视觉语言模型的免训练时空令牌剪枝
+3. [Sink-Token-Aware Pruning for Fine-Grained Video Understanding in Efficient Video LLMs](/all__20260427-202732-752017/2604.20937v1-sink-token-aware-pruning-for-fine-grained-video-understanding-in-efficient-video-llms)  
    标签：评分：8.0/10、query:llm
-   evidence：即插即用的 LoRA 剪枝方法，用于排除有害模块
-3. [Predicting LLM Compression Degradation from Spectral Statistics](/all__20260426-200449-874064/2604.18085v1-predicting-llm-compression-degradation-from-spectral-statistics)  
+   evidence：视频大语言模型的免训练视觉标记剪枝
+4. [DocPrune:Efficient Document Question Answering via Background, Question, and Comprehension-aware Token Pruning](/all__20260427-202732-752017/2604.22281v1-docpruneefficient-document-question-answering-via-background-question-and-comprehension-aware-token-pruning)  
    标签：评分：8.0/10、query:llm
-   evidence：预测大语言模型压缩性能下降
-4. [CATP: Confidence-Aware Token Pruning for Camouflaged Object Detection](/all__20260426-200449-874064/2604.16854v1-catp-confidence-aware-token-pruning-for-camouflaged-object-detection)  
+   evidence：渐进式文档令牌剪枝框架
+5. [Forget, Then Recall: Learnable Compression and Selective Unfolding via Gist Sparse Attention](/all__20260427-202732-752017/2604.20920v1-forget-then-recall-learnable-compression-and-selective-unfolding-via-gist-sparse-attention)  
+   标签：评分：7.5/10、query:llm
+   evidence：通过要点稀疏注意力实现可学习的压缩和选择性展开
+6. [Towards a Data-Parameter Correspondence for LLMs: A Preliminary Discussion](/all__20260427-202732-752017/2604.17384v1-towards-a-data-parameter-correspondence-for-llms-a-preliminary-discussion)  
    标签：评分：7.0/10、query:llm
-   evidence：针对Transformer的置信度感知Token剪枝
-5. [Prune, Interpret, Evaluate: A Cross-Layer Transcoder-Native Framework for Efficient Circuit Discovery via Feature Attribution](/all__20260426-200449-874064/2604.16889v1-prune-interpret-evaluate-a-cross-layer-transcoder-native-framework-for-efficient-circuit-discovery-via-feature-attribution)  
+   evidence：数据剪枝与参数剪枝之间的几何对应关系
+7. [How Much Cache Does Reasoning Need? Depth-Cache Tradeoffs in KV-Compressed Transformers](/all__20260427-202732-752017/2604.17935v1-how-much-cache-does-reasoning-need-depth-cache-tradeoffs-in-kv-compressed-transformers)  
    标签：评分：7.0/10、query:llm
-   evidence：基于梯度加权归因的转码器特征剪枝
-6. [Efficient Task Adaptation in Large Language Models via Selective Parameter Optimization](/all__20260426-200449-874064/2604.17051v1-efficient-task-adaptation-in-large-language-models-via-selective-parameter-optimization)  
+   evidence：KV压缩Transformer与深度缓存权衡
+8. [Predicting LLM Compression Degradation from Spectral Statistics](/all__20260427-202732-752017/2604.18085v1-predicting-llm-compression-degradation-from-spectral-statistics)  
    标签：评分：7.0/10、query:llm
-   evidence：用于选择性优化的参数元素重要性
-7. [Towards a Data-Parameter Correspondence for LLMs: A Preliminary Discussion](/all__20260426-200449-874064/2604.17384v1-towards-a-data-parameter-correspondence-for-llms-a-preliminary-discussion)  
-   标签：评分：7.0/10、query:llm
-   evidence：讨论了大语言模型中数据剪枝与参数剪枝的对应关系
-8. [MoE-nD: Per-Layer Mixture-of-Experts Routing for Multi-Axis KV Cache Compression](/all__20260426-200449-874064/2604.17695v1-moe-nd-per-layer-mixture-of-experts-routing-for-multi-axis-kv-cache-compression)  
-   标签：评分：7.0/10、query:llm
-   evidence：通过令牌剔除和低秩投影进行KV缓存压缩
-9. [Reducing Peak Memory Usage for Modern Multimodal Large Language Model Pipelines](/all__20260426-200449-874064/2604.16734v1-reducing-peak-memory-usage-for-modern-multimodal-large-language-model-pipelines)  
+   evidence：通过频谱统计预测大模型压缩性能下降
+9. [ESsEN: Training Compact Discriminative Vision-Language Transformers in a Low-Resource Setting](/all__20260427-202732-752017/2604.18452v1-essen-training-compact-discriminative-vision-language-transformers-in-a-low-resource-setting)  
+   标签：评分：6.5/10、query:llm
+   evidence：训练紧凑的判别式视觉语言Transformer
+10. [MoE-nD: Per-Layer Mixture-of-Experts Routing for Multi-Axis KV Cache Compression](/all__20260427-202732-752017/2604.17695v1-moe-nd-per-layer-mixture-of-experts-routing-for-multi-axis-kv-cache-compression)  
    标签：评分：6.0/10、query:llm
-   evidence：多模态大语言模型的KV缓存压缩
-10. [D-QRELO: Training- and Data-Free Delta Compression for Large Language Models via Quantization and Residual Low-Rank Approximation](/all__20260426-200449-874064/2604.16940v1-d-qrelo-training--and-data-free-delta-compression-for-large-language-models-via-quantization-and-residual-low-rank-approximation)  
+   evidence：长文本大模型的多轴KV缓存压缩
+11. [AQPIM: Breaking the PIM Capacity Wall for LLMs with In-Memory Activation Quantization](/all__20260427-202732-752017/2604.18137v1-aqpim-breaking-the-pim-capacity-wall-for-llms-with-in-memory-activation-quantization)  
    标签：评分：6.0/10、query:llm
-   evidence：通过量化和低秩近似对大模型进行增量压缩
-11. [EvoComp: Learning Visual Token Compression for Multimodal Large Language Models via Semantic-Guided Evolutionary Labeling](/all__20260426-200449-874064/2604.17087v1-evocomp-learning-visual-token-compression-for-multimodal-large-language-models-via-semantic-guided-evolutionary-labeling)  
-   标签：评分：6.0/10、query:llm
-   evidence：多模态大模型推理效率的视觉Token压缩
+   evidence：用于Transformer内存效率的激活量化和稀疏注意力
 
 
 <div class="dpr-home-promo-card">
