@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.23475v1/fig-001.webp",
+      "caption": "Figure A11. LP vs activation supernode pruning. Pruning performance is similar across models for LP-defined and activation-defined protected sets. The 50% Llama-3.1-8B values use the 128-sequence calibration protocol from Table A6, so they are not directly comparable to the 64-sequence main Table 1 setting. The highest-sparsity point is a stress test outside the main operating regime.",
+      "page": 21,
+      "index": 1,
+      "width": 1017,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23475v1/fig-002.webp",
+      "caption": "Figure 3. Sparsity–perplexity tradeoff across models. (A) Llama-3.1-8B, (B) Mistral-7B, (C) Llama-2-7B, (D) Qwen2-7B. Each panel shows perplexity vs. structured FFN channel sparsity for SCAR-LP (solid red) and channel-adapted baselines (dashed). SCAR generally maintains lower perplexity across the models shown, with gaps often widening at high sparsity.",
+      "page": 7,
+      "index": 2,
+      "width": 492,
+      "height": 340
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23475v1/fig-003.webp",
+      "caption": "Figure A12. 70B scale validation. (A) Sparsity–perplexity curves. (B) Baseline perplexity relative to SCAR-LP at the same sparsity.",
+      "page": 22,
+      "index": 3,
+      "width": 935,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23475v1/fig-004.webp",
+      "caption": "Figure A13. OLMo-2-7B structured pruning curves. Perplexity on WikiText-2 as a function of FFN channel sparsity for SCAR variants and baselines. SCAR-LP and Wanda-channel track each other closely across sparsities, with a small separation only at 70%; magnitude and random pruning are far worse throughout.",
+      "page": 22,
+      "index": 4,
+      "width": 833,
+      "height": 572
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23475v1/fig-005.webp",
+      "caption": "Figure 5. Supernodes emerge during OLMo-2-7B pretraining. Ten checkpoints of allenai/OLMo-2-1124-7B (SwiGLU, 32 FFN layers) evaluated with the same 64×512 WikiText-2 calibration used for the main 7–8B claims. (A) Median top-1% LP mass fraction rises overall with training tokens (with some non-monotonic variation mid-training); the shaded band shows the interquartile range over layers. (B) Median LP max/mean ratio (layer-level extreme-outlier diagnostic) climbs overall with training, also non-monotonically. (C) Per-layer Jaccard overlap between the top-1% at each checkpoint and the top-1% at the final (main) checkpoint. The final checkpoint has 100% self-overlap by construction; the earlier points show identities stabilizing late in training.",
+      "page": 10,
+      "index": 5,
+      "width": 1017,
+      "height": 288
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23475v1/fig-006.webp",
+      "caption": "Figure 2. Halo redundancy and LP-vs-activation comparisons. (A) Per-layer directed redundancy from write-halo channels to the supernode core, compared with matched non-halo channels. (B) Aggregate redundancy summary: write-halo channels show higher redundancy to the protected core. (C) Conditional ablation control: halo and matched non-halo ablations preserve the supernode core, while the supernode-ablation bar shows the much larger effect of removing the core. (D) Jaccard overlap between top-1% LP channels and top-1% activation channels. (E) Spearman correlation between LP and activation scores. LP and activation scores are related but not interchangeable.",
+      "page": 3,
+      "index": 6,
+      "width": 1017,
+      "height": 258
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23475v1/fig-007.webp",
+      "caption": "Figure 4. Pruning validation: accuracy and supernode hit-rate. (A) Average downstream accuracy across 7 benchmarks vs. sparsity on Llama-3.1-8B. (B) Perplexity at 50% sparsity with supernode hit-rate annotations; pruning more supernodes leads to much worse perplexity.",
+      "page": 8,
+      "index": 7,
+      "width": 917,
+      "height": 379
+    },
+    {
+      "url": "assets/figures/arxiv/2604.23475v1/fig-008.webp",
+      "caption": "Table A11. Runtime breakdown for Llama-3.1-8B on a single A100. The forward-only row is a baseline comparison and is not included in the SCAR-specific subtotal.",
+      "page": 19,
+      "index": 8,
+      "width": 483,
+      "height": 267
+    }
+  ]
+}
