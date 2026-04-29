@@ -1,0 +1,731 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-29T20:31:17.481293+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 11,
+    "deep_cap": 6,
+    "deep_selected": 7,
+    "quick_candidates": 13,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2604.19398v1",
+      "source": "arxiv",
+      "title": "GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models",
+      "abstract": "Large language models (LLMs) are expensive to serve because model parameters, attention computation, and KV caches impose substantial memory and latency costs. We present GRASPrune, a structured pruning framework applied after pretraining that jointly prunes FFN channels and KV head groups under a single global budget. Instead of learning importance scores without constraints and applying the budget only after training, GRASPrune learns lightweight gate scores with a projected straight-through estimator that enforces a hard mask satisfying the budget at every step while keeping the backbone weights frozen. After the mask is fixed, we calibrate scaling factors on the retained units to mitigate scale mismatch caused by pruning, and fold these factors into the pruned weights to obtain a smaller dense checkpoint with no extra parameters at inference. On LLaMA-2-7B, GRASPrune removes 50% of parameters and achieves 12.18 perplexity on WikiText-2 while maintaining competitive average zero-shot accuracy on five benchmarks, using four epochs on 512 unlabeled calibration sequences on a single NVIDIA A100 80GB GPU without any full model fine-tuning.",
+      "authors": [
+        "Ziyang Wang",
+        "Jiangfeng Xiao",
+        "Chuan Xiao",
+        "Ruoxiang Li",
+        "Rui Mao",
+        "Jianbin Qin"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-21T12:26:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.19398v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Structured pruning framework for LLMs using global gating and straight-through estimators",
+      "llm_evidence_cn": "针对大语言模型的结构化剪枝框架，采用全局门控和直通估计器",
+      "llm_evidence": "针对大语言模型的结构化剪枝框架，采用全局门控和直通估计器",
+      "canonical_evidence": "针对大语言模型的结构化剪枝框架，采用全局门控和直通估计器",
+      "llm_tldr_en": "GRASPrune introduces a structured pruning method for LLMs that jointly optimizes FFN and KV cache reduction.",
+      "llm_tldr_cn": "GRASPrune 提出了一种针对大模型的结构化剪枝方法，可同时优化 FFN 和 KV 缓存的缩减。",
+      "llm_tldr": "GRASPrune 提出了一种针对大模型的结构化剪枝方法，可同时优化 FFN 和 KV 缓存的缩减。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Large language model pruning techniques and methods",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.25098v1",
+      "source": "arxiv",
+      "title": "Doing More With Less: Revisiting the Effectiveness of LLM Pruning for Test-Time Scaling",
+      "abstract": "While current Large Language Models (LLMs) exhibit remarkable reasoning capabilities through test-time compute scaling (TTS), their massive parameter counts and high inference costs have motivated the development of pruning methods that can reduce model size without sacrificing performance. However, specific to reasoning LLMs, prior work has shown that structured pruning (methods which removes entire set of layer blocks), significantly degrades TTS reasoning performance. In this work, we revisit this assumption and instead investigate whether unstructured pruning (methods that carefully remove only certain redundant/detrimental weights) exhibits similar limitations. Surprisingly, our extensive experiments across four reasoning benchmarks on two reasoning LLMs: s1.1-7B and Qwen3-8B, consistently show that unstructured pruning augments TTS performance compared to structured pruning, and at times can even outperform the unpruned full-weight LLMs. Furthermore, we also empirically study the impact of different layer-wise sparsity allocation strategies, which are an important parametric choice for instantiating unstructured pruning methods. These findings challenge the conventional notion that pruning always reduces TTS performance and in fact, suggest that carefully undertaken pruning can improve TTS effectiveness even further.",
+      "authors": [
+        "Ocean Monjur",
+        "Shahriar Kabir Nahin",
+        "Anshuman Chhabra"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-04-28T01:04:09+00:00",
+      "link": "https://arxiv.org/pdf/2604.25098v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "The paper compares structured and unstructured pruning effectiveness for LLM reasoning performance.",
+      "llm_evidence_cn": "该论文对比了结构化与非结构化剪枝对大语言模型推理性能的影响。",
+      "llm_evidence": "该论文对比了结构化与非结构化剪枝对大语言模型推理性能的影响。",
+      "canonical_evidence": "该论文对比了结构化与非结构化剪枝对大语言模型推理性能的影响。",
+      "llm_tldr_en": "Investigates how unstructured pruning preserves LLM reasoning capabilities during test-time scaling better than structured pruning.",
+      "llm_tldr_cn": "研究发现非结构化剪枝在推理阶段扩展时比结构化剪枝能更好地保留大模型的推理能力。",
+      "llm_tldr": "研究发现非结构化剪枝在推理阶段扩展时比结构化剪枝能更好地保留大模型的推理能力。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "comparison between structured and unstructured pruning for LLMs",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.24938v1",
+      "source": "arxiv",
+      "title": "Rethinking Layer Redundancy in Large Language Models: Calibration Objectives and Search for Depth Pruning",
+      "abstract": "Depth pruning improves the inference efficiency of large language models by removing Transformer blocks. Prior work has focused on importance criteria and search algorithms, often treating layer redundancy as an inherent structural property of pretrained networks. In contrast, we adopt a \\emph{functional perspective}, where redundancy is jointly influenced by the model and the evaluation objective, suggesting that a universal ranking may not be sufficient. Through an empirical study across three LLM families, two calibration objectives, and seven search algorithms, we observe that different objectives yield qualitatively different redundant layers, and that perplexity and downstream accuracy rankings do not consistently align. Under a fixed objective, however, search algorithms tend to produce similar solutions. Overall, our results suggest that the calibration objective may play a more influential role than the choice of search algorithm, indicating that further attention to objective design could be beneficial.",
+      "authors": [
+        "Minkyu Kim",
+        "Vincent-Daniel Yun",
+        "Youngrae Kim",
+        "Youngjin Heo",
+        "Suin Cho",
+        "Seong-hun Kim",
+        "Woosang Lim",
+        "Gaeul Kwon"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-27T19:25:28+00:00",
+      "link": "https://arxiv.org/pdf/2604.24938v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.5,
+      "llm_evidence_en": "The paper investigates depth pruning techniques for large language models by removing Transformer blocks.",
+      "llm_evidence_cn": "该论文研究了通过移除Transformer块的大语言模型深度剪枝技术。",
+      "llm_evidence": "该论文研究了通过移除Transformer块的大语言模型深度剪枝技术。",
+      "canonical_evidence": "该论文研究了通过移除Transformer块的大语言模型深度剪枝技术。",
+      "llm_tldr_en": "This paper explores how calibration objectives and search algorithms affect depth pruning efficiency in LLMs.",
+      "llm_tldr_cn": "本文探讨了校准目标和搜索算法如何影响大语言模型的深度剪枝效率。",
+      "llm_tldr": "本文探讨了校准目标和搜索算法如何影响大语言模型的深度剪枝效率。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Large language model pruning techniques and methods",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.19520v1",
+      "source": "arxiv",
+      "title": "SimDiff: Depth Pruning via Similarity and Difference",
+      "abstract": "Depth pruning improves the deployment efficiency of large language models (LLMs) by identifying and removing redundant layers. A widely accepted standard for this identification process is to measure the similarity between layers using cosine distance. However, we find that methods relying solely on this one-dimensional heuristic can exhibit unpredictable performance and even catastrophic collapse across different architectures. To address this issue, we propose SimDiff, a novel layer importance criterion that jointly evaluates layers from two orthogonal perspectives: representational similarity and transformation difference. The difference is quantified using two distinct metrics: MSSD, which is sensitive to outliers and identifies layers that make decisive corrections, and MASD, which robustly measures a layer's average contribution. Extensive experiments on multiple models ranging from 0.5B to 13B parameters demonstrate that SimDiff significantly outperforms state-of-the-art baselines across various pruning ratios. Notably, our method retains over 91% of LLaMA2-7B's performance at a 25% pruning ratio and achieves up to a 1.49x inference speedup when pruning 12 layers on LLaMA3.1-8B. We also show that pruned models can be effectively recovered with minimal fine-tuning.",
+      "authors": [
+        "Yuli Chen",
+        "Shuhao Zhang",
+        "Fanshen Meng",
+        "Bo Cheng",
+        "Jiale Han",
+        "Qiang Tong",
+        "Xiulei Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-21T14:43:21+00:00",
+      "link": "https://arxiv.org/pdf/2604.19520v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes SimDiff, a novel layer importance criterion for depth pruning in LLMs to improve deployment efficiency.",
+      "llm_evidence_cn": "提出SimDiff，一种用于大语言模型深度剪枝的新型层重要性准则，旨在提高部署效率。",
+      "llm_evidence": "提出SimDiff，一种用于大语言模型深度剪枝的新型层重要性准则，旨在提高部署效率。",
+      "canonical_evidence": "提出SimDiff，一种用于大语言模型深度剪枝的新型层重要性准则，旨在提高部署效率。",
+      "llm_tldr_en": "SimDiff improves LLM depth pruning by combining representational similarity and transformation difference metrics.",
+      "llm_tldr_cn": "SimDiff通过结合表示相似性和变换差异指标，改进了大语言模型的深度剪枝效果。",
+      "llm_tldr": "SimDiff通过结合表示相似性和变换差异指标，改进了大语言模型的深度剪枝效果。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Large language model pruning techniques and methods",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.21952v1",
+      "source": "arxiv",
+      "title": "Focus Session: Hardware and Software Techniques for Accelerating Multimodal Foundation Models",
+      "abstract": "This work presents a multi-layered methodology for efficiently accelerating multimodal foundation models (MFMs). It combines hardware and software co-design of transformer blocks with an optimization pipeline that reduces computational and memory requirements. During model development, it employs performance enhancements through fine-tuning for domain-specific adaptation. Our methodology further incorporates hardware and software techniques for optimizing MFMs. Specifically, it employs MFM compression using hierarchy-aware mixed-precision quantization and structural pruning for transformer blocks and MLP channels. It also optimizes operations through speculative decoding, model cascading that routes queries through a small-to-large cascade and uses lightweight self-tests to determine when to escalate to larger models, as well as co-optimization of sequence length, visual resolution & stride, and graph-level operator fusion. To efficiently execute the model, the processing dataflow is optimized based on the underlying hardware architecture together with memory-efficient attention to meet on-chip bandwidth and latency budgets. To support this, a specialized hardware accelerator for the transformer workloads is employed, which can be developed through expert design or an LLM-aided design approach. We demonstrate the effectiveness of the proposed methodology on medical-MFMs and on code generation tasks, and conclude with extensions toward energy-efficient spiking-MFMs.",
+      "authors": [
+        "Muhammad Shafique",
+        "Abdul Basit",
+        "Muhammad Abdullah Hanif",
+        "Alberto Marchisio",
+        "Rachmad Vidya Wicaksana Putra",
+        "Minghao Shao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.AR",
+        "cs.NE",
+        "cs.RO"
+      ],
+      "published": "2026-04-23T05:27:39+00:00",
+      "link": "https://arxiv.org/pdf/2604.21952v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "structural pruning for transformer blocks and MLP channels in foundation models",
+      "llm_evidence_cn": "基础模型中Transformer块和MLP通道的结构化剪枝",
+      "llm_evidence": "基础模型中Transformer块和MLP通道的结构化剪枝",
+      "canonical_evidence": "基础模型中Transformer块和MLP通道的结构化剪枝",
+      "llm_tldr_en": "Presents a methodology for accelerating multimodal foundation models using structural pruning and quantization.",
+      "llm_tldr_cn": "介绍了一种利用结构化剪枝和量化技术加速多模态基础模型的方法。",
+      "llm_tldr": "介绍了一种利用结构化剪枝和量化技术加速多模态基础模型的方法。",
+      "llm_tags": [
+        "query:llm:composite"
+      ],
+      "matched_query_tag": "query:llm:composite",
+      "matched_query_text": "Papers central to 大模型剪枝, especially work that connects or combines: Large language model pruning techniques and methods; Unstructured pruning and weight sparsity in deep learning; Inducing weight sparsity in large language models; Model compression strategies for large scale transformers; Weight magnitude based pruning algorithms; Gradient-based importance estimation for pruning; state of the art large language model pruning methods; comparison between structured and unstructured pruning for LLMs; how to prune large language models without significant performance loss; efficiency and speedup of pruned transformer models.",
+      "matched_requirement_id": "req-composite-llm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.24380v1",
+      "source": "arxiv",
+      "title": "Structural Pruning of Large Vision Language Models: A Comprehensive Study on Pruning Dynamics, Recovery, and Data Efficiency",
+      "abstract": "While Large Vision Language Models (LVLMs) demonstrate impressive capabilities, their substantial computational and memory requirements pose deployment challenges on resource-constrained edge devices. Current parameter reduction techniques primarily involve training LVLMs from small language models, but these methods offer limited flexibility and remain computationally intensive. We study a complementary route: compressing existing LVLMs by applying structured pruning to the language model backbone, followed by lightweight recovery training. Specifically, we investigate two structural pruning paradigms: layerwise and widthwise pruning, and pair them with supervised finetuning and knowledge distillation on logits and hidden states. Additionally, we assess the feasibility of conducting recovery training with only a small fraction of the available data. Our results show that widthwise pruning generally maintains better performance in low-resource scenarios, where computational resources are limited or there is insufficient finetuning data. As for the recovery training, finetuning only the multimodal projector is sufficient at small compression levels. Furthermore, a combination of supervised finetuning and hidden-state distillation yields optimal recovery across various pruning levels. Notably, effective recovery can be achieved using just 5% of the original data, while retaining over 95% of the original performance. Through empirical study on three representative LVLM families ranging from 3B to 7B parameters, this study offers actionable insights for practitioners to compress LVLMs without extensive computation resources or sufficient data. The code base is available at https://github.com/YiranHuangIrene/VLMCompression.git.",
+      "authors": [
+        "Yiran Huang",
+        "Lukas Thede",
+        "Massimiliano Mancini",
+        "Wenjia Xu",
+        "Zeynep Akata"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-04-27T12:10:44+00:00",
+      "link": "https://arxiv.org/pdf/2604.24380v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Structural pruning of the language model backbone in Large Vision Language Models",
+      "llm_evidence_cn": "对大型视觉语言模型中的语言模型主干进行结构化剪枝",
+      "llm_evidence": "对大型视觉语言模型中的语言模型主干进行结构化剪枝",
+      "canonical_evidence": "对大型视觉语言模型中的语言模型主干进行结构化剪枝",
+      "llm_tldr_en": "This paper explores layerwise and widthwise structural pruning for compressing Large Vision Language Models.",
+      "llm_tldr_cn": "本文研究了用于压缩大型视觉语言模型的层级和宽度结构化剪枝方法。",
+      "llm_tldr": "本文研究了用于压缩大型视觉语言模型的层级和宽度结构化剪枝方法。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Large language model pruning techniques and methods",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.24647v1",
+      "source": "arxiv",
+      "title": "DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference",
+      "abstract": "Long-context reasoning is a critical capability of large language models (LLMs), enabling applications such as long-document understanding, summarization, and code generation. However, efficient autoregressive inference relies on the key-value (KV) cache, whose memory footprint grows linearly with sequence length, leading to a major memory bottleneck. To mitigate this overhead, KV cache pruning methods discard cached tokens with low attention scores during inference. Most existing methods apply a uniform pruning ratio across layers, implicitly assuming that all layers contribute equally to overall model performance. We show that this assumption is suboptimal, as layers differ significantly in their sensitivity to pruning. We propose DepthKV, a layer-dependent pruning framework that allocates a fixed global KV budget across layers based on their sensitivity, rather than using a uniform allocation. Across multiple models and tasks, DepthKV consistently outperforms uniform pruning at the same global pruning ratio, demonstrating more effective utilization of the KV cache budget through layer-dependent allocation.",
+      "authors": [
+        "Zahra Dehghanighobadi",
+        "Asja Fischer"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-04-27T16:15:37+00:00",
+      "link": "https://arxiv.org/pdf/2604.24647v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Layer-dependent KV cache pruning for LLM inference efficiency",
+      "llm_evidence_cn": "针对大语言模型推理效率的层依赖KV缓存剪枝",
+      "llm_evidence": "针对大语言模型推理效率的层依赖KV缓存剪枝",
+      "canonical_evidence": "针对大语言模型推理效率的层依赖KV缓存剪枝",
+      "llm_tldr_en": "Proposes DepthKV to optimize LLM inference by applying non-uniform pruning ratios across different layers.",
+      "llm_tldr_cn": "提出DepthKV，通过在不同层应用非均匀剪枝比例来优化大模型推理。",
+      "llm_tldr": "提出DepthKV，通过在不同层应用非均匀剪枝比例来优化大模型推理。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Large language model pruning techniques and methods",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2604.20682v1",
+      "source": "arxiv",
+      "title": "Variance Is Not Importance: Structural Analysis of Transformer Compressibility Across Model Scales",
+      "abstract": "We present a systematic empirical study of transformer compression through over 40 experiments on GPT-2 (124M parameters) and Mistral 7B (7.24B parameters). Our analysis covers spectral compression, block-level function replacement, rotation-based quantization, activation geometry, and adaptive early exit.   We identify five structural properties relevant to compression. (1) Variance is not importance: high-variance activation directions are approximately 96 percent uncorrelated with predictive directions (measured via CCA), and projecting onto these subspaces preserves over 90 percent of variance while degrading perplexity. (2) Block linearity is conditional: transformer blocks are approximately linear (R^2 ~ 0.95 on GPT-2, 0.93 on Mistral block 31) only under the correct upstream distribution; modifying earlier blocks induces distribution shift that degrades downstream approximations. (3) The reconstruction wall: approaches that factor weights into quantized components amplify errors through cross-terms, making direct quantization strictly superior. (4) Linearity increases with depth: Mistral 7B exhibits a progression from R^2 = 0.17 (block 0) to R^2 = 0.93 (block 31), indicating a division between nonlinear feature construction and linear refinement. (5) Approximately 30 percent of tokens are computationally easy, confirmed via exit heads and KL divergence sensitivity.   We demonstrate that single-block linear replacement achieves 34x compression with a 1.71 perplexity increase on the final block of Mistral 7B, while multi-block replacement fails due to residual error accumulation and distribution shift. These findings suggest fundamental limits to static post-training compression and motivate adaptive, per-token computation as a more effective direction.",
+      "authors": [
+        "Samuel Salfati"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-22T15:31:46+00:00",
+      "link": "https://arxiv.org/pdf/2604.20682v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 8.5,
+      "llm_evidence_en": "Systematic empirical study of transformer compression on Mistral 7B and GPT-2 including structural analysis for pruning.",
+      "llm_evidence_cn": "对Mistral 7B和GPT-2进行Transformer压缩的系统性实证研究，包括用于剪枝的结构分析。",
+      "llm_evidence": "对Mistral 7B和GPT-2进行Transformer压缩的系统性实证研究，包括用于剪枝的结构分析。",
+      "canonical_evidence": "对Mistral 7B和GPT-2进行Transformer压缩的系统性实证研究，包括用于剪枝的结构分析。",
+      "llm_tldr_en": "Analyzes transformer structural properties to improve compression strategies like pruning and quantization for LLMs.",
+      "llm_tldr_cn": "分析Transformer结构特性，以优化大语言模型的剪枝和量化等压缩策略。",
+      "llm_tldr": "分析Transformer结构特性，以优化大语言模型的剪枝和量化等压缩策略。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.19167v1",
+      "source": "arxiv",
+      "title": "LBLLM: Lightweight Binarization of Large Language Models via Three-Stage Distillation",
+      "abstract": "Deploying large language models (LLMs) in resource-constrained environments is hindered by heavy computational and memory requirements. We present LBLLM, a lightweight binarization framework that achieves effective W(1+1)A4 quantization through a novel three-stage quantization strategy. The framework proceeds as follows: (1) initialize a high-quality quantized model via PTQ; (2) quantize binarized weights, group-wise bitmaps, and quantization parameters through layer-wise distillation while keeping activations in full precision; and (3) training learnable activation quantization factors to dynamically quantize activations to 4 bits. This decoupled design mitigates interference between weight and activation quantization, yielding greater training stability and better inference accuracy. LBLLM, trained only using 0.016B tokens with a single GPU, surpasses existing state-of-the-art binarization methods on W2A4 quantization settings across tasks of language modeling, commonsense QA, and language understanding. These results demonstrate that extreme low-bit quantization of LLMs can be both practical and highly effective without introducing any extra high-precision channels or rotational matrices commonly used in recent PTQ-based works, offering a promising path toward efficient LLM deployment in resource-limited situations.",
+      "authors": [
+        "Siqing Song",
+        "Chuang Wang",
+        "Yong Lang",
+        "Yi Yang",
+        "Xu-Yao Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-21T07:25:02+00:00",
+      "link": "https://arxiv.org/pdf/2604.19167v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 7.5,
+      "llm_evidence_en": "Model compression strategy for large scale transformers using binarization and distillation",
+      "llm_evidence_cn": "使用二值化和蒸馏的大规模Transformer模型压缩策略",
+      "llm_evidence": "使用二值化和蒸馏的大规模Transformer模型压缩策略",
+      "canonical_evidence": "使用二值化和蒸馏的大规模Transformer模型压缩策略",
+      "llm_tldr_en": "LBLLM introduces a three-stage distillation framework for LLM binarization to reduce memory and compute costs.",
+      "llm_tldr_cn": "LBLLM 提出了一种三阶段蒸馏框架，通过大模型二值化降低内存和计算开销。",
+      "llm_tldr": "LBLLM 提出了一种三阶段蒸馏框架，通过大模型二值化降低内存和计算开销。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.21254v1",
+      "source": "arxiv",
+      "title": "Hyperloop Transformers",
+      "abstract": "LLM architecture research generally aims to maximize model quality subject to fixed compute/latency budgets. However, many applications of interest such as edge and on-device deployment are further constrained by the model's memory footprint, thus motivating parameter-efficient architectures for language modeling. This paper describes a simple architecture that improves the parameter-efficiency of LLMs. Our architecture makes use of looped Transformers as a core primitive, which reuse Transformer layers across depth and are thus more parameter-efficient than ordinary (depth-matched) Transformers. We organize the looped Transformer into three blocks--begin, middle, and end blocks--where each block itself consists of multiple Transformer layers, and only the middle block is applied recurrently across depth. We augment the looped middle block with hyper-connections (Xie et al., 2026), which expand the residual stream into matrix-valued residual streams. Hyper-connections are applied only after each loop, and therefore add minimal new parameters and compute cost. Across various model scales, we find that our Hyper-Connected Looped Transformer (Hyperloop Transformer) is able to outperform depth-matched Transformer and mHC Transformer baselines despite using approximately 50% fewer parameters. The outperformance persists through post-training weight quantization, thus positioning Hyperloop Transformers as an attractive architecture for memory-efficient language modeling.",
+      "authors": [
+        "Abbas Zeitoun",
+        "Lucas Torroba-Hennigen",
+        "Yoon Kim"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-04-23T03:46:14+00:00",
+      "link": "https://arxiv.org/pdf/2604.21254v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 6.5,
+      "llm_evidence_en": "parameter-efficient architectures for language modeling and memory footprint reduction",
+      "llm_evidence_cn": "语言模型的参数高效架构和减少内存占用",
+      "llm_evidence": "语言模型的参数高效架构和减少内存占用",
+      "canonical_evidence": "语言模型的参数高效架构和减少内存占用",
+      "llm_tldr_en": "Introduces Hyperloop Transformers using looped layers to improve LLM parameter efficiency and reduce memory footprint.",
+      "llm_tldr_cn": "引入循环Transformer架构，通过层复用来提高大语言模型的参数效率并减少内存占用。",
+      "llm_tldr": "引入循环Transformer架构，通过层复用来提高大语言模型的参数效率并减少内存占用。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.23475v1",
+      "source": "arxiv",
+      "title": "Supernodes and Halos: Loss-Critical Hubs in LLM Feed-Forward Layers",
+      "abstract": "We study the organization of channel-level importance in transformer feed-forward networks (FFNs). Using a Fisher-style loss proxy (LP) based on activation-gradient second moments, we show that loss sensitivity is concentrated in a small set of channels within each layer. In Llama-3.1-8B, the top 1% of channels per layer accounts for a median of 58.7% of LP mass, with a range of 33.0% to 86.1%. We call these loss-critical channels supernodes. Although FFN layers also contain strong activation outliers, LP-defined supernodes overlap only weakly with activation-defined outliers and are not explained by activation power or weight norms alone. Around this core, we find a weaker but consistent halo structure: some non-supernode channels share the supernodes' write support and show stronger redundancy with the protected core. We use one-shot structured FFN pruning as a diagnostic test of this organization. At 50% FFN sparsity, baselines that prune many supernodes degrade sharply, whereas our SCAR variants explicitly protect the supernode core; the strongest variant, SCAR-Prot, reaches perplexity 54.8 compared with 989.2 for Wanda-channel. The LP-concentration pattern appears across Mistral-7B, Llama-2-7B, and Qwen2-7B, remains visible in targeted Llama-3.1-70B experiments, and increases during OLMo-2-7B pretraining. These results suggest that LLM FFNs develop a small learned core of loss-critical channels, and that preserving this core is important for reliable structured pruning.",
+      "authors": [
+        "Audrey Cherilyn",
+        "Houman Safaai"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-04-26T00:00:41+00:00",
+      "link": "https://arxiv.org/pdf/2604.23475v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 8.5,
+      "llm_evidence_en": "Uses Fisher-style loss proxy based on activation-gradient second moments to identify channel importance in LLMs",
+      "llm_evidence_cn": "使用基于激活梯度二阶矩的Fisher风格损失代理来识别大语言模型中的通道重要性",
+      "llm_evidence": "使用基于激活梯度二阶矩的Fisher风格损失代理来识别大语言模型中的通道重要性",
+      "canonical_evidence": "使用基于激活梯度二阶矩的Fisher风格损失代理来识别大语言模型中的通道重要性",
+      "llm_tldr_en": "Identifies loss-critical supernodes in LLM FFNs using gradient-based importance, enabling targeted pruning.",
+      "llm_tldr_cn": "通过基于梯度的重要性评估识别LLM中的关键超节点，为结构化剪枝提供理论依据。",
+      "llm_tldr": "通过基于梯度的重要性评估识别LLM中的关键超节点，为结构化剪枝提供理论依据。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Gradient-based importance estimation for pruning",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.24820v1",
+      "source": "arxiv",
+      "title": "Salca: A Sparsity-Aware Hardware Accelerator for Efficient Long-Context Attention Decoding",
+      "abstract": "Long contexts improve capabilities of large language models but pose serious hardware challenges: compute and memory footprints grow linearly with sequence length. Particularly, the decoding phase continuously accesses massive KV cache, dramatically increasing bandwidth and computing pressure. Existing accelerators are primarily designed and evaluated for short contexts. They suffer from significant performance degradation when processing long contexts. To bridge this gap, we identify the major bottleneck and present a hardware accelerator for long context attention decoding via hardware-software co-design. On the software side, we propose dual-compression dynamic sparse attention. It combines ultra-low-precision quantization with feature sparsity to minimize prediction overhead. A hardware-friendly approximate Top-K selection further reduces filter complexity from $O(n \\log k)$ to $O(n)$. On the hardware side, we deeply optimize compute and memory access to tackle bottlenecks from intricate interplay between sparse attention and long contexts, and establish a performance model to derive the optimal co-design scheme. The resulting hardware adopts a fully pipelined parallel architecture and achieves $O(n)$ efficiency even for long sequences. Experiments show that our design delivers $3.82\\times$ speedup and $74.19\\times$ energy efficiency over A100. Compared to SOTA accelerators, this is the first ASIC accelerator that efficiently supports long context inference, with at least $3.5\\times$ higher throughput and $2.08\\times$ better energy efficiency.",
+      "authors": [
+        "Wang Fan",
+        "Wei Cao",
+        "Xi Zha",
+        "Kedi Ma",
+        "MingQian Sun",
+        "Jialin Chen",
+        "Fengzhe Zhang",
+        "Fan Zhang"
+      ],
+      "primary_category": "cs.AR",
+      "categories": [
+        "cs.AR",
+        "cs.AI"
+      ],
+      "published": "2026-04-27T14:06:21+00:00",
+      "link": "https://arxiv.org/pdf/2604.24820v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 7.5,
+      "llm_evidence_en": "dynamic sparse attention and dual-compression for LLM efficiency",
+      "llm_evidence_cn": "针对大语言模型效率的动态稀疏注意力和双重压缩技术",
+      "llm_evidence": "针对大语言模型效率的动态稀疏注意力和双重压缩技术",
+      "canonical_evidence": "针对大语言模型效率的动态稀疏注意力和双重压缩技术",
+      "llm_tldr_en": "Salca is a hardware-software co-design for efficient long-context LLM decoding using dynamic sparse attention.",
+      "llm_tldr_cn": "Salca通过软硬件协同设计，利用动态稀疏注意力实现高效的长文本大模型解码。",
+      "llm_tldr": "Salca通过软硬件协同设计，利用动态稀疏注意力实现高效的长文本大模型解码。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.24008v1",
+      "source": "arxiv",
+      "title": "Coverage-Based Calibration for Post-Training Quantization via Weighted Set Cover over Outlier Channels",
+      "abstract": "Post-Training Quantization (PTQ) compresses large language models to low bit-widths using a small calibration set, and its quality depends strongly on which samples are chosen. We identify a failure mode in which calibration samples fail to activate outlier channels, hidden dimensions with unusually large activations, causing the quantizer to underestimate their dynamic range and producing per-channel reconstruction errors that dominate layer-wise loss. Motivated by this observation, we argue that PTQ calibration quality is governed more by weighted outlier-channel coverage than by generic sample representativeness, and formulate calibration selection as a weighted set cover problem over outlier channels. The objective is monotone submodular, and the greedy algorithm, COVERCAL, operates on pre-computed activation statistics and requires no GPU time at selection. We further show that the weight choice is internally consistent: under a stylized clipping model, missed weighted coverage upper-bounds surrogate loss, justifying the weighted coverage objective as principled rather than purely empirical. Across LLaMA-2, LLaMA-3, and Mistral, under AWQ and GPTQ backends and five downstream evaluations, COVERCAL improves over random, max-perplexity, max-activation-variance, and stratified baselines, with the largest gains at small calibration budgets. At INT4 with 128 samples, COVERCAL improves MMLU by 1.2 to 1.5 points over random calibration and reduces perplexity degradation by 15 to 30\\%; with 64 samples, it matches or exceeds random calibration at 256. The contribution is not a new PTQ backend but a formulation of calibration selection as weighted outlier coverage, with a simple, efficient algorithm and a surrogate-based justification.",
+      "authors": [
+        "Ibne Farabi Shihab",
+        "Sanjeda Akter",
+        "Anuj Sharma"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-27T03:43:29+00:00",
+      "link": "https://arxiv.org/pdf/2604.24008v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 6.5,
+      "llm_evidence_en": "The paper focuses on Post-Training Quantization (PTQ) for compressing large language models, which is a core model compression strategy alongside pruning.",
+      "llm_evidence_cn": "该论文专注于大语言模型的训练后量化（PTQ），这是与剪枝并列的核心模型压缩策略。",
+      "llm_evidence": "该论文专注于大语言模型的训练后量化（PTQ），这是与剪枝并列的核心模型压缩策略。",
+      "canonical_evidence": "该论文专注于大语言模型的训练后量化（PTQ），这是与剪枝并列的核心模型压缩策略。",
+      "llm_tldr_en": "This paper improves LLM quantization by selecting calibration samples that better cover outlier channels.",
+      "llm_tldr_cn": "该研究通过选择能更好覆盖离线通道的校准样本，优化了大语言模型的量化压缩效果。",
+      "llm_tldr": "该研究通过选择能更好覆盖离线通道的校准样本，优化了大语言模型的量化压缩效果。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.21335v1",
+      "source": "arxiv",
+      "title": "Sub-Token Routing in LoRA for Adaptation and Query-Aware KV Compression",
+      "abstract": "Sub-token routing offers a finer control axis for transformer efficiency than the coarse units used in most prior work, such as tokens, pages, heads, or layers. In this paper, we study routing within a token representation itself in LoRA-adapted transformers. The motivation is that a relevant token need not be internally uniform: under a retention budget, preserved value groups are distributed unevenly both across tokens and within tokens, which suggests that KV compression need not be an all-or-nothing decision at token level. We study this fine-grained routing mechanism in two settings. For compression-aware language modeling, we introduce a query-independent design that combines routed subspace LoRA with value-group routing on the KV path. For downstream-task-preserving KV compression, we introduce a query-aware design in which a predictor-based selector allocates a global retention budget over context-token/value-group pairs using query-conditioned relevance. Experiments show that the query-independent design improves the quality-compression tradeoff for language modeling, while the query-aware design preserves downstream behavior under reduced KV budgets. We further examine the relation between token-level and sub-token-level query-aware routing, and show that they form complementary compression axes: token-level methods determine which tokens survive globally, while sub-token routing determines how the surviving tokens are compressed internally.",
+      "authors": [
+        "Wei Jiang",
+        "Wei Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-04-23T06:47:33+00:00",
+      "link": "https://arxiv.org/pdf/2604.21335v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Sub-token routing for KV compression and transformer efficiency",
+      "llm_evidence_cn": "用于KV压缩和Transformer效率的子Token路由",
+      "llm_evidence": "用于KV压缩和Transformer效率的子Token路由",
+      "canonical_evidence": "用于KV压缩和Transformer效率的子Token路由",
+      "llm_tldr_en": "Explores fine-grained sub-token routing to improve KV cache compression and model efficiency in LLMs.",
+      "llm_tldr_cn": "探索细粒度的子Token路由，以提高大语言模型中的KV缓存压缩和模型效率。",
+      "llm_tldr": "探索细粒度的子Token路由，以提高大语言模型中的KV缓存压缩和模型效率。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.25578v1",
+      "source": "arxiv",
+      "title": "Marco-MoE: Open Multilingual Mixture-of-Expert Language Models with Efficient Upcycling",
+      "abstract": "We present Marco-MoE, a suite of fully open multilingual sparse Mixture-of-Experts (MoE) models. Marco-MoE features a highly sparse design in which only around 5\\% of the total parameters are activated per input token. This extreme sparsity, combined with upcycling from dense models, enables efficient pre-training on 5T tokens. Our models surpass similarly-sized competitors on English and multilingual benchmarks, achieving a best-in-class performance-to-compute ratio. We further post-train these models to create Marco-MoE-\\textsc{Instruct} variants, which surpass the performance of competing models possessing $3$--$14\\times$ more activated parameters. Our analysis reveals that Marco-MoE learns structured expert activation patterns shared across related languages, while maintaining highly specialized utilization for linguistically isolated ones. We further show that Marco-MoE allows for scalable language expansion without the interference typical of dense models. To support the community, we disclose our full training datasets, recipes, and model weights.",
+      "authors": [
+        "Fan Jiang",
+        "Yu Zhao",
+        "Chenyang Lyu",
+        "Tianqi Shi",
+        "Yichao Du",
+        "Feihu Jiang",
+        "Longyue Wang",
+        "Weihua Luo"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-04-28T12:45:07+00:00",
+      "link": "https://arxiv.org/pdf/2604.25578v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 7.5,
+      "llm_evidence_en": "highly sparse design and upcycling from dense models for efficient large scale transformers",
+      "llm_evidence_cn": "高度稀疏设计和从稠密模型向上采样以实现高效的大规模Transformer",
+      "llm_evidence": "高度稀疏设计和从稠密模型向上采样以实现高效的大规模Transformer",
+      "canonical_evidence": "高度稀疏设计和从稠密模型向上采样以实现高效的大规模Transformer",
+      "llm_tldr_en": "Marco-MoE uses extreme sparsity and upcycling to create efficient multilingual models with high performance.",
+      "llm_tldr_cn": "Marco-MoE通过极端稀疏性和向上采样技术构建了高性能且高效的多语言混合专家模型。",
+      "llm_tldr": "Marco-MoE通过极端稀疏性和向上采样技术构建了高性能且高效的多语言混合专家模型。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.22281v1",
+      "source": "arxiv",
+      "title": "DocPrune:Efficient Document Question Answering via Background, Question, and Comprehension-aware Token Pruning",
+      "abstract": "Recent advances in vision-language models have demonstrated remarkable performance across diverse multi-modal tasks, including document question answering that leverages structured visual cues from text, tables, and figures. However, unlike natural images, document images contain large backgrounds and only sparse supporting evidence, leading to the inefficient consumption of substantial computational resources, especially for long documents. We observe that existing token-reduction methods for natural images and videos fall short in utilizing the structural sparsity unique to documents. To address this, we propose DocPrune, a training-free and progressive document token pruning framework designed for efficient long-document understanding. The proposed method preserves only the essential tokens for the task while removing unnecessary ones, such as background or question-irrelevant tokens. Moreover, it automatically selects the appropriate layers to initiate token pruning based on the model's level of comprehension. Our experiments on the M3DocRAG show that DocPrune improves throughput by 3.0x and 3.3x in the encoder and decoder, respectively, while boosting the F1 score by +1.0, achieving both higher accuracy and efficiency without any additional training.",
+      "authors": [
+        "Joonmyung Choi",
+        "Sanghyeok Lee",
+        "Jongha Kim",
+        "Sehyung Kim",
+        "Dohwan Ko",
+        "Jihyung Kil",
+        "Hyunwoo J. Kim"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-24T06:51:58+00:00",
+      "link": "https://arxiv.org/pdf/2604.22281v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "token pruning for vision-language models and transformers",
+      "llm_evidence_cn": "针对视觉语言模型和Transformer的令牌剪枝",
+      "llm_evidence": "针对视觉语言模型和Transformer的令牌剪枝",
+      "canonical_evidence": "针对视觉语言模型和Transformer的令牌剪枝",
+      "llm_tldr_en": "DocPrune is a training-free token pruning framework for efficient document QA in vision-language models.",
+      "llm_tldr_cn": "DocPrune是一个无需训练的令牌剪枝框架，用于提高视觉语言模型在文档问答中的效率。",
+      "llm_tldr": "DocPrune是一个无需训练的令牌剪枝框架，用于提高视觉语言模型在文档问答中的效率。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.23717v1",
+      "source": "arxiv",
+      "title": "HeadRouter: Dynamic Head-Weight Routing for Task-Adaptive Audio Token Pruning in Large Audio Language Models",
+      "abstract": "Recent large audio language models (LALMs) demonstrate remarkable capabilities in processing extended multi-modal sequences, yet incur high inference costs. Token compression is an effective method that directly reduces redundant tokens in the sequence. Existing compression methods usually assume that all attention heads in LALMs contribute equally to various audio tasks and calculate token importance by averaging scores across all heads. However, our analysis demonstrates that attention heads exhibit distinct behaviors across diverse audio domains. We further reveal that only a sparse subset of attention heads actively responds to audio, with completely different performance when handling semantic and acoustic tasks. In light of this observation, we propose HeadRouter, a head-importance-aware token pruning method that perceives the varying importance of attention heads in different audio tasks to maximize the retention of crucial tokens. HeadRouter is training-free and can be applied to various LALMs. Extensive experiments on the AudioMarathon and MMAU-Pro benchmarks demonstrate that HeadRouter achieves state-of-the-art compression performance, exceeding the baseline model even when retaining 70% of the audio tokens and achieving 101.8% and 103.0% of the vanilla average on Qwen2.5-Omni-3B and Qwen2.5-Omni-7B, respectively.",
+      "authors": [
+        "Peize He",
+        "Yaodi Luo",
+        "Xiaoqian Liu",
+        "Xuyang Liu",
+        "Jiahang Deng",
+        "Yaosong Du",
+        "Bangyu Li",
+        "Xiyan Gui",
+        "Yuxuan Chen",
+        "Linfeng Zhang"
+      ],
+      "primary_category": "cs.SD",
+      "categories": [
+        "cs.SD",
+        "cs.CL"
+      ],
+      "published": "2026-04-26T14:00:31+00:00",
+      "link": "https://arxiv.org/pdf/2604.23717v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Dynamic token pruning and head-weight routing for large audio language models",
+      "llm_evidence_cn": "针对大型音频语言模型的动态令牌剪枝和头权重路由技术",
+      "llm_evidence": "针对大型音频语言模型的动态令牌剪枝和头权重路由技术",
+      "canonical_evidence": "针对大型音频语言模型的动态令牌剪枝和头权重路由技术",
+      "llm_tldr_en": "HeadRouter optimizes Large Audio Language Models by dynamically pruning redundant tokens based on head importance.",
+      "llm_tldr_cn": "HeadRouter通过根据注意力头重要性动态剪枝冗余令牌，优化大型音频语言模型的推理效率。",
+      "llm_tldr": "HeadRouter通过根据注意力头重要性动态剪枝冗余令牌，优化大型音频语言模型的推理效率。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.22906v1",
+      "source": "arxiv",
+      "title": "Network Edge Inference for Large Language Models: Principles, Techniques, and Opportunities",
+      "abstract": "Large language models (LLMs) have advanced rapidly, emerging as versatile tools across fields thanks to their exceptional language understanding, generation, and reasoning capabilities. However, performing LLM inference at the network edge remains challenging due to their large memory and compute demands. This survey outlines the challenges specific to LLM edge inference and provides a comprehensive overview of recent progress, covering system architectures, model optimization and deployment, and resource management and scheduling. By synthesizing state-of-the-art techniques and mapping future directions, this survey aims to unlock the potential of LLMs in resource-constrained edge environments.",
+      "authors": [
+        "Zhixiong Chen",
+        "Bingjie Zhu",
+        "Jiangzhou Wang",
+        "Hyundong Shin",
+        "Arumugam Nallanathan",
+        "Dusit Niyato"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC"
+      ],
+      "published": "2026-04-24T16:56:53+00:00",
+      "link": "https://arxiv.org/pdf/2604.22906v1",
+      "tags": [
+        "keyword:LLM剪枝",
+        "query:LLM剪枝"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Covers model optimization and deployment techniques for large language models in resource-constrained environments.",
+      "llm_evidence_cn": "涵盖了资源受限环境下大语言模型的模型优化和部署技术。",
+      "llm_evidence": "涵盖了资源受限环境下大语言模型的模型优化和部署技术。",
+      "canonical_evidence": "涵盖了资源受限环境下大语言模型的模型优化和部署技术。",
+      "llm_tldr_en": "A survey on LLM edge inference covering model optimization and deployment strategies for resource-constrained devices.",
+      "llm_tldr_cn": "综述了大语言模型边缘推理技术，涵盖了针对资源受限设备的模型优化与部署策略。",
+      "llm_tldr": "综述了大语言模型边缘推理技术，涵盖了针对资源受限设备的模型优化与部署策略。",
+      "llm_tags": [
+        "query:llm"
+      ],
+      "matched_query_tag": "query:llm",
+      "matched_query_text": "Model compression strategies for large scale transformers",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

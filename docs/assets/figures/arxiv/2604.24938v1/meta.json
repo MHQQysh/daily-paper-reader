@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.24938v1/fig-001.webp",
+      "caption": "Table 2: Perplexity (↓) of perplexity-pruned models across LLaMA3, LLaMA3.1, and Qwen3 (8B). Each model is pruned by minimizing calibration perplexity on C4, then evaluated on WikiText-2 (W2), C4, and LAMBADA (LMB). M denotes the number of removed layers. The best results for each pruning scale are highlighted in bold.",
+      "page": 6,
+      "index": 1,
+      "width": 782,
+      "height": 303
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24938v1/fig-002.webp",
+      "caption": "Figure 2: Perplexity rank vs. accuracy rank for perplexity-pruned models. Spearman ρ is negative or near-zero in most conditions, indicating that lower perplexity does not guarantee higher accuracy.",
+      "page": 6,
+      "index": 2,
+      "width": 817,
+      "height": 589
+    },
+    {
+      "url": "assets/figures/arxiv/2604.24938v1/fig-003.webp",
+      "caption": "Table 1: Zero-shot accuracy (↑) of task-likelihood-pruned models on downstream reasoning tasks for LLaMA3/3.1 and Qwen3 (8B). Each model is pruned by minimizing the task likelihood margin loss on Commonsense 170k [6], then evaluated without fine-tuning on HellaSwag (Hella), WinoGrande (Wino), ARC-Easy (ARC-E), ARC-Challenge (ARC-C), PIQA, and BoolQ. The Margin column reports the task likelihood margin (more negative is better). M denotes the number of removed layers. Best accuracy per pruning scale is in bold; best (most negative) Margin is underlined.",
+      "page": 5,
+      "index": 3,
+      "width": 644,
+      "height": 870
+    }
+  ]
+}
