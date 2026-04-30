@@ -6,77 +6,83 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-04-29 · 2026-04-29 20:15:58
-- 运行时间：2026-04-29 20:36:06 UTC
+- 最新运行日期：2026-04-30 · 2026-04-30 20:00:22
+- 运行时间：2026-04-30 20:05:41 UTC
 - 运行状态：成功
-- 本次总论文数：18
-- 精读区：7
+- 本次总论文数：21
+- 精读区：10
 - 速读区：11
 
 ### 今日简报（AI）
-- 今日共生成 18 篇推荐（精读 7 篇，速读 11 篇）
-- 精读：《GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models》（10.0/10）, 《Doing More With Less: Revisiting the Effectiveness of LLM Pruning for Test-Time Scaling》（10.0/10）
-- 速读：《Variance Is Not Importance: Structural Analysis of Transformer Compressibility Across Model Scales》（8.5/10）, 《Supernodes and Halos: Loss-Critical Hubs in LLM Feed-Forward Layers》（8.5/10）, 《Sub-Token Routing in LoRA for Adaptation and Query-Aware KV Compression》（8.0/10）
-- 这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。
-- 详情：[/all__20260429-201558-331710/README](/all__20260429-201558-331710/README)
+今日聚焦大模型“瘦身”艺术，深度解析了视觉语言模型与 LLM 的结构化剪枝与层冗余优化
+- 详情：[/all__20260430-200022-003659/README](/all__20260430-200022-003659/README)
 
 ### 精读区论文标签
-1. [GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models](/all__20260429-201558-331710/2604.19398v1-grasprune-global-gating-for-budgeted-structured-pruning-of-large-language-models)  
+1. [Structural Pruning of Large Vision Language Models: A Comprehensive Study on Pruning Dynamics, Recovery, and Data Efficiency](/all__20260430-200022-003659/2604.24380v1-structural-pruning-of-large-vision-language-models-a-comprehensive-study-on-pruning-dynamics-recovery-and-data-efficiency)  
    标签：评分：10.0/10、query:llm
-   evidence：针对大语言模型的结构化剪枝框架，采用全局门控和直通估计器
-2. [Doing More With Less: Revisiting the Effectiveness of LLM Pruning for Test-Time Scaling](/all__20260429-201558-331710/2604.25098v1-doing-more-with-less-revisiting-the-effectiveness-of-llm-pruning-for-test-time-scaling)  
+   evidence：大视觉语言模型的结构化剪枝，包含层级和宽度范式
+2. [Rethinking Layer Redundancy in Large Language Models: Calibration Objectives and Search for Depth Pruning](/all__20260430-200022-003659/2604.24938v1-rethinking-layer-redundancy-in-large-language-models-calibration-objectives-and-search-for-depth-pruning)  
    标签：评分：10.0/10、query:llm
-   evidence：该论文对比了结构化与非结构化剪枝对大语言模型推理性能的影响。
-3. [Rethinking Layer Redundancy in Large Language Models: Calibration Objectives and Search for Depth Pruning](/all__20260429-201558-331710/2604.24938v1-rethinking-layer-redundancy-in-large-language-models-calibration-objectives-and-search-for-depth-pruning)  
-   标签：评分：9.5/10、query:llm
-   evidence：该论文研究了通过移除Transformer块的大语言模型深度剪枝技术。
-4. [SimDiff: Depth Pruning via Similarity and Difference](/all__20260429-201558-331710/2604.19520v1-simdiff-depth-pruning-via-similarity-and-difference)  
+   evidence：通过移除LLM中的Transformer块进行深度剪枝
+3. [Doing More With Less: Revisiting the Effectiveness of LLM Pruning for Test-Time Scaling](/all__20260430-200022-003659/2604.25098v1-doing-more-with-less-revisiting-the-effectiveness-of-llm-pruning-for-test-time-scaling)  
+   标签：评分：10.0/10、query:llm
+   evidence：研究LLM推理中非结构化剪枝与结构化剪枝的对比
+4. [Variance Is Not Importance: Structural Analysis of Transformer Compressibility Across Model Scales](/all__20260430-200022-003659/2604.20682v1-variance-is-not-importance-structural-analysis-of-transformer-compressibility-across-model-scales)  
    标签：评分：9.0/10、query:llm
-   evidence：提出SimDiff，一种用于大语言模型深度剪枝的新型层重要性准则，旨在提高部署效率。
-5. [Focus Session: Hardware and Software Techniques for Accelerating Multimodal Foundation Models](/all__20260429-201558-331710/2604.21952v1-focus-session-hardware-and-software-techniques-for-accelerating-multimodal-foundation-models)  
+   evidence：对Transformer压缩和重要性评估的系统研究
+5. [Sink-Token-Aware Pruning for Fine-Grained Video Understanding in Efficient Video LLMs](/all__20260430-200022-003659/2604.20937v1-sink-token-aware-pruning-for-fine-grained-video-understanding-in-efficient-video-llms)  
+   标签：评分：9.0/10、query:llm
+   evidence：高效视频LLM的免训练视觉Token剪枝
+6. [Focus Session: Hardware and Software Techniques for Accelerating Multimodal Foundation Models](/all__20260430-200022-003659/2604.21952v1-focus-session-hardware-and-software-techniques-for-accelerating-multimodal-foundation-models)  
    标签：评分：9.0/10、query:llm
    evidence：基础模型中Transformer块和MLP通道的结构化剪枝
-6. [Structural Pruning of Large Vision Language Models: A Comprehensive Study on Pruning Dynamics, Recovery, and Data Efficiency](/all__20260429-201558-331710/2604.24380v1-structural-pruning-of-large-vision-language-models-a-comprehensive-study-on-pruning-dynamics-recovery-and-data-efficiency)  
+7. [Supernodes and Halos: Loss-Critical Hubs in LLM Feed-Forward Layers](/all__20260430-200022-003659/2604.23475v1-supernodes-and-halos-loss-critical-hubs-in-llm-feed-forward-layers)  
    标签：评分：9.0/10、query:llm
-   evidence：对大型视觉语言模型中的语言模型主干进行结构化剪枝
-7. [DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference](/all__20260429-201558-331710/2604.24647v1-depthkv-layer-dependent-kv-cache-pruning-for-long-context-llm-inference)  
+   evidence：大语言模型前馈层中基于Fisher风格损失代理的通道级重要性评估
+8. [DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference](/all__20260430-200022-003659/2604.24647v1-depthkv-layer-dependent-kv-cache-pruning-for-long-context-llm-inference)  
    标签：评分：9.0/10、query:llm
-   evidence：针对大语言模型推理效率的层依赖KV缓存剪枝
+   evidence：针对大语言模型推理效率的分层KV缓存剪枝
+9. [Carbon-Taxed Transformers: A Green Compression Pipeline for Overgrown Language Models](/all__20260430-200022-003659/2604.25903v1-carbon-taxed-transformers-a-green-compression-pipeline-for-overgrown-language-models)  
+   标签：评分：9.0/10、query:llm
+   evidence：大语言模型的系统化多架构压缩流水线
+10. [Adaptive and Fine-grained Module-wise Expert Pruning for Efficient LoRA-MoE Fine-Tuning](/all__20260430-200022-003659/2604.26340v1-adaptive-and-fine-grained-module-wise-expert-pruning-for-efficient-lora-moe-fine-tuning)  
+   标签：评分：9.0/10、query:llm
+   evidence：LoRA-MoE微调的模块化专家剪枝
 
 ### 速读区论文标签
-1. [Variance Is Not Importance: Structural Analysis of Transformer Compressibility Across Model Scales](/all__20260429-201558-331710/2604.20682v1-variance-is-not-importance-structural-analysis-of-transformer-compressibility-across-model-scales)  
-   标签：评分：8.5/10、query:llm
-   evidence：对Mistral 7B和GPT-2进行Transformer压缩的系统性实证研究，包括用于剪枝的结构分析。
-2. [Supernodes and Halos: Loss-Critical Hubs in LLM Feed-Forward Layers](/all__20260429-201558-331710/2604.23475v1-supernodes-and-halos-loss-critical-hubs-in-llm-feed-forward-layers)  
-   标签：评分：8.5/10、query:llm
-   evidence：使用基于激活梯度二阶矩的Fisher风格损失代理来识别大语言模型中的通道重要性
-3. [Sub-Token Routing in LoRA for Adaptation and Query-Aware KV Compression](/all__20260429-201558-331710/2604.21335v1-sub-token-routing-in-lora-for-adaptation-and-query-aware-kv-compression)  
+1. [Hybrid Policy Distillation for LLMs](/all__20260430-200022-003659/2604.20244v1-hybrid-policy-distillation-for-llms)  
    标签：评分：8.0/10、query:llm
-   evidence：用于KV压缩和Transformer效率的子Token路由
-4. [HeadRouter: Dynamic Head-Weight Routing for Task-Adaptive Audio Token Pruning in Large Audio Language Models](/all__20260429-201558-331710/2604.23717v1-headrouter-dynamic-head-weight-routing-for-task-adaptive-audio-token-pruning-in-large-audio-language-models)  
-   标签：评分：8.0/10、query:llm
-   evidence：针对大型音频语言模型的动态令牌剪枝和头权重路由技术
-5. [LBLLM: Lightweight Binarization of Large Language Models via Three-Stage Distillation](/all__20260429-201558-331710/2604.19167v1-lbllm-lightweight-binarization-of-large-language-models-via-three-stage-distillation)  
-   标签：评分：7.5/10、query:llm
-   evidence：使用二值化和蒸馏的大规模Transformer模型压缩策略
-6. [Salca: A Sparsity-Aware Hardware Accelerator for Efficient Long-Context Attention Decoding](/all__20260429-201558-331710/2604.24820v1-salca-a-sparsity-aware-hardware-accelerator-for-efficient-long-context-attention-decoding)  
-   标签：评分：7.5/10、query:llm
-   evidence：针对大语言模型效率的动态稀疏注意力和双重压缩技术
-7. [Marco-MoE: Open Multilingual Mixture-of-Expert Language Models with Efficient Upcycling](/all__20260429-201558-331710/2604.25578v1-marco-moe-open-multilingual-mixture-of-expert-language-models-with-efficient-upcycling)  
-   标签：评分：7.5/10、query:llm
-   evidence：高度稀疏设计和从稠密模型向上采样以实现高效的大规模Transformer
-8. [Network Edge Inference for Large Language Models: Principles, Techniques, and Opportunities](/all__20260429-201558-331710/2604.22906v1-network-edge-inference-for-large-language-models-principles-techniques-and-opportunities)  
+   evidence：用于压缩大语言模型的知识蒸馏范式
+2. [Sub-Token Routing in LoRA for Adaptation and Query-Aware KV Compression](/all__20260430-200022-003659/2604.21335v1-sub-token-routing-in-lora-for-adaptation-and-query-aware-kv-compression)  
    标签：评分：7.0/10、query:llm
-   evidence：涵盖了资源受限环境下大语言模型的模型优化和部署技术。
-9. [Hyperloop Transformers](/all__20260429-201558-331710/2604.21254v1-hyperloop-transformers)  
-   标签：评分：6.5/10、query:llm
-   evidence：语言模型的参数高效架构和减少内存占用
-10. [Coverage-Based Calibration for Post-Training Quantization via Weighted Set Cover over Outlier Channels](/all__20260429-201558-331710/2604.24008v1-coverage-based-calibration-for-post-training-quantization-via-weighted-set-cover-over-outlier-channels)  
-   标签：评分：6.5/10、query:llm
-   evidence：该论文专注于大语言模型的训练后量化（PTQ），这是与剪枝并列的核心模型压缩策略。
-11. [DocPrune:Efficient Document Question Answering via Background, Question, and Comprehension-aware Token Pruning](/all__20260429-201558-331710/2604.22281v1-docpruneefficient-document-question-answering-via-background-question-and-comprehension-aware-token-pruning)  
+   evidence：查询感知的KV压缩和子Token路由以提高Transformer效率
+3. [Guess-Verify-Refine: Data-Aware Top-K for Sparse-Attention Decoding on Blackwell via Temporal Correlation](/all__20260430-200022-003659/2604.22312v1-guess-verify-refine-data-aware-top-k-for-sparse-attention-decoding-on-blackwell-via-temporal-correlation)  
+   标签：评分：7.0/10、query:llm
+   evidence：用于稀疏注意力解码效率的数据感知Top-K算法
+4. [Preserving Long-Tailed Expert Information in Mixture-of-Experts Tuning](/all__20260430-200022-003659/2604.23036v1-preserving-long-tailed-expert-information-in-mixture-of-experts-tuning)  
+   标签：评分：7.0/10、query:llm
+   evidence：在混合专家模型架构中系统地剪枝专家
+5. [HeadRouter: Dynamic Head-Weight Routing for Task-Adaptive Audio Token Pruning in Large Audio Language Models](/all__20260430-200022-003659/2604.23717v1-headrouter-dynamic-head-weight-routing-for-task-adaptive-audio-token-pruning-in-large-audio-language-models)  
+   标签：评分：7.0/10、query:llm
+   evidence：大型音频语言模型中的任务自适应音频Token剪枝
+6. [LearnPruner: Rethinking Attention-based Token Pruning in Vision Language Models](/all__20260430-200022-003659/2604.23950v1-learnpruner-rethinking-attention-based-token-pruning-in-vision-language-models)  
+   标签：评分：7.0/10、query:llm
+   evidence：利用LLM注意力分数进行视觉语言模型中的Token剪枝
+7. [Stabilizing Efficient Reasoning with Step-Level Advantage Selection](/all__20260430-200022-003659/2604.24003v1-stabilizing-efficient-reasoning-with-step-level-advantage-selection)  
+   标签：评分：7.0/10、query:llm
+   evidence：通过剪枝和基于长度的奖励进行推理压缩
+8. [Salca: A Sparsity-Aware Hardware Accelerator for Efficient Long-Context Attention Decoding](/all__20260430-200022-003659/2604.24820v1-salca-a-sparsity-aware-hardware-accelerator-for-efficient-long-context-attention-decoding)  
+   标签：评分：7.0/10、query:llm
+   evidence：针对长文本大语言模型的动态稀疏注意力和双重压缩技术
+9. [FSFM: A Biologically-Inspired Framework for Selective Forgetting of Agent Memory](/all__20260430-200022-003659/2604.20300v2-fsfm-a-biologically-inspired-framework-for-selective-forgetting-of-agent-memory)  
    标签：评分：6.0/10、query:llm
-   evidence：针对视觉语言模型和Transformer的令牌剪枝
+   evidence：LLM智能体内存剪枝
+10. [DocPrune:Efficient Document Question Answering via Background, Question, and Comprehension-aware Token Pruning](/all__20260430-200022-003659/2604.22281v1-docpruneefficient-document-question-answering-via-background-question-and-comprehension-aware-token-pruning)  
+   标签：评分：6.0/10、query:llm
+   evidence：用于提高效率的渐进式文档令牌剪枝框架
+11. [Network Edge Inference for Large Language Models: Principles, Techniques, and Opportunities](/all__20260430-200022-003659/2604.22906v1-network-edge-inference-for-large-language-models-principles-techniques-and-opportunities)  
+   标签：评分：6.0/10、query:llm
+   evidence：大语言模型边缘推理的模型优化与部署的全面综述
 
 
 <div class="dpr-home-promo-card">
