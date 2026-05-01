@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.27115v1/fig-001.webp",
+      "caption": "Table 4: Fine-tuning analysis results. EM for math models and HumanEval for code models.",
+      "page": 6,
+      "index": 1,
+      "width": 826,
+      "height": 218
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27115v1/fig-002.webp",
+      "caption": "Figure 7: Example of a Type 1 trap (left) and mitigated Type 1 case (right).",
+      "page": 15,
+      "index": 2,
+      "width": 826,
+      "height": 370
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27115v1/fig-003.webp",
+      "caption": "Figure 3: Selective vs. random pruning under different seeds.",
+      "page": 7,
+      "index": 3,
+      "width": 399,
+      "height": 340
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27115v1/fig-004.webp",
+      "caption": "Table 7: Complete LoRA Fine-Tuning Hyperparameters",
+      "page": 14,
+      "index": 4,
+      "width": 752,
+      "height": 245
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27115v1/fig-005.webp",
+      "caption": "Table 8: HumanEval Evaluation Configuration",
+      "page": 14,
+      "index": 5,
+      "width": 790,
+      "height": 282
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27115v1/fig-006.webp",
+      "caption": "Figure 5: Distractor semantic similarity analysis",
+      "page": 8,
+      "index": 6,
+      "width": 414,
+      "height": 340
+    }
+  ]
+}

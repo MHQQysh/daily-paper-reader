@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.27796v1/fig-001.webp",
+      "caption": "Figure 8: Accuracy vs rank during Energy based Compression on Image Classification benchmarks.",
+      "page": 14,
+      "index": 1,
+      "width": 1036,
+      "height": 356
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27796v1/fig-002.webp",
+      "caption": "Figure 9: Distribution of singular values in LoRAs trained on different image classification datasets.",
+      "page": 14,
+      "index": 2,
+      "width": 1034,
+      "height": 406
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27796v1/fig-003.webp",
+      "caption": "Table 3: Accuracy Results of PARA and baselines with Gemma3-4B on Commonsense Reasoning Tasks. PARA outperforms baselines and scores highest (bold) or second-highest across datasets.",
+      "page": 8,
+      "index": 3,
+      "width": 960,
+      "height": 186
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27796v1/fig-004.webp",
+      "caption": "Figure 2: Distribution of singular values from a LoRA of rank 16 trained on the Food-101 image classification dataset. Similar plots from other datasets are presented in Figure 9.",
+      "page": 4,
+      "index": 4,
+      "width": 486,
+      "height": 270
+    },
+    {
+      "url": "assets/figures/arxiv/2604.27796v1/fig-005.webp",
+      "caption": "Figure 7: Scatter plot comparing PARA and Fisher-PARA accuracies across image classification and natural language understanding datasets.",
+      "page": 9,
+      "index": 5,
+      "width": 450,
+      "height": 306
+    }
+  ]
+}
