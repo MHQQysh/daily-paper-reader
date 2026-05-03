@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-001.webp",
+      "caption": "Table 2: SFT encourages supertoken adoption, reducing reasoning trace length while preserving accuracy across three model families and five math benchmarks. All accuracy deltas fall within the 95% confidence interval of zero; ˚ marks token reductions whose 95% CI excludes zero (p ă 0.05). See Appendix J for methodology. Table 9.",
+      "page": 6,
+      "index": 1,
+      "width": 827,
+      "height": 579
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-002.webp",
+      "caption": "Table 9: Wall-clock latency (mean seconds per sample) for baseline vs. SFT models, served via SGLang or VLLM on H200 GPUs. Latency reductions exceed or track token count reductions from Table 2.",
+      "page": 21,
+      "index": 2,
+      "width": 572,
+      "height": 711
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-003.webp",
+      "caption": "Table 3: Supertoken structural taxonomy. Each merge in the SuperBPE vocabulary is classified into one of nine structural categories based on its decoded text. Representative supertokens are shown for each category.",
+      "page": 7,
+      "index": 3,
+      "width": 822,
+      "height": 467
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-004.webp",
+      "caption": "Table 10: Mean conditional entropy (bits) by token role for QwQ-32B reasoning traces (2K samples, 22.9M tokens), scored by the generating model (QwQ-32B, self) vs. a different model (Qwen3-30B-A3B, cross). The structural/organic entropy gap (bottom row) persists and widens under cross-model scoring, confirming the pattern is not an artifact of a single model’s distribution.",
+      "page": 22,
+      "index": 4,
+      "width": 837,
+      "height": 332
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-005.webp",
+      "caption": "Figure 1: Overview of the pipeline: (1) derive reasoning-specific supertokens via BPE merges on reasoning traces, then (2) adapt the model to utilize these supertokens via supervised fine-tuning to produce shorter reasoning trajectories while preserving accuracy.",
+      "page": 3,
+      "index": 5,
+      "width": 717,
+      "height": 540
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-006.webp",
+      "caption": "Table 8: LoRA rank ablation on Qwen3-30B-A3B. All runs use α“32, targets tq,k,v,ou proj, with embed/lm head as modules to save. Supertoken usage is consistent across ranks („10–13%); accuracy is robust to rank choice.",
+      "page": 18,
+      "index": 6,
+      "width": 826,
+      "height": 582
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-007.webp",
+      "caption": "Figure 6: Token compression rate based on merge selection rules and number of merges included.",
+      "page": 18,
+      "index": 7,
+      "width": 829,
+      "height": 506
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-008.webp",
+      "caption": "Table 12: 95% confidence intervals for accuracy and completion-token deltas. Accuracy: twoproportion CI treating each condition as a single evaluation on N questions (conservative). All 15 accuracy CIs include zero. Completion tokens: paired-difference CI with estimated σpaired « 0.24 ˆ T̄. ✓ marks token reductions whose CI excludes zero. Reductions are significant on larger benchmarks; AIME (N“30) lacks power except for the large DS-R1-70B compressions.",
+      "page": 23,
+      "index": 8,
+      "width": 830,
+      "height": 420
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-009.webp",
+      "caption": "Table 5: Representative super-tokens from unfiltered and filtered BPE. The filter removes syntactically promiscuous merges and math artifacts, and by admitting apostrophes surfaces",
+      "page": 13,
+      "index": 9,
+      "width": 698,
+      "height": 978
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-010.webp",
+      "caption": "Figure 3: Supertoken signposts reveal reasoning structure. Each block represents a structural reasoning move detected via supertokens. The correct trace (top) shows diverse, balanced reasoning with verification; the incorrect trace (bottom) is dominated by repeated backtracking without verification.",
+      "page": 8,
+      "index": 10,
+      "width": 820,
+      "height": 249
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-011.webp",
+      "caption": "Table 1: Comparison with CoT compression methods. Content-level and latent methods achieve higher compression but alter or remove reasoning steps. Our vocabulary-level approach preserves the complete readable trace and is orthogonal to content-level methods (the two can be composed). ˚Relative to respective baselines on MATH-500.",
+      "page": 4,
+      "index": 11,
+      "width": 826,
+      "height": 344
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-012.webp",
+      "caption": "Figure 7: Token-level conditional entropy for two windows from QwQ-32B reasoning traces (blue = low, red = high). Black brackets mark supertoken merge spans (ě3 base tokens). Within bracketed spans, continuation tokens are predominantly low-entropy, confirming that structural phrases are near-deterministic once begun (continuation mean: 1.03 bits vs. non-merge mean: 1.27 bits).",
+      "page": 19,
+      "index": 12,
+      "width": 805,
+      "height": 256
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-013.webp",
+      "caption": "Table 7: Comparison of SFT training strategies on QWQ-32B. Partial unfreezing achieves the best compression while maintaining accuracy.",
+      "page": 17,
+      "index": 13,
+      "width": 750,
+      "height": 398
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-014.webp",
+      "caption": "Figure 9: Theoretical compression ceiling. (a) Mean entropy by token role (continuation: 1.03, merge heads: 1.11, non-merged: 1.27 bits), all well below the vocabulary maximum of 17.2 bits. (b) Compression ceiling decomposition (∆ “ ρ ˆ p1 ´ H̄{ log2 |V |q). Compressibility is „94% across all roles; the combined ceiling ∆ “ 14.3%.",
+      "page": 20,
+      "index": 14,
+      "width": 805,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-015.webp",
+      "caption": "Figure 2: Continuation-token entropy by supertoken merge length. (a) Mean conditional entropy per bin (dashed line: non-merge average, 1.27 bits). The gap widens from 33% at length 2 to 79% at length 16+; length-3 merges are an outlier (´5%). (b) Relative entropy reduction (1 ´ H̄cont{H̄non-merge); longer merges capture progressively more deterministic continuations.",
+      "page": 5,
+      "index": 15,
+      "width": 805,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2604.26355v2/fig-016.webp",
+      "caption": "Table 6: Taxonomy classification rules applied in priority order. N = number of the 250 supertokens assigned to each category. All 250 merges are classified; no merges fall into an “other” residual category.",
+      "page": 16,
+      "index": 16,
+      "width": 826,
+      "height": 430
+    }
+  ]
+}
