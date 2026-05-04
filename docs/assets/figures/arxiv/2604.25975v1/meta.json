@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.25975v1/fig-001.webp",
+      "caption": "Figure 3. Capacity preservation and capacity–performance correlation on Qasper.Top: Retained capacity under increasing cache compression ratios for different KV cache eviction methods, shown for three simplified capacity proxies.Bottom: Scatter plots of retained capacity versus task performance across eviction methods and compression ratios, with Spearman rank correlation coefficients and corresponding p-values annotated.Results on additional datasets are provided in Appendix C.2.",
+      "page": 6,
+      "index": 1,
+      "width": 1003,
+      "height": 464
+    },
+    {
+      "url": "assets/figures/arxiv/2604.25975v1/fig-002.webp",
+      "caption": "Table 1. Experimental results of Qwen3-8B and Qwen3-14B on Longbench Benchmark.",
+      "page": 7,
+      "index": 2,
+      "width": 1031,
+      "height": 879
+    },
+    {
+      "url": "assets/figures/arxiv/2604.25975v1/fig-003.webp",
+      "caption": "Figure 5. Runtime comparison of KV cache eviction methods under varying context lengths and compression ratios on Qwen3-8B.",
+      "page": 14,
+      "index": 3,
+      "width": 1006,
+      "height": 563
+    },
+    {
+      "url": "assets/figures/arxiv/2604.25975v1/fig-004.webp",
+      "caption": "Figure 2. Information-Theoretic Perspective of KV Cache Eviction. We model cached key–value pairs as communication channels mapping future queries to attention outputs. Query as Source: Future queries are characterized as stochastic signals sampled from q ∼ N (µQ,ΛQ). KV Cache Channels: Each cached entities induces an effective channel, the vector direction signifies its contribution to the output space, while color intensity encodes query–key alignment. Given a fixed budget |C| = B, diverse channel orientations maximize the information capacity (Theorem 3.2), whereas redundant directions lead to capacity loss. The full KV cache serves as the theoretical upper bound. Output as Destination: Output fidelity is evaluated against the full-cache reference, demonstrating that higher effective capacity directly correlates with lower representational distortion.",
+      "page": 4,
+      "index": 4,
+      "width": 965,
+      "height": 340
+    },
+    {
+      "url": "assets/figures/arxiv/2604.25975v1/fig-005.webp",
+      "caption": "Figure 6. Capacity–Performance Correlation analysis on 2WIKIMQA (top two rows), MULTIFIELDQA (middle two rows), and PASSAGERETRIEVAL (bottom two rows). For each dataset, the top row shows the retained KV cache capacity under increasing compression ratios for different eviction methods, evaluated using three simplified capacity proxies (K, U, and KU-Capacity). The bottom row plots downstream task performance against the corresponding retained capacity across methods and compression ratios, with Spearman rank correlation coefficients and associated p-values annotated.",
+      "page": 16,
+      "index": 5,
+      "width": 873,
+      "height": 1229
+    }
+  ]
+}

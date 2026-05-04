@@ -1,0 +1,485 @@
+Title: Post-Optimization Adaptive Rank Allocation for LoRA
+
+URL Source: https://arxiv.org/pdf/2604.27796v1
+
+Published Time: Fri, 01 May 2026 00:54:58 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# Post-Optimization Adaptive Rank Allocation for LoRA 
+
+# Vishnuprasadh Kumaravelu 1,2 , Sunil Gupta *2, P. K. Srijith *1
+
+> 1
+
+Indian Institute of Technology Hyderabad 2Deakin University s224229262@deakin.edu.au, sunil.gupta@deakin.edu.au, srijith@cse.iith.ac.in 
+
+Abstract 
+
+Exponential growth in the scale of modern foundation models has led to the widespread adoption of Low-Rank Adaptation (LoRA) as a parameter-efficient fine-tuning technique. How-ever, standard LoRA implementations disregard the varying intrinsic dimensionality of model layers and enforce a uni-form rank, leading to parameter redundancy. We propose Post-Optimization Adaptive Rank Allocation (PARA), a data-free compression method for LoRA that integrates seamlessly into existing fine-tuning pipelines. PARA leverages Singular Value Decomposition to prune LoRA ranks using a global threshold over singular values across all layers. This results in non-uniform rank allocation based on layer-wise spectral importance. As a post-hoc method, PARA circumvents the training modifications and resulting instabilities that dynamic architectures typically incur. We empirically demonstrate that PARA reduces parameter count by 75-90% while preserv-ing the predictive performance of the original, uncompressed LoRA across multiple vision and language benchmarks. Code will be published upon acceptance. 
+
+# Introduction 
+
+Large pretrained models have induced a paradigm shift in the field of Artificial Intelligence. Trained on massive and diverse data corpora, these models demonstrate strong gen-eralization and zero-shot capabilities (Radford et al. 2019). As a result, practitioners increasingly opt to finetune these models on domain-specific datasets rather than training from scratch. As the scaling laws (Kaplan et al. 2020) continue to drive models past the trillion-parameter mark (Team et al. 2025b), full-parameter finetuning has become computation-ally prohibitive. Moreover, finetuning models pretrained on internet-scale datasets on much smaller domain datasets is often sample-inefficient and prone to overfitting. This has led to the rise of Parameter Efficient Fine-Tuning (PEFT) methods (Mangrulkar et al. 2022), which propose adapting such large models using a much smaller fraction of their pa-rameters. Among PEFT methods, Low-Rank Adaptation (LoRA) (Hu et al. 2022) has gained massive traction due to its sim-ple architecture and strong empirical performance. LoRA is founded on the hypothesis that the updates induced by fine-tuning lie in a low-rank subspace. LoRA decomposes 
+
+> *
+
+Denotes equal supervision 
+
+the weight update to each pretrained weight matrix as the product of two low-rank matrices, keeping the original pre-trained parameters frozen and optimizing only the low-rank matrices during adaptation. Formally, for any linear layer 
+
+W ∈ Rd1×d2 in the pretrained model, LoRA reparame-terizes its update ∆W as ∆W = BA , with B ∈ Rd1×r
+
+and A ∈ Rr×d2 being the low rank matrices and rank, 
+
+r ≪ min( d1, d 2).The choice of rank dictates both the parameter budget and adaptation capacity. While LoRA can match full fine-tuning performance given a sufficiently large rank (Schulman and Lab 2025), empirical evidence shows that fine-tuning per-formance is highly sensitive to this choice (Valipour et al. 2023). Excessive rank yields diminishing returns and can lead to overfitting, while insufficient rank limits expressiv-ity. Despite its significance, selecting the right rank remains a heuristic process requiring computationally expensive hy-perparameter sweeps that undermines the efficiency gains that motivate PEFT methods in the first place. This challenge becomes particularly acute in production environments. While it is common for simple single-task de-ployments to merge LoRA with the base model to eliminate additional inference latency, modern ML systems increas-ingly operate in multi-tenant regimes where a frozen back-bone supports thousands of distinct task-specific adapters (Vasani et al. 2025). In such settings, adapters are dynam-ically swapped into GPU memory on demand, and adapter size directly bottlenecks system throughput through mem-ory capacity and bandwidth constraints. The rank selection problem thus manifests as both a training-time optimization challenge and a deployment-time efficiency bottleneck. Beyond rank allocation, the optimal location for LoRA updates remains an open question. Early work restricted adaptation to attention weights (Hu et al. 2022), but QLoRA (Dettmers et al. 2023) later argued that including MLP lay-ers is critical for performance. Conversely, Biderman et al. (Biderman et al. 2024) found adaptation of attention lay-ers redundant when MLPs are tuned. Methods such as AdaLoRA (Zhang et al. 2023), SoRA (Ding et al. 2023), and DoRA (Mao et al. 2024) propose to automate this se-lection by treating rank and layer selection as a joint op-timization problem and dynamically pruning ranks during training. However, these adaptive approaches introduce sig-nificant complexity, relying on architectural modifications, 
+
+> arXiv:2604.27796v1 [cs.AI] 30 Apr 2026
+
+expensive parameter-importance calculations, and intricate pruning schedules that can destabilize training if improperly tuned. Consequently, the burden shifts from selecting a fixed rank to tuning a complex suite of pruning schedules and reg-ularization constants, effectively increasing the hyperparam-eter search space rather than reducing it. To address these challenges, we propose Post-Optimization Adaptive Rank Allocation (PARA). PARA is a data-free compression framework for pre-trained LoRA adapters. Unlike dynamic methods, PARA imposes no architectural changes or training overhead. For PARA, we recommend training all transformer layers with standard LoRA at a sufficiently high rank to ensure capacity during optimization, relying on the post-hoc compression to dis-card extra ranks and redundant adapter layers. Upon training completion, PARA applies Singular Value Decomposition (SVD) to each adapter’s weight matrix. This decomposition separates the learned update ∆W into singular vectors, which encode the transformation directions, and singular values, which quantify the magnitude of those transforma-tions. Consequently, the singular values serve as a direct proxy for the importance of each rank dimension. A single global threshold is then applied to the collective singular values across the entire model. This threshold is determined by the practitioner’s choice of either a target average rank (given the ranks vary across layers) or a relative energy retention ratio (the fraction of the total Frobenius norm preserved). This mechanism automatically allocates higher ranks to layers with a greater concentration of globally large singular values while aggressively pruning, or even entirely discarding, layers with negligible singular values. Crucially, PARA’s adaptive rank allocation consistently outperforms LoRA adapters natively trained at the equiva-lent parameter budget. Standard LoRA enforces a uniform rank constraint, bottlenecking layers that require higher ex-pressivity to model complex features, while simultaneously wasting parameters on layers that contribute little to the task. By decoupling the training rank from the final inference rank, PARA circumvents this limitation. Training in a high-rank regime allows the adapter to explore a larger subspace of solutions, leading to better convergence. Based on spec-tral importance, PARA then redistributes the parameter bud-get, yielding an adapter that is more accurate than its uni-formly trained counterpart. The result is a non-uniform rank distribution (Figure 1) derived analytically from the learned weights themselves, preserving the training stability and ar-chitectural simplicity of standard LoRA. PARA’s use of singular values as an importance metric fundamentally contrasts with training-time pruning methods like AdaLoRA that rely on expensive gradient-based param-eter importance calculations. However, a naive application of SVD to large Transformer weight matrices can be com-putationally expensive as well. To address this, PARA ex-ploits the intrinsic low-rank structure of the adapters and performs SVD via QR decomposition. This strategy allows us to compute singular values without ever materializing the full weight matrix, reducing the computational complex-ity. To the best of our knowledge, PARA is the first frame-work to integrate this numerical optimization into the LoRA 
+
+Figure 1: Rank distribution across layer types and depth on a LoRA trained at rank 16 on the Food 101 Image Classi-fication task and compressed by PARA to an average rank of 4. PARA automatically allocates ranks based on spectral importance. ecosystem. The result is a highly efficient process that yields compact adapters with minimal memory footprints, signifi-cantly lowering VRAM consumption and enabling higher concurrency in multi-tenant serving scenarios. PARA’s effi-ciency enables a ”Train First, Tune Later” workflow, where rank selection is decoupled from training and delegated to the deployment phase. This also enables a versatile “one-to-many” deployment strategy. Similar to DyLoRA (Valipour et al. 2023), a single high-rank LoRA parent can spawn a family of PARA-compressed child adapters at varying sizes to satisfy diverse latency constraints. However, un-like DyLoRA’s uniform rank truncation, PARA’s adaptive-rank adapters maximize performance for every target bud-get. Across various image classification, natural language understanding, and generation benchmarks, PARA achieves 75-90% parameter reduction with less than 1% accuracy degradation in most cases. PARA consistently outperforms existing adaptive rank methods such as AdaLoRA (Zhang et al. 2023), SoRA (Ding et al. 2023), and DoRA (Mao et al. 2024), as well as multi-rank methods such as Dy-LoRA (Valipour et al. 2023) across benchmarks. Our contributions can be summarized as follows: 1. We introduce PARA, a data-free compression framework that automatically optimizes rank distribution using the singular value spectrum of learned updates. 2. We establish a “Train First, Tune Later” paradigm that decouples training capacity from inference constraints to maximize both optimization stability and deployment ef-ficiency. 3. We enable versatile “one-to-many” deployment, allow-ing a single parent model to spawn a family of adaptive adapters for varying latency budgets. 4. We exploit the intrinsic low-rank structure of LoRA adapters via QR-based SVD, enabling efficient spectral analysis without materializing full weight matrices. 5. Our method outperforms baselines, achieving 75-90% parameter reduction with negligible accuracy loss across diverse vision and language benchmarks. Related Work 
+
+Adaptive Rank LoRA Variants 
+
+The rigidity of LoRA’s uniform rank assignment has spurred a variety of adaptive rank methods. AdaLoRA (Zhang et al. 2023) sets a universal parameter budget and leverages pa-rameter importance to adaptively determine ranks for differ-ent layers. Based on a pruning schedule, AdaLoRA begins with a uniform rank distribution and progressively prunes less informative ranks until a target budget is reached, result-ing in varying rank allocations. Crucially, AdaLoRA makes architectural changes to LoRA and adds additional regu-larization terms to the loss function. These modifications, along with expensive periodic parameter importance calcu-lations and tuning the pruning schedule, complicate train-ing, requiring multiple hyperparameter decisions and vali-dations. SoRA (Ding et al. 2023) modifies LoRA by intro-ducing a trainable gating vector between the LoRA matrices to progressively prune rank. It employs a proximal gradi-ent method with L1 regularization to update the gate, ef-fectively performing soft-thresholding to promote sparsity during training. Post-training, zeroed-out ranks are pruned to yield a LoRA adapter with variable ranks. DoRA (Mao et al. 2024) reparameterizes LoRA into sums of single-rank components, dynamically pruning them based on their con-tribution to the total Frobenius norm of the update. To pre-vent instability, DoRA employs an additional regulariza-tion term that penalizes the variance of elements within components, to ensure a balanced magnitude distribution. SoRA and DoRA both incur additional training overhead in the form of architectural modifications, importance calcula-tions, additional regularization terms, or bespoke optimiza-tion strategies. Unlike the methods discussed so far, which are training-time modifications to LoRA, GoRA (haonan he et al. 2025) is an initialization framework. GoRA computes sensitivity-based parameter importance for each backbone layer using accumulated gradients from a subset of training samples and allocates ranks accordingly. In addition, it ini-tializes matrix A randomly as usual, but initializes matrix 
+
+B using a formula involving the pseudo-inverse of A and the accumulated gradients to approximate the initial gradient update. Consequently, GoRA sits philosophically opposite to PARA. While GoRA is a data-driven initialization strat-egy designed to optimize LoRA’s initialization before fine-tuning, PARA is a data-free post-optimization technique de-signed to compress LoRA after fine-tuning. 
+
+Simultaneous Multi-Rank Training 
+
+DyLoRA (Valipour et al. 2023) extends LoRA by train-ing for a range of ranks simultaneously rather than a sin-gle fixed rank. Following Nested Dropout (Rippel, Gelbart, and Adams 2014), DyLoRA randomly samples a rank dur-ing training, truncates the LoRA matrices, and updates the parameters. This forces the adapters to learn ordered repre-sentations, ensuring critical information is concentrated in the lower ranks. At inference, DyLoRA can be deployed at any rank within the trained range, enabling dynamic adap-tation to hardware constraints without retraining. PARA brings similar post-training dynamic rank adjustment ben-efits to standard LoRA without any bespoke training adjust-ments, solely relying on spectral importance to enable or-dered pruning. 
+
+Spectral Decomposition in LoRA 
+
+Recent works have explored leveraging Singular Value De-composition in the context of LoRA to improve initial-ization. PiSSA (Meng, Wang, and Zhang 2024) initial-izes LoRA matrices with the principal singular components of the pretrained weight matrix, effectively allowing the adapter to optimize the principal subspace directly. On the contrary, MiLoRA (Wang et al. 2025) initializes adapters using minor components in order to mitigate forgetting of pretrained knowledge. While PiSSA and MiLoRA use SVD on pretrained matrices for initialization to aid convergence, PARA uses SVD on fine-tuned LoRA matrices to aid de-ployment efficiency. Furthermore, PARA is complemen-tary to these approaches; one could theoretically initialize with PiSSA to accelerate training, and subsequently apply PARA to prune the resulting adapters for efficient inference. 
+
+PhLoRA (Vasani et al. 2025) uses SVD to extract a LoRA adapter from a fine-tuned model by performing truncated SVD on the weight update ∆W . While PhLoRA and PARA both use SVD as a compression technique, PhLoRA focuses on full model weights to generate regular LoRAs whereas PARA’s focus is on redistributing the rank budget of LoRAs in order to maximize efficiency. 
+
+# Methodology 
+
+Let MΘ be a pretrained transformer parameterized by weights Θ = {W yi | y ∈ Y, i ∈ { 1, 2, . . . , N }} , where Y =
+
+{q, k, v, o, m 1, m 2} denotes the layer types and N is the number of transformer layers. Each transformer layer com-prises the attention matrices: q (query), k (key), v (value) and o (out-projection), and the two MLP matrices m1 and 
+
+m2 respectively. The biases are ignored for brevity. Assum-ing matrices of all types are adapted, let Φ = {ϕyi | y ∈
+
+Y, i ∈ { 1, 2, . . . , N }} be the set of all LoRA adapters, where 
+
+ϕyi = Byi Ayi . We define the total rank budget of the model as B = P 
+
+> y,i
+
+rank (ϕyi ). Given that the initial rank r is fixed across all matrices, Binit = r · N · | Y |. Let Btgt < B init 
+
+be the target budget after compression. As PARA compres-sion results in variable ranks across matrices, we define the average target rank after compression ¯r = Btgt    
+
+> N|Y|
+
+.
+
+Post-Optimization Adaptive Rank Allocation 
+
+PARA seeks to compress LoRA adapters by identifying and pruning redundant singular values and corresponding singu-lar vectors globally across the network. We first consider the Singular Value Decomposition of each LoRA ϕyi :
+
+ϕyi = Byi Ayi = U yi Σyi (V yi )T (1) Since ϕyi is the product of two rank-r matrices, it has at most rank r. Thus, we compute the compact SVD where Σyi =
+
+diag (σyi, 1, . . . , σ yi,r ) contains the r singular values and U yi ∈
+
+Rd1×r and V yi ∈ Rd2×r contain the corresponding left and right singular vectors. Let E = S
+
+> y,i
+
+{σyi,j }rj=1 be the global set of all singular values across all adapters. To satisfy the target budget Btgt ,we determine a global threshold τ , such that exactly Btgt 
+
+singular values in E are greater than or equal to τ . We con-struct the pruned diagonal matrix ˆΣyi by masking singular values below the global threhold τ :
+
+( ˆΣyi )jj = (Σ yi )jj · I[(Σ yi )jj ≥ τ ] (2) where I(·) is the identity function. We then reconstruct the LoRA adapters using the pruned singular values. To main-tain the LoRA structure, we distribute the singular values symmetrically: 
+
+U yi ˆΣyi (V yi )T = [ U yi
+
+q
+
+ˆΣyi ][ 
+
+q
+
+ˆΣyi (V yi )T ] = ˆByi ˆAyi = ˆϕyi
+
+(3) This results in adapters with heterogeneous ranks 0 ≤ ˆryi ≤
+
+r, allocating more budget to layers with higher spectral en-ergy and effectively removing layers where contributions are negligible 
+
+SVD in the LoRA Subspace via QR Decomposition 
+
+Directly computing the SVD of ϕyi incurs a computational complexity of O(d1d22) where d1 ≥ d2. For large pretrained transformers, this is prohibitively expensive. However, the architecture of LoRA enforces a strong inductive bias where the optimization is confined to a low-rank subspace r << d1, d 2. Rather than multiplying Byi and Ayi to materialize 
+
+ϕyi , which by itself costs O(d1d2r), and then performing an ambient-space decomposition, PARA exploits the low-rank structure directly. Following (Heath et al. 1986), we compute SVD via QR decomposition of the LoRA matrices without requiring the full matrix: 
+
+Byi = QByi RByi (4) 
+
+(Ayi )T = QAyi RAyi =⇒ Ayi = RTAyi
+
+QTAyi
+
+(5) where QByi ∈ Rd1×r and QAyi ∈ Rd2×r have orthonor-mal columns spanning the column space of B and the row space of A respectively and, RByi ∈ Rr×r and RAyi ∈ Rr×r
+
+are upper triangular matrices. Substituting the QR forms in 
+
+ϕyi = Byi Ayi , we have: 
+
+ϕyi = QByi [RByi RTAyi
+
+]QTAyi
+
+(6) We define the interaction matrix M yi = RByi RTAyi
+
+. M ∈
+
+Rr×r encapsulates the interaction between the input and output subspaces entirely within the latent dimension r. We then compute the SVD of M , thus discarding the null space before decomposition rather than during it: 
+
+M yi = ˜U yi Σyi ( ˜V yi )T (7) Substituting Equation 7 back in Equation 6 
+
+ϕyi = QByi [ ˜U yi Σyi ( ˜V yi )T ]QTAyi
+
+= [ QByi
+
+˜U yi ]Σ yi [( ˜V yi )T QTAyi
+
+]= [ QByi
+
+˜U yi ]Σ yi [QAyi
+
+˜V yi ]T
+
+= U yi Σyi (V yi )T
+
+(8) This approach is mathematically equivalent to the full SVD. 
+
+Figure 2: Distribution of singular values from a LoRA of rank 16 trained on the Food-101 image classification dataset. Similar plots from other datasets are presented in Figure 9. 
+
+Proposition 1 (Orthogonality of Derived Bases) . The ma-trices U yi = QByi
+
+˜U yi and V yi = QAyi
+
+˜V yi form valid or-thonormal bases for the Singular Value Decomposition of 
+
+ϕyi = Byi Ayi .Proof. We verify the orthonormality of the left singular vec-tors U yi :
+
+(U yi )T U yi = ( QByi
+
+˜U yi )T (QByi
+
+˜U yi )= ( ˜U yi )T (QTByi
+
+QByi ) ˜U yi
+
+= ( ˜U yi )T I ˜U yi (since QByi has orthonormal columns) 
+
+= ( ˜U yi )T ˜U yi
+
+= I (since ˜U yi is unitary) (9) The derivation for V yi follows symmetrically. Thus, the decomposition U yi Σyi (V yi )T satisfies all conditions of the SVD. Since the singular values Σyi are intrinsic to the opera-tor ϕyi , they are invariant to the method of computation. Crucially, the computational cost is now determined by the QR decomposition of the A and B matrices, followed by the SVD of the interaction matrix M : O(d2r2) + O(d1r2) + 
+
+O(r3). Thus, the computational costs are reduced to O(( d1+
+
+d2)r2 + r3), where r ≪ d1, d 2. Given that d1 and d2 are typically in the thousands and r ∈ [8 , 64] , this optimiza-tion reduces the decomposition overhead by orders of mag-nitude, making PARA feasible for very large transformer models. We summarize the complete procedure for Post-Optimization Adaptive Rank Allocation in Algorithm 1. 
+
+Justification 
+
+Analyzing the distribution of singular values of Low Rank Adapters (Fig. 2), we observe that most singular values are near zero, with a pronounced long tail. The spectral en-ergy of the update is dominated by a handful of singular values that occupy the long tail of the distribution, imply-ing that the effective rank of the update is much lower than the LoRA rank. This indicates that the LoRA has learned a few strong directions, while the remaining components con-tribute marginally and may represent memorization or noise. The use of singular values as an importance metric is grounded in the Eckart-Young-Mirsky theorem (Eckart and Young 1936; Golub, Hoffman, and Stewart 1987). The the-orem provides the optimal low-rank approximation of a ma-trix. It states that the best rank-k approximation of a ma-trix A, in both the Frobenius norm or any unitarily invariant norm, is obtained by truncating the Singular Value Decom-position (SVD) of A after the k-th largest singular value. 
+
+Theorem 1 (Eckart-Young-Mirsky (Eckart and Young 1936; Golub, Hoffman, and Stewart 1987)) . Let ϕ ∈ Rd1×d2 have singular value decomposition ϕ = U ΣV ⊤ with singular values σ1 ≥ σ2 ≥ · · · ≥ σr > 0. For any target rank 
+
+k < r , the truncated SVD 
+
+ϕk =
+
+> k
+
+X
+
+> i=1
+
+σiuiv⊤ 
+
+> i
+
+(10) 
+
+is the unique minimizer of ∥ϕ− ˆϕ∥F over all matrices ˆϕ with rank ( ˆϕ) ≤ k. Moreover, the approximation error is exactly: 
+
+∥ϕ − ϕk∥F =
+
+vuut
+
+> r
+
+X
+
+> i=k+1
+
+σ2 
+
+> i
+
+(11) Each singular value σi contributes exactly σ2 
+
+> i
+
+to the squared Frobenius norm of the update, which measures the total magnitude of the weight modification. Pruning small singular values thus removes components that contribute minimally to the adaptation signal. With PARA, compression is performed optimally in the Frobenius norm sense, and rank is allocated to layers in pro-portion to their spectral energy. Layers with concentrated spectral energy retain higher ranks, while layers with diffuse or negligible spectra are aggressively pruned or discarded entirely. 
+
+Threshold Selection Policies 
+
+While the global threshold τ dictates the compression rate, selecting its optimal value depends on the deployment con-straints. We propose two distinct policies for determining τ .
+
+γ-PARA This policy mirrors that of other adaptive rank LoRA frameworks such as AdaLoRA, DoRA, etc where the practitioner is required to make a decision on the target rank based on deployment constraints. The optimal target average rank can be attained through a validation set guided search. Unlike LoRA’s rank selection which requires mutliple train-ing runs for different ranks, PARA is training-free and can generate LoRAs across a range of ranks much more effi-ciently. Given a rank preservation ratio γ ∈ (0 , 1] , we obtain the target average rank ¯r = γ ·r, and subsequently, the target parameter budget Btgt = ¯ r · N · | Y |. The threshold is then calculated as follows: 
+
+τγ = E↓[Btgt ] (12) where τγ is the Btgt -th element of the list of singular values sorted in descending order, E↓.Algorithm 1: Post-Optimization Adaptive Rank Allocation (PARA) 
+
+Input: LoRA adapters Φ,Rank Preservation Ratio γ or Target Energy Preservation ratio ϵ
+
+Output: Compressed LoRA adapters ˆΦ
+
+Init: Singular value pool E ← ∅ and cache C ← ∅ 
+
+Phase 1: Decomposition 
+
+for each layer i ∈ { 1, . . . , N } do for each layer type y ∈ Y do 
+
+QByi , R Byi ← QR (Byi )
+
+QAyi , R Ayi ← QR (( Ayi )T )
+
+M yi ← RByi RTAyi
+
+˜U yi , Σyi , ( ˜V yi )T ← SVD (M yi )
+
+U yi ← QByi
+
+˜U yi
+
+V yi ← QAyi
+
+˜V yi
+
+E ← E ∪ diag (Σ yi ) {Collect singular values }
+
+Store ( ˜U yi , ˜V yi , Σyi ) in C
+
+end for end for 
+
+Phase 2: Pruning & Reconstruction 
+
+Calculate τ as given by Eqn. 12 or Eqn. 14 per policy 
+
+for each layer i ∈ { 1, . . . , N } do for each layer type y ∈ Y do 
+
+Retrieve ( ˜U yi , ˜V yi , Σyi ) from C
+
+Construct ˆΣyi such that ( ˆΣyi )jj = (Σ yi )jj ·
+
+I((Σ yi )jj ≥ τ )ˆByi ← U yi
+
+q ˆΣyi
+
+ˆAyi ←
+
+q ˆΣyi (V yi )T
+
+ˆΦ ← ˆΦ ∪ { ( ˆByi , ˆAyi )}
+
+end for end for return ˆΦ
+
+ϵ-PARA This policy relies solely on the intrinsic spectral properties of the adapters to define the global threshold. We define the total spectral energy as the sum of squared singu-lar values from all adapter layers: 
+
+Etotal =
+
+> N
+
+X
+
+> i=1
+
+X
+
+> y∈Y
+
+X
+
+> σ∈Σyi
+
+σ2 (13) Given a target preservation ratio ϵ ∈ (0 , 1] (e.g., ϵ = 0 .99 ), we seek the maximum threshold τ such that the retained en-ergy meets the target: 
+
+τϵ = max τ |
+
+> N
+
+X
+
+> i=1
+
+X
+
+> y∈Y
+
+X
+
+> σ∈Σyi
+
+σ2 · I(σ ≥ τ ) ≥ ϵ · Etotal 
+
+(14) This policy guarantees that the compressed model retains ϵ-fraction of the update’s information content in the Frobenius norm sense. Experiments 
+
+We benchmark PARA under diverse settings such as stan-dard image classification, natural language understanding, multi-rank deployment and model merging. In all our ex-periments, unless mentioned explicitly otherwise, we follow the γ-PARA policy with γ = 0 .25 , resulting in a compressed LoRA one fourth the original size. This is to maintain uni-formity in number of parameters with our baselines. We em-ploy the standard LoRA (Hu et al. 2022) as our first base-line. However, unlike the original implementation that only adapts attention matrices, our implementation applies LoRA adapters to all layers for maximum performance. In addition, we consider the following Adaptive Rank LoRA variants as baselines: AdaLoRA (Zhang et al. 2023), SoRA (Ding et al. 2023), DoRA (Mao et al. 2024), and GoRA (haonan he et al. 2025). For the training-time adaptive rank frameworks, namely AdaLoRA, SoRA and DoRA, we start training at 
+
+rinit and progressively prune to rtgt . For GoRA, which is an initialization method, we allocate a parameter budget equiv-alent to an average rank rtgt . All experiments were con-ducted on a single Nvidia H100 GPU. Pruning schedules and other baseline configuration details are presented in the Appendix. 
+
+Image Classification 
+
+We benchmark PARA and the baselines on standard im-age classification datasets such as CIFAR-10 (Krizhevsky, Nair, and Hinton), CIFAR-100 (Krizhevsky, Nair, and Hin-ton), Eurosat (Helber et al. 2019, 2018), Oxford Flowers (Nilsback and Zisserman 2008), Oxford-IIIT Pet (Parkhi et al. 2012), Stanford Cars (Krause et al. 2013), and Food-101 (Bossard, Guillaumin, and Van Gool 2014). For vision tasks, we adopt SigLIP2 Base’s vision encoder (Tschannen et al. 2025) as the frozen backbone and set rinit = 16 and 
+
+rtgt = 4 . Our empirical results (Tab. 1) show that PARA out-performs LoRA and the adaptive LoRA variants AdaLoRA, SoRA and GoRA across all datasets. PARA performs better than DoRA in all but two datasets, namely Oxford-IIIT pet and Oxford Flowers, where it finishes second. Fig 4 demon-strates ϵ-PARA on the Stanford Cars Dataset. The rank ex-ponentially decays with reducing energy but performance remains stable until a certain point, after which it drops. In-terestingly, we see that the higher rank compressed adapters perform slightly better than the parent adapter. This could be attributed to the spectral pruning eliminating noise, resulting in a clearer signal. We observe consistent behaviors across other image classification datasets as well (Fig. 8). Conversely, we plot Fig. 3. The energy–rank curve shows that most performance is retained while aggressively reduc-ing rank when discarding low-energy (trailing) singular di-rections, whereas the reverse ablation demonstrates that re-moving a small number of high-energy singular directions catastrophically degrades accuracy; together, these results indicate that LoRA updates are dominated by a few task-critical singular components, making trailing-singular-value pruning a reliable and principled compression strategy. 
+
+Figure 3: Plot denoting Accuracy (blue bars) and Rank (red dots) at various compression levels where top K singular val-ues are dropped (Uniform ϵ-PARA compression not feasible due to high concentration of energy in principal singular val-ues) of LoRA of rank 16 trained on the Stanford Cars Image Classification dataset. 
+
+Figure 4: Plot denoting Accuracy (blue bars) and Rank (red dots) at various compression levels as a percentage of Total Spectral Energy of LoRA of rank 16 trained on the Stanford Cars Image Classification dataset. 
+
+Natural Language Understanding 
+
+For natural language understanding tasks, we benchmark on the GLUE tasks (Wang et al. 2019) MNLI (Williams, Nangia, and Bowman 2018), SST-2 (Socher et al. 2013), CoLA (Warstadt, Singh, and Bowman 2019), QNLI (Ra-jpurkar et al. 2016), and MRPC (Dolan and Brockett 2005). We use RoBERTa Base (Liu et al. 2019) as the frozen backbone model. Following Sec , we set rinit = 16 and 
+
+rtgt = 4 . Empirical results from the NLU tasks (Tab.2) also paint a picture similar to that of Image Classification, where PARA outperforms LoRA and its adaptive rank variants. ϵ-PARA behaves in a manner similar to Image Classification (Fig. 8) where the rank decays with reducing spectral energy, enabling high compression ratios whilst preserving perfor-mance. 
+
+Commonsense Reasoning 
+
+To test commonsense reasoning, we adopt the Instruction Tuned Gemma3-4B (Team et al. 2025a) model as our frozen backbone. We train LoRA and its adaptive variants on the Commonsense-170k dataset (Ma et al. 2020) and test them across eight downstream tasks namely BoolQ (Clark et al. 2019), PIQA (Bisk et al. 2019), SIQA (Sap et al. 2019), Hel-laSwag (Zellers et al. 2019), WinoGrande (Sakaguchi et al. 2019), ARC-C (Chollet 2019), ARC-E (Chollet 2019) and OBQA (Luo, Chen, and Baral 2022). We set rinit = 16 Table 1: Accuracy Results of PARA and baselines on Image Classification Tasks. PARA outperforms baselines and scores highest (bold) or second-highest across datasets. 
+
+Method CIFAR 10 CIFAR 100 Pets Flowers Cars Food Eurosat Average 
+
+LoRA 97.53 68.11 87.08 82.18 78.55 79.43 97.22 84.30 AdaLoRA 96.09 50.8 88.5 84.14 54.58 68.43 96.22 76.96 SoRA 96.24 60.12 82.17 83.41 64.38 72.19 96.22 79.25 DoRA 96.51 64.48 90.49 87.87 66.63 74.49 96.30 82.39 GoRA 96.91 67.76 83.35 79.8 71.10 80.66 97.56 82.45 PARA 97.89 79.08 89.97 86.03 84.58 86.4 97.85 88.83 
+
+Table 2: Accuracy Results of PARA and baselines with RoBERTA-Base on Natural Language Understanding Tasks. PARA outperforms baselines and scores highest (bold) across datasets. 
+
+Method MNLI(M) MNLI(U) SST-2 CoLA QNLI MRPC Average 
+
+LoRA 81.69 82.38 92.89 82.17 88.14 86.27 85.59 AdaLoRA 50.86 51.88 90.83 79.19 56.21 82.35 68.55 SoRA 72.17 74.32 91.16 79.19 83.72 84.26 80.80 DoRA 75.29 76.52 91.28 79.77 83.36 83.82 81.67 GoRA 81.37 81.78 91.97 78.62 86.49 86.76 84.49 PARA 83.84 83.7 93.46 82.26 88.71 86.76 86.45 
+
+Figure 5: Scatter plot comparing PARA, DyLoRA and LoRA. Presented results are averaged across all image clas-sification benchmarks as laid out in Sec. . and rtgt = 4 . Our empirical results demonstrate that PARA outperforms baselines in most benchmarks and attains the highest average accuracy. 
+
+Mathematical Reasoning 
+
+To test PARA and the baselines on Mathematical Reasoning tasks, we train on the MetaMathQA (Yu et al. 2024) and test on GSM-8K (Cobbe et al. 2021) and MATH (Hendrycks et al. 2021) benchmarks. Following Sec , we use Gemma3-4B (IT) (Team et al. 2025a) as our backbone with rinit = 16 
+
+and rtgt = 4 . From Tab.4, we observe that PARA attains the highest performance in all benchmarks. 
+
+Multi-Rank Deployment 
+
+In multi-tenant serving systems, adapter swapping is a band-width bottleneck. Typically, supporting clients with differ-
+
+Figure 6: Scatter plot comparing PARA, DyLoRA and LoRA. Presented results are averaged across all natural lan-guage understanding benchmarks as laid out in Sec. ent latency constraints requires training and storing multiple adapters at distinct ranks. We train a single high-rank LoRA and use PARA to generate a family of compressed LoRAs. This reduces storage costs and allows real-time serving ad-justments based on current GPU load without retraining. Dy-LoRA (Valipour et al. 2023) simultaneously trains a range of ranks and enables dynamic rank selection at inference. Note that, unlike PARA which generates adaptive rank LoRAs, DyLoRA only supports standard, uniform-rank LoRAs. We compare LoRAs generated by PARA from a parent LoRA of rank 16 with DyLoRA trained in a range of ranks from 1 to 16 and LoRAs trained natively at ranks 1, 2, 4, 8 and 16. We present results from both the Image Classification (Fig. 5) and Natural Language Understanding (Fig. 6) benchmark suites. A consistent trend in both image classification and natu-Table 3: Accuracy Results of PARA and baselines with Gemma3-4B on Commonsense Reasoning Tasks. PARA outperforms baselines and scores highest (bold) or second-highest across datasets. 
+
+Method BoolQ PIQA SIQA HellaSwag WinoGrande ARC-C ARC-E OBQA Average 
+
+LoRA 83.6 73.2 49.8 47.8 74 43.6 54.4 43.2 58.7 AdaLoRA 81.2 70.3 48.4 46.5 71.6 43.4 52.8 42.4 57.1 SoRA 80.4 69.1 50.4 45.9 70.2 43.2 56.1 41.8 57.1 DoRA 81.8 68.2 52.6 47.3 70.2 42.8 58.9 39.2 57.6 GoRA 83 67.6 51.8 46.8 70.4 43.2 46.7 40.4 56.2 PARA 84.4 74.8 50.2 48.1 74.2 47.6 58.2 45.4 60.4 
+
+Table 4: Accuracy Results of PARA and baselines with Gemma3-4B on Mathematical Reasoning Tasks. PARA out-performs baselines and scores highest (bold) across datasets. 
+
+Method GSM 8K MATH Average 
+
+LoRA 77.5 44.1 60.8 AdaLoRA 70 42.3 56.15 SoRA 71.2 40.6 55.9 DoRA 72.4 41.8 57.1 GoRA 76.5 43.2 59.85 PARA 78.2 45.5 61.8 
+
+ral language understanding is that both DyLoRA and PARA-derived adapters often outperform LoRAs trained natively at the same target rank. We hypothesize that training a high-rank adapter provides additional degrees of freedom that make subspace discovery easier during optimization. The learned update typically concentrates most of its energy in a small number of dominant directions, so truncation recovers these task-relevant components while discarding low-energy variance. DyLoRA employs a similar idea during training via rank sampling and prefix-ordered components, which implicitly regularizes the adapter and encourages useful in-formation to be represented in early rank dimensions, im-proving performance at low truncation ranks relative to inde-pendently trained low-rank LoRAs. Empirically, DyLoRA reports higher accuracy over LoRA at matched ranks, while PARA outperforms both native LoRAs and DyLoRA. 
+
+Ablations 
+
+Fisher Importance Optimal compression necessitates the identification of parameters whose removal minimally im-pacts model performance. This sensitivity is formally quan-tified via the second-order Taylor expansion of the loss func-tion, where the governing component is the Hessian matrix (H) containing the second-order partial derivatives. Funda-mentally, the Hessian measures the local “curvature” of the loss landscape: high curvature values indicate that the model resides in a steep valley with respect to a specific param-eter, where even slight perturbations cause significant in-creases in loss, thereby deeming the parameter important .Conversely, low curvature implies a flat plateau where pa-rameters can be modified or removed with negligible effect, rendering them unimportant . Since computing the exact full Hessian for billion-parameter models is computationally in-tractable, practitioners typically utilize the Empirical Fisher Information Matrix (FIM) as a positive semi-definite ap-proximation. Furthermore, to alleviate memory constraints, it is standard practice to ignore correlations between param-eters by calculating only the diagonal of the Fisher matrix, effectively treating the importance of each parameter inde-pendently. A central premise of PARA is that singular values serve as a sufficient proxy for parameter importance within the low-rank subspace, circumventing the need for computationally expensive Hessian or Fisher Information Matrix (FIM) ap-proximations. To validate this, we compare PARA against a Fisher-PARA baseline, where the importance score for a given rank is derived from the FIM of its constituent param-eters. Ignoring layer indices for brevity, for a decomposed LoRA adapter ϕ = U ΣV T where U ∈ Rd1×r , Σ ∈ Rr×r,and V ∈ Rd2×r , we define the Fisher Importance Score 
+
+Ij for the j-th rank component as the sum of the empiri-cal Fisher information of its corresponding singular vectors and singular value: 
+
+Ij =
+
+> d1
+
+X
+
+> p=1
+
+ˆF (Upj ) + ˆF (Σ jj ) + 
+
+> d2
+
+X
+
+> q=1
+
+ˆF (Vqj )
+
+where ˆF (ω) represents the diagonal of the empirical Fisher Information Matrix for a specific parameter ω, calculated over a validation set Dval :
+
+ˆF (ω) = 1
+
+|D val |
+
+> N
+
+X
+
+> n=1
+
+ ∂L(xn, y n; Θ) 
+
+∂ω 
+
+2
+
+As shown in Figure 7, PARA achieves performance par-ity with Fisher-PARA across all benchmarks. Points lying near the y = x diagonal indicate that our singular-value proxy captures the same essential importance signals as the gradient-based Fisher metric. Crucially, PARA eliminates the need for the 50-batch gradient computation required by Fisher, providing a truly data-free and significantly faster compression strategy. 
+
+Local Pruning PARA employs a global parameter budget 
+
+Btgt , allowing rank to vary dynamically across layers based on spectral significance. We compare this against a Local Pruning baseline, which enforces a uniform rank rlocal = 
+
+> Btgt
+> layers
+
+across the entire network. Table 5: Results (Accuracy %) comparing PARA (Global pruning) and Local pruning. 
+
+Image Classification 
+
+CIFAR 100 Food Flowers Cars 
+
+Local Pruning 78.23 84.49 85.15 83.82 PARA 79.08 86.40 86.03 84.58 
+
+Natural Language Understanding 
+
+QNLI MRPC CoLA SST-2 
+
+Local Pruning 86.85 83.17 81.64 92.22 PARA 88.71 86.76 82.26 93.46 
+
+Figure 7: Scatter plot comparing PARA and Fisher-PARA accuracies across image classification and natural language understanding datasets. The Global policy consistently outperforms the Local pol-icy, particularly at high compression ratios. We observe that PARA tends to allocate higher ranks to specific layers, sug-gesting that task-specific knowledge is not uniformly dis-tributed. This affirms that a global spectral threshold effec-tively reallocates the parameter budget to where it is most needed. 
+
+# Conclusion 
+
+In this work, we introduce the Post-Optimization Adap-tive Rank Allocation (PARA), a post-optimization compres-sion framework that decouples the training rank from the inference rank without the need for complex regulariza-tion or training instability. PARA efficiently identifies and prunes redundant spectral components, serving as a data-free proxy for parameter importance that matches the ef-ficacy of Fisher Information metrics. Our empirical results across diverse vision and language benchmarks demonstrate that PARA consistently outperforms existing adaptive base-lines while enabling a practical ”Train First, Tune Later” paradigm. Ultimately, PARA provides a robust solution for multi-tenant serving environments, allowing practitioners to derive a family of lightweight, hardware-compliant adapters from a single high-capacity parent adapter. References 
+
+Biderman, D.; Portes, J.; Ortiz, J. J. G.; Paul, M.; Greengard, P.; Jennings, C.; King, D.; Havens, S.; Chiley, V.; Frankle, J.; Blakeney, C.; and Cunningham, J. P. 2024. LoRA Learns Less and Forgets Less. Transactions on Machine Learning Research . Featured Certification. Bisk, Y.; Zellers, R.; Bras, R. L.; Gao, J.; and Choi, Y. 2019. PIQA: Reasoning about Physical Commonsense in Natural Language. arXiv:1911.11641. Bossard, L.; Guillaumin, M.; and Van Gool, L. 2014. Food-101 – Mining Discriminative Components with Random Forests. In European Conference on Computer Vision .Chollet, F. 2019. On the Measure of Intelligence. arXiv:1911.01547. Clark, C.; Lee, K.; Chang, M.-W.; Kwiatkowski, T.; Collins, M.; and Toutanova, K. 2019. BoolQ: Explor-ing the Surprising Difficulty of Natural Yes/No Questions. arXiv:1905.10044. Cobbe, K.; Kosaraju, V.; Bavarian, M.; Chen, M.; Jun, H.; Kaiser, L.; Plappert, M.; Tworek, J.; Hilton, J.; Nakano, R.; Hesse, C.; and Schulman, J. 2021. Training Verifiers to Solve Math Word Problems. arXiv:2110.14168. Dettmers, T.; Pagnoni, A.; Holtzman, A.; and Zettlemoyer, L. 2023. QLoRA: Efficient Finetuning of Quantized LLMs. arXiv:2305.14314. Ding, N.; Lv, X.; Wang, Q.; Chen, Y.; Zhou, B.; Liu, Z.; and Sun, M. 2023. Sparse Low-rank Adaptation of Pre-trained Language Models. In The 2023 Conference on Empirical Methods in Natural Language Processing .Dolan, W. B.; and Brockett, C. 2005. Automatically Con-structing a Corpus of Sentential Paraphrases. In Proceed-ings of the Third International Workshop on Paraphrasing (IWP2005) .Eckart, C.; and Young, G. 1936. The approximation of one matrix by another of lower rank. Psychometrika , 1(3): 211– 218. Golub, G. H.; Hoffman, A. J.; and Stewart, G. W. 1987. A generalization of the Eckart-Young-Mirsky matrix approxi-mation theorem. Linear Algebra and its Applications , 317– 327. haonan he; Ye, P.; Ren, Y.; yuan yuan; LuyangZhou; Shu-cunJu; and lei chen. 2025. GoRA: Gradient-driven Adaptive Low Rank Adaptation. In The Thirty-ninth Annual Confer-ence on Neural Information Processing Systems .Heath, M. T.; Laub, A. J.; Paige, C. C.; and Ward, R. C. 1986. Computing the Singular Value Decomposition of a Product of Two Matrices. SIAM Journal on Scientific and Statistical Computing , 7(4): 1147–1159. Helber, P.; Bischke, B.; Dengel, A.; and Borth, D. 2018. In-troducing EuroSAT: A Novel Dataset and Deep Learning Benchmark for Land Use and Land Cover Classification. In 
+
+IGARSS 2018-2018 IEEE International Geoscience and Re-mote Sensing Symposium , 204–207. IEEE. Helber, P.; Bischke, B.; Dengel, A.; and Borth, D. 2019. Eu-rosat: A novel dataset and deep learning benchmark for land use and land cover classification. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing .Hendrycks, D.; Burns, C.; Kadavath, S.; Arora, A.; Basart, S.; Tang, E.; Song, D.; and Steinhardt, J. 2021. Measur-ing Mathematical Problem Solving With the MATH Dataset. arXiv:2103.03874. Hu, E. J.; yelong shen; Wallis, P.; Allen-Zhu, Z.; Li, Y.; Wang, S.; Wang, L.; and Chen, W. 2022. LoRA: Low-Rank Adaptation of Large Language Models. In International Conference on Learning Representations .Kaplan, J.; McCandlish, S.; Henighan, T.; Brown, T. B.; Chess, B.; Child, R.; Gray, S.; Radford, A.; Wu, J.; and Amodei, D. 2020. Scaling Laws for Neural Language Mod-els. arXiv:2001.08361. Krause, J.; Stark, M.; Deng, J.; and Fei-Fei, L. 2013. 3D ob-ject representations for fine-grained categorization. In Pro-ceedings - 2013 IEEE International Conference on Com-puter Vision Workshops, ICCVW 2013 , Proceedings of the IEEE International Conference on Computer Vision, 554– 561. United States: Institute of Electrical and Electronics Engineers Inc. ISBN 9781479930227. 2013 14th IEEE International Conference on Computer Vision Workshops, ICCVW 2013 ; Conference date: 01-12-2013 Through 08-12-2013. Krizhevsky, A.; Nair, V.; and Hinton, G. ???? CIFAR-100 (Canadian Institute for Advanced Research). Liu, Y.; Ott, M.; Goyal, N.; Du, J.; Joshi, M.; Chen, D.; Levy, O.; Lewis, M.; Zettlemoyer, L.; and Stoyanov, V. 2019. RoBERTa: A Robustly Optimized BERT Pretraining Approach. arXiv:1907.11692. Luo, M.; Chen, S.; and Baral, C. 2022. A Simple Approach to Jointly Rank Passages and Select Relevant Sentences in the OBQA Context. arXiv:2109.10497. Ma, K.; Ilievski, F.; Francis, J.; Bisk, Y.; Nyberg, E.; and Oltramari, A. 2020. Knowledge-driven Data Construction for Zero-shot Evaluation in Commonsense Question An-swering. arXiv:2011.03863. Mangrulkar, S.; Gugger, S.; Debut, L.; Belkada, Y.; Paul, S.; Bossan, B.; and Tietz, M. 2022. PEFT: State-of-the-art Parameter-Efficient Fine-Tuning methods. https://github. com/huggingface/peft. Mao, Y.; Huang, K.; Guan, C.; Bao, G.; Mo, F.; and Xu, J. 2024. DoRA: Enhancing Parameter-Efficient Fine-Tuning with Dynamic Rank Distribution. arXiv:2405.17357. Meng, F.; Wang, Z.; and Zhang, M. 2024. PiSSA: Principal Singular Values and Singular Vectors Adaptation of Large Language Models. In The Thirty-eighth Annual Conference on Neural Information Processing Systems .Nilsback, M.-E.; and Zisserman, A. 2008. Automated Flower Classification over a Large Number of Classes. In 
+
+2008 Sixth Indian Conference on Computer Vision, Graph-ics And Image Processing , 722–729. Parkhi, O. M.; Vedaldi, A.; Zisserman, A.; and Jawahar, C. V. 2012. Cats and dogs. 2012 IEEE Conference on Com-puter Vision and Pattern Recognition , 3498–3505. Radford, A.; Wu, J.; Child, R.; Luan, D.; Amodei, D.; and Sutskever, I. 2019. Language Models are Unsupervised Multitask Learners. Rajpurkar, P.; Zhang, J.; Lopyrev, K.; and Liang, P. 2016. SQuAD: 100,000+ Questions for Machine Comprehension of Text. In Su, J.; Duh, K.; and Carreras, X., eds., Pro-ceedings of the 2016 Conference on Empirical Methods in Natural Language Processing , 2383–2392. Austin, Texas: Association for Computational Linguistics. Rippel, O.; Gelbart, M. A.; and Adams, R. P. 2014. Learning ordered representations with nested dropout. In Proceed-ings of the 31st International Conference on International Conference on Machine Learning - Volume 32 , ICML’14, II–1746–II–1754. JMLR.org. Sakaguchi, K.; Bras, R. L.; Bhagavatula, C.; and Choi, Y. 2019. WinoGrande: An Adversarial Winograd Schema Challenge at Scale. arXiv:1907.10641. Sap, M.; Rashkin, H.; Chen, D.; LeBras, R.; and Choi, Y. 2019. SocialIQA: Commonsense Reasoning about Social Interactions. arXiv:1904.09728. Schulman, J.; and Lab, T. M. 2025. LoRA With-out Regret. Thinking Machines Lab: Connectionism .Https://thinkingmachines.ai/blog/lora/. Socher, R.; Perelygin, A.; Wu, J.; Chuang, J.; Manning, C. D.; Ng, A.; and Potts, C. 2013. Recursive Deep Mod-els for Semantic Compositionality Over a Sentiment Tree-bank. In Yarowsky, D.; Baldwin, T.; Korhonen, A.; Livescu, K.; and Bethard, S., eds., Proceedings of the 2013 Confer-ence on Empirical Methods in Natural Language Process-ing , 1631–1642. Seattle, Washington, USA: Association for Computational Linguistics. Team, G.; Kamath, A.; Ferret, J.; Pathak, S.; Vieillard, N.; Merhej, R.; Perrin, S.; Matejovicova, T.; Ram´ e, A.; Rivi` ere, M.; Rouillard, L.; Mesnard, T.; Cideron, G.; bastien Grill, J.; Ramos, S.; Yvinec, E.; Casbon, M.; Pot, E.; Penchev, I.; Liu, G.; Visin, F.; Kenealy, K.; Beyer, L.; Zhai, X.; Tsit-sulin, A.; Busa-Fekete, R.; Feng, A.; Sachdeva, N.; Cole-man, B.; Gao, Y.; Mustafa, B.; Barr, I.; Parisotto, E.; Tian, D.; Eyal, M.; Cherry, C.; Peter, J.-T.; Sinopalnikov, D.; Bhu-patiraju, S.; Agarwal, R.; Kazemi, M.; Malkin, D.; Kumar, R.; Vilar, D.; Brusilovsky, I.; Luo, J.; Steiner, A.; Friesen, A.; Sharma, A.; Sharma, A.; Gilady, A. M.; Goedeckemeyer, A.; Saade, A.; Feng, A.; Kolesnikov, A.; Bendebury, A.; Abdagic, A.; Vadi, A.; Gy¨ orgy, A.; Pinto, A. S.; Das, A.; Bapna, A.; Miech, A.; Yang, A.; Paterson, A.; Shenoy, A.; Chakrabarti, A.; Piot, B.; Wu, B.; Shahriari, B.; Petrini, B.; Chen, C.; Lan, C. L.; Choquette-Choo, C. A.; Carey, C.; Brick, C.; Deutsch, D.; Eisenbud, D.; Cattle, D.; Cheng, D.; Paparas, D.; Sreepathihalli, D. S.; Reid, D.; Tran, D.; Zelle, D.; Noland, E.; Huizenga, E.; Kharitonov, E.; Liu, F.; Amirkhanyan, G.; Cameron, G.; Hashemi, H.; Klimczak-Pluci´ nska, H.; Singh, H.; Mehta, H.; Lehri, H. T.; Hazimeh, H.; Ballantyne, I.; Szpektor, I.; Nardini, I.; Pouget-Abadie, J.; Chan, J.; Stanton, J.; Wieting, J.; Lai, J.; Orbay, J.; Fer-nandez, J.; Newlan, J.; yeong Ji, J.; Singh, J.; Black, K.; Yu, K.; Hui, K.; Vodrahalli, K.; Greff, K.; Qiu, L.; Valen-tine, M.; Coelho, M.; Ritter, M.; Hoffman, M.; Watson, M.; Chaturvedi, M.; Moynihan, M.; Ma, M.; Babar, N.; Noy, N.; Byrd, N.; Roy, N.; Momchev, N.; Chauhan, N.; Sachdeva, N.; Bunyan, O.; Botarda, P.; Caron, P.; Rubenstein, P. K.; Culliton, P.; Schmid, P.; Sessa, P. G.; Xu, P.; Stanczyk, P.; Tafti, P.; Shivanna, R.; Wu, R.; Pan, R.; Rokni, R.; Willoughby, R.; Vallu, R.; Mullins, R.; Jerome, S.; Smoot, S.; Girgin, S.; Iqbal, S.; Reddy, S.; Sheth, S.; P˜ oder, S.; Bhat-nagar, S.; Panyam, S. R.; Eiger, S.; Zhang, S.; Liu, T.; Ya-covone, T.; Liechty, T.; Kalra, U.; Evci, U.; Misra, V.; Rose-berry, V.; Feinberg, V.; Kolesnikov, V.; Han, W.; Kwon, W.; Chen, X.; Chow, Y.; Zhu, Y.; Wei, Z.; Egyed, Z.; Cotruta, V.; Giang, M.; Kirk, P.; Rao, A.; Black, K.; Babar, N.; Lo, J.; Moreira, E.; Martins, L. G.; Sanseviero, O.; Gonzalez, L.; Gleicher, Z.; Warkentin, T.; Mirrokni, V.; Senter, E.; Collins, E.; Barral, J.; Ghahramani, Z.; Hadsell, R.; Matias, Y.; Sculley, D.; Petrov, S.; Fiedel, N.; Shazeer, N.; Vinyals, O.; Dean, J.; Hassabis, D.; Kavukcuoglu, K.; Farabet, C.; Buchatskaya, E.; Alayrac, J.-B.; Anil, R.; Dmitry; Lepikhin; Borgeaud, S.; Bachem, O.; Joulin, A.; Andreev, A.; Hardin, C.; Dadashi, R.; and Hussenot, L. 2025a. Gemma 3 Techni-cal Report. arXiv:2503.19786. Team, K.; Bai, Y.; Bao, Y.; Chen, G.; Chen, J.; Chen, N.; Chen, R.; Chen, Y.; Chen, Y.; Chen, Y.; Chen, Z.; Cui, J.; Ding, H.; Dong, M.; Du, A.; Du, C.; Du, D.; Du, Y.; Fan, Y.; Feng, Y.; Fu, K.; Gao, B.; Gao, H.; Gao, P.; Gao, T.; Gu, X.; Guan, L.; Guo, H.; Guo, J.; Hu, H.; Hao, X.; He, T.; He, W.; He, W.; Hong, C.; Hu, Y.; Hu, Z.; Huang, W.; Huang, Z.; Huang, Z.; Jiang, T.; Jiang, Z.; Jin, X.; Kang, Y.; Lai, G.; Li, C.; Li, F.; Li, H.; Li, M.; Li, W.; Li, Y.; Li, Y.; Li, Z.; Li, Z.; Lin, H.; Lin, X.; Lin, Z.; Liu, C.; Liu, C.; Liu, H.; Liu, J.; Liu, J.; Liu, L.; Liu, S.; Liu, T. Y.; Liu, T.; Liu, W.; Liu, Y.; Liu, Y.; Liu, Y.; Liu, Y.; Liu, Z.; Lu, E.; Lu, L.; Ma, S.; Ma, X.; Ma, Y.; Mao, S.; Mei, J.; Men, X.; Miao, Y.; Pan, S.; Peng, Y.; Qin, R.; Qu, B.; Shang, Z.; Shi, L.; Shi, S.; Song, F.; Su, J.; Su, Z.; Sun, X.; Sung, F.; Tang, H.; Tao, J.; Teng, Q.; Wang, C.; Wang, D.; Wang, F.; Wang, H.; Wang, J.; Wang, J.; Wang, J.; Wang, S.; Wang, S.; Wang, Y.; Wang, Y.; Wang, Y.; Wang, Y.; Wang, Y.; Wang, Z.; Wang, Z.; Wang, Z.; Wei, C.; Wei, Q.; Wu, W.; Wu, X.; Wu, Y.; Xiao, C.; Xie, X.; Xiong, W.; Xu, B.; Xu, J.; Xu, J.; Xu, L. H.; Xu, L.; Xu, S.; Xu, W.; Xu, X.; Xu, Y.; Xu, Z.; Yan, J.; Yan, Y.; Yang, X.; Yang, Y.; Yang, Z.; Yang, Z.; Yang, Z.; Yao, H.; Yao, X.; Ye, W.; Ye, Z.; Yin, B.; Yu, L.; Yuan, E.; Yuan, H.; Yuan, M.; Zhan, H.; Zhang, D.; Zhang, H.; Zhang, W.; Zhang, X.; Zhang, Y.; Zhang, Y.; Zhang, Y.; Zhang, Y.; Zhang, Y.; Zhang, Y.; Zhang, Z.; Zhao, H.; Zhao, Y.; Zheng, H.; Zheng, S.; Zhou, J.; Zhou, X.; Zhou, Z.; Zhu, Z.; Zhuang, W.; and Zu, X. 2025b. Kimi K2: Open Agentic Intelligence. arXiv:2507.20534. Tschannen, M.; Gritsenko, A.; Wang, X.; Naeem, M. F.; Al-abdulmohsin, I.; Parthasarathy, N.; Evans, T.; Beyer, L.; Xia, Y.; Mustafa, B.; H´ enaff, O.; Harmsen, J.; Steiner, A.; and Zhai, X. 2025. SigLIP 2: Multilingual Vision-Language En-coders with Improved Semantic Understanding, Localiza-tion, and Dense Features. arXiv:2502.14786. Valipour, M.; Rezagholizadeh, M.; Kobyzev, I.; and Gh-odsi, A. 2023. DyLoRA: Parameter Efficient Tuning of Pre-trained Models using Dynamic Search-Free Low-Rank Adaptation. arXiv:2210.07558. Vasani, B.; FitzGerald, J.; Fang, A.; and Vaish, S. 2025. PHLoRA: data-free Post-hoc Low-Rank Adapter extraction from full-rank checkpoint. In NeurIPS 2025 Workshop on Efficient Reasoning .Wang, A.; Singh, A.; Michael, J.; Hill, F.; Levy, O.; and Bowman, S. R. 2019. GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding. In 
+
+International Conference on Learning Representations .Wang, H.; Li, Y.; Wang, S.; Chen, G.; and Chen, Y. 2025. MiLoRA: Harnessing Minor Singular Components for Parameter-Efficient LLM Finetuning. In Chiruzzo, L.; Ritter, A.; and Wang, L., eds., Proceedings of the 2025 Con-ference of the Nations of the Americas Chapter of the As-sociation for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers) , 4823–4836. Albu-querque, New Mexico: Association for Computational Lin-guistics. ISBN 979-8-89176-189-6. Warstadt, A.; Singh, A.; and Bowman, S. R. 2019. Neural Network Acceptability Judgments. Transactions of the As-sociation for Computational Linguistics , 7: 625–641. Williams, A.; Nangia, N.; and Bowman, S. 2018. A Broad-Coverage Challenge Corpus for Sentence Understanding through Inference. In Walker, M.; Ji, H.; and Stent, A., eds., 
+
+Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers) ,1112–1122. New Orleans, Louisiana: Association for Com-putational Linguistics. Yu, L.; Jiang, W.; Shi, H.; Yu, J.; Liu, Z.; Zhang, Y.; Kwok, J. T.; Li, Z.; Weller, A.; and Liu, W. 2024. MetaMath: Boot-strap Your Own Mathematical Questions for Large Lan-guage Models. arXiv:2309.12284. Zellers, R.; Holtzman, A.; Bisk, Y.; Farhadi, A.; and Choi, Y. 2019. HellaSwag: Can a Machine Really Finish Your Sentence? arXiv:1905.07830. Zhang, Q.; Chen, M.; Bukharin, A.; He, P.; Cheng, Y.; Chen, W.; and Zhao, T. 2023. Adaptive Budget Allocation for Parameter-Efficient Fine-Tuning. In The Eleventh Interna-tional Conference on Learning Representations .Appendix Implementation Details 
+
+We compare against AdaLoRA, DoRA, DyLoRA, SoRA, and GoRA using their standard settings: AdaLoRA and DoRA start from rank 16 and adapt toward rank 4 with a scheduled transition ( tinit = 500 , tfinal = 500 , ∆T =500 ); DoRA additionally uses ηDEM = 0.3 and β =0.9, while AdaLoRA uses an orthogonality regularizer of 
+
+10 −5. DyLoRA spans ranks from 1 to 16 and evaluates 
+
+{1, 2, 4, 8, 16 }. SoRA uses λ = 0 .1, gate lr = 10 −3,
+
+warmup = 500 , and target sparsity = 0 .7. GoRA is configured with ref r = 4 , init batches = 64 , and 
+
+γ = 0 .05 . Unless noted (e.g., SoRA gating), all baselines use the same optimizer and learning rate as the main image-classification setup (AdamW , 5 × 10 −5). Figure 8: Accuracy vs rank during Energy based Compression on Image Classification benchmarks. 
+
+Figure 9: Distribution of singular values in LoRAs trained on different image classification datasets.
