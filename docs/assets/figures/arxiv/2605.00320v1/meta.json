@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2605.00320v1/fig-001.webp",
+      "caption": "Fig. 3: BoothFlex core: shared radix-4 Booth array supporting ternary–INT (1 iteration via a single 3-bit window) and INT8×INT8 (5 iterations with row-wise “≪ 2” shifts).",
+      "page": 2,
+      "index": 1,
+      "width": 448,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2605.00320v1/fig-002.webp",
+      "caption": "TABLE I: Comprehensive Comparison of Ternary LLM Accelerator Designs",
+      "page": 4,
+      "index": 2,
+      "width": 531,
+      "height": 278
+    },
+    {
+      "url": "assets/figures/arxiv/2605.00320v1/fig-003.webp",
+      "caption": "Fig. 4: LOP array with a comparison-free top-K selector: (LO, sgn) features feed ExpAdd PEs; bucketized scores stream K indices without pairwise compares.",
+      "page": 3,
+      "index": 3,
+      "width": 460,
+      "height": 291
+    },
+    {
+      "url": "assets/figures/arxiv/2605.00320v1/fig-004.webp",
+      "caption": "Fig. 1: BitNet b1.58 architecture with BitLinear replacing all weight projection layers.",
+      "page": 1,
+      "index": 4,
+      "width": 390,
+      "height": 317
+    }
+  ]
+}
